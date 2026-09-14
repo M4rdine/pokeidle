@@ -695,7 +695,7 @@ describe('attach / tick / persist', () => {
     expect(scheduler.get(trainerId)!.state).toEqual(ref.state)
     expect(scheduler.get(trainerId)!.catchingUp).toBe(false)
     const types = msgs(s).map((m) => m.t)
-    expect(types.filter((t) => t === 'hunt.catchup').length).toBe(2)
+    expect(msgs(s).filter((m) => m.t === 'hunt.catchup').map((m) => (m as { ticksRemaining: number }).ticksRemaining)).toEqual([3000, 1000, 0])
     expect(types.slice(-2)).toEqual(['hunt.summary', 'hunt.snapshot'])
     await scheduler.whenIdle(trainerId)
     expect((await loadActive(db, trainerId))!.state.tick).toBe(3000)
@@ -743,7 +743,7 @@ describe('intents e finish', () => {
     await start(11)
     let guard = 0
     while (scheduler.size() > 0 && guard++ < 3000) scheduler.tick()
-    await new Promise((r) => setTimeout(r, 20))
+    await scheduler.whenIdle(trainerId)
     expect(scheduler.size()).toBe(0)
     expect(msgs(s).at(-1)).toEqual({ t: 'hunt.stopped', reason: 'team-fainted', healed: true })
     const [p] = await db.select().from(pokemon).where(eq(pokemon.trainerId, trainerId))
@@ -848,6 +848,7 @@ export interface Scheduler {
   finish(trainerId: string, reason: StopReason): Promise<TrainerRow | null>
   flushAll(): Promise<void>
   whenIdle(trainerId: string): Promise<void>
+  idle(): Promise<void>
 }
 
 export const snapshotMessage = (r: Runner): ServerMessage => ({

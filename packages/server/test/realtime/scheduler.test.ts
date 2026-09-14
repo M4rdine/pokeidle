@@ -1,18 +1,21 @@
 import { createRng, hpAt, loadRegistry, TICK_MS, xpForLevel } from '@pokeidle/shared'
 import { eq } from 'drizzle-orm'
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { chooseStarter } from '../../src/account/starter.js'
 import type { Db } from '../../src/db/client.js'
 import { huntLog, huntSessions, inventory, pokemon, trainers, users } from '../../src/db/schema.js'
 import { simulate } from '../../src/engine/simulate.js'
 import { loadActive, startHunt } from '../../src/hunt-store/index.js'
-import { SNAPSHOT_EVERY_TICKS, SYNC_EVERY_TICKS } from '../../src/realtime/constants.js'
+import { PERSIST_MAX_FAILURES, SNAPSHOT_EVERY_TICKS, SYNC_EVERY_TICKS } from '../../src/realtime/constants.js'
+import { finishRunner, flushRunner } from '../../src/realtime/persist.js'
 import { createScheduler, type Scheduler } from '../../src/realtime/scheduler.js'
 import { createSocketRegistry, OPEN, type SocketLike } from '../../src/realtime/sockets.js'
 import { silentLogger } from '../helpers/app.js'
 import { openTestDb, truncateAll } from '../helpers/db.js'
 
 const registry = loadRegistry()
+/** Mesmo registro, mas sem nenhuma hunt — usado para forçar `engineDeps` a falhar com `not-found`. */
+const brokenRegistry = { ...registry, hunts: new Map() }
 const T0 = new Date('2026-09-14T12:00:00Z')
 let db: Db
 let close: () => Promise<void>
@@ -150,11 +153,112 @@ describe('intents e finish', () => {
     expect((await loadActive(db, trainerId))!.state.tick).toBe(10)
   })
   it('escritas ficam em ordem: um save enfileirado antes do finish chega antes', async () => {
-    await start(2)
-    for (let i = 0; i < SNAPSHOT_EVERY_TICKS; i++) scheduler.tick() // enfileira um save
-    for (let i = 0; i < 20; i++) scheduler.tick()
-    const trainer = await scheduler.finish(trainerId, 'intent')
+    const kinds: string[] = []
+    const s2 = createScheduler({
+      db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
+      hooks: { onPersistStart: (kind) => kinds.push(kind) },
+    })
+    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 2 })
+    await s2.attach(trainerId)
+    for (let i = 0; i < SNAPSHOT_EVERY_TICKS; i++) s2.tick() // enfileira um save
+    for (let i = 0; i < 20; i++) s2.tick()
+    const trainer = await s2.finish(trainerId, 'intent')
     expect(trainer).not.toBeNull()
     expect(await db.select().from(huntSessions)).toEqual([]) // o save (UPDATE) não ressuscita a linha porque veio antes do DELETE
+    expect(kinds).toEqual(['save', 'finish'])
+  })
+})
+
+describe('contenção de erros e seams de teste', () => {
+  it('attach: erro no catch-up (motor) remove o runner, preserva a sessão e propaga o erro', async () => {
+    const s2 = createScheduler({ db, registry: brokenRegistry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve() })
+    await startHunt(db, registry, trainerId, 'route-1', T0)
+    clock.now = new Date(T0.getTime() + 10 * 60 * 1000) // 3000 ticks > MIN_CATCHUP_TICKS, entra no catch-up
+    await expect(s2.attach(trainerId)).rejects.toMatchObject({ code: 'not-found' })
+    expect(s2.size()).toBe(0)
+    expect((await db.select().from(huntSessions)).length).toBe(1)
+  })
+  it('attach: catch-up abortado por stop() persiste o tempo simulado (não o relógio) e remove o runner', async () => {
+    const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
+    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 4 })
+    clock.now = new Date(T0.getTime() + 20 * 60 * 1000) // 6000 ticks
+    const abortingScheduler: Scheduler = createScheduler({
+      db, registry, now: () => clock.now, sockets, logger: silentLogger,
+      yieldNow: async () => { abortingScheduler.stop() },
+    })
+    await abortingScheduler.attach(trainerId)
+    expect(abortingScheduler.size()).toBe(0)
+    const types = msgs(s).map((m) => m.t)
+    expect(types).not.toContain('hunt.summary')
+    expect(types).not.toContain('hunt.snapshot')
+    await abortingScheduler.idle()
+    const active = (await loadActive(db, trainerId))!
+    expect(active.state.tick).toBe(2000)
+    expect(active.lastSimulatedAt).toEqual(new Date(T0.getTime() + 2000 * TICK_MS))
+  })
+  it('tick: erro no motor remove o runner, preserva a sessão e notifica o socket', async () => {
+    const s2 = createScheduler({ db, registry: brokenRegistry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve() })
+    const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
+    await startHunt(db, registry, trainerId, 'route-1', clock.now) // lastSimulatedAt === now: sem catch-up
+    await s2.attach(trainerId) // sucesso: o caminho sem catch-up não chama engineDeps
+    expect(s2.size()).toBe(1)
+    s2.tick()
+    expect(s2.size()).toBe(0)
+    expect((await db.select().from(huntSessions)).length).toBe(1)
+    expect(msgs(s).at(-1)).toEqual({ t: 'error', code: 'internal', message: 'erro interno' })
+  })
+  it('finish: falha ao persistir propaga erro, mantém a sessão e não manda hunt.stopped', async () => {
+    const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
+    const failingFinish: typeof finishRunner = async () => { throw new Error('boom') }
+    const s2 = createScheduler({
+      db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
+      persistence: { flush: flushRunner, finish: failingFinish },
+    })
+    await startHunt(db, registry, trainerId, 'route-1', clock.now)
+    await s2.attach(trainerId)
+    await expect(s2.finish(trainerId, 'intent')).rejects.toMatchObject({ code: 'internal' })
+    expect(msgs(s).at(-1)).toEqual({ t: 'error', code: 'internal', message: 'erro interno' })
+    expect(msgs(s).map((m) => m.t)).not.toContain('hunt.stopped')
+    expect((await db.select().from(huntSessions)).length).toBe(1)
+    expect(s2.size()).toBe(0)
+  })
+  it('falhas de persistência consecutivas finalizam a hunt com persist-failed (sem sync)', async () => {
+    const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
+    const failingFlush: typeof flushRunner = async () => { throw new Error('db down') }
+    const s2 = createScheduler({
+      db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
+      persistence: { flush: failingFlush, finish: finishRunner },
+    })
+    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 6 })
+    await s2.attach(trainerId)
+    for (let i = 0; i < PERSIST_MAX_FAILURES * SNAPSHOT_EVERY_TICKS; i++) { clock.now = new Date(clock.now.getTime() + TICK_MS); s2.tick() }
+    await s2.idle() // drena os 3 saves que falham (o terceiro dispara o finish por persist-failed)
+    await s2.idle() // drena o finish() encadeado a partir do terceiro
+    expect(s2.size()).toBe(0)
+    expect(msgs(s).at(-1)).toEqual({ t: 'hunt.stopped', reason: 'persist-failed', healed: false })
+    expect(await db.select().from(huntSessions)).toEqual([])
+    const [tr] = await db.select().from(trainers).where(eq(trainers.id, trainerId))
+    expect(tr!.xp).toBe(0) // sem sync: xp nunca foi escrito na tabela trainers
+  })
+  it('detach remove o runner sem persistir', async () => {
+    await start()
+    expect(scheduler.size()).toBe(1)
+    scheduler.detach(trainerId)
+    expect(scheduler.size()).toBe(0)
+    expect((await db.select().from(huntSessions)).length).toBe(1) // sessão intacta, nada foi persistido
+  })
+  it('start/stop/isStopping: start duas vezes cria um único interval; stop limpa', () => {
+    vi.useFakeTimers()
+    try {
+      scheduler.start()
+      scheduler.start()
+      expect(vi.getTimerCount()).toBe(1)
+      expect(scheduler.isStopping()).toBe(false)
+      scheduler.stop()
+      expect(vi.getTimerCount()).toBe(0)
+      expect(scheduler.isStopping()).toBe(true)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

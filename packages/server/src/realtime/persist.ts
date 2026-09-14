@@ -13,9 +13,9 @@ export async function insertLog(tx: Tx, trainerId: string, entries: readonly Log
 
 /** Snapshot sempre; com `sync`, tabelas + hunt_log na mesma transação. */
 export async function flushRunner(db: Db, snap: PersistSnapshot, now: Date, opts: { readonly sync: boolean }): Promise<void> {
-  if (!opts.sync) { await saveSnapshot(db, snap.trainerId, snap.state, snap.rngState, now); return }
+  if (!opts.sync) { await saveSnapshot(db, snap.trainerId, snap.state, snap.rngState, snap.lastSimulatedAt, now); return }
   await db.transaction(async (tx) => {
-    await saveSnapshot(tx, snap.trainerId, snap.state, snap.rngState, now)
+    await saveSnapshot(tx, snap.trainerId, snap.state, snap.rngState, snap.lastSimulatedAt, now)
     await syncWithin(tx, snap.trainerId, snap.state, now)
     await insertLog(tx, snap.trainerId, snap.pendingLog)
   })

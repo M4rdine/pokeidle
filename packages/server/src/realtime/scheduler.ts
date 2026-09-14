@@ -19,6 +19,10 @@ export interface SchedulerDeps {
   readonly db: Db; readonly registry: Registry; readonly now: () => Date
   readonly sockets: SocketRegistry; readonly logger: SchedulerLogger
   readonly yieldNow?: () => Promise<void>
+  /** @internal só para testes */
+  readonly hooks?: { onPersistStart?(kind: 'save' | 'sync' | 'finish', trainerId: string): void }
+  /** @internal só para testes */
+  readonly persistence?: { readonly flush: typeof flushRunner; readonly finish: typeof finishRunner }
 }
 export interface Scheduler {
   start(): void; stop(): void; isStopping(): boolean
@@ -41,10 +45,13 @@ export const snapshotMessage = (r: Runner): ServerMessage => ({
 const healsOn = (reason: StopReason): boolean => reason === 'team-fainted'
 const syncsOn = (reason: StopReason): boolean => reason !== 'corrupt' && reason !== 'persist-failed'
 
-/** Um scheduler para todas as hunts vivas. `runners`/`chains` são infraestrutura mutável; cada Runner é imutável e trocado inteiro. */
+/** Um scheduler para todas as hunts vivas. `runners`/`chains`/`inFlight` são infraestrutura mutável; cada Runner é imutável e trocado inteiro. */
 export function createScheduler(deps: SchedulerDeps): Scheduler {
   const runners = new Map<string, Runner>()
   const chains = new Map<string, Promise<void>>()
+  const inFlight = new Set<Promise<void>>()
+  const flush = deps.persistence?.flush ?? flushRunner
+  const finishFn = deps.persistence?.finish ?? finishRunner
   let timer: ReturnType<typeof setInterval> | null = null
   let stopping = false
   let lastTickAt: number | null = null
@@ -67,7 +74,8 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
   const persist = (runner: Runner, sync: boolean): Runner => {
     const snap = toPersistSnapshot(runner)
     void enqueue(runner.trainerId, async () => {
-      await flushRunner(deps.db, snap, deps.now(), { sync })
+      deps.hooks?.onPersistStart?.(sync ? 'sync' : 'save', runner.trainerId)
+      await flush(deps.db, snap, deps.now(), { sync })
       const current = runners.get(runner.trainerId)
       if (current && current.persistFailures > 0) runners.set(runner.trainerId, { ...current, persistFailures: 0 })
     })
@@ -75,19 +83,19 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
   }
 
   const tickOne = (runner: Runner): void => {
-    let outcome
-    try { outcome = tickRunner(runner, engineDeps(runner, deps.registry)) } catch (error) {
-      deps.logger.error({ err: error, trainerId: runner.trainerId }, 'erro no motor; runner removido, sessão preservada')
+    try {
+      const outcome = tickRunner(runner, engineDeps(runner, deps.registry))
+      let next: Runner = { ...outcome.runner, lastSimulatedAt: deps.now() }
+      if (outcome.events.length > 0) deps.sockets.broadcast(runner.trainerId, { t: 'hunt.tick', tick: runner.state.tick, events: outcome.events })
+      if (outcome.stopped) { runners.set(runner.trainerId, next); void finish(runner.trainerId, outcome.stopped.reason); return }
+      if (needsSync(next)) next = persist(next, true)
+      else if (needsSave(next)) next = persist(next, false)
+      runners.set(runner.trainerId, next)
+    } catch (error) {
+      deps.logger.error({ err: error, trainerId: runner.trainerId }, 'erro no tick; runner removido, sessão preservada')
       runners.delete(runner.trainerId)
       deps.sockets.broadcast(runner.trainerId, { t: 'error', code: 'internal', message: 'erro interno' })
-      return
     }
-    let next: Runner = { ...outcome.runner, lastSimulatedAt: deps.now() }
-    if (outcome.events.length > 0) deps.sockets.broadcast(runner.trainerId, { t: 'hunt.tick', tick: runner.state.tick, events: outcome.events })
-    if (outcome.stopped) { runners.set(runner.trainerId, next); void finish(runner.trainerId, outcome.stopped.reason); return }
-    if (needsSync(next)) next = persist(next, true)
-    else if (needsSave(next)) next = persist(next, false)
-    runners.set(runner.trainerId, next)
   }
 
   const tick = (): void => {
@@ -103,12 +111,49 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     runners.delete(trainerId)
     const snap = toPersistSnapshot(runner)
     let trainer: TrainerRow | null = null
-    await enqueue(trainerId, async () => { trainer = await finishRunner(deps.db, snap, deps.now(), { sync: syncsOn(reason), healTeam: healsOn(reason) }) })
+    let failure: unknown
+    await enqueue(trainerId, async () => {
+      deps.hooks?.onPersistStart?.('finish', trainerId)
+      try { trainer = await finishFn(deps.db, snap, deps.now(), { sync: syncsOn(reason), healTeam: healsOn(reason) }) }
+      catch (error) { failure = error }
+    })
+    if (failure) {
+      deps.logger.error({ err: failure, trainerId }, 'falha ao encerrar a hunt')
+      deps.sockets.broadcast(trainerId, { t: 'error', code: 'internal', message: 'erro interno' })
+      throw new AppError('internal', 'não foi possível encerrar a hunt')
+    }
     deps.sockets.broadcast(trainerId, { t: 'hunt.stopped', reason, healed: healsOn(reason) })
     return trainer
   }
 
-  const attach = async (trainerId: string): Promise<void> => {
+  const runCatchUp = async (trainerId: string, base: Runner, owed: number): Promise<void> => {
+    try {
+      const result = await catchUp(base, owed, engineDeps(base, deps.registry), {
+        onSlice: (remaining) => deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: remaining }),
+        shouldAbort: () => stopping,
+        ...(deps.yieldNow && { yieldNow: deps.yieldNow }),
+      })
+      if (result.stopped) { runners.set(trainerId, result.runner); await finish(trainerId, result.stopped.reason); return }
+      if (result.ticksDone < owed) {
+        // Abortado (processo encerrando): persiste o tempo realmente simulado e sai da memória,
+        // sem sumário nem snapshot — o próximo attach retoma o catch-up de onde parou.
+        persist({ ...result.runner, catchingUp: false }, true)
+        runners.delete(trainerId)
+        return
+      }
+      const settled = persist({ ...result.runner, catchingUp: false }, true)
+      runners.set(trainerId, settled)
+      deps.sockets.broadcast(trainerId, { t: 'hunt.summary', summary: result.summary })
+      deps.sockets.broadcast(trainerId, snapshotMessage(settled))
+    } catch (error) {
+      runners.delete(trainerId)
+      deps.logger.error({ err: error, trainerId }, 'erro no catch-up; runner removido, sessão preservada')
+      deps.sockets.broadcast(trainerId, { t: 'error', code: 'internal', message: 'erro interno' })
+      throw error
+    }
+  }
+
+  const attachInner = async (trainerId: string): Promise<void> => {
     let active
     try { active = await loadActive(deps.db, trainerId) } catch (error) {
       if (!(error instanceof CorruptSnapshotError)) throw error
@@ -123,16 +168,14 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     if (owed < MIN_CATCHUP_TICKS) { runners.set(trainerId, base); deps.sockets.broadcast(trainerId, snapshotMessage(base)); return }
     runners.set(trainerId, { ...base, catchingUp: true })
     deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: owed })
-    const result = await catchUp(base, owed, engineDeps(base, deps.registry), {
-      onSlice: (remaining) => deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: remaining }),
-      shouldAbort: () => stopping,
-      ...(deps.yieldNow && { yieldNow: deps.yieldNow }),
-    })
-    if (result.stopped) { runners.set(trainerId, result.runner); await finish(trainerId, result.stopped.reason); return }
-    const settled = persist({ ...result.runner, catchingUp: false }, true)
-    runners.set(trainerId, settled)
-    deps.sockets.broadcast(trainerId, { t: 'hunt.summary', summary: result.summary })
-    deps.sockets.broadcast(trainerId, snapshotMessage(settled))
+    await runCatchUp(trainerId, base, owed)
+  }
+
+  const attach = (trainerId: string): Promise<void> => {
+    const p = attachInner(trainerId)
+    inFlight.add(p)
+    p.finally(() => inFlight.delete(p)).catch(() => {})
+    return p
   }
 
   const applyIntent = (trainerId: string, intent: Intent): IntentResult => {
@@ -161,10 +204,14 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     applyIntent,
     finish,
     flushAll: async () => {
+      await Promise.allSettled([...inFlight])
       for (const runner of runners.values()) if (!runner.catchingUp) runners.set(runner.trainerId, persist(runner, true))
       await Promise.allSettled([...chains.values()])
     },
     whenIdle: (trainerId) => chains.get(trainerId) ?? Promise.resolve(),
-    idle: async () => { await Promise.allSettled([...chains.values()]) },
+    idle: async () => {
+      await Promise.allSettled([...inFlight])
+      await Promise.allSettled([...chains.values()])
+    },
   }
 }

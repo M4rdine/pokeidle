@@ -27,7 +27,10 @@ export interface Runner {
   readonly persistFailures: number
 }
 
-export interface PersistSnapshot { readonly trainerId: string; readonly huntId: string; readonly state: HuntState; readonly rngState: number; readonly pendingLog: readonly LogEntry[] }
+export interface PersistSnapshot {
+  readonly trainerId: string; readonly huntId: string; readonly state: HuntState; readonly rngState: number
+  readonly pendingLog: readonly LogEntry[]; readonly lastSimulatedAt: Date
+}
 export interface TickOutcome { readonly runner: Runner; readonly events: readonly Event[]; readonly stopped: StoppedEvent | null }
 
 export function createRunner(trainerId: string, active: ActiveHunt): Runner {
@@ -66,4 +69,7 @@ export const needsSync = (r: Runner): boolean => r.state.tick - r.lastSyncTick >
 export const markSaved = (r: Runner, sync: boolean): Runner =>
   sync ? { ...r, lastSaveTick: r.state.tick, lastSyncTick: r.state.tick, pendingLog: [] } : { ...r, lastSaveTick: r.state.tick }
 
-export const toPersistSnapshot = (r: Runner): PersistSnapshot => ({ trainerId: r.trainerId, huntId: r.huntId, state: r.state, rngState: r.rng.state(), pendingLog: r.pendingLog })
+export const toPersistSnapshot = (r: Runner): PersistSnapshot => ({
+  trainerId: r.trainerId, huntId: r.huntId, state: r.state, rngState: r.rng.state(),
+  pendingLog: r.pendingLog, lastSimulatedAt: r.lastSimulatedAt,
+})

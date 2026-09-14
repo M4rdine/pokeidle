@@ -86,7 +86,7 @@ describe('save/sync', () => {
   it('toPersistSnapshot captura o rngState no momento', () => {
     const r = createRunner('t1', activeOf(5))
     const snap = toPersistSnapshot(r)
-    expect(snap).toEqual({ trainerId: 't1', huntId: r.huntId, state: r.state, rngState: r.rng.state(), pendingLog: [] })
+    expect(snap).toEqual({ trainerId: 't1', huntId: r.huntId, state: r.state, rngState: r.rng.state(), pendingLog: [], lastSimulatedAt: r.lastSimulatedAt })
     r.rng.next()
     expect(snap.rngState).not.toBe(r.rng.state())
   })

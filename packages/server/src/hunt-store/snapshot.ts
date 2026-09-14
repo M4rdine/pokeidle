@@ -9,8 +9,8 @@ export interface ActiveHunt {
   readonly seed: number; readonly rngState: number; readonly startedAt: Date; readonly lastSimulatedAt: Date
 }
 
-export async function saveSnapshot(db: DbLike, trainerId: string, state: HuntState, rngState: number, now: Date): Promise<void> {
-  await db.update(huntSessions).set({ state, rngState, lastSimulatedAt: now, updatedAt: now }).where(eq(huntSessions.trainerId, trainerId))
+export async function saveSnapshot(db: DbLike, trainerId: string, state: HuntState, rngState: number, simulatedAt: Date, now: Date = simulatedAt): Promise<void> {
+  await db.update(huntSessions).set({ state, rngState, lastSimulatedAt: simulatedAt, updatedAt: now }).where(eq(huntSessions.trainerId, trainerId))
 }
 
 /**

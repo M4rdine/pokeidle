@@ -29,6 +29,11 @@ export async function startHunt(db: Db, registry: Registry, trainerId: string, h
     inventory: Object.fromEntries(items.filter((i) => i.quantity > 0).map((i) => [i.itemId, i.quantity])),
     settings: toHuntSettings(trainer, dex.map((d) => d.species)), trainer: { xp: trainer.xp, gold: trainer.gold },
   }, { registry, hunt, rng })
-  const [row] = await db.insert(huntSessions).values({ trainerId, huntId, sessionId, state, seed, rngState: rng.state(), startedAt: now, lastSimulatedAt: now }).returning()
-  return row!
+  const [row] = await db.insert(huntSessions).values({ trainerId, huntId, sessionId, state, seed, rngState: rng.state(), startedAt: now, lastSimulatedAt: now })
+    .onConflictDoNothing({ target: huntSessions.trainerId }).returning()
+  // Janela de corrida entre o hasActiveHunt acima e este insert: duas starts concorrentes podem
+  // ambas passar na checagem; a PK de hunt_sessions.trainer_id garante que só uma linha existe,
+  // e onConflictDoNothing devolve nenhuma linha para a perdedora em vez de um erro 23505 cru.
+  if (!row) throw new AppError('hunt-active', 'já existe uma hunt ativa')
+  return row
 }

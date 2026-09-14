@@ -17,7 +17,7 @@ describe('lootTableFor', () => {
 
 describe('rollLoot', () => {
   it('ouro dentro da faixa e drops conforme o sorteio', () => {
-    const r = rollLoot(zubat, loot, { int: (min, max) => max, next: () => 0.3 })
+    const r = rollLoot(zubat, loot, { int: (min, max) => max, next: () => 0.3, state: () => 0 })
     expect(r).toEqual({ gold: 9, drops: [{ item: 'poke-ball', quantity: 1 }] })
   })
   it('com PRNG seedado é determinístico e respeita a faixa em mil rolagens', () => {

@@ -15,7 +15,7 @@ const ember: Move = { name: 'ember', type: 'fire', power: 40, accuracy: 100, dam
 const scratch: Move = { name: 'scratch', type: 'normal', power: 40, accuracy: 100, damageClass: 'physical' }
 const charmander5: Combatant = { level: 5, types: ['fire'], stats: statsAt({ hp: 39, attack: 52, defense: 43, spAttack: 60, spDefense: 50, speed: 65 }, 5) }
 const bulbasaur5: Combatant = { level: 5, types: ['grass', 'poison'], stats: statsAt({ hp: 45, attack: 49, defense: 49, spAttack: 65, spDefense: 65, speed: 45 }, 5) }
-const fixed = (v: number) => ({ next: () => v, int: () => 0 })
+const fixed = (v: number) => ({ next: () => v, int: () => 0, state: () => 0 })
 
 describe('typeMultiplier', () => {
   it('multiplica sobre os tipos do defensor', () => {

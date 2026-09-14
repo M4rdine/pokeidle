@@ -20,7 +20,7 @@ describe('captureChance', () => {
 describe('rollCapture', () => {
   const input = { captureRate: 45, hpMax: 100, hpCurrent: 50, ballBonus: 1 }
   it('compara o sorteio com a chance', () => {
-    expect(rollCapture(input, { next: () => 0.1, int: () => 0 })).toBe(true)
-    expect(rollCapture(input, { next: () => 0.2, int: () => 0 })).toBe(false)
+    expect(rollCapture(input, { next: () => 0.1, int: () => 0, state: () => 0 })).toBe(true)
+    expect(rollCapture(input, { next: () => 0.2, int: () => 0, state: () => 0 })).toBe(false)
   })
 })

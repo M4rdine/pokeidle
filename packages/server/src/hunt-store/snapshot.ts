@@ -13,8 +13,14 @@ export async function saveSnapshot(db: DbLike, trainerId: string, state: HuntSta
   await db.update(huntSessions).set({ state, rngState, lastSimulatedAt: now, updatedAt: now }).where(eq(huntSessions.trainerId, trainerId))
 }
 
-export async function loadActive(db: DbLike, trainerId: string): Promise<ActiveHunt | null> {
-  const [row] = await db.select().from(huntSessions).where(eq(huntSessions.trainerId, trainerId))
+/**
+ * Carrega a hunt ativa do treinador. O tick loop (fase 2c) DEVE chamar com
+ * `{ forUpdate: true }` dentro da própria transação para travar a linha antes de simular.
+ */
+export async function loadActive(db: DbLike, trainerId: string, opts: { forUpdate?: boolean } = {}): Promise<ActiveHunt | null> {
+  const query = db.select().from(huntSessions).where(eq(huntSessions.trainerId, trainerId))
+  const rows = opts.forUpdate ? await query.for('update') : await query
+  const [row] = rows
   if (!row) return null
   return { huntId: row.huntId, sessionId: row.sessionId, state: parseHuntState(row.state), seed: row.seed, rngState: row.rngState, startedAt: row.startedAt, lastSimulatedAt: row.lastSimulatedAt }
 }

@@ -60,6 +60,19 @@ describe('startHunt', () => {
     expect(row.sessionId).toMatch(/^[0-9a-f-]{36}$/)
     expect(row.seed).toBeGreaterThanOrEqual(0)
   })
+  it('duas starts concorrentes: só uma conclui, a outra falha com hunt-active; só uma linha persiste', async () => {
+    const [r1, r2] = await Promise.allSettled([
+      startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's1', seed: 1 }),
+      startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's2', seed: 2 }),
+    ])
+    const fulfilled = [r1, r2].filter((r) => r.status === 'fulfilled')
+    const rejected = [r1, r2].filter((r) => r.status === 'rejected')
+    expect(fulfilled).toHaveLength(1)
+    expect(rejected).toHaveLength(1)
+    expect((rejected[0] as PromiseRejectedResult).reason).toMatchObject({ code: 'hunt-active' })
+    const rows = await db.select().from(huntSessions).where(eq(huntSessions.trainerId, trainerId))
+    expect(rows).toHaveLength(1)
+  })
 })
 
 describe('snapshot e sync', () => {
@@ -89,6 +102,8 @@ describe('snapshot e sync', () => {
     const rows = await snapshotRows()
     expect(rows.trainer).toEqual({ xp: state.trainer.xp, gold: state.trainer.gold })
     expect(state.trainer.xp).toBeGreaterThan(10)
+    expect(state.trainer.gold).toBeGreaterThan(7) // ouro foi ganho (não é só o valor inicial repassado)
+    expect(state.inventory['poke-ball'] ?? 0).toBeLessThan(5) // bolas foram consumidas nas capturas
     const team = state.player.team
     expect(team.length).toBeGreaterThan(1) // houve captura
     for (const [slot, p] of team.entries()) {
@@ -124,6 +139,16 @@ describe('stopHunt', () => {
     await saveSnapshot(db, trainerId, state, 1, T0)
     const trainer = await stopHunt(db, trainerId, T0)
     expect(trainer).toMatchObject({ id: trainerId, xp: state.trainer.xp, gold: state.trainer.gold })
+    expect(await loadActive(db, trainerId)).toBeNull()
+  })
+  it('duas paradas concorrentes: o lock de linha serializa; só uma conclui, a outra vê no-hunt', async () => {
+    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 9 })
+    const [r1, r2] = await Promise.allSettled([stopHunt(db, trainerId, T0), stopHunt(db, trainerId, T0)])
+    const fulfilled = [r1, r2].filter((r) => r.status === 'fulfilled')
+    const rejected = [r1, r2].filter((r) => r.status === 'rejected')
+    expect(fulfilled).toHaveLength(1)
+    expect(rejected).toHaveLength(1)
+    expect((rejected[0] as PromiseRejectedResult).reason).toMatchObject({ code: 'no-hunt' })
     expect(await loadActive(db, trainerId)).toBeNull()
   })
 })

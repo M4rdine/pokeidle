@@ -7,7 +7,7 @@ import { syncWithin } from './sync.js'
 
 export async function stopHunt(db: Db, trainerId: string, now: Date): Promise<TrainerRow> {
   return db.transaction(async (tx) => {
-    const active = await loadActive(tx, trainerId)
+    const active = await loadActive(tx, trainerId, { forUpdate: true })
     if (!active) throw new AppError('no-hunt', 'não há hunt ativa')
     await syncWithin(tx, trainerId, active.state, now)
     await tx.delete(huntSessions).where(eq(huntSessions.trainerId, trainerId))

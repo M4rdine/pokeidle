@@ -7,7 +7,9 @@
     "assets": "tsx tools/assets/src/main.ts",
     "pokedata": "tsx tools/pokedata/src/main.ts",
     "shared:test": "pnpm --filter @pokeidle/shared test",
-    "server:test": "pnpm --filter @pokeidle/server test"
+    "server:test": "pnpm --filter @pokeidle/server test",
+    "server:dev": "pnpm --filter @pokeidle/server dev",
+    "db:up": "docker compose up -d"
   },
   "devDependencies": {
     "tsx": "^4.19.0"

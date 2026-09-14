@@ -8,6 +8,7 @@ import type { Config } from '../config.js'
 import type { Db } from '../db/client.js'
 import { AppError, errorBody } from './errors.js'
 import { authRoutes } from './routes/auth.js'
+import { huntRoutes } from './routes/hunts.js'
 import { trainerRoutes } from './routes/trainer.js'
 import { checkOrigin, REDACT_PATHS } from './security.js'
 
@@ -58,6 +59,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
 
   await app.register(authRoutes, { db, config, now })
   await app.register(trainerRoutes, { db, config, now })
+  await app.register(huntRoutes, { db, config, now })
   deps.extraRoutes?.(app)
   return app
 }

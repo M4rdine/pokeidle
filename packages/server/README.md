@@ -83,3 +83,67 @@ em si não faz esse recorte.
 Accuracy (todo golpe acerta) e shiny. Sistema de box: `captured` sinaliza `toBox: true`
 quando o time já está em `MAX_TEAM_SIZE`, mas o motor não guarda o Pokémon em lugar
 nenhum nesse caso — persistir a captura cabe a quem consome o evento.
+
+## Servidor HTTP (fase 2b)
+
+### Subir localmente
+
+1. `pnpm db:up` — sobe o Postgres do `docker-compose.yml` (porta 5433).
+2. Copie `.env.example` (raiz) para `packages/server/.env` (arquivo ignorado pelo
+   git): `pnpm server:dev`/`start` rodam com `cwd = packages/server` (via `pnpm
+   --filter`), e `dotenv/config` em `main.ts` só lê `.env` do diretório atual.
+3. `pnpm server:dev` — roda `src/main.ts` com `tsx watch`: aplica as migrations e sobe
+   o Fastify em `PORT` (padrão 3000). `pnpm --filter @pokeidle/server start` roda a
+   mesma coisa sem watch.
+
+### Rotas
+
+| Rota | Auth | Códigos de erro |
+|---|---|---|
+| `POST /auth/register` | — | `validation`, `email-taken`, `name-taken`, `rate-limited` |
+| `POST /auth/login` | — | `validation`, `invalid-credentials`, `rate-limited` |
+| `POST /auth/logout` | — | — |
+| `GET /me` | sim | `unauthorized` |
+| `POST /trainer/starter` | sim | `validation`, `starter-already-chosen` |
+| `GET/PUT /trainer/team` | sim | `validation`, `not-found`, `hunt-active` |
+| `PATCH /trainer/settings` | sim | `validation` |
+| `GET /trainer/inventory` \| `/trainer/pokedex` | sim | — |
+| `GET /hunts` | sim | — |
+| `POST /hunts/:id/start` | sim | `not-found`, `no-starter`, `hunt-active`, `validation` |
+| `POST /hunts/stop` | sim | `no-hunt` |
+| `GET /hunts/active` | sim | — |
+
+Toda rota autenticada exige o cookie de sessão `sid` (`httpOnly`, `SameSite=Lax`,
+`Secure` em produção — ver `auth/cookie.ts`) e falha com `unauthorized` (401) sem ele.
+Rotas que mudam estado exigem o cabeçalho `Origin` igual a `APP_ORIGIN` (S11); sem ele
+o erro é `forbidden` (403). `GET /hunts/active` e `POST /hunts/:id/start` nunca
+devolvem `seed`/`rngState` — só `huntId`, `sessionId`, `startedAt` e o `state` público
+do motor (S3).
+
+### `hunt-store`
+
+`startHunt`/`stopHunt`/`loadActive` (`src/hunt-store`) são a única porta de entrada
+para `hunt_sessions`: o `trainerId` sempre vem da sessão autenticada, nunca do corpo ou
+da URL, e `sessionId`/`seed` são sempre gerados no servidor (S2). O snapshot
+(`state`, `rngState`) é o `HuntState` do motor serializado em `jsonb`. Contrato para a
+fase 2c: o scheduler de ticks chama `saveSnapshot` a cada 10 s (grava `state`/
+`rngState`), `syncToTables` a cada 60 s e no `stop` (grava em `pokemon`, `inventory`,
+`trainers`, `pokedex_entries` — idempotente), e registra eventos relevantes em
+`hunt_log` conforme ocorrem.
+
+### Testes
+
+`docker compose up -d` é obrigatório antes de `pnpm --filter @pokeidle/server test`
+(os testes de integração abrem conexão real com Postgres). `DATABASE_URL_TEST`
+(padrão `postgres://pokeidle:pokeidle@localhost:5433/pokeidle_test`) aponta para o
+banco de teste; `test/helpers/db.ts` roda as migrations e trunca todas as tabelas
+entre os testes.
+
+### Segurança
+
+Critérios S1–S20 (números só do servidor, isolamento entre contas, segredo do PRNG,
+sessão, senha, rate limit, CSRF, headers, erros sem vazamento, segredos em `.env` etc.)
+estão descritos em
+`docs/superpowers/specs/2026-09-14-fase-2b-account-persistence-design.md` §9; os testes
+que os cobrem estão espalhados entre `test/security.test.ts`, `test/auth.test.ts` e
+`test/hunts.test.ts` (isolamento entre contas, S2/S3).

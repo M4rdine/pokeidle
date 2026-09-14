@@ -25,7 +25,7 @@ export const authRoutes: FastifyPluginAsync<RouteDeps> = async (app, { db, confi
 
   app.post('/auth/login', AUTH_LIMIT, async (request, reply) => {
     const input = parseBody(LoginSchema, request.body)
-    const { user, trainer, token } = await login(db, input, { now: now() })
+    const { user, trainer, token } = await login(db, input, { now: now(), hash })
     reply.setCookie(SESSION_COOKIE, token, sessionCookieOptions(config.COOKIE_SECURE))
     return reply.send({ user: userDto(user), trainer: trainerDto(trainer, await trainerExtra(db, trainer.id)) })
   })

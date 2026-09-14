@@ -1,10 +1,8 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { SESSION_TTL_MS, TOUCH_INTERVAL_MS, hashToken } from '../src/auth/session.js'
-import { loadConfig } from '../src/config.js'
-import { buildApp } from '../src/http/app.js'
 import { inventory, sessions, trainers, users } from '../src/db/schema.js'
 import { truncateAll } from './helpers/db.js'
-import { api, cookieOf, ORIGIN, registerAndLogin, T0, testApp, type TestApp } from './helpers/app.js'
+import { api, cookieOf, freshApp, ORIGIN, registerAndLogin, T0, testApp, type TestApp } from './helpers/app.js'
 
 let t: TestApp
 beforeAll(async () => { t = await testApp() })
@@ -93,23 +91,35 @@ describe('segurança HTTP', () => {
     expect(evil.json()).toMatchObject({ error: { code: 'forbidden' } })
     expect((await t.app.inject({ method: 'GET', url: '/me' })).statusCode).toBe(401)
   })
-  it('rate limit: 11ª tentativa de login → 429', async () => {
-    for (let i = 0; i < 10; i++) await api(t.app).post('/auth/login', { email: 'x@test.dev', password: 'errada-errada' })
-    const r = await api(t.app).post('/auth/login', { email: 'x@test.dev', password: 'errada-errada' })
-    expect(r.statusCode).toBe(429)
-    expect(r.json()).toMatchObject({ error: { code: 'rate-limited' } })
+  it('rate limit: 11ª tentativa de login e de registro → 429 (por IP, isolado dos outros testes)', async () => {
+    const loginIp = { ip: '10.2.0.1' }
+    for (let i = 0; i < 10; i++) {
+      const r = await api(t.app, undefined, loginIp).post('/auth/login', { email: 'x@test.dev', password: 'errada-errada' })
+      expect(r.statusCode).toBe(401)
+    }
+    const login11 = await api(t.app, undefined, loginIp).post('/auth/login', { email: 'x@test.dev', password: 'errada-errada' })
+    expect(login11.statusCode).toBe(429)
+    expect(login11.json()).toMatchObject({ error: { code: 'rate-limited' } })
+
+    const registerIp = { ip: '10.2.0.2' }
+    const regBody = { email: 'rate-limit@test.dev', password: 'senha-forte-123', name: 'RateLimit' }
+    for (let i = 0; i < 10; i++) {
+      const r = await api(t.app, undefined, registerIp).post('/auth/register', regBody)
+      expect([201, 409]).toContain(r.statusCode)
+    }
+    const register11 = await api(t.app, undefined, registerIp).post('/auth/register', regBody)
+    expect(register11.statusCode).toBe(429)
+    expect(register11.json()).toMatchObject({ error: { code: 'rate-limited' } })
   })
   it('corpo > 16 KB → 413; JSON inválido → 400; content-type errado → 400', async () => {
-    // App isolado: o teste anterior esgota o limite de 10/min de /auth/login para o mesmo IP simulado.
-    const config = loadConfig({ DATABASE_URL: 'postgres://x:x@localhost:1/x', APP_ORIGIN: ORIGIN, ARGON2_MEMORY_KIB: '4096', ARGON2_TIME_COST: '1' })
-    const fresh = await buildApp({ db: t.db, config, now: () => t.clock.now, logger: false })
-    const big = await api(fresh).post('/auth/login', { email: 'x@test.dev', password: 'a'.repeat(17 * 1024) })
+    const big = await api(t.app).post('/auth/login', { email: 'x@test.dev', password: 'a'.repeat(17 * 1024) })
     expect(big.statusCode).toBe(413)
-    const bad = await fresh.inject({ method: 'POST', url: '/auth/login', payload: '{"email":', headers: { origin: ORIGIN, 'content-type': 'application/json' } })
+    expect(big.json()).toMatchObject({ error: { code: 'payload-too-large' } })
+    const bad = await t.app.inject({ method: 'POST', url: '/auth/login', payload: '{"email":', headers: { origin: ORIGIN, 'content-type': 'application/json' } })
     expect(bad.statusCode).toBe(400)
-    const form = await fresh.inject({ method: 'POST', url: '/auth/login', payload: 'a=b', headers: { origin: ORIGIN, 'content-type': 'application/x-www-form-urlencoded' } })
+    const form = await t.app.inject({ method: 'POST', url: '/auth/login', payload: 'a=b', headers: { origin: ORIGIN, 'content-type': 'application/x-www-form-urlencoded' } })
     expect(form.statusCode).toBe(400)
-    await fresh.close()
+    expect(form.json()).toMatchObject({ error: { code: 'validation' } })
   })
   it('cabeçalhos do helmet e 404 em JSON', async () => {
     const r = await api(t.app).get('/nao-existe')
@@ -122,14 +132,7 @@ describe('segurança HTTP', () => {
     expect(r.headers['strict-transport-security']).toBeUndefined()
   })
   it('erro inesperado vira 500 genérico', async () => {
-    const config = loadConfig({ DATABASE_URL: 'postgres://x:x@localhost:1/x', APP_ORIGIN: ORIGIN, ARGON2_MEMORY_KIB: '4096', ARGON2_TIME_COST: '1' })
-    const boom = await buildApp({
-      db: t.db,
-      config,
-      now: () => t.clock.now,
-      logger: false,
-      extraRoutes: (a) => a.get('/boom', async () => { throw new Error('segredo do banco: tabela users') }),
-    })
+    const boom = await freshApp(t, (a) => a.get('/boom', async () => { throw new Error('segredo do banco: tabela users') }))
     const r = await api(boom).get('/boom')
     expect(r.statusCode).toBe(500)
     expect(r.json()).toEqual({ error: { code: 'internal', message: 'erro interno' } })

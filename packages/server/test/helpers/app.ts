@@ -1,6 +1,4 @@
 import type { FastifyInstance, InjectOptions, LightMyRequestResponse } from 'fastify'
-
-type Method = NonNullable<InjectOptions['method']>
 import { loadConfig } from '../../src/config.js'
 import type { Db } from '../../src/db/client.js'
 import { buildApp } from '../../src/http/app.js'
@@ -11,19 +9,32 @@ export const T0 = new Date('2026-09-14T12:00:00Z')
 
 export interface TestApp { app: FastifyInstance; db: Db; clock: { now: Date }; close: () => Promise<void> }
 
+const testConfig = () => loadConfig({ DATABASE_URL: 'postgres://x:x@localhost:1/x', APP_ORIGIN: ORIGIN, ARGON2_MEMORY_KIB: '4096', ARGON2_TIME_COST: '1' })
+
 export async function testApp(): Promise<TestApp> {
   const { db, close } = await openTestDb()
   await truncateAll(db)
-  const config = loadConfig({ DATABASE_URL: 'postgres://x:x@localhost:1/x', APP_ORIGIN: ORIGIN, ARGON2_MEMORY_KIB: '4096', ARGON2_TIME_COST: '1' })
   const clock = { now: T0 }
-  const app = await buildApp({ db, config, now: () => clock.now, logger: false })
+  const app = await buildApp({ db, config: testConfig(), now: () => clock.now, logger: false })
   return { app, db, clock, close: async () => { await app.close(); await close() } }
 }
 
+/** Constrói uma instância de app isolada (banco e relógio compartilhados com `t`), útil para testes que não podem herdar estado do app principal (ex.: contador do rate limit, rotas extras de teste). */
+export async function freshApp(t: Pick<TestApp, 'db' | 'clock'>, extraRoutes?: (app: FastifyInstance) => void): Promise<FastifyInstance> {
+  return buildApp({ db: t.db, config: testConfig(), now: () => t.clock.now, logger: false, ...(extraRoutes && { extraRoutes }) })
+}
+
+type Method = NonNullable<InjectOptions['method']>
 type Body = Record<string, unknown> | undefined
-export function api(app: FastifyInstance, cookie?: string) {
+export function api(app: FastifyInstance, cookie?: string, opts: { ip?: string } = {}) {
   const call = (method: Method, url: string, payload?: Body, headers: Record<string, string> = {}) =>
-    app.inject({ method, url, ...(payload !== undefined && { payload }), headers: { origin: ORIGIN, ...(cookie && { cookie }), ...headers } })
+    app.inject({
+      method,
+      url,
+      ...(payload !== undefined && { payload }),
+      ...(opts.ip && { remoteAddress: opts.ip }),
+      headers: { origin: ORIGIN, ...(cookie && { cookie }), ...headers },
+    })
   return {
     get: (url: string, headers?: Record<string, string>) => call('GET', url, undefined, headers),
     post: (url: string, payload?: Body, headers?: Record<string, string>) => call('POST', url, payload ?? {}, headers),
@@ -41,7 +52,7 @@ export function cookieOf(res: LightMyRequestResponse): string {
 
 export async function registerAndLogin(app: FastifyInstance, n = 1): Promise<{ cookie: string; trainerId: string; email: string }> {
   const email = `user${n}@test.dev`
-  const res = await api(app).post('/auth/register', { email, password: 'senha-forte-123', name: `Trainer${n}` })
+  const res = await api(app, undefined, { ip: `10.1.0.${n}` }).post('/auth/register', { email, password: 'senha-forte-123', name: `Trainer${n}` })
   if (res.statusCode !== 201) throw new Error(`registro falhou: ${res.body}`)
   return { cookie: cookieOf(res), trainerId: (res.json() as { trainer: { id: string } }).trainer.id, email }
 }

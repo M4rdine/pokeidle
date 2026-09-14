@@ -11,5 +11,18 @@ export function verifyPassword(hash: string, plain: string): Promise<boolean> {
   return argon2.verify(hash, plain).catch(() => false)
 }
 
-/** Hash de um segredo aleatório, usado para igualar o tempo de resposta quando o e-mail não existe (S7). */
-export const DUMMY_HASH: string = await hashPassword(randomBytes(32).toString('hex'), { memoryCost: 4096, timeCost: 1 })
+const dummyHashCache = new Map<string, Promise<string>>()
+
+/**
+ * Hash de um segredo aleatório, com o MESMO custo do hash real (`options`), usado para igualar
+ * o tempo de resposta quando o e-mail não existe (S7). Memoizado por combinação de opções para
+ * não recalcular a cada tentativa de login.
+ */
+export function dummyHashFor(options: HashOptions): Promise<string> {
+  const key = `${options.memoryCost ?? 'default'}:${options.timeCost ?? 'default'}`
+  const cached = dummyHashCache.get(key)
+  if (cached) return cached
+  const promise = hashPassword(randomBytes(32).toString('hex'), options)
+  dummyHashCache.set(key, promise)
+  return promise
+}

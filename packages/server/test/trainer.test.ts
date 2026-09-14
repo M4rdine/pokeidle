@@ -1,5 +1,9 @@
+import { loadRegistry } from '@pokeidle/shared'
+import { eq } from 'drizzle-orm'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { chooseStarter } from '../src/account/starter.js'
 import { huntSessions, pokedexEntries, pokemon } from '../src/db/schema.js'
+import { AppError } from '../src/http/errors.js'
 import { truncateAll } from './helpers/db.js'
 import { api, registerAndLogin, T0, testApp, type TestApp } from './helpers/app.js'
 
@@ -25,6 +29,22 @@ describe('inicial', () => {
   })
   it('rejeita espécie fora da lista', async () => {
     expect((await api(t.app, cookie).post('/trainer/starter', { species: 'mewtwo' })).statusCode).toBe(400)
+  })
+  it('duas escolhas concorrentes do inicial: só uma vence, a outra recebe starter-already-chosen', async () => {
+    const registry = loadRegistry()
+    const results = await Promise.allSettled([
+      chooseStarter(t.db, registry, trainerId, 'charmander', T0),
+      chooseStarter(t.db, registry, trainerId, 'squirtle', T0),
+    ])
+    const fulfilled = results.filter((r) => r.status === 'fulfilled')
+    const rejected = results.filter((r) => r.status === 'rejected')
+    expect(fulfilled).toHaveLength(1)
+    expect(rejected).toHaveLength(1)
+    const [{ reason }] = rejected as [PromiseRejectedResult]
+    expect(reason).toBeInstanceOf(AppError)
+    expect((reason as AppError).code).toBe('starter-already-chosen')
+    const rows = await t.db.select().from(pokemon).where(eq(pokemon.trainerId, trainerId))
+    expect(rows).toHaveLength(1)
   })
 })
 
@@ -62,6 +82,9 @@ describe('time', () => {
 
 describe('settings, inventário e pokédex', () => {
   it('PATCH settings mescla e valida', async () => {
+    const empty = await api(t.app, cookie).patch('/trainer/settings', {})
+    expect(empty.statusCode).toBe(200)
+    expect(empty.json()).toEqual({ settings: { returnHpPercent: 30, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false } } })
     const r = await api(t.app, cookie).patch('/trainer/settings', { returnHpPercent: 50, capture: { ballTier: 'great' } })
     expect(r.json()).toEqual({ settings: { returnHpPercent: 50, capture: { ballTier: 'great', maxWildHpPercent: 30, allowDuplicates: false } } })
     expect((await api(t.app, cookie).patch('/trainer/settings', { returnHpPercent: 101 })).statusCode).toBe(400)
@@ -80,5 +103,7 @@ describe('settings, inventário e pokédex', () => {
   it('todas exigem login', async () => {
     for (const [m, url] of [['get', '/trainer/team'], ['get', '/trainer/inventory'], ['get', '/trainer/pokedex']] as const) expect((await api(t.app)[m](url)).statusCode).toBe(401)
     expect((await api(t.app).post('/trainer/starter', { species: 'charmander' })).statusCode).toBe(401)
+    expect((await api(t.app).put('/trainer/team', { slots: ['x-w1'] })).statusCode).toBe(401)
+    expect((await api(t.app).patch('/trainer/settings', { returnHpPercent: 50 })).statusCode).toBe(401)
   })
 })

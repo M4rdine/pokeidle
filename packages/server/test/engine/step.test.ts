@@ -32,6 +32,26 @@ describe('pickTarget e caminhada', () => {
     expect(r.state.player.mode).toBe('searching')
     expect(r.events).toEqual([])
   })
+  it('dois selvagens equidistantes: escolhe o de menor id', () => {
+    const deps = miniDeps()
+    const s = baseState({}, deps)
+    const wilds = [
+      { ...s.wilds[0]!, id: 5, position: { x: 2, y: 0 } },
+      { ...s.wilds[0]!, id: 3, position: { x: 0, y: 2 } },
+    ]
+    const t = pickTarget({ ...s, wilds }, deps)
+    expect(t).toEqual({ wildId: 3, path: [{ x: 0, y: 1 }] })
+  })
+  it('selvagem cercado é ignorado; escolhe o outro alcançável', () => {
+    const deps = miniDeps()
+    const s = baseState({}, deps)
+    const surrounded = { ...s.wilds[0]!, id: 9, position: { x: 4, y: 4 } }
+    const blockerA = { ...s.wilds[0]!, id: 10, position: { x: 3, y: 4 }, hp: 0 }
+    const blockerB = { ...s.wilds[0]!, id: 11, position: { x: 4, y: 3 }, hp: 0 }
+    const wilds = [s.wilds[0]!, surrounded, blockerA, blockerB]
+    const t = pickTarget({ ...s, wilds }, deps)
+    expect(t).toEqual({ wildId: 1, path: [{ x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }] })
+  })
 })
 
 describe('combate até a derrota e respawn', () => {

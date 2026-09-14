@@ -1,6 +1,6 @@
 import { HEAL_TICKS } from './constants.js'
 import { attemptCapture, captureApplies, playerAttack } from './combat.js'
-import { findPath, isAdjacent, samePoint } from './grid.js'
+import { findPath, floodFrom, inBounds, isAdjacent, neighbors, pathFromFlood, samePoint } from './grid.js'
 import { blockedAt, isWalkable } from './spawn.js'
 import type { EngineDeps, Event, HuntState, PlayerState, Point, StepResult, WildState } from './types.js'
 
@@ -13,14 +13,33 @@ function pathTo(state: HuntState, deps: EngineDeps, target: Point, isGoal: (p: P
   return findPath({ from: state.player.position, target, isBlocked, isGoal, width: deps.hunt.width, height: deps.hunt.height })
 }
 
+/**
+ * Alvo mais próximo por uma única busca em largura a partir da posição do jogador (em vez de um
+ * A* por selvagem candidato): monta o mapa de bloqueio uma vez, inunda a partir do jogador e, para
+ * cada selvagem vivo não ignorado, olha a menor distância entre os seus vizinhos em bounds.
+ */
 export function pickTarget(state: HuntState, deps: EngineDeps): { wildId: number; path: Point[] } | null {
+  const { width, height } = deps.hunt
   const candidates = state.wilds.filter((w) => w.hp > 0 && !state.player.skippedWildIds.includes(w.id))
-  let best: { wildId: number; path: Point[] } | null = null
+  if (candidates.length === 0) return null
+  const isBlocked = (p: Point): boolean => blockedAt(deps.hunt, p) || state.wilds.some((w) => samePoint(w.position, p))
+  const flood = floodFrom({ from: state.player.position, isBlocked, width, height })
+  const floodKey = (p: Point): number => p.y * width + p.x
+
+  let best: { wildId: number; distance: number; neighbor: Point } | null = null
   for (const w of [...candidates].sort((a, b) => a.id - b.id)) {
-    const path = pathTo(state, deps, w.position, (p) => isAdjacent(p, w.position), w.id)
-    if (path && (best === null || path.length < best.path.length)) best = { wildId: w.id, path }
+    let nearest: Point | null = null
+    let nearestDistance = Number.POSITIVE_INFINITY
+    for (const n of neighbors(w.position)) {
+      if (!inBounds(n, width, height)) continue
+      const d = flood.dist.get(floodKey(n))
+      if (d !== undefined && d < nearestDistance) { nearestDistance = d; nearest = n }
+    }
+    if (nearest && (best === null || nearestDistance < best.distance)) best = { wildId: w.id, distance: nearestDistance, neighbor: nearest }
   }
-  return best
+  if (!best) return null
+  const path = pathFromFlood(flood, state.player.position, best.neighbor, width)
+  return path && { wildId: best.wildId, path }
 }
 
 const targetOf = (state: HuntState): WildState | undefined => state.wilds.find((w) => w.id === state.player.targetWildId && w.hp > 0)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findPath, isAdjacent, manhattan, neighbors } from '../../src/engine/grid.js'
+import { findPath, floodFrom, isAdjacent, manhattan, neighbors, pathFromFlood } from '../../src/engine/grid.js'
 
 // mapa 5x5: '#' bloqueia
 const rows = ['.....', '.###.', '.....', '.#.#.', '.....']
@@ -40,5 +40,32 @@ describe('findPath', () => {
     const path = findPath({ ...base, from: at(1, 1), target: at(4, 4), isBlocked: (p) => blocked(p) || (p.x === 1 && p.y === 1), isGoal: (p) => p.x === 4 && p.y === 4 })
     expect(path).not.toBeNull()
     for (const p of path!) { expect(p.x).toBeGreaterThanOrEqual(0); expect(p.y).toBeLessThan(5); expect(blocked(p)).toBe(false) }
+  })
+})
+
+describe('floodFrom / pathFromFlood', () => {
+  const width = 3
+  const height = 3
+  const isBlocked = (p: { x: number; y: number }) => p.x === 1 && p.y === 1
+
+  it('calcula as distâncias corretas num 3x3 com o centro bloqueado', () => {
+    const flood = floodFrom({ from: at(0, 0), isBlocked, width, height })
+    const distAt = (x: number, y: number) => flood.dist.get(y * width + x)
+    expect(distAt(0, 0)).toBe(0)
+    expect(distAt(1, 0)).toBe(1)
+    expect(distAt(0, 1)).toBe(1)
+    expect(distAt(2, 0)).toBe(2)
+    expect(distAt(0, 2)).toBe(2)
+    expect(distAt(2, 1)).toBe(3)
+    expect(distAt(1, 2)).toBe(3)
+    expect(distAt(2, 2)).toBe(4)
+    expect(flood.dist.has(1 * width + 1)).toBe(false) // tile bloqueado: inalcançável
+  })
+
+  it('pathFromFlood devolve o caminho sem a origem, e null se o alvo não foi alcançado', () => {
+    const flood = floodFrom({ from: at(0, 0), isBlocked, width, height })
+    expect(pathFromFlood(flood, at(0, 0), at(2, 2), width)).toEqual([at(1, 0), at(2, 0), at(2, 1), at(2, 2)])
+    expect(pathFromFlood(flood, at(0, 0), at(0, 0), width)).toEqual([])
+    expect(pathFromFlood(flood, at(0, 0), at(1, 1), width)).toBeNull()
   })
 })

@@ -53,3 +53,47 @@ function reconstruct(cameFrom: Map<number, Point>, end: Point, from: Point): Poi
   while (cur && !samePoint(cur, from)) { path.push(cur); cur = cameFrom.get(key(cur)) }
   return path.reverse()
 }
+
+export interface FloodInput {
+  readonly from: Point; readonly isBlocked: (p: Point) => boolean
+  readonly width: number; readonly height: number
+}
+
+export interface Flood { readonly dist: ReadonlyMap<number, number>; readonly parent: ReadonlyMap<number, number> } // chave = y*width+x
+
+/** BFS em 4 vizinhos (N, E, S, W), custo 1, a partir de `from` (nunca bloqueada). Não revisita tiles. */
+export function floodFrom({ from, isBlocked, width, height }: FloodInput): Flood {
+  const floodKey = (p: Point): number => p.y * width + p.x
+  const dist = new Map<number, number>([[floodKey(from), 0]])
+  const parent = new Map<number, number>()
+  const queue: Point[] = [from]
+  for (let i = 0; i < queue.length; i++) {
+    const current = queue[i]!
+    const currentDist = dist.get(floodKey(current))!
+    for (const next of neighbors(current)) {
+      if (!inBounds(next, width, height) || isBlocked(next)) continue
+      const nk = floodKey(next)
+      if (dist.has(nk)) continue
+      dist.set(nk, currentDist + 1)
+      parent.set(nk, floodKey(current))
+      queue.push(next)
+    }
+  }
+  return { dist, parent }
+}
+
+/** Reconstrói o caminho de `from` até `to` a partir de um `Flood`. Caminho sem a origem; null se `to` não foi alcançado. */
+export function pathFromFlood(flood: Flood, from: Point, to: Point, width: number): Point[] | null {
+  const floodKey = (p: Point): number => p.y * width + p.x
+  const fromKey = floodKey(from)
+  let currentKey = floodKey(to)
+  if (!flood.dist.has(currentKey)) return null
+  const path: Point[] = []
+  while (currentKey !== fromKey) {
+    path.push({ x: currentKey % width, y: Math.floor(currentKey / width) })
+    const parentKey = flood.parent.get(currentKey)
+    if (parentKey === undefined) return null
+    currentKey = parentKey
+  }
+  return path.reverse()
+}

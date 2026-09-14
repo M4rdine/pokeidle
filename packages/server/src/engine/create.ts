@@ -21,7 +21,7 @@ export function createHuntState(input: CreateInput, deps: EngineDeps): HuntState
   const respawns = input.hunt.spawns.flatMap((s, spawnIndex) => Array.from({ length: s.count }, () => ({ spawnIndex, atTick: 0 })))
   const initial: HuntState = {
     huntId: input.hunt.id, tick: 0,
-    player: { team: input.team, activeIndex: 0, position: input.hunt.spawnPoint, path: [], mode: 'searching', targetWildId: null, healingUntilTick: null, cooldowns: {} },
+    player: { team: input.team, activeIndex: 0, position: input.hunt.spawnPoint, path: [], mode: 'searching', targetWildId: null, healingUntilTick: null, cooldowns: {}, skippedWildIds: [] },
     wilds: [], respawns, nextWildId: 1,
     trainer: { xp: 0, gold: 0 },
     inventory: input.inventory,

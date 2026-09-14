@@ -20,6 +20,7 @@ export interface PlayerState {
   readonly position: Point; readonly path: readonly Point[]
   readonly mode: PlayerMode; readonly targetWildId: number | null; readonly healingUntilTick: number | null
   readonly cooldowns: Readonly<Record<string, number>>
+  readonly skippedWildIds: readonly number[]
 }
 export interface Respawn { readonly spawnIndex: number; readonly atTick: number }
 export interface HuntState {

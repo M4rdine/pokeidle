@@ -1,7 +1,7 @@
 import { z } from 'zod'
+import { parseOrThrow } from '@pokeidle/shared'
 import type { Catalog } from './catalog.js'
 import { readJson } from './json-file.js'
-import { parseOrThrow } from './parse-or-throw.js'
 
 const KEBAB = /^[a-z0-9-]+$/
 const ONLY_DIGITS = /^\d+$/

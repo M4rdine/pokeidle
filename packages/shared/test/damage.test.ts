@@ -1,10 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { TYPE_NAMES, createRng, type Move, type TypeChart } from '../src/index.js'
+import { TYPE_NAMES, createRng, type Move, type TypeChart, type TypeName } from '../src/index.js'
 import { bestMove, computeDamage, expectedDamage, typeMultiplier, type Combatant } from '../src/damage.js'
 import { statsAt } from '../src/stats.js'
 
-const chart = Object.fromEntries(TYPE_NAMES.map((a) => [a, Object.fromEntries(TYPE_NAMES.map((d) => [d, 1]))])) as TypeChart
-chart.fire.grass = 2; chart.fire.water = 0.5; chart.fire.fire = 0.5; chart.electric.ground = 0; chart.fire.bug = 2
+const baseRow = Object.fromEntries(TYPE_NAMES.map((d) => [d, 1])) as TypeChart[TypeName]
+const baseChart = Object.fromEntries(TYPE_NAMES.map((a) => [a, baseRow])) as TypeChart
+const chart: TypeChart = {
+  ...baseChart,
+  fire: { ...baseRow, grass: 2, water: 0.5, fire: 0.5, bug: 2 },
+  electric: { ...baseRow, ground: 0 },
+}
 
 const ember: Move = { name: 'ember', type: 'fire', power: 40, accuracy: 100, damageClass: 'special' }
 const scratch: Move = { name: 'scratch', type: 'normal', power: 40, accuracy: 100, damageClass: 'physical' }

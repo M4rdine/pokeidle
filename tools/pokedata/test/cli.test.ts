@@ -41,6 +41,19 @@ describe('buildProgram', () => {
     expect(stdout.lines()).toMatch(/2 espécies/)
   })
 
+  it('rejeita manifest inválido', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokedata-cli-'))
+    const manifestPath = join(dir, 'manifest.json')
+    await writeFile(manifestPath, JSON.stringify({ species: 'x' }))
+    const outDir = join(dir, 'out')
+    const cacheDir = join(dir, 'cache')
+    const { api } = fakeApi(cacheDir)
+    const program = buildProgram({ createApi: () => api })
+
+    captureStdout()
+    await expect(program.parseAsync(['node', 'pokedata', 'sync', '--manifest', manifestPath, '--out', outDir, '--cache', cacheDir])).rejects.toThrow(/manifest inválido/)
+  })
+
   it('repassa --force para createApi', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'pokedata-cli-'))
     const manifestPath = await writeManifest(dir)

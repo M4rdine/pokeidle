@@ -11,7 +11,7 @@ pnpm assets inspect <spr> <dat> [--version 860|854]
 pnpm assets extract <spr> <dat> [--out assets/extracted] [--version 860|854]
 pnpm assets contact-sheet [--extracted assets/extracted] [--all-outfits] [--all-items]
 pnpm assets build [--extracted assets/extracted] [--manifest tools/assets/manifest.json] [--out assets/atlas]
-pnpm assets map-import <mapa.tmj> --id rota-1 --name "Rota 1" [--tileset assets/atlas/tiles.tsj] [--manifest tools/assets/manifest.json] [--out packages/shared/data/hunts]
+pnpm assets map-import tools/assets/maps/route-1.tmj --id rota-1 --name "Rota 1" [--tileset assets/atlas/tiles.tsj] [--manifest tools/assets/manifest.json] [--out packages/shared/data/hunts]
 ```
 
 - `inspect` resume assinaturas, contagens e avisos sem escrever nada.
@@ -22,6 +22,9 @@ pnpm assets map-import <mapa.tmj> --id rota-1 --name "Rota 1" [--tileset assets/
   por padrão; sem `--manifest`, confere os nomes de espécie dos spawns contra
   `loadRegistry().species` do `@pokeidle/shared` (com `--manifest`, usa os nomes do
   manifest em vez do registro).
+
+Os `.tmj` de origem do Tiled (commitados, não gerados) ficam em `tools/assets/maps/` — só o
+`HuntMap` JSON convertido vai para `packages/shared/data/hunts`.
 
 Efeitos e mísseis são opcionais: se o `.dat` estiver corrompido nessas seções, a leitura
 segue e um `aviso: ...` é impresso.
@@ -111,9 +114,8 @@ o id local de cada tile é a posição no manifest e o nome vai na propriedade `
 O schema exige camadas com exatamente `width * height` entradas, `minLevel <= maxLevel`
 e todas as posições (`spawnPoint`, `pokecenter`, cada spawn) dentro do mapa.
 
-> `HuntMapSchema` mora em `@pokeidle/shared` (compartilhado entre servidor e cliente).
-> `hunt-map.ts` e `parse-or-throw.ts` aqui são apenas re-exports de lá — veja
-> `packages/shared/README.md`.
+> `HuntMapSchema` e `parseOrThrow` moram em `@pokeidle/shared` (compartilhado entre servidor
+> e cliente) e são importados diretamente de lá — veja `packages/shared/README.md`.
 
 ## Desenvolvimento
 

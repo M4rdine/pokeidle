@@ -1,7 +1,6 @@
 import { z } from 'zod'
+import { TILE_SIZE, parseHuntMap, parseOrThrow, type HuntMap, type HuntSpawn } from '@pokeidle/shared'
 import type { TiledTileset } from './atlas.js'
-import { TILE_SIZE, parseHuntMap, type HuntMap, type HuntSpawn } from './hunt-map.js'
-import { parseOrThrow } from './parse-or-throw.js'
 
 const TiledPropertySchema = z.object({ name: z.string(), type: z.string(), value: z.union([z.string(), z.number(), z.boolean()]) })
 

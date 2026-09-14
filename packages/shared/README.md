@@ -20,7 +20,7 @@ Busca no PokeAPI as espécies listadas em `tools/assets/manifest.json`, grava
 | --- | --- |
 | `species.json`, `moves.json`, `type-chart.json` | `pnpm pokedata sync` (PokeAPI) |
 | `items.json`, `loot.json` | autorais, editados à mão |
-| `hunts/*.json` | `pnpm assets map-import` (a partir de um `.tmj` do Tiled) |
+| `hunts/*.json` | `pnpm assets map-import` (a partir de um `.tmj` do Tiled em `tools/assets/maps/`) |
 
 Cada hunt precisa de um import próprio em `src/data-files.ts` — adicionar uma hunt é
 adicionar uma linha lá (ver seção abaixo).
@@ -31,7 +31,8 @@ adicionar uma linha lá (ver seção abaixo).
 loadRegistry(): Registry // memoizado; lança na primeira chamada se houver referência quebrada
   // Registry = { species, speciesById, moves, items, loot, hunts, typeChart }
   // species/speciesById/moves/items/loot/hunts são ReadonlyMap; falha inclui golpe sem
-  // ficha, evolução sem alvo, item de loot inexistente e espécie de spawn inexistente.
+  // ficha, evolução sem alvo, item de loot inexistente, espécie de spawn inexistente e
+  // entrada de loot.json cuja species não existe.
 
 statAt(base: number, level: number): number
 hpAt(base: number, level: number): number
@@ -78,13 +79,14 @@ createRng(seed): Rng // único gerador aleatório do jogo
 
 ## Adicionar uma hunt
 
-1. Exporte o mapa do Tiled e rode `pnpm assets map-import <mapa.tmj> --id <id> --name <nome>`
-   (grava em `data/hunts/<id>.json` por padrão; sem `--manifest`, valida `speciesName` dos
-   spawns contra `loadRegistry().species`).
+1. Exporte o mapa do Tiled para `tools/assets/maps/<id>.tmj` (é onde os `.tmj` de origem
+   ficam, commitados) e rode `pnpm assets map-import tools/assets/maps/<id>.tmj --id <id>
+   --name <nome>` (grava em `data/hunts/<id>.json` por padrão; sem `--manifest`, valida
+   `speciesName` dos spawns contra `loadRegistry().species`).
 2. Adicione `import <id> from '../data/hunts/<id>.json' with { type: 'json' }` e inclua no
    array `hunts` de `rawData`, em `src/data-files.ts`.
 
 ## Consumidores
 
-`tools/assets` usa este pacote como dependência de workspace: `hunt-map.ts` e
-`parse-or-throw.ts` lá são apenas re-exports daqui.
+`tools/assets` usa este pacote como dependência de workspace: importa `HuntMapSchema`,
+`parseHuntMap`, `TILE_SIZE` e `parseOrThrow` diretamente daqui (sem shims locais).

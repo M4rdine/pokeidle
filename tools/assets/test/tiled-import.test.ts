@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import { parseHuntMap } from '@pokeidle/shared'
 import type { TiledTileset } from '../src/atlas.js'
-import { parseHuntMap } from '../src/hunt-map.js'
 import { importTiledMap, parseTiledTileset } from '../src/tiled-import.js'
 
 const tileset: TiledTileset = {

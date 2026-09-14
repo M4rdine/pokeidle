@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { parseOrThrow } from './parse-or-throw.js'
+import { parseOrThrow } from '@pokeidle/shared'
 import { FLAG_GROUND, FLAG_NOT_WALKABLE, type DatFile, type DatVersion, type ThingType } from './dat.js'
 import type { SprFile } from './spr.js'
 

@@ -29,7 +29,7 @@ Decisões desta fase (respostas do usuário em 2026-09-14):
 | Módulo | Responsabilidade |
 |---|---|
 | `engine/` | Fase 2a, intocado. |
-| `config.ts` | Variáveis de ambiente validadas com Zod: `DATABASE_URL`, `PORT` (padrão 3000), `COOKIE_SECURE` (`true`/`false`, padrão `false`), `LOG_LEVEL` (padrão `info`). |
+| `config.ts` | Variáveis de ambiente validadas com Zod: `DATABASE_URL`, `PORT` (padrão 3000), `COOKIE_SECURE` (`true`/`false`, padrão `false`), `APP_ORIGIN` (ex.: `http://localhost:3000`, usado na checagem de `Origin`), `TRUST_PROXY` (padrão `false`), `LOG_LEVEL` (padrão `info`). |
 | `db/schema.ts` | Tabelas Drizzle (§3). |
 | `db/client.ts` | `createDb(url): Db` (pool `pg` + `drizzle`), `closeDb(db)`. `Db` é o tipo do Drizzle com o schema. |
 | `db/migrate.ts` | `migrate(db)` aplica `packages/server/drizzle/*.sql` (drizzle-orm/node-postgres/migrator). |
@@ -41,6 +41,7 @@ Decisões desta fase (respostas do usuário em 2026-09-14):
 | `http/app.ts` | `buildApp({ db, config, logger? }): FastifyInstance` — registra cookie, rate limit, auth plugin, rotas e o tratamento de erros. |
 | `http/routes/{auth,trainer,hunts}.ts` | Rotas por domínio; corpos validados com Zod. |
 | `http/errors.ts` | `AppError(code, status, message)` e o mapa código → HTTP. |
+| `http/security.ts` | Checagem de `Origin` nas rotas que mudam estado, registro do helmet e do `redact` do logger. |
 | `main.ts` | Único ponto com I/O de processo: carrega config, cria `db`, roda migrations, sobe o servidor. |
 
 Regra de dependência: `http → account | hunt-store → db`; `hunt-store → engine`; `engine`
@@ -172,7 +173,7 @@ Invariante: `startHunt` seguido de `syncToTables` sem nenhum tick não altera li
 Todo erro é `{ error: { code, message } }`. Códigos e HTTP: `validation` 400,
 `invalid-credentials` 401, `unauthorized` 401, `not-found` 404, `email-taken` 409,
 `name-taken` 409, `starter-already-chosen` 409, `no-starter` 409, `hunt-active` 409,
-`no-hunt` 409, `rate-limited` 429, `internal` 500. Erros Zod viram `validation` com a
+`no-hunt` 409, `forbidden` 403, `rate-limited` 429, `payload-too-large` 413, `internal` 500. Erros Zod viram `validation` com a
 mensagem do primeiro problema. Erros inesperados viram `internal` com mensagem genérica
 e são logados com stack pelo pino. `AppError` é a única exceção de domínio; serviços
 lançam `AppError`, nunca objetos soltos.
@@ -197,10 +198,96 @@ lançam `AppError`, nunca objetos soltos.
   stop sem hunt, stop com sync); `hunt-store` direto: start → 400 ticks de `simulate` com
   o motor → `syncToTables` → banco reflete HP/XP/nível/captura nova/inventário/ouro/Pokédex;
   start → sync sem tick = no-op (linhas iguais); `loadActive` rejeita jsonb corrompido.
+- **Segurança** (integração): S2 (conta B não acessa recursos de A), S3 (`seed`/`rng_state`
+  ausentes), S5 (flags do cookie; `sessions` sem o token em claro), S7 (corpo e status
+  iguais), S9 (campo desconhecido → 400; corpo > 16 KB → 413), S10 (429), S11 (`Origin`
+  errado → 403), S12 (cabeçalhos presentes), S13 (500 genérico), S14 (`redact`, unitário).
 - Cobertura ≥ 80 % de linhas em `packages/server/src` (motor já em 97 %). Todos os
   testes via `app.inject`, sem porta aberta.
 
-## 9. Fora do escopo
+## 9. Segurança
+
+Princípio: o navegador pertence ao jogador. Tudo o que o cliente envia, um jogador pode
+enviar à mão; tudo o que o cliente recebe, ele pode ler. Esconder a API não é critério de
+segurança, é no máximo atrito. O que protege é o servidor ser a única autoridade e
+validar cada mensagem. (Verificação feita em 2026-09-14: o pokeidle.io **se comunica**
+sim — um único WebSocket em `wss://pokeidle.io` com JSON nos dois sentidos, 86 tipos de
+mensagem do cliente como `{ t: 'ball.throw', ballId, slot }` e respostas como
+`capturado`, `levelup`; REST só para auth, compras, ranking e JSON estático; Cloudflare
+Turnstile no login; token de sessão em `localStorage`. Os frames só aparecem no filtro
+"WS" do DevTools e só se ele estava aberto antes da conexão. Não há nada a reproduzir
+nesse ponto: o nosso desenho já tem a mesma forma, REST mínimo mais um WS na 2c, e é
+mais forte num aspecto, o cookie `httpOnly` em vez de token legível por XSS.)
+
+Critérios desta fase, cada um com o teste que o prova (§8 ganha a lista abaixo):
+
+**Autoridade e autorização**
+- S1. Todo número que vale pontos nasce no servidor (motor da 2a). O cliente só envia
+  intenções; nenhuma rota aceita XP, ouro, HP, nível ou itens no corpo.
+- S2. Dono do recurso vem da sessão, nunca do corpo ou da URL: `trainerId` é sempre
+  `request.auth.trainer.id`. Teste: conta B tenta reordenar o time / parar a hunt /
+  ler `hunts/active` de A → 404 ou 409, nunca os dados de A.
+- S3. `seed` e `rng_state` nunca saem do servidor (`GET /hunts/active` os remove). Teste:
+  a resposta não contém as chaves.
+- S4. Relógio só do servidor: `now` vem de `Date.now()` no servidor; nenhuma rota lê
+  timestamps do cliente.
+
+**Sessão e senha**
+- S5. Cookie `sid` `httpOnly`, `SameSite=Lax`, `Secure` em produção, `Path=/`; o banco
+  guarda só o SHA-256 do token; token de 32 bytes de `crypto.randomBytes`. Teste: flags
+  presentes no `Set-Cookie`; a linha em `sessions` não contém o token.
+- S6. Login cria sessão nova (rotação); logout apaga; sessão vencida é apagada ao ser
+  encontrada. Uma conta pode ter várias sessões (vários dispositivos).
+- S7. argon2id com parâmetros padrão da biblioteca; senha nunca logada; resposta e tempo
+  iguais para e-mail inexistente e senha errada (`DUMMY_HASH`). Teste: os dois casos
+  devolvem o mesmo corpo e status.
+- S8. Enumeração de e-mail no registro (`email-taken` 409) é aceita de propósito pela
+  escala de amigos e pela UX; fica limitada pelo rate limit de registro.
+
+**Entrada**
+- S9. Zod em todo corpo, query e params, com `.strict()` (campos desconhecidos → 400).
+  `bodyLimit` 16 KB. Só `application/json` nas rotas com corpo.
+- S10. Rate limit por IP: `/auth/login` e `/auth/register` 10/min; registro também
+  20/dia; demais rotas 300/min. `trustProxy` ligado por config para o IP real atrás do
+  proxy. Teste: 11ª tentativa → 429.
+- S11. CSRF: além de `SameSite=Lax`, toda rota que muda estado exige `Origin` (ou
+  `Referer`) igual a `APP_ORIGIN` da config; ausente ou diferente → 403 `forbidden`.
+  Formulários cross-site não conseguem enviar JSON sem preflight, e o preflight falha
+  porque não há CORS (a API só serve a própria origem). Teste: POST com `Origin`
+  estranho → 403.
+
+**Saída e cabeçalhos**
+- S12. `@fastify/helmet`: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`,
+  `Referrer-Policy: same-origin`, CSP mínima (`default-src 'self'`; ajustada na fase 3
+  quando houver cliente), HSTS só quando `COOKIE_SECURE=true`.
+- S13. Erros: nunca stack, texto de banco ou nome de tabela na resposta; 500 é genérico.
+  Teste: um erro forçado no serviço devolve `{ error: { code: 'internal' } }` sem detalhe.
+- S14. Log com `pino` e `redact` para `req.headers.cookie`, `req.headers.authorization`,
+  `password`, `token`. Teste unitário do `redact`.
+
+**Banco e economia**
+- S15. Só consultas parametrizadas (Drizzle). `check (quantity >= 0)`, únicos em e-mail,
+  nome e `team_slot`; FKs com `on delete cascade`. Toda escrita de ouro, item ou captura
+  em transação (`syncToTables`, `stopHunt`, registro, inicial).
+- S16. Usuário do banco da aplicação sem superuser; em produção a porta 5432 não é
+  pública (só no Compose de dev). Migrations rodam no boot com o mesmo usuário.
+- S17. `hunt_log` (2c) permite detectar outliers de XP por minuto; nesta fase a tabela
+  existe.
+
+**Segredos e dependências**
+- S18. Segredos só em variáveis de ambiente; `.env` no `.gitignore`; `.env.example` sem
+  valores reais. Config falha no boot se `DATABASE_URL` faltar.
+- S19. Versões fixas no `pnpm-lock.yaml`; `pnpm audit --prod` no script `check`.
+- S20. Bundle do cliente (fase 3) não terá segredos; as regras do jogo em `shared` são
+  públicas por natureza, e o servidor decide mesmo assim.
+
+**Fora desta fase, anotado para depois**: captcha (Turnstile) no registro se aparecer
+abuso; bloqueio progressivo por conta após N falhas de login; verificação de e-mail;
+reset de senha; 2FA; auditoria de admin; origem e rate limit de intenções no WebSocket
+(2c: `Origin` no handshake, cookie no handshake, 1 intenção a cada 200 ms por conexão,
+tamanho máximo de mensagem).
+
+## 10. Fora do escopo
 
 Scheduler, WebSocket, catch-up, `hunt_log` por eventos, aplicação de `updateSettings`
 em hunt ativa, verificação de e-mail, reset de senha, papéis de admin além da coluna,

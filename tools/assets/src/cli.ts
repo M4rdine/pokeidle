@@ -4,6 +4,7 @@ import { buildAtlases } from './build-atlases.js'
 import { parseDat, type DatVersion } from './dat.js'
 import { extractAll } from './extract.js'
 import { parseSpr } from './spr.js'
+import { writeContactSheet } from './contact-sheet.js'
 
 const out = (line: string): void => void process.stdout.write(`${line}\n`)
 
@@ -48,6 +49,16 @@ program
   .option('--out <dir>', 'pasta de saída dos atlases', 'assets/atlas')
   .action(async (opts: { extracted: string; manifest: string; out: string }) => {
     await buildAtlases({ extractedDir: opts.extracted, manifestPath: opts.manifest, outDir: opts.out }, out)
+  })
+
+program
+  .command('contact-sheet')
+  .option('--extracted <dir>', 'pasta com PNGs extraídos e catalog.json', 'assets/extracted')
+  .option('--all-outfits', 'incluir outfits 1x1', false)
+  .option('--all-items', 'incluir itens que não são chão', false)
+  .action(async (opts: { extracted: string; allOutfits: boolean; allItems: boolean }) => {
+    const path = await writeContactSheet(opts.extracted, { onlyMultiTileOutfits: !opts.allOutfits, groundItemsOnly: !opts.allItems })
+    out(`abra no navegador: ${path}`)
   })
 
 export { program }

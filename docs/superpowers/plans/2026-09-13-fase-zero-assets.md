@@ -73,7 +73,7 @@ assets/                          # gitignored
 
 **Tibia.dat:** `u32 signature`, `u16 lastItemId`, `u16 outfitCount`, `u16 effectCount`, `u16 missileCount`. Depois os things em sequência: itens com id de 100 até `lastItemId`, outfits de 1 até `outfitCount`, efeitos, mísseis. Cada thing: lista de flags (1 byte cada, termina em `0xFF`, algumas carregam dados), depois `u8 width`, `u8 height`, se `width > 1 || height > 1` então `u8 exactSize`, `u8 layers`, `u8 patternX`, `u8 patternY`, `u8 patternZ`, `u8 phases`, e `width*height*layers*patternX*patternY*patternZ*phases` × `u16 spriteId`.
 
-Flags com dados na numeração 8.60: `0x00 Ground (u16)`, `0x08 Writable (u16)`, `0x09 WritableOnce (u16)`, `0x15 Light (u16,u16)`, `0x18 Displacement (u16 x, u16 y)`, `0x19 Elevation (u16)`, `0x1C MinimapColor (u16)`, `0x1D LensHelp (u16)`, `0x20 Cloth (u16)`, `0x21 Market (u16,u16,u16, string u16-len, u16,u16)`. Em 8.54 a flag `0x08` é `Chargeable` sem dados e todas as flags acima de 8 valem um a menos que em 8.60.
+Flags com dados na numeração 8.60: `0x00 Ground (u16)`, `0x08 Writable (u16)`, `0x09 WritableOnce (u16)`, `0x15 Light (u16,u16)`, `0x18 Displacement (u16 x, u16 y)`, `0x19 Elevation (u16)`, `0x1C MinimapColor (u16)`, `0x1D LensHelp (u16)`, `0x20 Cloth (u16)`, `0x21 Market (u16,u16,u16, string u16-len, u16,u16)`. Em 8.54 a flag `0x08` é `Chargeable` sem dados e todas as flags acima de 8 valem um a MAIS que em 8.60 (ex.: Displacement é `0x19` em 8.54 e `0x18` em 8.60); a normalização para 8.60 subtrai 1.
 
 Para outfits, `patternX` são as direções na ordem norte, leste, sul, oeste; `patternY` são addons; `patternZ` é montaria (1 em 8.x); `layers` 2 significa camada 1 de máscara de cor, usamos só a camada 0. Um frame multi-tile é desenhado com o sprite `(w=0,h=0)` no canto inferior direito: o sprite `(w,h)` vai em `x=(width-w-1)*32`, `y=(height-h-1)*32`.
 
@@ -770,10 +770,10 @@ describe('parseDat (860)', () => {
 
 describe('parseDat (854)', () => {
   it('trata a flag 8 como Chargeable sem dados e desloca as demais', () => {
-    // em 854: 0x17 = Displacement (0x18 em 860), 0x08 = Chargeable
+    // em 854: 0x19 = Displacement (0x18 em 860), 0x08 = Chargeable
     const file = buildDat({
       items: [{ ...groundItemSpec(1), flags: [0x00, 100, 0, 0x08] }],
-      outfits: [outfitSpec(1, 10, [0x17, 4, 0, 4, 0])],
+      outfits: [outfitSpec(1, 10, [0x19, 4, 0, 4, 0])],
     })
     const dat = parseDat(file, 854)
     expect(dat.items[0]?.groundSpeed).toBe(100)

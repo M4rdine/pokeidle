@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { xpForLevel } from '@pokeidle/shared'
-import { applyDefeat, gainXp, makePokemon } from '../../src/engine/progression.js'
+import { applyDefeat, gainXp, makePokemon, removeWild } from '../../src/engine/progression.js'
 import { baseState, charmander5, miniDeps } from './fixtures/mini.js'
 
 describe('makePokemon', () => {
@@ -29,6 +29,18 @@ describe('gainXp', () => {
     // charmeleon L16: hpAt(58,16) = floor(147*16/100)+16+10 = 23+26 = 49
     expect(r.pokemon.hpMax).toBe(49)
     expect(r.pokemon.hp).toBe(12 + (49 - 20))
+  })
+})
+
+describe('removeWild', () => {
+  it('remove o selvagem, agenda respawn e volta o jogador para searching', () => {
+    const deps = miniDeps()
+    const s = { ...baseState({}, deps), tick: 40, player: { ...baseState({}, deps).player, mode: 'fighting' as const, targetWildId: 1, path: [{ x: 1, y: 0 }] } }
+    const wild = s.wilds[0]!
+    const next = removeWild(s, deps, wild)
+    expect(next.wilds).toEqual([])
+    expect(next.respawns).toEqual([{ spawnIndex: 0, atTick: 40 + 2 * 5 }])
+    expect(next.player).toMatchObject({ mode: 'searching', targetWildId: null, path: [] })
   })
 })
 

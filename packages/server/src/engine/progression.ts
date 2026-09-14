@@ -35,6 +35,22 @@ function addItems(inventory: Readonly<Record<string, number>>, drops: readonly {
   return drops.reduce<Record<string, number>>((acc, d) => ({ ...acc, [d.item]: (acc[d.item] ?? 0) + d.quantity }), { ...inventory })
 }
 
+/**
+ * Remove um selvagem do estado, agenda seu respawn e volta o jogador para `searching`.
+ * Compartilhado entre `applyDefeat` (derrota) e `attemptCapture` (captura bem-sucedida) —
+ * ambos os fluxos terminam o combate da mesma forma.
+ */
+export function removeWild(state: HuntState, deps: EngineDeps, wild: WildState): HuntState {
+  const spawn = deps.hunt.spawns[wild.spawnIndex]
+  if (!spawn) throw new Error(`spawn ${wild.spawnIndex} não existe`)
+  return {
+    ...state,
+    wilds: state.wilds.filter((w) => w.id !== wild.id),
+    respawns: [...state.respawns, { spawnIndex: wild.spawnIndex, atTick: state.tick + spawn.respawnSeconds * TICKS_PER_SECOND }],
+    player: { ...state.player, mode: 'searching', targetWildId: null, path: [] },
+  }
+}
+
 export function applyDefeat(state: HuntState, deps: EngineDeps, wild: WildState): StepResult {
   const species = speciesOf(deps.registry, wild.speciesName)
   const xp = xpOnDefeat(species, wild.level)
@@ -42,9 +58,8 @@ export function applyDefeat(state: HuntState, deps: EngineDeps, wild: WildState)
   if (!active) throw new Error('sem Pokémon ativo')
   const gained = gainXp(active, xp, deps.registry, state.tick)
   const loot = rollLoot(species, deps.registry.loot, deps.rng)
-  const spawn = deps.hunt.spawns[wild.spawnIndex]
-  if (!spawn) throw new Error(`spawn ${wild.spawnIndex} não existe`)
-  const team = state.player.team.map((p, i) => (i === state.player.activeIndex ? gained.pokemon : p))
+  const removed = removeWild(state, deps, wild)
+  const team = removed.player.team.map((p, i) => (i === state.player.activeIndex ? gained.pokemon : p))
   const defeated: Event = {
     type: 'wildDefeated',
     tick: state.tick,
@@ -58,12 +73,10 @@ export function applyDefeat(state: HuntState, deps: EngineDeps, wild: WildState)
   }
   return {
     state: {
-      ...state,
-      wilds: state.wilds.filter((w) => w.id !== wild.id),
-      respawns: [...state.respawns, { spawnIndex: wild.spawnIndex, atTick: state.tick + spawn.respawnSeconds * TICKS_PER_SECOND }],
+      ...removed,
       trainer: { xp: state.trainer.xp + xp, gold: state.trainer.gold + loot.gold },
       inventory: addItems(state.inventory, loot.drops),
-      player: { ...state.player, team, mode: 'searching', targetWildId: null, path: [] },
+      player: { ...removed.player, team },
     },
     events: [defeated, ...gained.events],
   }

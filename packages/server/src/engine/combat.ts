@@ -1,5 +1,6 @@
 import { availableMoves, bestMove, computeDamage, cooldownTicks, expectedDamage, rollCapture, statsAt, xpForLevel, type Combatant, type Item, type Move, type Registry } from '@pokeidle/shared'
-import { BALL_ITEM_BY_TIER, MAX_TEAM_SIZE, TICKS_PER_SECOND } from './constants.js'
+import { BALL_ITEM_BY_TIER, MAX_TEAM_SIZE } from './constants.js'
+import { removeWild } from './progression.js'
 import type { EngineDeps, Event, HuntState, PokemonState, StepResult, WildState } from './types.js'
 
 export type AttackOutcome = 'hit' | 'none' | 'immune'
@@ -99,18 +100,15 @@ export function attemptCapture(state: HuntState, deps: EngineDeps, wild: WildSta
       events: [{ type: 'captureFailed', tick: state.tick, wildId: wild.id, ball: ball.id }],
     }
   }
-  const spawn = deps.hunt.spawns[wild.spawnIndex]
-  if (!spawn) throw new Error(`spawn ${wild.spawnIndex} não existe`)
   const toBox = state.player.team.length >= MAX_TEAM_SIZE
   const pokemon: PokemonState = { id: `wild-${wild.id}`, speciesName: wild.speciesName, level: wild.level, xp: xpForLevel(s.growthRate, wild.level), hp: wild.hp, hpMax: wild.hpMax }
   const seen = state.settings.seen.includes(wild.speciesName) ? state.settings.seen : [...state.settings.seen, wild.speciesName]
+  const removed = removeWild({ ...state, inventory }, deps, wild)
   return {
     state: {
-      ...state, inventory,
-      wilds: state.wilds.filter((w) => w.id !== wild.id),
-      respawns: [...state.respawns, { spawnIndex: wild.spawnIndex, atTick: state.tick + spawn.respawnSeconds * TICKS_PER_SECOND }],
-      settings: { ...state.settings, seen },
-      player: { ...state.player, team: toBox ? state.player.team : [...state.player.team, pokemon], mode: 'searching', targetWildId: null, path: [] },
+      ...removed,
+      settings: { ...removed.settings, seen },
+      player: { ...removed.player, team: toBox ? removed.player.team : [...removed.player.team, pokemon] },
     },
     events: [{ type: 'captured', tick: state.tick, wildId: wild.id, speciesName: wild.speciesName, level: wild.level, ball: ball.id, toBox }],
   }

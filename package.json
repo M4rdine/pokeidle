@@ -4,7 +4,8 @@
   "packageManager": "pnpm@9.12.0",
   "scripts": {
     "test": "pnpm -r test",
-    "assets": "tsx tools/assets/src/main.ts"
+    "assets": "tsx tools/assets/src/main.ts",
+    "shared:test": "pnpm --filter @pokeidle/shared test"
   },
   "devDependencies": {
     "tsx": "^4.19.0"

@@ -17,6 +17,7 @@ export function makePokemon(registry: Registry, id: string, speciesName: string,
 export function gainXp(pokemon: PokemonState, amount: number, registry: Registry, tick: number): { pokemon: PokemonState; events: Event[] } {
   const xp = pokemon.xp + amount
   let species = speciesOf(registry, pokemon.speciesName)
+  // Nível calculado com a curva da espécie ANTES da evolução; correto enquanto evoluções mantêm o growthRate (verdade para a Gen 1).
   const newLevel = levelFromXp(species.growthRate, xp)
   const events: Event[] = []
   for (let level = pokemon.level + 1; level <= newLevel; level++) {

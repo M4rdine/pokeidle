@@ -39,8 +39,11 @@ faixa.
 `walking` (segue o caminho A*) → `fighting` (captura se aplicável, senão ataca; um golpe
 imune marca o alvo em `skippedWildIds` e volta a `searching`) → `returning` (a caminho do
 Pokécenter) → `healing` (cura o time e limpa `skippedWildIds`) → `stopped` (time inteiro
-caído ou intenção `stop`; só sai por nova `createHuntState`). `skippedWildIds` também é
-limpo ao trocar de ativo (`setActive`, fainted) e ao subir de nível/evoluir.
+caído ou intenção `stop`). `skippedWildIds` também é limpo ao trocar de ativo
+(`setActive`, fainted) e ao subir de nível/evoluir. Em `stopped`, `step` só roda
+`processRespawns` e avança o tick — nenhum outro efeito colateral se repete enquanto a
+hunt fica parada; sair desse modo é assunto de uma intenção de reinício, que ainda não
+existe no motor (fica para a fase 2b/2c).
 
 ## Constantes (`constants.ts`)
 

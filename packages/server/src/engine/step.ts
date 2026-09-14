@@ -53,6 +53,10 @@ export function resolveConsequences(state: HuntState, deps: EngineDeps): StepRes
 }
 
 export function step(state: HuntState, deps: EngineDeps): StepResult {
-  const r = chain(chain(chain(processRespawns(state, deps), (s) => stepPlayer(s, deps)), (s) => engagedWildAttack(s, deps)), (s) => resolveConsequences(s, deps))
+  const respawned = processRespawns(state, deps)
+  if (state.player.mode === 'stopped') {
+    return { state: { ...respawned.state, tick: respawned.state.tick + 1 }, events: respawned.events }
+  }
+  const r = chain(chain(chain(respawned, (s) => stepPlayer(s, deps)), (s) => engagedWildAttack(s, deps)), (s) => resolveConsequences(s, deps))
   return { state: { ...r.state, tick: r.state.tick + 1 }, events: r.events }
 }

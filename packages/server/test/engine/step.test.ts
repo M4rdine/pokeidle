@@ -140,6 +140,23 @@ describe('resolveLowHp com returnHpPercent inválido (regressão)', () => {
   })
 })
 
+describe('hunt parada (bug: eventos repetidos)', () => {
+  it('depois de parar, só processa respawns; não repete pokemonFainted/stopped', () => {
+    const deps = miniDeps()
+    const s = baseState({}, deps)
+    const dying = { ...s, player: { ...s.player, mode: 'fighting' as const, team: [{ ...charmander5(), hp: 0 }] } }
+    const first = step(dying, deps)
+    expect(first.events.map((e) => e.type)).toEqual(['pokemonFainted', 'stopped'])
+    expect(first.state.player.mode).toBe('stopped')
+    const second = step(first.state, deps)
+    const third = step(second.state, deps)
+    expect(second.events).toEqual([])
+    expect(third.events).toEqual([])
+    expect(third.state.player).toEqual(first.state.player)
+    expect(third.state.tick).toBe(first.state.tick + 2)
+  })
+})
+
 describe('skippedWildIds é limpo quando a imunidade pode ter mudado', () => {
   it('trocar de Pokémon ativo limpa a lista', () => {
     const deps = miniDeps()

@@ -1,3 +1,5 @@
+import { Writable } from 'node:stream'
+import pino from 'pino'
 import { describe, expect, it } from 'vitest'
 import { checkOrigin, REDACT_PATHS } from '../src/http/security.js'
 
@@ -22,7 +24,21 @@ describe('checkOrigin', () => {
 })
 
 describe('REDACT_PATHS', () => {
-  it('cobre cookie, authorization, set-cookie, password e token', () => {
-    expect(REDACT_PATHS).toEqual(['req.headers.cookie', 'req.headers.authorization', 'res.headers["set-cookie"]', '*.password', '*.token'])
+  it('um pino real com redact: REDACT_PATHS apaga cookie, authorization, password e token da linha logada (S14)', () => {
+    let logged = ''
+    const stream = new Writable({
+      write(chunk: Buffer, _enc, cb) {
+        logged += chunk.toString()
+        cb()
+      },
+    })
+    const logger = pino({ redact: [...REDACT_PATHS] }, stream)
+    logger.info({ req: { headers: { cookie: 'sid=abc', authorization: 'Bearer x' } }, password: 'p', token: 't' }, 'linha de teste')
+
+    expect(logged).not.toContain('sid=abc')
+    expect(logged).not.toContain('Bearer x')
+    expect(logged).not.toContain('"password":"p"')
+    expect(logged).not.toContain('"token":"t"')
+    expect(logged).toContain('[Redacted]')
   })
 })

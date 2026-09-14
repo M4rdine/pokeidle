@@ -22,7 +22,13 @@ export function dummyHashFor(options: HashOptions): Promise<string> {
   const key = `${options.memoryCost ?? 'default'}:${options.timeCost ?? 'default'}`
   const cached = dummyHashCache.get(key)
   if (cached) return cached
-  const promise = hashPassword(randomBytes(32).toString('hex'), options)
+  // Se o hash falhar (ex.: config inválida), tira a chave do cache antes de relançar — senão
+  // toda chamada seguinte com as mesmas opções ficaria presa devolvendo a mesma promise já
+  // rejeitada pra sempre, em vez de tentar de novo.
+  const promise = hashPassword(randomBytes(32).toString('hex'), options).catch((error: unknown) => {
+    dummyHashCache.delete(key)
+    throw error
+  })
   dummyHashCache.set(key, promise)
   return promise
 }

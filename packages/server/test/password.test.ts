@@ -29,4 +29,12 @@ describe('password', () => {
     expect(h3).toContain('m=8192')
     expect(h3).toContain('t=2')
   })
+  it('dummyHashFor tira a chave do cache quando a promise rejeita e tenta de novo na próxima chamada', async () => {
+    const bad = { memoryCost: 1 } // argon2 rejeita: "Memory cost is too small"
+    const p1 = dummyHashFor(bad)
+    await expect(p1).rejects.toThrow()
+    const p2 = dummyHashFor(bad)
+    expect(p2).not.toBe(p1) // não é a mesma promise (já rejeitada) de antes
+    await expect(p2).rejects.toThrow()
+  })
 })

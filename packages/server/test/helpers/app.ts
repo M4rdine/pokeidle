@@ -7,6 +7,8 @@ import { openTestDb, truncateAll } from './db.js'
 export const ORIGIN = 'http://localhost:3000'
 export const T0 = new Date('2026-09-14T12:00:00Z')
 
+export const silentLogger = { info: () => {}, warn: () => {}, error: () => {} }
+
 export interface TestApp { app: FastifyInstance; db: Db; clock: { now: Date }; close: () => Promise<void> }
 
 const testConfig = (overrides: Readonly<Record<string, string>> = {}) =>

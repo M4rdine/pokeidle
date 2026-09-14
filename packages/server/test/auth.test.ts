@@ -111,6 +111,24 @@ describe('segurança HTTP', () => {
     expect(register11.statusCode).toBe(429)
     expect(register11.json()).toMatchObject({ error: { code: 'rate-limited' } })
   })
+  it('rota inexistente também entra no rate limit global: 301ª tentativa → 429', async () => {
+    const ip = { ip: '10.5.0.1' }
+    for (let i = 0; i < 300; i++) {
+      const r = await api(t.app, undefined, ip).post('/nao-existe')
+      expect(r.statusCode).toBe(404)
+    }
+    const r301 = await api(t.app, undefined, ip).post('/nao-existe')
+    expect(r301.statusCode).toBe(429)
+  })
+  it('Origin errado corre antes da resolução de sessão: 403 sem tocar a sessão no banco', async () => {
+    const { cookie } = await registerAndLogin(t.app, 6)
+    const before = (await t.db.select().from(sessions))[0]!
+    t.clock.now = new Date(T0.getTime() + TOUCH_INTERVAL_MS + 1)
+    const evil = await api(t.app, cookie).post('/hunts/stop', {}, { origin: 'http://evil.test' })
+    expect(evil.statusCode).toBe(403)
+    const after = (await t.db.select().from(sessions))[0]!
+    expect(after.lastSeenAt).toEqual(before.lastSeenAt)
+  })
   it('TRUST_PROXY como hops confia no XFF fixo; TRUST_PROXY=false ignora XFF mesmo rotacionado (S10)', async () => {
     const proxyApp = await freshApp(t, undefined, { TRUST_PROXY: '1' })
     const xff = { 'x-forwarded-for': '203.0.113.9' }

@@ -41,14 +41,20 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     hsts: config.COOKIE_SECURE ? { maxAge: 15552000 } : false,
   })
   await app.register(cookie)
-  await app.register(rateLimit, { max: 300, timeWindow: '1 minute' })
-  await app.register(authPlugin, { db, now })
 
+  // S11 ANTES da sessão: rejeita origem errada sem tocar o banco (nem SELECT nem o touch de
+  // `last_seen_at`). Hooks de instância (addHook aqui, e o de authPlugin via fastify-plugin)
+  // rodam na ordem de registro, então este precisa vir antes de `authPlugin`.
   app.addHook('onRequest', async (request) => {
     if (!checkOrigin(request, config.APP_ORIGIN)) throw new AppError('forbidden', 'origem não permitida')
   })
 
-  app.setNotFoundHandler((_request, reply) => reply.status(404).send(errorBody('not-found', 'rota não encontrada')))
+  await app.register(rateLimit, { max: 300, timeWindow: '1 minute' })
+  await app.register(authPlugin, { db, now })
+
+  // S10: rotas inexistentes também contam pro limite global (senão 404 vira um jeito de
+  // martelar o servidor sem esbarrar em rate limit nenhum).
+  app.setNotFoundHandler({ preHandler: app.rateLimit() }, (_request, reply) => reply.status(404).send(errorBody('not-found', 'rota não encontrada')))
   app.setErrorHandler((error, request, reply) => {
     if (error instanceof AppError) return reply.status(error.status).send(errorBody(error.code, error.message))
     if (error instanceof ZodError) return reply.status(400).send(errorBody('validation', error.issues[0]?.message ?? 'entrada inválida'))

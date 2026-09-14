@@ -1,12 +1,24 @@
-import { readFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { Command } from 'commander'
+import type { TiledTileset } from './atlas.js'
 import { buildAtlases } from './build-atlases.js'
 import { parseDat, type DatVersion } from './dat.js'
 import { extractAll } from './extract.js'
 import { parseSpr } from './spr.js'
 import { writeContactSheet } from './contact-sheet.js'
+import { importTiledMap } from './tiled-import.js'
 
 const out = (line: string): void => void process.stdout.write(`${line}\n`)
+
+async function readJson(path: string): Promise<unknown> {
+  const text = await readFile(path, 'utf8')
+  try {
+    return JSON.parse(text) as unknown
+  } catch (e) {
+    throw new Error(`${path}: ${e instanceof Error ? e.message : String(e)}`)
+  }
+}
 
 export function parseVersion(raw: string): DatVersion {
   if (raw === '860') return 860
@@ -59,6 +71,23 @@ program
   .action(async (opts: { extracted: string; allOutfits: boolean; allItems: boolean }) => {
     const path = await writeContactSheet(opts.extracted, { onlyMultiTileOutfits: !opts.allOutfits, groundItemsOnly: !opts.allItems })
     out(`abra no navegador: ${path}`)
+  })
+
+program
+  .command('map-import')
+  .argument('<tiled>', 'mapa exportado do Tiled em JSON (.tmj)')
+  .requiredOption('--id <id>', 'id kebab-case da hunt')
+  .requiredOption('--name <nome>', 'nome exibido da hunt')
+  .option('--tileset <file>', 'tileset gerado pelo build', 'assets/atlas/tiles.tsj')
+  .option('--out <dir>', 'pasta de saída', 'data/hunts')
+  .action(async (tiledPath: string, opts: { id: string; name: string; tileset: string; out: string }) => {
+    const tiled = await readJson(tiledPath)
+    const tileset = (await readJson(opts.tileset)) as TiledTileset
+    const map = importTiledMap(tiled, tileset, { id: opts.id, name: opts.name })
+    await mkdir(opts.out, { recursive: true })
+    const target = join(opts.out, `${map.id}.json`)
+    await writeFile(target, JSON.stringify(map, null, 2))
+    out(`hunt gravada em ${target} (${map.width}x${map.height}, ${map.spawns.length} spawns)`)
   })
 
 export { program }

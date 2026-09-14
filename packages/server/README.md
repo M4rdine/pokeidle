@@ -20,7 +20,10 @@ summarizeEvents(events: readonly Event[], ticks: number): Summary
 `@pokeidle/shared`. `createHuntState` recebe `settings` opcional (senão usa
 `defaultSettings()`) e sempre grampeia `returnHpPercent` e
 `capture.maxWildHpPercent` para `[0, 100]`, mesmo se o chamador passar algo fora da
-faixa.
+faixa. `createHuntState` também exige `sessionId: string` — um identificador único por
+sessão de hunt (o servidor passa um uuid) — que fica gravado em `HuntState.sessionId` e
+prefixa o `id` de todo Pokémon capturado (`${sessionId}-w${wild.id}`), para que capturas
+de sessões diferentes nunca colidam.
 
 ## Ordem do tick (`step`)
 

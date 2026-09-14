@@ -24,7 +24,7 @@ export interface PlayerState {
 }
 export interface Respawn { readonly spawnIndex: number; readonly atTick: number }
 export interface HuntState {
-  readonly huntId: string; readonly tick: number
+  readonly huntId: string; readonly sessionId: string; readonly tick: number
   readonly player: PlayerState
   readonly wilds: readonly WildState[]
   readonly respawns: readonly Respawn[]

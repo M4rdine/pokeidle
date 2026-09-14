@@ -11,6 +11,7 @@ export const defaultSettings = (seen: readonly string[] = []): HuntSettings => (
 
 export interface CreateInput {
   readonly hunt: HuntMap
+  readonly sessionId: string
   readonly team: readonly PokemonState[]
   readonly inventory: Readonly<Record<string, number>>
   readonly settings?: HuntSettings
@@ -28,7 +29,7 @@ export function createHuntState(input: CreateInput, deps: EngineDeps): HuntState
   if (input.team.length === 0) throw new Error('time vazio')
   const respawns = input.hunt.spawns.flatMap((s, spawnIndex) => Array.from({ length: s.count }, () => ({ spawnIndex, atTick: 0 })))
   const initial: HuntState = {
-    huntId: input.hunt.id, tick: 0,
+    huntId: input.hunt.id, sessionId: input.sessionId, tick: 0,
     player: { team: input.team, activeIndex: 0, position: input.hunt.spawnPoint, path: [], mode: 'searching', targetWildId: null, healingUntilTick: null, cooldowns: {}, skippedWildIds: [] },
     wilds: [], respawns, nextWildId: 1,
     trainer: { xp: 0, gold: 0 },

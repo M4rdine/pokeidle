@@ -19,7 +19,7 @@ describe('createHuntState', () => {
   it('clampa returnHpPercent e maxWildHpPercent para [0, 100]', () => {
     const deps = miniDeps()
     const settings = { ...defaultSettings(), returnHpPercent: 150, capture: { ...defaultSettings().capture, maxWildHpPercent: -5 } }
-    const s = createHuntState({ hunt: deps.hunt, team: [charmander5()], inventory: {}, settings }, deps)
+    const s = createHuntState({ hunt: deps.hunt, sessionId: 'mini', team: [charmander5()], inventory: {}, settings }, deps)
     expect(s.settings.returnHpPercent).toBe(100)
     expect(s.settings.capture.maxWildHpPercent).toBe(0)
   })
@@ -58,7 +58,7 @@ describe('spawnWild / processRespawns', () => {
   it('createHuntState com count 2 gera dois selvagens em tiles distintos quando há espaço', () => {
     const deps = miniDeps()
     const hunt = { ...deps.hunt, spawns: [{ ...deps.hunt.spawns[0]!, radius: 1, count: 2 }] }
-    const s = createHuntState({ hunt, team: [charmander5()], inventory: {} }, { ...deps, hunt })
+    const s = createHuntState({ hunt, sessionId: 'mini', team: [charmander5()], inventory: {} }, { ...deps, hunt })
     expect(s.wilds).toHaveLength(2)
     expect(`${s.wilds[0]!.position.x},${s.wilds[0]!.position.y}`).not.toBe(`${s.wilds[1]!.position.x},${s.wilds[1]!.position.y}`)
   })

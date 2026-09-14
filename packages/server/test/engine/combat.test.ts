@@ -90,7 +90,7 @@ describe('captura', () => {
     const r = attemptCapture({ ...s, wilds: [low] }, deps, low, ball)
     expect(r.state.inventory['poke-ball']).toBe(1)
     expect(r.state.player.team).toHaveLength(2)
-    expect(r.state.player.team[1]).toMatchObject({ id: 'wild-1', speciesName: 'zubat', level: 3, hp: 4, hpMax: 16 })
+    expect(r.state.player.team[1]).toMatchObject({ id: 'mini-w1', speciesName: 'zubat', level: 3, hp: 4, hpMax: 16 })
     expect(r.state.settings.seen).toEqual(['zubat'])
     expect(r.state.wilds).toEqual([])
     expect(r.state.respawns).toEqual([{ spawnIndex: 0, atTick: 60 }])

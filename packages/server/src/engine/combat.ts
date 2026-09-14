@@ -101,7 +101,7 @@ export function attemptCapture(state: HuntState, deps: EngineDeps, wild: WildSta
     }
   }
   const toBox = state.player.team.length >= MAX_TEAM_SIZE
-  const pokemon: PokemonState = { id: `wild-${wild.id}`, speciesName: wild.speciesName, level: wild.level, xp: xpForLevel(s.growthRate, wild.level), hp: wild.hp, hpMax: wild.hpMax }
+  const pokemon: PokemonState = { id: `${state.sessionId}-w${wild.id}`, speciesName: wild.speciesName, level: wild.level, xp: xpForLevel(s.growthRate, wild.level), hp: wild.hp, hpMax: wild.hpMax }
   const seen = state.settings.seen.includes(wild.speciesName) ? state.settings.seen : [...state.settings.seen, wild.speciesName]
   const removed = removeWild({ ...state, inventory }, deps, wild)
   return {

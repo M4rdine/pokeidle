@@ -52,6 +52,6 @@ export const miniDeps = (seed = 1): EngineDeps => ({ registry: miniRegistry(), h
 export const charmander5 = (): PokemonState => ({ id: 'p1', speciesName: 'charmander', level: 5, xp: xpForLevel('medium-slow', 5), hp: hpAt(39, 5), hpMax: hpAt(39, 5) })
 
 export function baseState(over: Partial<HuntState> = {}, deps: EngineDeps = miniDeps()): HuntState {
-  const state = createHuntState({ hunt: deps.hunt, team: [charmander5()], inventory: { potion: 1, 'poke-ball': 2 }, settings: defaultSettings() }, deps)
+  const state = createHuntState({ hunt: deps.hunt, sessionId: 'mini', team: [charmander5()], inventory: { potion: 1, 'poke-ball': 2 }, settings: defaultSettings() }, deps)
   return { ...state, ...over }
 }

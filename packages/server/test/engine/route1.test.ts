@@ -10,7 +10,7 @@ import type { EngineDeps, HuntState } from '../../src/engine/types.js'
 const registry = loadRegistry()
 const hunt = registry.hunts.get('route-1')!
 const deps = (seed: number): EngineDeps => ({ registry, hunt, rng: createRng(seed) })
-const start = (d: EngineDeps): HuntState => createHuntState({ hunt, team: [makePokemon(registry, 'p1', 'charmander', 12)], inventory: { potion: 3, 'poke-ball': 5 }, settings: defaultSettings() }, d)
+const start = (d: EngineDeps): HuntState => createHuntState({ hunt, sessionId: 'route1-test', team: [makePokemon(registry, 'p1', 'charmander', 12)], inventory: { potion: 3, 'poke-ball': 5 }, settings: defaultSettings() }, d)
 
 function checkInvariants(before: HuntState, after: HuntState): void {
   for (const p of after.player.team) { expect(p.hp).toBeGreaterThanOrEqual(0); expect(p.hp).toBeLessThanOrEqual(p.hpMax); expect(p.xp).toBeGreaterThanOrEqual(before.player.team.find((q) => q.id === p.id)?.xp ?? 0) }

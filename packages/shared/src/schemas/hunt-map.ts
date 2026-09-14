@@ -31,7 +31,7 @@ export const HuntMapSchema = z
     }),
     spawnPoint: PointSchema,
     pokecenter: PointSchema,
-    spawns: z.array(SpawnSchema),
+    spawns: z.array(SpawnSchema).min(1),
   })
   .superRefine((m, ctx) => {
     const expected = m.width * m.height

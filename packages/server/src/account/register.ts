@@ -31,7 +31,10 @@ export async function register(db: Db, input: RegisterInput, opts: { hash: HashO
   return db.transaction(async (tx) => {
     const [user] = await tx.insert(users).values({ email: input.email, passwordHash }).onConflictDoNothing().returning()
     if (!user) throw new AppError('email-taken', 'e-mail já cadastrado')
-    const [trainer] = await tx.insert(trainers).values({ userId: user.id, name: input.name }).onConflictDoNothing().returning()
+    // Alvo explícito: `trainers` também tem `user_id` único (não pode colidir aqui, `user.id`
+    // acabou de ser criado), mas sem `target` o ON CONFLICT DO NOTHING abafaria qualquer
+    // conflito de qualquer constraint única da tabela, não só o de nome.
+    const [trainer] = await tx.insert(trainers).values({ userId: user.id, name: input.name }).onConflictDoNothing({ target: trainers.name }).returning()
     if (!trainer) throw new AppError('name-taken', 'nome já em uso')
     await tx.insert(inventory).values(STARTER_INVENTORY.map((i) => ({ ...i, trainerId: trainer.id })))
     const token = await createSession(tx, user.id, opts.now)

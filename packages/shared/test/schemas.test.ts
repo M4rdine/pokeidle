@@ -116,4 +116,7 @@ describe('parseOrThrow e HuntMap', () => {
     const map = { ...validMap, id: 'Rota_1' }
     expect(() => parseHuntMap(map)).toThrow()
   })
+  it('rejeita spawns vazio', () => {
+    expect(() => parseHuntMap(validMap)).toThrow()
+  })
 })

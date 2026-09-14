@@ -6,7 +6,8 @@
     "test": "pnpm -r test",
     "assets": "tsx tools/assets/src/main.ts",
     "pokedata": "tsx tools/pokedata/src/main.ts",
-    "shared:test": "pnpm --filter @pokeidle/shared test"
+    "shared:test": "pnpm --filter @pokeidle/shared test",
+    "server:test": "pnpm --filter @pokeidle/server test"
   },
   "devDependencies": {
     "tsx": "^4.19.0"

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { xpForLevel } from '@pokeidle/shared'
 import { applyPotion, weakestPotion } from '../../src/engine/items.js'
 import { pickTarget, stepPlayer } from '../../src/engine/player.js'
 import { resolveConsequences, step } from '../../src/engine/step.js'
@@ -123,5 +124,57 @@ describe('applyPotion', () => {
     expect(applyPotion(s, deps.registry, 'poke-ball')).toMatchObject({ error: { code: 'not-a-potion' } })
     expect(applyPotion({ ...s, inventory: {} }, deps.registry, 'potion')).toMatchObject({ error: { code: 'out-of-stock' } })
     expect(applyPotion(s, deps.registry, 'potion')).toMatchObject({ error: { code: 'full-hp' } })
+  })
+})
+
+describe('resolveLowHp com returnHpPercent inválido (regressão)', () => {
+  it('returnHpPercent > 100 no HP cheio não lança e não altera time/inventário', () => {
+    const deps = miniDeps()
+    const s = baseState({}, deps)
+    const high = { ...s, settings: { ...s.settings, returnHpPercent: 150 } }
+    expect(() => resolveConsequences(high, deps)).not.toThrow()
+    const r = resolveConsequences(high, deps)
+    expect(r.state.player.team).toEqual(high.player.team)
+    expect(r.state.inventory).toEqual(high.inventory)
+    expect(r.events).toEqual([])
+  })
+})
+
+describe('skippedWildIds é limpo quando a imunidade pode ter mudado', () => {
+  it('trocar de Pokémon ativo limpa a lista', () => {
+    const deps = miniDeps()
+    const s = baseState({}, deps)
+    const st = {
+      ...s,
+      player: { ...s.player, mode: 'fighting' as const, skippedWildIds: [1], team: [{ ...charmander5(), hp: 0 }, { ...charmander5(), id: 'p2' }] },
+    }
+    const r = resolveConsequences(st, deps)
+    expect(r.state.player.activeIndex).toBe(1)
+    expect(r.state.player.skippedWildIds).toEqual([])
+  })
+  it('curar no Centro limpa a lista', () => {
+    const deps = miniDeps()
+    const s = baseState({}, deps)
+    const st = {
+      ...s,
+      wilds: [],
+      player: { ...s.player, mode: 'healing' as const, healingUntilTick: 0, skippedWildIds: [1], team: [{ ...charmander5(), hp: 5 }] },
+    }
+    const r = stepPlayer(st, deps)
+    expect(r.events.some((e) => (e as { type: string }).type === 'healed')).toBe(true)
+    expect(r.state.player.skippedWildIds).toEqual([])
+  })
+  it('subir de nível limpa a lista', () => {
+    const deps = miniDeps(3)
+    const s = baseState({}, deps)
+    const nearLevelUp = { ...charmander5(), xp: xpForLevel('medium-slow', 6) - 1 }
+    const st = {
+      ...s,
+      wilds: [{ ...s.wilds[0]!, hp: 0 }],
+      player: { ...s.player, mode: 'fighting' as const, targetWildId: 1, skippedWildIds: [1], team: [nearLevelUp] },
+    }
+    const r = resolveConsequences(st, deps)
+    expect(r.events.some((e) => e.type === 'levelUp')).toBe(true)
+    expect(r.state.player.skippedWildIds).toEqual([])
   })
 })

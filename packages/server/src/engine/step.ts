@@ -28,7 +28,7 @@ function resolveFaint(state: HuntState): StepResult {
     return { state: { ...state, player: { ...state.player, mode: 'stopped', targetWildId: null, path: [] } }, events: [fainted, { type: 'stopped', tick: state.tick, reason: 'team-fainted' }] }
   }
   const switched: Event = { type: 'switched', tick: state.tick, pokemonId: state.player.team[next]!.id }
-  return { state: { ...state, player: { ...state.player, activeIndex: next, cooldowns: {} } }, events: [fainted, switched] }
+  return { state: { ...state, player: { ...state.player, activeIndex: next, cooldowns: {}, skippedWildIds: [] } }, events: [fainted, switched] }
 }
 
 function resolveLowHp(state: HuntState, deps: EngineDeps): StepResult {
@@ -37,12 +37,19 @@ function resolveLowHp(state: HuntState, deps: EngineDeps): StepResult {
   if (!active || active.hp <= 0 || !(mode === 'searching' || mode === 'walking' || mode === 'fighting')) return { state, events: [] }
   if ((active.hp / active.hpMax) * 100 >= state.settings.returnHpPercent) return { state, events: [] }
   const potion = weakestPotion(state, deps.registry)
-  if (potion) { const r = applyPotion(state, deps.registry, potion.id); if ('error' in r) throw new Error(r.error.message); return r }
+  if (potion) { const r = applyPotion(state, deps.registry, potion.id); return 'error' in r ? { state, events: [] } : r }
   return { state: { ...state, player: { ...state.player, mode: 'returning', targetWildId: null, path: [] } }, events: [{ type: 'returning', tick: state.tick }] }
 }
 
+const clearSkippedOnGrowth = (result: StepResult): StepResult => {
+  const grew = result.events.some((e) => e.type === 'levelUp' || e.type === 'evolved')
+  if (!grew) return result
+  return { ...result, state: { ...result.state, player: { ...result.state.player, skippedWildIds: [] } } }
+}
+
 export function resolveConsequences(state: HuntState, deps: EngineDeps): StepResult {
-  return chain(chain(resolveDefeats(state, deps), resolveFaint), (s) => resolveLowHp(s, deps))
+  const defeats = clearSkippedOnGrowth(resolveDefeats(state, deps))
+  return chain(chain(defeats, resolveFaint), (s) => resolveLowHp(s, deps))
 }
 
 export function step(state: HuntState, deps: EngineDeps): StepResult {

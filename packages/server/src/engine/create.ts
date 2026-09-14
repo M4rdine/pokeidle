@@ -16,6 +16,14 @@ export interface CreateInput {
   readonly settings?: HuntSettings
 }
 
+const clampPercent = (value: number): number => Math.min(100, Math.max(0, value))
+
+const clampSettings = (settings: HuntSettings): HuntSettings => ({
+  ...settings,
+  returnHpPercent: clampPercent(settings.returnHpPercent),
+  capture: { ...settings.capture, maxWildHpPercent: clampPercent(settings.capture.maxWildHpPercent) },
+})
+
 export function createHuntState(input: CreateInput, deps: EngineDeps): HuntState {
   if (input.team.length === 0) throw new Error('time vazio')
   const respawns = input.hunt.spawns.flatMap((s, spawnIndex) => Array.from({ length: s.count }, () => ({ spawnIndex, atTick: 0 })))
@@ -25,7 +33,7 @@ export function createHuntState(input: CreateInput, deps: EngineDeps): HuntState
     wilds: [], respawns, nextWildId: 1,
     trainer: { xp: 0, gold: 0 },
     inventory: input.inventory,
-    settings: input.settings ?? defaultSettings(),
+    settings: clampSettings(input.settings ?? defaultSettings()),
   }
   return processRespawns(initial, deps).state
 }

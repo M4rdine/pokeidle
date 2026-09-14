@@ -16,6 +16,13 @@ describe('createHuntState', () => {
     expect(s.tick).toBe(0)
     expect(s.settings).toEqual(defaultSettings())
   })
+  it('clampa returnHpPercent e maxWildHpPercent para [0, 100]', () => {
+    const deps = miniDeps()
+    const settings = { ...defaultSettings(), returnHpPercent: 150, capture: { ...defaultSettings().capture, maxWildHpPercent: -5 } }
+    const s = createHuntState({ hunt: deps.hunt, team: [charmander5()], inventory: {}, settings }, deps)
+    expect(s.settings.returnHpPercent).toBe(100)
+    expect(s.settings.capture.maxWildHpPercent).toBe(0)
+  })
 })
 
 describe('spawnTiles / blockedAt / isWalkable', () => {

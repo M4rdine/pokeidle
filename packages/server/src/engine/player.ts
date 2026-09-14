@@ -76,7 +76,7 @@ function returning(state: HuntState, deps: EngineDeps): StepResult {
 function healing(state: HuntState): StepResult {
   if (state.player.healingUntilTick === null || state.tick < state.player.healingUntilTick) return idle(state)
   const team = state.player.team.map((p) => ({ ...p, hp: p.hpMax }))
-  return { state: withPlayer(state, { team, mode: 'searching', healingUntilTick: null }), events: [{ type: 'healed', tick: state.tick }] }
+  return { state: withPlayer(state, { team, mode: 'searching', healingUntilTick: null, skippedWildIds: [] }), events: [{ type: 'healed', tick: state.tick }] }
 }
 
 export function stepPlayer(state: HuntState, deps: EngineDeps): StepResult {

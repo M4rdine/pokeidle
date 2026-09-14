@@ -82,12 +82,15 @@ Objetivo: transformar um pack PokeTibia bruto em arquivos que o PixiJS carrega d
    (versão 8.54 ou 8.60), mais `items.otb` e um `.otbm` de exemplo para referência
    de mapa.
 2. **Extração.** Leitor de `.spr/.dat` em TypeScript em `tools/assets`. Saída: um PNG
-   por sprite ID e um JSON com a composição de cada objeto (Pokémon 64x64 usa quatro
-   sprites 32x32 por frame). Object Builder é descartado por ser Adobe AIR.
+   por frame já composto (Pokémon 64x64 usa quatro sprites 32x32 por frame) e um
+   `catalog.json` com os metadados de cada outfit e item. Object Builder é descartado
+   por ser Adobe AIR.
 3. **Curadoria.** `manifest.json` manual mapeando nome de espécie para IDs de sprite,
    com frames de andar em 4 direções e ataque. O `.dat` não tem nomes.
-4. **Empacotamento.** Spritesheets via `free-tex-packer-core`, atlas JSON no formato
-   nativo do PixiJS. Atlas separado para tiles de chão, montanha e detalhes.
+4. **Empacotamento.** Spritesheets por empacotador em grade próprio (determinístico,
+   sem dependências; frames nunca são recortados ou rotacionados), atlas JSON no formato
+   nativo do PixiJS. Um atlas `pokemon` e um único atlas `tiles` usado pelas camadas
+   de chão e de detalhe.
 5. **Mapa.** Uma hunt é um JSON de tiles com camadas (chão, detalhes, bloqueio) e uma
    lista de spawns. Desenhado no Tiled usando o atlas de tiles como tileset, exportado
    para JSON.

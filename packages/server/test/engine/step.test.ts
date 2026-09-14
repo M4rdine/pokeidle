@@ -12,7 +12,7 @@ function run(state: HuntState, deps = miniDeps(), ticks = 1) {
   return cur
 }
 
-const fixed = (v: number) => ({ next: () => v, int: (min: number) => min })
+const fixed = (v: number) => ({ next: () => v, int: (min: number) => min, state: () => 0 })
 
 describe('pickTarget e caminhada', () => {
   it('escolhe o zubat e traça caminho até ficar adjacente', () => {

@@ -23,6 +23,12 @@ describe('createHuntState', () => {
     expect(s.settings.returnHpPercent).toBe(100)
     expect(s.settings.capture.maxWildHpPercent).toBe(0)
   })
+  it('carrega xp e ouro absolutos do treinador quando informados', () => {
+    const deps = miniDeps()
+    const s = createHuntState({ hunt: deps.hunt, sessionId: 'mini', team: [charmander5()], inventory: {}, trainer: { xp: 120, gold: 45 } }, deps)
+    expect(s.trainer).toEqual({ xp: 120, gold: 45 })
+    expect(createHuntState({ hunt: deps.hunt, sessionId: 'mini', team: [charmander5()], inventory: {} }, deps).trainer).toEqual({ xp: 0, gold: 0 })
+  })
 })
 
 describe('spawnTiles / blockedAt / isWalkable', () => {

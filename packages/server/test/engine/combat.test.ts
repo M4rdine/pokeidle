@@ -3,7 +3,7 @@ import { attemptCapture, captureApplies, playerAttack, readyMoves, selectBall, w
 import { makePokemon } from '../../src/engine/progression.js'
 import { baseState, miniDeps } from './fixtures/mini.js'
 
-const fixed = (v: number) => ({ next: () => v, int: (min: number) => min })
+const fixed = (v: number) => ({ next: () => v, int: (min: number) => min, state: () => 0 })
 const fighting = (deps = miniDeps()) => { const s = baseState({}, deps); return { ...s, tick: 100, player: { ...s.player, mode: 'fighting' as const, targetWildId: 1, position: { x: 3, y: 0 } } } }
 
 describe('readyMoves', () => {

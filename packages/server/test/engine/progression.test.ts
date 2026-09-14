@@ -68,7 +68,7 @@ describe('applyDefeat', () => {
     expect(r.events[0]).toMatchObject({ type: 'wildDefeated', tick: 40, wildId: 1, speciesName: 'zubat', level: 3, xpTrainer: 21, xpPokemon: 21 })
   })
   it('drops entram no inventário', () => {
-    const deps = { ...miniDeps(), rng: { next: () => 0, int: (min: number) => min } }
+    const deps = { ...miniDeps(), rng: { next: () => 0, int: (min: number) => min, state: () => 0 } }
     const r = applyDefeat(baseState({}, deps), deps, baseState({}, deps).wilds[0]!)
     expect(r.state.inventory['potion']).toBe(2)
     expect(r.state.trainer.gold).toBe(4)

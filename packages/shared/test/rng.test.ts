@@ -25,4 +25,11 @@ describe('createRng', () => {
   it('int lança se min > max', () => {
     expect(() => createRng(1).int(6, 5)).toThrow(RangeError)
   })
+  it('state() permite retomar a sequência', () => {
+    const a = createRng(1)
+    a.next(); a.next(); a.next()
+    const b = createRng(1, a.state())
+    expect([b.next(), b.next()]).toEqual([a.next(), a.next()])
+    expect(createRng(5).state()).toBe(5)
+  })
 })

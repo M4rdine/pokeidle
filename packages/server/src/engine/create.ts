@@ -15,6 +15,7 @@ export interface CreateInput {
   readonly team: readonly PokemonState[]
   readonly inventory: Readonly<Record<string, number>>
   readonly settings?: HuntSettings
+  readonly trainer?: { readonly xp: number; readonly gold: number }
 }
 
 const clampPercent = (value: number): number => Math.min(100, Math.max(0, value))
@@ -32,7 +33,7 @@ export function createHuntState(input: CreateInput, deps: EngineDeps): HuntState
     huntId: input.hunt.id, sessionId: input.sessionId, tick: 0,
     player: { team: input.team, activeIndex: 0, position: input.hunt.spawnPoint, path: [], mode: 'searching', targetWildId: null, healingUntilTick: null, cooldowns: {}, skippedWildIds: [] },
     wilds: [], respawns, nextWildId: 1,
-    trainer: { xp: 0, gold: 0 },
+    trainer: input.trainer ?? { xp: 0, gold: 0 },
     inventory: input.inventory,
     settings: clampSettings(input.settings ?? defaultSettings()),
   }

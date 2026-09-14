@@ -34,4 +34,16 @@ describe('BinaryReader', () => {
     const r = BinaryReader.fromBuffer(bytes.subarray(7))
     expect(r.u8()).toBe(0xaa)
   })
+
+  it('seek para exatamente length sucede', () => {
+    const r = BinaryReader.fromBuffer(bytes)
+    expect(() => r.seek(r.length)).not.toThrow()
+    expect(r.position).toBe(9)
+  })
+
+  it('lê quando offset === length lança RangeError', () => {
+    const r = BinaryReader.fromBuffer(bytes)
+    r.seek(r.length)
+    expect(() => r.u8()).toThrow(RangeError)
+  })
 })

@@ -31,6 +31,7 @@ export interface Scheduler {
   finish(trainerId: string, reason: StopReason): Promise<TrainerRow | null>
   flushAll(): Promise<void>
   whenIdle(trainerId: string): Promise<void>
+  idle(): Promise<void>
 }
 
 export const snapshotMessage = (r: Runner): ServerMessage => ({
@@ -121,8 +122,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     const owed = ticksOwedSince(active.lastSimulatedAt, deps.now())
     if (owed < MIN_CATCHUP_TICKS) { runners.set(trainerId, base); deps.sockets.broadcast(trainerId, snapshotMessage(base)); return }
     runners.set(trainerId, { ...base, catchingUp: true })
-    // Sem broadcast inicial aqui: `catchUp` já manda um `hunt.catchup` por fatia via `onSlice`,
-    // e a primeira fatia cumpre o papel de "começou a recuperar o tempo perdido".
+    deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: owed })
     const result = await catchUp(base, owed, engineDeps(base, deps.registry), {
       onSlice: (remaining) => deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: remaining }),
       shouldAbort: () => stopping,
@@ -165,5 +165,6 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
       await Promise.allSettled([...chains.values()])
     },
     whenIdle: (trainerId) => chains.get(trainerId) ?? Promise.resolve(),
+    idle: async () => { await Promise.allSettled([...chains.values()]) },
   }
 }

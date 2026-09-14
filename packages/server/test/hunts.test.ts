@@ -53,6 +53,9 @@ describe('start / active / stop', () => {
   it('snapshot corrompido: active → 500 genérico; stop apaga sem sync e permite iniciar de novo', async () => {
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
     await api(t.app, cookie).post('/hunts/route-1/start')
+    // Com o scheduler, active/stop só voltam a ler o banco quando não há runner vivo em memória
+    // (ex.: após um restart do processo) — daí o detach simulando essa situação antes de corromper.
+    t.scheduler.detach(trainerId)
     await t.db.update(huntSessions).set({ state: { lixo: 1 } }).where(eq(huntSessions.trainerId, trainerId))
 
     const active = await api(t.app, cookie).get('/hunts/active')

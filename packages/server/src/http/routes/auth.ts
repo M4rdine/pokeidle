@@ -1,3 +1,4 @@
+import type { Registry } from '@pokeidle/shared'
 import type { FastifyPluginAsync } from 'fastify'
 import { trainerDto, userDto } from '../../account/dto.js'
 import { login, LoginSchema } from '../../account/login.js'
@@ -5,15 +6,20 @@ import { logout } from '../../account/logout.js'
 import { trainerExtra } from '../../account/me.js'
 import { register, RegisterSchema } from '../../account/register.js'
 import { SESSION_COOKIE, sessionCookieOptions } from '../../auth/cookie.js'
+import { hashToken } from '../../auth/session.js'
 import type { Config } from '../../config.js'
 import type { Db } from '../../db/client.js'
+import type { AppDeps } from '../app.js'
 import { parseBody } from '../validate.js'
 
-export interface RouteDeps { readonly db: Db; readonly config: Config; readonly now: () => Date }
+export interface RouteDeps {
+  readonly db: Db; readonly config: Config; readonly now: () => Date
+  readonly realtime: AppDeps['realtime']; readonly registry: Registry
+}
 
 const AUTH_LIMIT = { config: { rateLimit: { max: 10, timeWindow: '1 minute' } } }
 
-export const authRoutes: FastifyPluginAsync<RouteDeps> = async (app, { db, config, now }) => {
+export const authRoutes: FastifyPluginAsync<RouteDeps> = async (app, { db, config, now, realtime }) => {
   const hash = { memoryCost: config.ARGON2_MEMORY_KIB, timeCost: config.ARGON2_TIME_COST }
 
   app.post('/auth/register', AUTH_LIMIT, async (request, reply) => {
@@ -31,7 +37,9 @@ export const authRoutes: FastifyPluginAsync<RouteDeps> = async (app, { db, confi
   })
 
   app.post('/auth/logout', async (request, reply) => {
-    await logout(db, request.cookies[SESSION_COOKIE])
+    const token = request.cookies[SESSION_COOKIE]
+    if (token) realtime.sockets.closeForToken(hashToken(token), 1008, 'logout')
+    await logout(db, token)
     reply.clearCookie(SESSION_COOKIE, { path: '/' })
     return reply.status(204).send()
   })

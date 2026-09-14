@@ -1,7 +1,10 @@
+import { loadRegistry, type Registry } from '@pokeidle/shared'
 import type { FastifyInstance, InjectOptions, LightMyRequestResponse } from 'fastify'
 import { loadConfig } from '../../src/config.js'
 import type { Db } from '../../src/db/client.js'
 import { buildApp } from '../../src/http/app.js'
+import { createScheduler, type Scheduler } from '../../src/realtime/scheduler.js'
+import { createSocketRegistry, type SocketRegistry } from '../../src/realtime/sockets.js'
 import { openTestDb, truncateAll } from './db.js'
 
 export const ORIGIN = 'http://localhost:3000'
@@ -9,7 +12,11 @@ export const T0 = new Date('2026-09-14T12:00:00Z')
 
 export const silentLogger = { info: () => {}, warn: () => {}, error: () => {} }
 
-export interface TestApp { app: FastifyInstance; db: Db; clock: { now: Date }; close: () => Promise<void> }
+export interface TestApp {
+  app: FastifyInstance; db: Db; clock: { now: Date }
+  registry: Registry; scheduler: Scheduler; sockets: SocketRegistry
+  close: () => Promise<void>
+}
 
 const testConfig = (overrides: Readonly<Record<string, string>> = {}) =>
   loadConfig({ DATABASE_URL: 'postgres://x:x@localhost:1/x', APP_ORIGIN: ORIGIN, ARGON2_MEMORY_KIB: '4096', ARGON2_TIME_COST: '1', ...overrides })
@@ -18,8 +25,14 @@ export async function testApp(): Promise<TestApp> {
   const { db, close } = await openTestDb()
   await truncateAll(db)
   const clock = { now: T0 }
-  const app = await buildApp({ db, config: testConfig(), now: () => clock.now, logger: false })
-  return { app, db, clock, close: async () => { await app.close(); await close() } }
+  const registry = loadRegistry()
+  const sockets = createSocketRegistry()
+  const scheduler = createScheduler({ db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve() })
+  const app = await buildApp({ db, config: testConfig(), now: () => clock.now, logger: false, realtime: { scheduler, sockets } })
+  return {
+    app, db, clock, registry, scheduler, sockets,
+    close: async () => { await scheduler.stop(); await app.close(); await close() },
+  }
 }
 
 /** Constrói uma instância de app isolada (banco e relógio compartilhados com `t`), útil para testes que não podem herdar estado do app principal (ex.: contador do rate limit, rotas extras de teste, config diferente como TRUST_PROXY). */
@@ -28,7 +41,10 @@ export async function freshApp(
   extraRoutes?: (app: FastifyInstance) => void,
   configOverrides?: Readonly<Record<string, string>>,
 ): Promise<FastifyInstance> {
-  return buildApp({ db: t.db, config: testConfig(configOverrides), now: () => t.clock.now, logger: false, ...(extraRoutes && { extraRoutes }) })
+  const registry = loadRegistry()
+  const sockets = createSocketRegistry()
+  const scheduler = createScheduler({ db: t.db, registry, now: () => t.clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve() })
+  return buildApp({ db: t.db, config: testConfig(configOverrides), now: () => t.clock.now, logger: false, realtime: { scheduler, sockets }, ...(extraRoutes && { extraRoutes }) })
 }
 
 type Method = NonNullable<InjectOptions['method']>

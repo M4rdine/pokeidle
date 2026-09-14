@@ -1,21 +1,23 @@
-import { loadRegistry } from '@pokeidle/shared'
 import type { FastifyPluginAsync } from 'fastify'
 import { pokemonDto, settingsDto } from '../../account/dto.js'
 import { listInventory } from '../../account/inventory.js'
 import { getMe } from '../../account/me.js'
 import { listPokedex } from '../../account/pokedex.js'
-import { SettingsPatchSchema, updateSettings } from '../../account/settings.js'
+import { SettingsPatchSchema } from '../../account/settings.js'
 import { chooseStarter, StarterSchema } from '../../account/starter.js'
 import { listTeam, setTeamOrder, TeamOrderSchema } from '../../account/team.js'
 import { authOf, requireAuth } from '../../auth/plugin.js'
 import type { PokemonRow } from '../../db/schema.js'
+import { applySettings, type RealtimeDeps } from '../../realtime/actions.js'
 import { parseBody } from '../validate.js'
 import type { RouteDeps } from './auth.js'
 
 const teamDto = (t: { team: PokemonRow[]; box: PokemonRow[] }) => ({ team: t.team.map(pokemonDto), box: t.box.map(pokemonDto) })
 
-export const trainerRoutes: FastifyPluginAsync<RouteDeps> = async (app, { db, now }) => {
-  const registry = loadRegistry()
+const rt = (d: RouteDeps): RealtimeDeps => ({ db: d.db, registry: d.registry, now: d.now, scheduler: d.realtime.scheduler, sockets: d.realtime.sockets })
+
+export const trainerRoutes: FastifyPluginAsync<RouteDeps> = async (app, deps) => {
+  const { db, now, registry } = deps
   const guard = { preHandler: requireAuth }
 
   app.get('/me', guard, async (request) => getMe(db, authOf(request)))
@@ -35,7 +37,8 @@ export const trainerRoutes: FastifyPluginAsync<RouteDeps> = async (app, { db, no
 
   app.patch('/trainer/settings', guard, async (request) => {
     const patch = parseBody(SettingsPatchSchema, request.body)
-    return { settings: settingsDto(await updateSettings(db, authOf(request).trainer.id, patch, now())) }
+    const row = await applySettings(rt(deps), authOf(request).trainer.id, patch)
+    return { settings: settingsDto(row) }
   })
 
   app.get('/trainer/inventory', guard, async (request) => ({ items: await listInventory(db, authOf(request).trainer.id) }))

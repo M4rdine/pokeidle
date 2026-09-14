@@ -1,12 +1,15 @@
 import cookie from '@fastify/cookie'
 import helmet from '@fastify/helmet'
 import rateLimit from '@fastify/rate-limit'
+import { loadRegistry } from '@pokeidle/shared'
 import Fastify, { type FastifyInstance } from 'fastify'
 import { ZodError } from 'zod'
 import { authPlugin } from '../auth/plugin.js'
 import type { Config } from '../config.js'
 import type { Db } from '../db/client.js'
 import { CorruptSnapshotError } from '../hunt-store/state-schema.js'
+import type { Scheduler } from '../realtime/scheduler.js'
+import type { SocketRegistry } from '../realtime/sockets.js'
 import { AppError, errorBody } from './errors.js'
 import { authRoutes } from './routes/auth.js'
 import { huntRoutes } from './routes/hunts.js'
@@ -18,6 +21,7 @@ export interface AppDeps {
   readonly config: Config
   readonly now?: () => Date
   readonly logger?: boolean
+  readonly realtime: { readonly scheduler: Scheduler; readonly sockets: SocketRegistry }
   /** @internal só para testes — a camada HTTP nunca deve passar isto. */
   readonly extraRoutes?: (app: FastifyInstance) => void
 }
@@ -76,9 +80,11 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     return reply.status(500).send(errorBody('internal', 'erro interno'))
   })
 
-  await app.register(authRoutes, { db, config, now })
-  await app.register(trainerRoutes, { db, config, now })
-  await app.register(huntRoutes, { db, config, now })
+  const registry = loadRegistry()
+  const routeDeps = { db, config, now, realtime: deps.realtime, registry }
+  await app.register(authRoutes, routeDeps)
+  await app.register(trainerRoutes, routeDeps)
+  await app.register(huntRoutes, routeDeps)
   deps.extraRoutes?.(app)
   return app
 }

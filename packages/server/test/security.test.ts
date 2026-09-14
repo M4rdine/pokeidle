@@ -1,10 +1,20 @@
 import { Writable } from 'node:stream'
 import pino from 'pino'
 import { describe, expect, it } from 'vitest'
-import { checkOrigin, REDACT_PATHS } from '../src/http/security.js'
+import { checkOrigin, REDACT_PATHS, sameOrigin } from '../src/http/security.js'
 
 const req = (method: string, headers: Record<string, string>) => ({ method, headers }) as unknown as import('fastify').FastifyRequest
 const APP = 'http://localhost:3000'
+
+describe('sameOrigin', () => {
+  it('compara origem completa, aceita Referer, rejeita ausência e lixo, independe do método', () => {
+    expect(sameOrigin(req('GET', { origin: APP }), APP)).toBe(true)
+    expect(sameOrigin(req('GET', {}), APP)).toBe(false)
+    expect(sameOrigin(req('GET', { origin: 'http://localhost:3001' }), APP)).toBe(false)
+    expect(sameOrigin(req('GET', { referer: `${APP}/app` }), APP)).toBe(true)
+    expect(sameOrigin(req('GET', { referer: 'lixo' }), APP)).toBe(false)
+  })
+})
 
 describe('checkOrigin', () => {
   it('GET/HEAD/OPTIONS passam sem Origin', () => {

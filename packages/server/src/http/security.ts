@@ -19,9 +19,14 @@ function originOf(value: string | undefined): string | null {
   }
 }
 
+/** Compara a origem completa (Origin, com fallback pro Referer) contra `appOrigin`, independente do método. */
+export function sameOrigin(request: FastifyRequest, appOrigin: string): boolean {
+  const origin = originOf(request.headers.origin) ?? originOf(request.headers.referer)
+  return origin !== null && origin === new URL(appOrigin).origin
+}
+
 /** S11: rotas que mudam estado só aceitam requisições da própria origem. */
 export function checkOrigin(request: FastifyRequest, appOrigin: string): boolean {
   if (SAFE_METHODS.has(request.method)) return true
-  const origin = originOf(request.headers.origin) ?? originOf(request.headers.referer)
-  return origin !== null && origin === new URL(appOrigin).origin
+  return sameOrigin(request, appOrigin)
 }

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { step } from '../../src/engine/step.js'
 import { simulate, summarizeEvents } from '../../src/engine/simulate.js'
 import { baseState, miniDeps } from './fixtures/mini.js'
 
@@ -17,5 +18,20 @@ describe('simulate', () => {
     const deps = miniDeps()
     expect(() => simulate(baseState({}, deps), -1, deps)).toThrow(RangeError)
     expect(simulate(baseState({}, deps), 0, deps).events).toEqual([])
+  })
+  it('acumula eventos de forma linear em uma janela grande de ticks', () => {
+    const deps = miniDeps(3)
+    const r = simulate(baseState({}, deps), 5000, deps)
+    expect(r.state.tick).toBe(5000)
+
+    const manualDeps = miniDeps(3)
+    let manualState = baseState({}, manualDeps)
+    let manualEventCount = 0
+    for (let i = 0; i < 5000; i++) {
+      const next = step(manualState, manualDeps)
+      manualEventCount += next.events.length
+      manualState = next.state
+    }
+    expect(r.events.length).toBe(manualEventCount)
   })
 })

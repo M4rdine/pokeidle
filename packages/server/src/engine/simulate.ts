@@ -3,12 +3,14 @@ import type { EngineDeps, Event, HuntState, StepResult } from './types.js'
 
 export function simulate(state: HuntState, ticks: number, deps: EngineDeps): StepResult {
   if (!Number.isInteger(ticks) || ticks < 0) throw new RangeError(`ticks inválido: ${ticks}`)
-  let current: StepResult = { state, events: [] }
+  const events: Event[] = []
+  let current = state
   for (let i = 0; i < ticks; i++) {
-    const next = step(current.state, deps)
-    current = { state: next.state, events: [...current.events, ...next.events] }
+    const next = step(current, deps)
+    events.push(...next.events)
+    current = next.state
   }
-  return current
+  return { state: current, events }
 }
 
 export interface Summary {

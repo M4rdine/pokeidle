@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { parseOrThrow } from './parse-or-throw.js'
 import { FLAG_GROUND, FLAG_NOT_WALKABLE, type DatFile, type DatVersion, type ThingType } from './dat.js'
 import type { SprFile } from './spr.js'
 
@@ -102,8 +103,5 @@ export const CatalogSchema = z.object({
 })
 
 export function parseCatalog(json: unknown): Catalog {
-  const result = CatalogSchema.safeParse(json)
-  if (result.success) return result.data
-  const lines = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`)
-  throw new Error(`catalog.json inválido:\n${lines.join('\n')}`)
+  return parseOrThrow(CatalogSchema, json, 'catalog.json')
 }

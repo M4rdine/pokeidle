@@ -39,7 +39,7 @@ export interface PixiSpritesheet {
 
 export interface TiledTileset {
   type: 'tileset'
-  version: '1.10'
+  version: string
   name: string
   image: string
   imagewidth: number
@@ -48,7 +48,7 @@ export interface TiledTileset {
   tileheight: number
   tilecount: number
   columns: number
-  margin: 0
+  margin: number
   spacing: number
   tiles: Array<{ id: number; properties: Array<{ name: 'name'; type: 'string'; value: string }> }>
 }
@@ -111,8 +111,10 @@ export function packGrid(frames: readonly AtlasFrame[], imageName: string, paddi
   }
 }
 
-export function toTiledTileset(sheet: PixiSpritesheet, name: string): TiledTileset {
-  const names = Object.keys(sheet.frames)
+export function toTiledTileset(sheet: PixiSpritesheet, name: string, order: readonly string[]): TiledTileset {
+  const frameNames = Object.keys(sheet.frames)
+  const mismatch = order.length !== frameNames.length || order.some((n) => sheet.frames[n] === undefined)
+  if (mismatch) throw new Error('ordem de frames não corresponde ao spritesheet')
   return {
     type: 'tileset',
     version: '1.10',
@@ -122,10 +124,10 @@ export function toTiledTileset(sheet: PixiSpritesheet, name: string): TiledTiles
     imageheight: sheet.meta.size.h,
     tilewidth: sheet.meta.cell.w,
     tileheight: sheet.meta.cell.h,
-    tilecount: names.length,
+    tilecount: order.length,
     columns: sheet.meta.columns,
     margin: 0,
     spacing: sheet.meta.padding,
-    tiles: names.map((value, id) => ({ id, properties: [{ name: 'name', type: 'string', value }] })),
+    tiles: order.map((value, id) => ({ id, properties: [{ name: 'name', type: 'string', value }] })),
   }
 }

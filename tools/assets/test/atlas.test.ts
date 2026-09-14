@@ -55,7 +55,7 @@ describe('packGrid', () => {
 })
 
 describe('toTiledTileset', () => {
-  it('gera tileset com ids locais na ordem dos frames e nome como propriedade', () => {
+  it('gera tileset com ids locais na ordem informada e nome como propriedade', () => {
     const { sheet } = packGrid(
       [
         { name: 'grass', image: solid(32, 32, 1) },
@@ -64,8 +64,33 @@ describe('toTiledTileset', () => {
       'tiles.png',
       0,
     )
-    const ts = toTiledTileset(sheet, 'tibia-tiles')
+    const ts = toTiledTileset(sheet, 'tibia-tiles', ['grass', 'water'])
     expect(ts).toMatchObject({ type: 'tileset', image: 'tiles.png', tilewidth: 32, tileheight: 32, tilecount: 2, columns: 2, spacing: 0 })
     expect(ts.tiles[1]).toEqual({ id: 1, properties: [{ name: 'name', type: 'string', value: 'water' }] })
+  })
+
+  it('respeita a ordem mesmo com nome numérico, que o JS hoista nas chaves do objeto', () => {
+    const { sheet } = packGrid(
+      [
+        { name: 'grass', image: solid(32, 32, 1) },
+        { name: '42', image: solid(32, 32, 2) },
+        { name: 'water', image: solid(32, 32, 3) },
+      ],
+      'tiles.png',
+      0,
+    )
+    expect(Object.keys(sheet.frames)[0]).toBe('42') // ordem das chaves não serve como ordem dos tiles
+    const ts = toTiledTileset(sheet, 'tibia-tiles', ['grass', '42', 'water'])
+    expect(ts.tiles.map((t) => [t.id, t.properties[0]!.value])).toEqual([
+      [0, 'grass'],
+      [1, '42'],
+      [2, 'water'],
+    ])
+  })
+
+  it('rejeita ordem com tamanho ou nomes diferentes do spritesheet', () => {
+    const { sheet } = packGrid([{ name: 'grass', image: solid(32, 32, 1) }], 'tiles.png', 0)
+    expect(() => toTiledTileset(sheet, 'x', [])).toThrow(/ordem de frames/)
+    expect(() => toTiledTileset(sheet, 'x', ['water'])).toThrow(/ordem de frames/)
   })
 })

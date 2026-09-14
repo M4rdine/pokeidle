@@ -13,7 +13,10 @@ const catalog: Catalog = {
     { id: 10, width: 2, height: 2, directions: 4, phases: 3, layers: 1, displacement: { x: 8, y: 8 } },
     { id: 11, width: 1, height: 1, directions: 1, phases: 1, layers: 1, displacement: { x: 0, y: 0 } },
   ],
-  items: [{ id: 100, width: 1, height: 1, patternX: 2, patternY: 1, phases: 1, isGround: true, isBlocking: false }],
+  items: [
+    { id: 100, width: 1, height: 1, patternX: 2, patternY: 1, phases: 1, isGround: true, isBlocking: false },
+    { id: 101, width: 2, height: 2, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false },
+  ],
 }
 
 const valid = {
@@ -30,6 +33,16 @@ describe('parseManifest', () => {
 
   it('rejeita nome fora de kebab-case com mensagem legível', () => {
     expect(() => parseManifest({ ...valid, species: [{ id: 1, name: 'Bulbasaur', outfitId: 10 }] })).toThrow(/species\.0\.name/)
+  })
+
+  it('rejeita nome só de dígitos, que viraria id local no tileset', () => {
+    expect(() => parseManifest({ ...valid, species: [{ id: 1, name: '42', outfitId: 10 }] })).toThrow(/species\.0\.name.*só dígitos/s)
+    expect(() => parseManifest({ ...valid, tiles: [{ name: '42', itemId: 100 }] })).toThrow(/tiles\.0\.name.*só dígitos/s)
+  })
+
+  it('tolera chaves extras no topo, como o _leiame do manifest.example.json', () => {
+    const m = parseManifest({ ...valid, _leiame: 'anotação para quem edita à mão' })
+    expect(m.species).toHaveLength(1)
   })
 })
 
@@ -52,6 +65,11 @@ describe('validateManifest', () => {
     expect(problems[0]).toMatch(/a.*outfit 999/)
     expect(problems[1]).toMatch(/b.*4 direções/)
     expect(problems[2]).toMatch(/t.*item 555/)
+  })
+
+  it('aponta item que não é 1x1, porque o tileset usa células de 32px', () => {
+    const m = parseManifest({ version: 1, species: [], tiles: [{ name: 'big', itemId: 101 }] })
+    expect(validateManifest(m, catalog)).toEqual(['tile big: item 101 é 2x2, tiles devem ser 1x1'])
   })
 
   it('aponta nomes e ids duplicados e pattern fora da faixa', () => {

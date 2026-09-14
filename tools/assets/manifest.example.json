@@ -1,4 +1,5 @@
 {
+  "_leiame": "ids 0 são placeholders; substitua pelos ids do assets/extracted/catalog.json (veja index.html)",
   "version": 1,
   "species": [
     { "id": 1, "name": "bulbasaur", "outfitId": 0 },

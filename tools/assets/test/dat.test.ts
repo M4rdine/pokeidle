@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { FIRST_ITEM_ID, FLAG_DISPLACEMENT, FLAG_GROUND, FLAG_NOT_WALKABLE, parseDat } from '../src/dat.js'
+import { FIRST_ITEM_ID, FLAG_CLOTH, FLAG_DISPLACEMENT, FLAG_GROUND, FLAG_LIGHT, FLAG_NOT_WALKABLE, parseDat } from '../src/dat.js'
 import { buildDat, groundItemSpec, outfitSpec } from './fixtures/dat-fixture.js'
 
 describe('parseDat (860)', () => {
@@ -52,6 +52,53 @@ describe('parseDat (860)', () => {
   it('lança erro para 0xfe em 860 (não é a flag Chargeable de 854)', () => {
     const broken = buildDat({ items: [{ ...groundItemSpec(1), flags: [0xfe] }], outfits: [] })
     expect(() => parseDat(broken, 860)).toThrow(/flag desconhecida 0xfe.*item 100/)
+  })
+
+  it('lê Light (0x15, dois u16) e Cloth (0x20, um u16)', () => {
+    const file = buildDat({
+      items: [
+        { ...groundItemSpec(1), flags: [FLAG_LIGHT, 5, 0, 6, 0] },
+        { ...groundItemSpec(2), flags: [FLAG_CLOTH, 3, 0] },
+      ],
+      outfits: [],
+    })
+    const parsed = parseDat(file, 860)
+    expect(parsed.items[0]!.flags.has(FLAG_LIGHT)).toBe(true)
+    expect(parsed.items[0]!.spriteIds).toEqual([1])
+    expect(parsed.items[1]!.flags.has(FLAG_CLOTH)).toBe(true)
+    expect(parsed.items[1]!.spriteIds).toEqual([2])
+  })
+
+  it('rejeita 0x21 (Market), que só existe a partir de 9.44', () => {
+    const broken = buildDat({ items: [{ ...groundItemSpec(1), flags: [0x21, 0, 0] }], outfits: [] })
+    expect(() => parseDat(broken, 860)).toThrow(/flag desconhecida 0x21.*item 100/)
+  })
+
+  it('identifica a thing em erro de leitura truncada', () => {
+    const file = buildDat({ items: [groundItemSpec(1)], outfits: [outfitSpec(1, 10)] })
+    const truncated = file.slice(0, file.length - 4)
+    expect(() => parseDat(truncated, 860)).toThrow(/outfit 1:.*ultrapassa o buffer/)
+  })
+})
+
+describe('parseDat (categorias opcionais)', () => {
+  it('ignora efeitos corrompidos e registra um aviso, preservando itens e outfits', () => {
+    const file = buildDat({
+      items: [groundItemSpec(1)],
+      outfits: [outfitSpec(1, 10)],
+      effects: [{ ...groundItemSpec(2), flags: [0x7e] }],
+    })
+    const parsed = parseDat(file, 860)
+    expect(parsed.items).toHaveLength(1)
+    expect(parsed.outfits).toHaveLength(1)
+    expect(parsed.effects).toEqual([])
+    expect(parsed.warnings).toHaveLength(1)
+    expect(parsed.warnings[0]).toMatch(/efeitos ignorados:.*flag desconhecida 0x7e/)
+  })
+
+  it('não registra avisos em um arquivo íntegro', () => {
+    const file = buildDat({ items: [groundItemSpec(1)], outfits: [outfitSpec(1, 10)] })
+    expect(parseDat(file, 860).warnings).toEqual([])
   })
 })
 

@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { buildCatalog, hasSprites, parseCatalog, type Catalog } from './catalog.js'
 import { DIRECTION_NAMES, composeFrame } from './compose.js'
 import { parseDat, type DatVersion, type ThingType } from './dat.js'
+import { readJson } from './json-file.js'
 import { encodePng } from './png.js'
 import { parseSpr, type SprFile } from './spr.js'
 
@@ -50,6 +51,7 @@ export async function extractAll(opts: ExtractOptions, log: Logger = () => {}): 
   const spr = parseSpr(new Uint8Array(await readFile(opts.sprPath)))
   const dat = parseDat(new Uint8Array(await readFile(opts.datPath)), opts.version)
   log(`spr: ${spr.spriteCount} sprites; dat: ${dat.items.length} itens, ${dat.outfits.length} outfits`)
+  for (const warning of dat.warnings) log(`aviso: ${warning}`)
 
   await mkdir(join(opts.outDir, 'items'), { recursive: true })
   const outfits = dat.outfits.filter(hasSprites)
@@ -70,5 +72,5 @@ export async function extractAll(opts: ExtractOptions, log: Logger = () => {}): 
 }
 
 export async function loadCatalog(outDir: string): Promise<Catalog> {
-  return parseCatalog(JSON.parse(await readFile(join(outDir, 'catalog.json'), 'utf8')))
+  return parseCatalog(await readJson(join(outDir, 'catalog.json')))
 }

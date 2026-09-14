@@ -1,6 +1,9 @@
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import type { Catalog } from '../src/catalog.js'
-import { renderContactSheet } from '../src/contact-sheet.js'
+import { renderContactSheet, writeContactSheet } from '../src/contact-sheet.js'
 
 const catalog: Catalog = {
   version: 860,
@@ -30,5 +33,17 @@ describe('renderContactSheet', () => {
     const html = renderContactSheet(catalog, { onlyMultiTileOutfits: false, groundItemsOnly: false })
     expect(html).toContain('outfits/11/south_0.png')
     expect(html).toContain('items/101_0_0.png')
+  })
+})
+
+describe('writeContactSheet', () => {
+  it('escreve index.html ao lado do catalog.json e devolve o caminho', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-sheet-'))
+    await writeFile(join(dir, 'catalog.json'), JSON.stringify(catalog))
+
+    const path = await writeContactSheet(dir, { onlyMultiTileOutfits: true, groundItemsOnly: true })
+
+    expect(path).toBe(join(dir, 'index.html'))
+    expect(await readFile(path, 'utf8')).toContain('outfits/10/south_0.png')
   })
 })

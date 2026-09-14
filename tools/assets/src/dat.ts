@@ -14,9 +14,9 @@ export const FLAG_ELEVATION = 0x19
 export const FLAG_MINIMAP_COLOR = 0x1c
 export const FLAG_LENS_HELP = 0x1d
 export const FLAG_CLOTH = 0x20
-export const FLAG_MARKET = 0x21
 export const FLAG_END = 0xff
-const FLAG_MAX_KNOWN = 0x25
+/** Última flag real do formato 8.x: Cloth; Market 0x21 só existe em 9.44+. */
+const FLAG_MAX_KNOWN = FLAG_CLOTH
 /** Sentinela interna para a flag Chargeable do formato 8.54, que não existe em 8.60. Valor negativo nunca iguala um byte bruto lido do arquivo. */
 const FLAG_CHARGEABLE_854 = -1
 
@@ -43,6 +43,8 @@ export interface DatFile {
   readonly outfits: readonly ThingType[]
   readonly effects: readonly ThingType[]
   readonly missiles: readonly ThingType[]
+  /** Categorias opcionais que falharam ao ser lidas, com o motivo. */
+  readonly warnings: readonly string[]
 }
 
 interface FlagBlock {
@@ -55,16 +57,6 @@ function normalizeFlag(raw: number, version: DatVersion): number {
   if (version === 860) return raw
   if (raw === 0x08) return FLAG_CHARGEABLE_854
   return raw > 0x08 ? raw - 1 : raw
-}
-
-function skipMarketData(reader: BinaryReader): void {
-  reader.u16() // category
-  reader.u16() // tradeAs
-  reader.u16() // showAs
-  const nameLength = reader.u16()
-  reader.bytes(nameLength)
-  reader.u16() // restrictVocation
-  reader.u16() // requiredLevel
 }
 
 function readFlags(reader: BinaryReader, version: DatVersion, label: string): FlagBlock {
@@ -95,9 +87,6 @@ function readFlags(reader: BinaryReader, version: DatVersion, label: string): Fl
       case FLAG_DISPLACEMENT:
         displacement = { x: reader.u16(), y: reader.u16() }
         break
-      case FLAG_MARKET:
-        skipMarketData(reader)
-        break
       case FLAG_CHARGEABLE_854:
         break
       default:
@@ -125,6 +114,17 @@ function readThing(reader: BinaryReader, id: number, category: ThingCategory, ve
   return { id, category, width, height, layers, patternX, patternY, patternZ, phases, spriteIds, ...block }
 }
 
+function readLabeledThing(reader: BinaryReader, id: number, category: ThingCategory, version: DatVersion): ThingType {
+  const label = `${category} ${id}`
+  try {
+    return readThing(reader, id, category, version)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    if (message.includes(label)) throw error
+    throw new Error(`${label}: ${message}`)
+  }
+}
+
 function readCategory(
   reader: BinaryReader,
   category: ThingCategory,
@@ -134,9 +134,30 @@ function readCategory(
 ): ThingType[] {
   const things: ThingType[] = []
   for (let id = firstId; id <= lastId; id++) {
-    things.push(readThing(reader, id, category, version))
+    things.push(readLabeledThing(reader, id, category, version))
   }
   return things
+}
+
+interface OptionalCategory {
+  readonly things: ThingType[]
+  readonly warning: string | null
+}
+
+/** Efeitos e mísseis não são usados na extração: uma falha vira aviso em vez de abortar tudo. */
+function readOptionalCategory(
+  reader: BinaryReader,
+  category: ThingCategory,
+  count: number,
+  version: DatVersion,
+  labelPt: string,
+): OptionalCategory {
+  try {
+    return { things: readCategory(reader, category, 1, count, version), warning: null }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    return { things: [], warning: `${labelPt} ignorados: ${message}` }
+  }
 }
 
 export function parseDat(data: Uint8Array, version: DatVersion = 860): DatFile {
@@ -148,7 +169,8 @@ export function parseDat(data: Uint8Array, version: DatVersion = 860): DatFile {
   const missileCount = reader.u16()
   const items = readCategory(reader, 'item', FIRST_ITEM_ID, lastItemId, version)
   const outfits = readCategory(reader, 'outfit', 1, outfitCount, version)
-  const effects = readCategory(reader, 'effect', 1, effectCount, version)
-  const missiles = readCategory(reader, 'missile', 1, missileCount, version)
-  return { signature, version, items, outfits, effects, missiles }
+  const effects = readOptionalCategory(reader, 'effect', effectCount, version, 'efeitos')
+  const missiles = readOptionalCategory(reader, 'missile', missileCount, version, 'mísseis')
+  const warnings = [effects.warning, missiles.warning].filter((w): w is string => w !== null)
+  return { signature, version, items, outfits, effects: effects.things, missiles: missiles.things, warnings }
 }

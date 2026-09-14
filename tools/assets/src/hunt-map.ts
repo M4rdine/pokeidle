@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { parseOrThrow } from './parse-or-throw.js'
 
 export const TILE_SIZE = 32
 const KEBAB = /^[a-z0-9-]+$/
@@ -39,10 +40,16 @@ export const HuntMapSchema = z
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['layers', name], message: `tem ${layer.length} tiles, esperado width*height = ${expected}` })
       }
     }
+    const outside = (p: { x: number; y: number }): boolean => p.x < 0 || p.x >= m.width || p.y < 0 || p.y >= m.height
+    const bounds = `fora do mapa (${m.width}x${m.height})`
+    for (const key of ['spawnPoint', 'pokecenter'] as const) {
+      if (outside(m[key])) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: bounds })
+    }
     for (const [i, s] of m.spawns.entries()) {
       if (s.minLevel > s.maxLevel) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spawns', i], message: 'minLevel maior que maxLevel' })
       }
+      if (outside(s)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['spawns', i], message: bounds })
     }
   })
 
@@ -50,8 +57,5 @@ export type HuntMap = z.infer<typeof HuntMapSchema>
 export type HuntSpawn = HuntMap['spawns'][number]
 
 export function parseHuntMap(json: unknown): HuntMap {
-  const result = HuntMapSchema.safeParse(json)
-  if (result.success) return result.data
-  const lines = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`)
-  throw new Error(`HuntMap inválido:\n${lines.join('\n')}`)
+  return parseOrThrow(HuntMapSchema, json, 'HuntMap')
 }

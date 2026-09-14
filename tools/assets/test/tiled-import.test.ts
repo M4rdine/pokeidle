@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { TiledTileset } from '../src/atlas.js'
 import { parseHuntMap } from '../src/hunt-map.js'
-import { importTiledMap } from '../src/tiled-import.js'
+import { importTiledMap, parseTiledTileset } from '../src/tiled-import.js'
 
 const tileset: TiledTileset = {
   type: 'tileset',
@@ -102,11 +102,50 @@ describe('importTiledMap', () => {
     const compressed = { ...tiled, layers: [{ ...tiled.layers[0]!, data: 'AAAA' }, ...tiled.layers.slice(1)] }
     expect(() => importTiledMap(compressed, tileset, { id: 'x', name: 'x' })).toThrow(/mapa Tiled inválido[\s\S]*CSV/)
   })
+
+  it('explica que camadas dentro de grupos não são suportadas', () => {
+    const grouped = { ...tiled, layers: [{ type: 'group', name: 'tudo' }, ...tiled.layers.slice(1)] }
+    expect(() => importTiledMap(grouped, tileset, { id: 'x', name: 'x' })).toThrow(/camada de tiles "ground".*grupos/)
+  })
+
+  it('aceita espécie desconhecida quando nenhum conjunto é informado', () => {
+    expect(() => importTiledMap(tiled, tileset, { id: 'x', name: 'x' })).not.toThrow()
+  })
+
+  it('rejeita espécie fora do manifest quando knownSpecies é informado', () => {
+    expect(() => importTiledMap(tiled, tileset, { id: 'x', name: 'x' }, { knownSpecies: new Set(['pidgey']) })).toThrow(
+      /espécie desconhecida "rattata" no spawn \(objeto 3\)/,
+    )
+    expect(() =>
+      importTiledMap(tiled, tileset, { id: 'x', name: 'x' }, { knownSpecies: new Set(['rattata']) }),
+    ).not.toThrow()
+  })
+})
+
+describe('parseTiledTileset', () => {
+  it('aceita o tiles.tsj gerado pelo build', () => {
+    expect(parseTiledTileset(JSON.parse(JSON.stringify(tileset)))).toEqual(tileset)
+  })
+
+  it('rejeita objeto que não é um tileset do Tiled', () => {
+    expect(() => parseTiledTileset({ type: 'map', tiles: [] })).toThrow(/tileset inválido/)
+  })
 })
 
 describe('parseHuntMap', () => {
+  const map = importTiledMap(tiled, tileset, { id: 'r', name: 'r' })
+
   it('rejeita camada com tamanho errado', () => {
-    const map = importTiledMap(tiled, tileset, { id: 'r', name: 'r' })
     expect(() => parseHuntMap({ ...map, layers: { ...map.layers, ground: ['grass'] } })).toThrow(/width\*height/)
+  })
+
+  it('rejeita spawn fora do mapa', () => {
+    const outside = { ...map, spawns: [{ ...map.spawns[0]!, x: 2 }] }
+    expect(() => parseHuntMap(outside)).toThrow(/spawns\.0: fora do mapa \(2x2\)/)
+  })
+
+  it('rejeita spawnPoint e pokecenter fora do mapa', () => {
+    expect(() => parseHuntMap({ ...map, spawnPoint: { x: 0, y: 5 } })).toThrow(/spawnPoint: fora do mapa/)
+    expect(() => parseHuntMap({ ...map, pokecenter: { x: 9, y: 0 } })).toThrow(/pokecenter: fora do mapa/)
   })
 })

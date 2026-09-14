@@ -11,7 +11,10 @@ const catalog: Catalog = {
   version: 860,
   sprSignature: 1,
   datSignature: 2,
-  outfits: [{ id: 10, width: 2, height: 2, directions: 4, phases: 2, layers: 1, displacement: { x: 8, y: 8 } }],
+  outfits: [
+    { id: 10, width: 2, height: 2, directions: 4, phases: 2, layers: 1, displacement: { x: 8, y: 8 } },
+    { id: 11, width: 2, height: 2, directions: 4, phases: 1, layers: 1, displacement: { x: 8, y: 8 } },
+  ],
   items: [{ id: 100, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false }],
 }
 
@@ -27,6 +30,7 @@ async function setupFixtures(): Promise<{ dir: string; extractedDir: string }> {
   await writeFile(join(extractedDir, 'catalog.json'), JSON.stringify(catalog))
   for (const d of ['north', 'east', 'south', 'west']) {
     for (const phase of [0, 1]) await writePng(outfitFramePath(extractedDir, 10, d, phase), 64, 64, 200)
+    await writePng(outfitFramePath(extractedDir, 11, d, 0), 64, 64, 150)
   }
   await writePng(itemFramePath(extractedDir, 100, 0, 0), 32, 32, 90)
   return { dir, extractedDir }
@@ -63,6 +67,28 @@ describe('buildAtlases', () => {
     expect(tiles.frames['grass'].frame).toEqual({ x: 0, y: 0, w: 32, h: 32 })
     const tsj = JSON.parse(await readFile(join(outDir, 'tiles.tsj'), 'utf8'))
     expect(tsj.tiles[0].properties[0].value).toBe('grass')
+  })
+
+  it('gera frames e animação de ataque quando a espécie tem attackOutfitId', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const outDir = join(dir, 'atlas')
+    const manifestPath = join(dir, 'manifest.json')
+    await writeFile(
+      manifestPath,
+      JSON.stringify({
+        version: 1,
+        species: [{ id: 1, name: 'bulbasaur', outfitId: 10, attackOutfitId: 11 }],
+        tiles: [{ name: 'grass', itemId: 100 }],
+      }),
+    )
+
+    const result = await buildAtlases({ extractedDir, manifestPath, outDir })
+    expect(result).toEqual({ pokemonFrames: 12, tileFrames: 1 })
+
+    const pokemon = JSON.parse(await readFile(join(outDir, 'pokemon.json'), 'utf8'))
+    expect(pokemon.frames['bulbasaur/attack_south_0']).toBeDefined()
+    expect(pokemon.frames['bulbasaur/attack_west_0']).toBeDefined()
+    expect(pokemon.animations['bulbasaur/attack_south']).toEqual(['bulbasaur/attack_south_0'])
   })
 
   it('falha listando problemas de validação', async () => {

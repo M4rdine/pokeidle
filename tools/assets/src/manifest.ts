@@ -1,19 +1,27 @@
-import { readFile } from 'node:fs/promises'
 import { z } from 'zod'
 import type { Catalog } from './catalog.js'
+import { readJson } from './json-file.js'
+import { parseOrThrow } from './parse-or-throw.js'
 
 const KEBAB = /^[a-z0-9-]+$/
+const ONLY_DIGITS = /^\d+$/
 const REQUIRED_DIRECTIONS = 4
+const TILE_SIZE_IN_TILES = 1
+
+const nameSchema = z
+  .string()
+  .regex(KEBAB, 'use kebab-case ascii')
+  .refine((n) => !ONLY_DIGITS.test(n), 'nome não pode ser só dígitos')
 
 const SpeciesSchema = z.object({
   id: z.number().int().positive(),
-  name: z.string().regex(KEBAB, 'use kebab-case ascii'),
+  name: nameSchema,
   outfitId: z.number().int().positive(),
   attackOutfitId: z.number().int().positive().optional(),
 })
 
 const TileSchema = z.object({
-  name: z.string().regex(KEBAB, 'use kebab-case ascii'),
+  name: nameSchema,
   itemId: z.number().int().min(100),
   patternX: z.number().int().min(0).default(0),
   patternY: z.number().int().min(0).default(0),
@@ -30,16 +38,12 @@ export type SpeciesEntry = Manifest['species'][number]
 export type TileEntry = Manifest['tiles'][number]
 
 export function parseManifest(json: unknown): Manifest {
-  const result = ManifestSchema.safeParse(json)
-  if (result.success) return result.data
-  const lines = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`)
-  throw new Error(`manifest inválido:\n${lines.join('\n')}`)
+  return parseOrThrow(ManifestSchema, json, 'manifest')
 }
 
 export async function loadManifest(path: string): Promise<Manifest> {
-  const text = await readFile(path, 'utf8')
   try {
-    return parseManifest(JSON.parse(text))
+    return parseManifest(await readJson(path))
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error)
     throw new Error(`manifest ${path}: ${reason}`)
@@ -69,6 +73,9 @@ function validateTile(t: TileEntry, catalog: Catalog): string[] {
   const item = catalog.items.find((i) => i.id === t.itemId)
   if (!item) return [`tile ${t.name}: item ${t.itemId} não existe no catálogo`]
   const problems: string[] = []
+  if (item.width !== TILE_SIZE_IN_TILES || item.height !== TILE_SIZE_IN_TILES) {
+    problems.push(`tile ${t.name}: item ${t.itemId} é ${item.width}x${item.height}, tiles devem ser 1x1`)
+  }
   if (t.patternX >= item.patternX) problems.push(`tile ${t.name}: patternX ${t.patternX} fora da faixa 0..${item.patternX - 1}`)
   if (t.patternY >= item.patternY) problems.push(`tile ${t.name}: patternY ${t.patternY} fora da faixa 0..${item.patternY - 1}`)
   return problems

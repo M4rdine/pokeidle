@@ -43,6 +43,13 @@ describe('toSpecies', () => {
   it('lança em growthRate fora da Gen 1', () => {
     expect(() => toSpecies(pokemon, { ...species, growth_rate: { name: 'erratic' } }, chain, new Set(), () => {})).toThrow(/erratic/)
   })
+  it('mapeia o nome "medium" do PokeAPI para medium-fast', () => {
+    const s = toSpecies(pokemon, { ...species, growth_rate: { name: 'medium' } }, chain, new Set(['charmander', 'charmeleon']), () => {})
+    expect(s.growthRate).toBe('medium-fast')
+  })
+  it('lança em growthRate "slow-then-very-fast" (nome do PokeAPI para erratic)', () => {
+    expect(() => toSpecies(pokemon, { ...species, growth_rate: { name: 'slow-then-very-fast' } }, chain, new Set(), () => {})).toThrow(/slow-then-very-fast/)
+  })
   it('ignora tipo desconhecido e avisa', () => {
     const warnings: string[] = []
     const withUnknownType: PokeApiPokemon = { ...pokemon, types: [...pokemon.types, { slot: 2, type: { name: 'shadow' } }] }

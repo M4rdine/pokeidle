@@ -1,10 +1,12 @@
-import { GROWTH_RATES, TYPE_NAMES, type GrowthRate, type Move, type Species, type TypeChart, type TypeName } from '@pokeidle/shared'
+import { TYPE_NAMES, type GrowthRate, type Move, type Species, type TypeChart, type TypeName } from '@pokeidle/shared'
 
 const VERSION_GROUP = 'firered-leafgreen'
 const LEVEL_UP = 'level-up'
 const STAT_KEYS: Record<string, keyof Species['baseStats']> = {
   hp: 'hp', attack: 'attack', defense: 'defense', 'special-attack': 'spAttack', 'special-defense': 'spDefense', speed: 'speed',
 }
+/** O PokeAPI nomeia a curva "medium fast" apenas como "medium"; as demais batem com o enum interno. */
+const GROWTH_RATE_ALIASES: Record<string, GrowthRate> = { medium: 'medium-fast', 'medium-fast': 'medium-fast', fast: 'fast', 'medium-slow': 'medium-slow', slow: 'slow' }
 
 export interface PokeApiPokemon {
   id: number; name: string; base_experience: number | null
@@ -19,7 +21,6 @@ export interface PokeApiMove { name: string; power: number | null; accuracy: num
 export interface PokeApiType { name: string; damage_relations: { double_damage_to: { name: string }[]; half_damage_to: { name: string }[]; no_damage_to: { name: string }[] } }
 
 const isTypeName = (n: string): n is TypeName => (TYPE_NAMES as readonly string[]).includes(n)
-const isGrowthRate = (n: string): n is GrowthRate => (GROWTH_RATES as readonly string[]).includes(n)
 
 function findNode(node: PokeApiChainNode, name: string): PokeApiChainNode | undefined {
   if (node.species.name === name) return node
@@ -57,8 +58,9 @@ function learnsetOf(p: PokeApiPokemon): Species['learnset'] {
 }
 
 export function toSpecies(p: PokeApiPokemon, s: PokeApiSpecies, chain: PokeApiChain, manifest: ReadonlySet<string>, warn: (m: string) => void): Species {
-  const growth = s.growth_rate.name
-  if (!isGrowthRate(growth)) throw new Error(`${p.name}: growthRate ${growth} não é suportada (só as curvas da Gen 1)`)
+  const raw = s.growth_rate.name
+  const growth = GROWTH_RATE_ALIASES[raw]
+  if (growth === undefined) throw new Error(`${p.name}: growthRate ${raw} não é suportada (só as curvas da Gen 1)`)
   const baseStats = Object.fromEntries(p.stats.map((st) => [STAT_KEYS[st.stat.name], st.base_stat])) as Species['baseStats']
   const types = typesOf(p, warn)
   const evolvesTo = evolutionOf(chain, p.name, manifest, warn)

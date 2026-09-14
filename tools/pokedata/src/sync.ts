@@ -28,7 +28,7 @@ async function fetchMoves(api: PokeApi, names: readonly string[], warn: (m: stri
     if (move === null) { warn(`golpe ${name} descartado: sem poder ou de status`); continue }
     moves.push(move)
   }
-  return moves.sort((a, b) => a.name.localeCompare(b.name))
+  return [...moves].sort((a, b) => a.name.localeCompare(b.name))
 }
 
 const write = async (dir: string, file: string, data: unknown): Promise<void> => writeFile(join(dir, file), `${JSON.stringify(data, null, 2)}\n`)
@@ -38,7 +38,7 @@ export async function sync(opts: SyncOptions): Promise<{ species: number; moves:
   const manifest = new Set(opts.speciesNames)
   const speciesList: Species[] = []
   for (const name of opts.speciesNames) speciesList.push(await fetchSpecies(opts.api, name, manifest, warn))
-  const sortedSpecies = speciesList.sort((a, b) => a.id - b.id)
+  const sortedSpecies = [...speciesList].sort((a, b) => a.id - b.id)
 
   const moveNames = [...new Set(sortedSpecies.flatMap((s) => s.learnset.map((l) => l.move)))].sort()
   const moves = await fetchMoves(opts.api, moveNames, warn)

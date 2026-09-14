@@ -43,6 +43,13 @@ describe('toSpecies', () => {
   it('lança em growthRate fora da Gen 1', () => {
     expect(() => toSpecies(pokemon, { ...species, growth_rate: { name: 'erratic' } }, chain, new Set(), () => {})).toThrow(/erratic/)
   })
+  it('ignora tipo desconhecido e avisa', () => {
+    const warnings: string[] = []
+    const withUnknownType: PokeApiPokemon = { ...pokemon, types: [...pokemon.types, { slot: 2, type: { name: 'shadow' } }] }
+    const s = toSpecies(withUnknownType, species, chain, new Set(['charmander', 'charmeleon']), (m) => warnings.push(m))
+    expect(s.types).toEqual(['fire'])
+    expect(warnings.some((w) => /shadow/.test(w))).toBe(true)
+  })
 })
 
 describe('toMove', () => {

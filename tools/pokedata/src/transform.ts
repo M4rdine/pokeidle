@@ -39,6 +39,15 @@ function evolutionOf(chain: PokeApiChain, name: string, manifest: ReadonlySet<st
   return undefined
 }
 
+function typesOf(p: PokeApiPokemon, warn: (m: string) => void): Species['types'] {
+  return [...p.types].sort((a, b) => a.slot - b.slot).flatMap((t) => {
+    const name = t.type.name
+    if (isTypeName(name)) return [name]
+    warn(`${p.name}: tipo ${name} desconhecido, ignorado`)
+    return []
+  })
+}
+
 function learnsetOf(p: PokeApiPokemon): Species['learnset'] {
   const entries = p.moves.flatMap((m) => {
     const d = m.version_group_details.find((v) => v.version_group.name === VERSION_GROUP && v.move_learn_method.name === LEVEL_UP)
@@ -51,7 +60,7 @@ export function toSpecies(p: PokeApiPokemon, s: PokeApiSpecies, chain: PokeApiCh
   const growth = s.growth_rate.name
   if (!isGrowthRate(growth)) throw new Error(`${p.name}: growthRate ${growth} não é suportada (só as curvas da Gen 1)`)
   const baseStats = Object.fromEntries(p.stats.map((st) => [STAT_KEYS[st.stat.name], st.base_stat])) as Species['baseStats']
-  const types = [...p.types].sort((a, b) => a.slot - b.slot).map((t) => t.type.name).filter(isTypeName)
+  const types = typesOf(p, warn)
   const evolvesTo = evolutionOf(chain, p.name, manifest, warn)
   return {
     id: p.id, name: p.name, types, baseStats,

@@ -1,4 +1,5 @@
 import { BinaryReader } from './binary-reader.js'
+import type { FormatOptions } from './spr.js'
 
 export type DatVersion = 854 | 860
 export type ThingCategory = 'item' | 'outfit' | 'effect' | 'missile'
@@ -39,6 +40,7 @@ export interface ThingType {
 export interface DatFile {
   readonly signature: number
   readonly version: DatVersion
+  readonly extended: boolean
   readonly items: readonly ThingType[]
   readonly outfits: readonly ThingType[]
   readonly effects: readonly ThingType[]
@@ -99,8 +101,13 @@ function readFlags(reader: BinaryReader, version: DatVersion, label: string): Fl
   return { flags, displacement, groundSpeed }
 }
 
-function readThing(reader: BinaryReader, id: number, category: ThingCategory, version: DatVersion): ThingType {
-  const block = readFlags(reader, version, `${category} ${id}`)
+interface DatFormat {
+  readonly version: DatVersion
+  readonly extended: boolean
+}
+
+function readThing(reader: BinaryReader, id: number, category: ThingCategory, format: DatFormat): ThingType {
+  const block = readFlags(reader, format.version, `${category} ${id}`)
   const width = reader.u8()
   const height = reader.u8()
   if (width > 1 || height > 1) reader.u8() // exactSize, não usado
@@ -110,14 +117,14 @@ function readThing(reader: BinaryReader, id: number, category: ThingCategory, ve
   const patternZ = reader.u8()
   const phases = reader.u8()
   const count = width * height * layers * patternX * patternY * patternZ * phases
-  const spriteIds = Array.from({ length: count }, () => reader.u16())
+  const spriteIds = Array.from({ length: count }, () => (format.extended ? reader.u32() : reader.u16()))
   return { id, category, width, height, layers, patternX, patternY, patternZ, phases, spriteIds, ...block }
 }
 
-function readLabeledThing(reader: BinaryReader, id: number, category: ThingCategory, version: DatVersion): ThingType {
+function readLabeledThing(reader: BinaryReader, id: number, category: ThingCategory, format: DatFormat): ThingType {
   const label = `${category} ${id}`
   try {
-    return readThing(reader, id, category, version)
+    return readThing(reader, id, category, format)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     if (message.includes(label)) throw error
@@ -130,11 +137,11 @@ function readCategory(
   category: ThingCategory,
   firstId: number,
   lastId: number,
-  version: DatVersion,
+  format: DatFormat,
 ): ThingType[] {
   const things: ThingType[] = []
   for (let id = firstId; id <= lastId; id++) {
-    things.push(readLabeledThing(reader, id, category, version))
+    things.push(readLabeledThing(reader, id, category, format))
   }
   return things
 }
@@ -149,28 +156,38 @@ function readOptionalCategory(
   reader: BinaryReader,
   category: ThingCategory,
   count: number,
-  version: DatVersion,
+  format: DatFormat,
   labelPt: string,
 ): OptionalCategory {
   try {
-    return { things: readCategory(reader, category, 1, count, version), warning: null }
+    return { things: readCategory(reader, category, 1, count, format), warning: null }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     return { things: [], warning: `${labelPt} ignorados: ${message}` }
   }
 }
 
-export function parseDat(data: Uint8Array, version: DatVersion = 860): DatFile {
+export function parseDat(data: Uint8Array, version: DatVersion = 860, options: FormatOptions = {}): DatFile {
+  const format: DatFormat = { version, extended: options.extended ?? false }
   const reader = BinaryReader.fromBuffer(data)
   const signature = reader.u32()
   const lastItemId = reader.u16()
   const outfitCount = reader.u16()
   const effectCount = reader.u16()
   const missileCount = reader.u16()
-  const items = readCategory(reader, 'item', FIRST_ITEM_ID, lastItemId, version)
-  const outfits = readCategory(reader, 'outfit', 1, outfitCount, version)
-  const effects = readOptionalCategory(reader, 'effect', effectCount, version, 'efeitos')
-  const missiles = readOptionalCategory(reader, 'missile', missileCount, version, 'mísseis')
+  const items = readCategory(reader, 'item', FIRST_ITEM_ID, lastItemId, format)
+  const outfits = readCategory(reader, 'outfit', 1, outfitCount, format)
+  const effects = readOptionalCategory(reader, 'effect', effectCount, format, 'efeitos')
+  const missiles = readOptionalCategory(reader, 'missile', missileCount, format, 'mísseis')
   const warnings = [effects.warning, missiles.warning].filter((w): w is string => w !== null)
-  return { signature, version, items, outfits, effects: effects.things, missiles: missiles.things, warnings }
+  return {
+    signature,
+    version,
+    extended: format.extended,
+    items,
+    outfits,
+    effects: effects.things,
+    missiles: missiles.things,
+    warnings,
+  }
 }

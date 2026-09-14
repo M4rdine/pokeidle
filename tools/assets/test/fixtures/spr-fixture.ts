@@ -38,8 +38,10 @@ export function encodeRle(pixels: ReadonlyArray<Rgb | null>): Uint8Array {
 export function buildSpr(
   sprites: ReadonlyArray<ReadonlyArray<Rgb | null> | null>,
   signature = 0x4a10_0000,
+  extended = false,
 ): Uint8Array {
-  const headerSize = 4 + 2 + sprites.length * 4
+  const countBytes = extended ? 4 : 2
+  const headerSize = 4 + countBytes + sprites.length * 4
   const bodies = sprites.map((s) => (s === null ? null : encodeRle(s)))
   const offsets: number[] = []
   let cursor = headerSize
@@ -54,7 +56,8 @@ export function buildSpr(
     bodyBytes.push(...chunk)
     cursor += chunk.length
   }
-  const header = [...u32(signature), ...u16(sprites.length), ...offsets.flatMap(u32)]
+  const count = extended ? u32(sprites.length) : u16(sprites.length)
+  const header = [...u32(signature), ...count, ...offsets.flatMap(u32)]
   return new Uint8Array([...header, ...bodyBytes])
 }
 

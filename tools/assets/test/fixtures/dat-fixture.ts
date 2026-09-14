@@ -16,6 +16,8 @@ export interface DatSpec {
   outfits: ThingSpec[]
   effects?: ThingSpec[]
   missiles?: ThingSpec[]
+  /** Formato "extended": ids de sprite em u32 (clientes 8.x modificados com mais de 65535 sprites). */
+  extended?: boolean
 }
 
 function u16(n: number): number[] {
@@ -26,7 +28,7 @@ function u32(n: number): number[] {
   return [n & 0xff, (n >> 8) & 0xff, (n >> 16) & 0xff, (n >>> 24) & 0xff]
 }
 
-function encodeThing(t: ThingSpec): number[] {
+function encodeThing(t: ThingSpec, extended: boolean): number[] {
   const expected = t.width * t.height * t.layers * t.patternX * t.patternY * t.patternZ * t.phases
   if (t.spriteIds.length !== expected) {
     throw new Error(`spriteIds tem ${t.spriteIds.length}, esperado ${expected}`)
@@ -43,7 +45,7 @@ function encodeThing(t: ThingSpec): number[] {
     t.patternY,
     t.patternZ,
     t.phases,
-    ...t.spriteIds.flatMap(u16),
+    ...t.spriteIds.flatMap(extended ? u32 : u16),
   ]
 }
 
@@ -58,7 +60,7 @@ export function buildDat(spec: DatSpec): Uint8Array {
     ...u16(effects.length),
     ...u16(missiles.length),
   ]
-  const body = [...spec.items, ...spec.outfits, ...effects, ...missiles].flatMap(encodeThing)
+  const body = [...spec.items, ...spec.outfits, ...effects, ...missiles].flatMap((t) => encodeThing(t, spec.extended ?? false))
   return new Uint8Array([...header, ...body])
 }
 

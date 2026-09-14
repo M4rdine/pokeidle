@@ -26,6 +26,7 @@ export interface CatalogItem {
 
 export interface Catalog {
   readonly version: DatVersion
+  readonly extended: boolean
   readonly sprSignature: number
   readonly datSignature: number
   readonly outfits: readonly CatalogOutfit[]
@@ -64,6 +65,7 @@ function toItem(t: ThingType): CatalogItem {
 export function buildCatalog(spr: SprFile, dat: DatFile): Catalog {
   return {
     version: dat.version,
+    extended: dat.extended,
     sprSignature: spr.signature,
     datSignature: dat.signature,
     outfits: dat.outfits.filter(hasSprites).map(toOutfit),
@@ -96,6 +98,7 @@ const CatalogItemSchema = z.object({
 
 export const CatalogSchema = z.object({
   version: z.union([z.literal(854), z.literal(860)]),
+  extended: z.boolean(),
   sprSignature: z.number().int(),
   datSignature: z.number().int(),
   outfits: z.array(CatalogOutfitSchema),

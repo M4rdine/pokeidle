@@ -7,6 +7,11 @@ const BYTES_PER_RGBA = 4
 
 export type Rgb = readonly [number, number, number]
 
+/** Clientes 8.x modificados ("extended") guardam a contagem de sprites e os ids em u32 para passar de 65535. */
+export interface FormatOptions {
+  readonly extended?: boolean
+}
+
 export interface SprFile {
   readonly signature: number
   readonly spriteCount: number
@@ -14,10 +19,10 @@ export interface SprFile {
   readonly data: Uint8Array
 }
 
-export function parseSpr(data: Uint8Array): SprFile {
+export function parseSpr(data: Uint8Array, options: FormatOptions = {}): SprFile {
   const reader = BinaryReader.fromBuffer(data)
   const signature = reader.u32()
-  const spriteCount = reader.u16()
+  const spriteCount = options.extended ? reader.u32() : reader.u16()
   const offsets = Array.from({ length: spriteCount }, () => reader.u32())
   return { signature, spriteCount, offsets, data }
 }

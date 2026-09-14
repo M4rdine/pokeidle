@@ -7,6 +7,7 @@ import { renderContactSheet, writeContactSheet } from '../src/contact-sheet.js'
 
 const catalog: Catalog = {
   version: 860,
+  extended: false,
   sprSignature: 1,
   datSignature: 2,
   outfits: [

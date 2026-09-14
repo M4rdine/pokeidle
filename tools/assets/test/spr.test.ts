@@ -21,6 +21,16 @@ describe('parseSpr', () => {
   })
 })
 
+describe('parseSpr (extended)', () => {
+  it('lê a contagem de sprites em u32 quando extended', () => {
+    const file = buildSpr([solidSprite(RED), null], 0xdead_beef, true)
+    const spr = parseSpr(file, { extended: true })
+    expect(spr.spriteCount).toBe(2)
+    expect(spr.offsets[0]).toBe(4 + 4 + 8)
+    expect(Array.from(decodeSprite(spr, 1).subarray(0, 4))).toEqual([255, 0, 0, 255])
+  })
+})
+
 describe('decodeSprite', () => {
   it('decodifica um sprite sólido em RGBA opaco', () => {
     const spr = parseSpr(buildSpr([solidSprite(RED)]))

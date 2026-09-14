@@ -9,6 +9,7 @@ import { decodePng, encodePng } from '../src/png.js'
 
 const catalog: Catalog = {
   version: 860,
+  extended: false,
   sprSignature: 1,
   datSignature: 2,
   outfits: [

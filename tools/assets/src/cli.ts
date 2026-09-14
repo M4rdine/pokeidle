@@ -24,6 +24,17 @@ async function importOptions(manifestPath: string | undefined): Promise<ImportOp
   return { knownSpecies: new Set(manifest.species.map((s) => s.name)) }
 }
 
+/** Um .dat extended lido como padrão falha cedo com flag absurda; a dica evita a investigação a olho. */
+function withExtendedHint<T>(extended: boolean, parse: () => T): T {
+  try {
+    return parse()
+  } catch (error) {
+    if (extended) throw error
+    const message = error instanceof Error ? error.message : String(error)
+    throw new Error(`${message}\ndica: se o pack tem mais de 65535 sprites, tente --extended`)
+  }
+}
+
 const program = new Command().name('pokeidle-assets').description('Pipeline de assets do Pokeidle')
 
 program
@@ -31,10 +42,13 @@ program
   .argument('<spr>')
   .argument('<dat>')
   .option('--version <v>', 'versão do .dat (860 ou 854)', '860')
-  .action(async (sprPath: string, datPath: string, opts: { version: string }) => {
-    const spr = parseSpr(new Uint8Array(await readFile(sprPath)))
-    const dat = parseDat(new Uint8Array(await readFile(datPath)), parseVersion(opts.version))
-    out(`spr signature 0x${spr.signature.toString(16)}, ${spr.spriteCount} sprites`)
+  .option('--extended', 'formato extended: contagem e ids de sprite em u32 (packs com mais de 65535 sprites)', false)
+  .action(async (sprPath: string, datPath: string, opts: { version: string; extended: boolean }) => {
+    const format = { extended: opts.extended }
+    const spr = parseSpr(new Uint8Array(await readFile(sprPath)), format)
+    const datBytes = new Uint8Array(await readFile(datPath))
+    const dat = withExtendedHint(opts.extended, () => parseDat(datBytes, parseVersion(opts.version), format))
+    out(`spr signature 0x${spr.signature.toString(16)}, ${spr.spriteCount} sprites${opts.extended ? ' (extended)' : ''}`)
     out(`dat signature 0x${dat.signature.toString(16)}`)
     out(`itens: ${dat.items.length} (100..${dat.items.length + 99})`)
     out(`outfits: ${dat.outfits.length}, efeitos: ${dat.effects.length}, mísseis: ${dat.missiles.length}`)
@@ -49,8 +63,9 @@ program
   .argument('<dat>')
   .option('--out <dir>', 'pasta de saída', 'assets/extracted')
   .option('--version <v>', 'versão do .dat (860 ou 854)', '860')
-  .action(async (sprPath: string, datPath: string, opts: { out: string; version: string }) => {
-    await extractAll({ sprPath, datPath, outDir: opts.out, version: parseVersion(opts.version) }, out)
+  .option('--extended', 'formato extended: contagem e ids de sprite em u32 (packs com mais de 65535 sprites)', false)
+  .action(async (sprPath: string, datPath: string, opts: { out: string; version: string; extended: boolean }) => {
+    await extractAll({ sprPath, datPath, outDir: opts.out, version: parseVersion(opts.version), extended: opts.extended }, out)
   })
 
 program

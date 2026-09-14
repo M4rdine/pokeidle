@@ -29,6 +29,7 @@ describe('extractAll', () => {
     )
 
     const catalog = await extractAll({ sprPath, datPath, outDir, version: 860 })
+    expect(catalog.extended).toBe(false)
 
     expect(catalog.outfits.map((o) => o.id)).toEqual([1])
     expect(catalog.outfits[0]).toMatchObject({ width: 2, height: 2, directions: 4, phases: 2 })

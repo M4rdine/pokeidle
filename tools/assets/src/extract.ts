@@ -12,6 +12,8 @@ export interface ExtractOptions {
   readonly datPath: string
   readonly outDir: string
   readonly version: DatVersion
+  /** Formato extended (ids e contagem de sprites em u32). Padrão: false. */
+  readonly extended?: boolean
 }
 
 export type Logger = (line: string) => void
@@ -48,8 +50,9 @@ async function writeItem(spr: SprFile, item: ThingType, outDir: string): Promise
 }
 
 export async function extractAll(opts: ExtractOptions, log: Logger = () => {}): Promise<Catalog> {
-  const spr = parseSpr(new Uint8Array(await readFile(opts.sprPath)))
-  const dat = parseDat(new Uint8Array(await readFile(opts.datPath)), opts.version)
+  const format = { extended: opts.extended ?? false }
+  const spr = parseSpr(new Uint8Array(await readFile(opts.sprPath)), format)
+  const dat = parseDat(new Uint8Array(await readFile(opts.datPath)), opts.version, format)
   log(`spr: ${spr.spriteCount} sprites; dat: ${dat.items.length} itens, ${dat.outfits.length} outfits`)
   for (const warning of dat.warnings) log(`aviso: ${warning}`)
 

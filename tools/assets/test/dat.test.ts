@@ -115,3 +115,22 @@ describe('parseDat (854)', () => {
     expect(dat.outfits[0]?.flags.has(FLAG_DISPLACEMENT)).toBe(true)
   })
 })
+
+describe('parseDat (extended)', () => {
+  it('lê ids de sprite em u32 quando extended', () => {
+    const file = buildDat({
+      items: [{ ...groundItemSpec(70000), flags: [] }],
+      outfits: [outfitSpec(1, 65530)],
+      extended: true,
+    })
+    const dat = parseDat(file, 854, { extended: true })
+    expect(dat.extended).toBe(true)
+    expect(dat.items[0]?.spriteIds).toEqual([70000])
+    expect(dat.outfits[0]?.spriteIds[15]).toBe(65545)
+  })
+
+  it('padrão continua sendo não extended', () => {
+    const dat = parseDat(buildDat({ items: [groundItemSpec(1)], outfits: [] }))
+    expect(dat.extended).toBe(false)
+  })
+})

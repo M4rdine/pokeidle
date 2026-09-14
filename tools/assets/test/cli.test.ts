@@ -40,6 +40,16 @@ const tiledMap = {
       objects: [
         { id: 1, class: 'spawnPoint', x: 0, y: 0, width: 32, height: 32 },
         { id: 2, class: 'pokecenter', x: 32, y: 0, width: 32, height: 32 },
+        {
+          id: 3, class: 'spawn', x: 0, y: 0, width: 32, height: 32,
+          properties: [
+            { name: 'species', type: 'string', value: 'charmander' },
+            { name: 'minLevel', type: 'int', value: 2 },
+            { name: 'maxLevel', type: 'int', value: 5 },
+            { name: 'count', type: 'int', value: 1 },
+            { name: 'respawnSeconds', type: 'int', value: 10 },
+          ],
+        },
       ],
     },
   ],
@@ -125,7 +135,12 @@ describe('program', () => {
     ])
 
     const written = JSON.parse(await readFile(join(outDir, 'rota-1.json'), 'utf8'))
-    expect(written).toMatchObject({ id: 'rota-1', name: 'Rota 1', width: 2, height: 1, spawns: [] })
+    // schemas.HuntMapSchema exige spawns.length >= 1 (uma hunt sem nenhum spawn não faz
+    // sentido no jogo); o fixture base já traz um spawn de charmander pra continuar válido.
+    expect(written).toMatchObject({
+      id: 'rota-1', name: 'Rota 1', width: 2, height: 1,
+      spawns: [{ speciesName: 'charmander', minLevel: 2, maxLevel: 5, count: 1, respawnSeconds: 10 }],
+    })
     expect(stdout.lines()).toMatch(/hunt gravada em/)
   })
 

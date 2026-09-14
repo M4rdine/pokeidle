@@ -6,3 +6,4 @@ dist/
 assets/
 coverage/
 .DS_Store
+.superpowers/

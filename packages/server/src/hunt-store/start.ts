@@ -8,9 +8,18 @@ import { createHuntState } from '../engine/create.js'
 import { AppError } from '../http/errors.js'
 import { toHuntSettings, toPokemonState } from './mappers.js'
 
+/** @internal só para testes — a camada HTTP nunca deve passar isto. */
 export interface StartIds { readonly sessionId?: string; readonly seed?: number }
 
-export async function startHunt(db: Db, registry: Registry, trainerId: string, huntId: string, now: Date, ids: StartIds = {}): Promise<HuntSessionRow> {
+export async function startHunt(
+  db: Db,
+  registry: Registry,
+  trainerId: string,
+  huntId: string,
+  now: Date,
+  /** @internal só para testes — a camada HTTP nunca deve passar isto. */
+  ids: StartIds = {},
+): Promise<HuntSessionRow> {
   const hunt = registry.hunts.get(huntId)
   if (!hunt) throw new AppError('not-found', `hunt ${huntId} não existe`)
   if (await hasActiveHunt(db, trainerId)) throw new AppError('hunt-active', 'já existe uma hunt ativa')

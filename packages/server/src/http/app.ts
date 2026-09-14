@@ -18,6 +18,7 @@ export interface AppDeps {
   readonly config: Config
   readonly now?: () => Date
   readonly logger?: boolean
+  /** @internal só para testes — a camada HTTP nunca deve passar isto. */
   readonly extraRoutes?: (app: FastifyInstance) => void
 }
 

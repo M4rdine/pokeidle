@@ -75,17 +75,22 @@ Migrations: `drizzle-kit generate` a partir de `schema.ts`, SQL versionado em
 `db:generate`, `db:migrate`, `dev` (tsx watch), `start`.
 
 `docker-compose.yml` na raiz: serviço `postgres` (`postgres:16-alpine`), usuário/senha
-`pokeidle`/`pokeidle`, banco `pokeidle`, porta `5432`, volume nomeado, e
+`pokeidle`/`pokeidle`, banco `pokeidle`, porta do host `5433` (a 5432 já é do Postgres
+local do Homebrew), volume nomeado, e
 `docker/postgres-init/01-test-db.sql` que cria o banco `pokeidle_test`. `.env.example`
-com `DATABASE_URL=postgres://pokeidle:pokeidle@localhost:5432/pokeidle`,
-`DATABASE_URL_TEST=postgres://pokeidle:pokeidle@localhost:5432/pokeidle_test`, `PORT`,
+com `DATABASE_URL=postgres://pokeidle:pokeidle@localhost:5433/pokeidle`,
+`DATABASE_URL_TEST=postgres://pokeidle:pokeidle@localhost:5433/pokeidle_test`, `PORT`,
 `COOKIE_SECURE`.
 
-### Mudança em `shared`
+### Mudanças em `shared` e no motor
 
 `createRng(seed, state?)` e `rng.state(): number` para o snapshot guardar o estado do
 mulberry32 e a retomada na 2c ser determinística. Teste: `createRng(1)` avançado N vezes
 e `createRng(1, s.state())` produzem a mesma sequência a partir daí.
+
+`CreateInput` do motor ganha `trainer?: { xp, gold }` (padrão `{ 0, 0 }`) para o
+`HuntState` carregar os valores absolutos do treinador desde o início da hunt; assim
+`syncToTables` grava absolutos e pode rodar quantas vezes for preciso sem somar duas vezes.
 
 ## 4. Autenticação e sessões
 
@@ -247,8 +252,8 @@ Critérios desta fase, cada um com o teste que o prova (§8 ganha a lista abaixo
 **Entrada**
 - S9. Zod em todo corpo, query e params, com `.strict()` (campos desconhecidos → 400).
   `bodyLimit` 16 KB. Só `application/json` nas rotas com corpo.
-- S10. Rate limit por IP: `/auth/login` e `/auth/register` 10/min; registro também
-  20/dia; demais rotas 300/min. `trustProxy` ligado por config para o IP real atrás do
+- S10. Rate limit por IP: `/auth/login` e `/auth/register` 10/min; demais rotas 300/min
+  (limite diário de registro entra junto com o captcha, se aparecer abuso). `trustProxy` ligado por config para o IP real atrás do
   proxy. Teste: 11ª tentativa → 429.
 - S11. CSRF: além de `SameSite=Lax`, toda rota que muda estado exige `Origin` (ou
   `Referer`) igual a `APP_ORIGIN` da config; ausente ou diferente → 403 `forbidden`.

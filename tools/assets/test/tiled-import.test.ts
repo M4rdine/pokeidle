@@ -112,6 +112,42 @@ describe('importTiledMap', () => {
     expect(() => importTiledMap(tiled, tileset, { id: 'x', name: 'x' })).not.toThrow()
   })
 
+  it('aceita spawn com espécie do registro real (zubat) sem consultá-lo, pois o importador puro não conhece registro', () => {
+    const tiledWithZubat = {
+      ...tiled,
+      layers: [
+        tiled.layers[0],
+        tiled.layers[1],
+        tiled.layers[2],
+        {
+          type: 'objectgroup',
+          name: 'objects',
+          objects: [
+            { id: 1, class: 'spawnPoint', x: 0, y: 0, width: 32, height: 32 },
+            { id: 2, class: 'pokecenter', x: 32, y: 0, width: 32, height: 32 },
+            {
+              id: 3,
+              class: 'spawn',
+              x: 0,
+              y: 32,
+              width: 64,
+              height: 32,
+              properties: [
+                { name: 'species', type: 'string', value: 'zubat' },
+                { name: 'minLevel', type: 'int', value: 2 },
+                { name: 'maxLevel', type: 'int', value: 5 },
+                { name: 'count', type: 'int', value: 3 },
+                { name: 'respawnSeconds', type: 'int', value: 20 },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    const map = importTiledMap(tiledWithZubat, tileset, { id: 'x', name: 'x' })
+    expect(map.spawns[0]?.speciesName).toBe('zubat')
+  })
+
   it('rejeita espécie fora do manifest quando knownSpecies é informado', () => {
     expect(() => importTiledMap(tiled, tileset, { id: 'x', name: 'x' }, { knownSpecies: new Set(['pidgey']) })).toThrow(
       /espécie desconhecida "rattata" no spawn \(objeto 3\)/,

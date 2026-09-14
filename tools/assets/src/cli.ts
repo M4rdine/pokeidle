@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { Command } from 'commander'
+import { loadRegistry } from '@pokeidle/shared'
 import { buildAtlases } from './build-atlases.js'
 import { parseDat, type DatVersion } from './dat.js'
 import { extractAll } from './extract.js'
@@ -19,7 +20,7 @@ export function parseVersion(raw: string): DatVersion {
 }
 
 async function importOptions(manifestPath: string | undefined): Promise<ImportOptions> {
-  if (manifestPath === undefined) return {}
+  if (manifestPath === undefined) return { knownSpecies: new Set(loadRegistry().species.keys()) }
   const manifest = await loadManifest(manifestPath)
   return { knownSpecies: new Set(manifest.species.map((s) => s.name)) }
 }
@@ -93,8 +94,8 @@ program
   .requiredOption('--id <id>', 'id kebab-case da hunt')
   .requiredOption('--name <nome>', 'nome exibido da hunt')
   .option('--tileset <file>', 'tileset gerado pelo build', 'assets/atlas/tiles.tsj')
-  .option('--manifest <file>', 'manifest de curadoria, para conferir os nomes de espécie dos spawns')
-  .option('--out <dir>', 'pasta de saída', 'data/hunts')
+  .option('--manifest <file>', 'opcional: usa os nomes do manifest em vez do registro do shared')
+  .option('--out <dir>', 'pasta de saída', 'packages/shared/data/hunts')
   .action(async (tiledPath: string, opts: { id: string; name: string; tileset: string; manifest?: string; out: string }) => {
     const tiled = await readJson(tiledPath)
     const tileset = parseTiledTileset(await readJson(opts.tileset))

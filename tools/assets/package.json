@@ -9,6 +9,7 @@
     "cli": "tsx src/main.ts"
   },
   "dependencies": {
+    "@pokeidle/shared": "workspace:*",
     "commander": "^12.1.0",
     "pngjs": "^7.0.0",
     "zod": "^3.23.8"

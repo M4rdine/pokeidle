@@ -11,15 +11,17 @@ pnpm assets inspect <spr> <dat> [--version 860|854]
 pnpm assets extract <spr> <dat> [--out assets/extracted] [--version 860|854]
 pnpm assets contact-sheet [--extracted assets/extracted] [--all-outfits] [--all-items]
 pnpm assets build [--extracted assets/extracted] [--manifest tools/assets/manifest.json] [--out assets/atlas]
-pnpm assets map-import <mapa.tmj> --id rota-1 --name "Rota 1" [--tileset assets/atlas/tiles.tsj] [--manifest tools/assets/manifest.json] [--out data/hunts]
+pnpm assets map-import <mapa.tmj> --id rota-1 --name "Rota 1" [--tileset assets/atlas/tiles.tsj] [--manifest tools/assets/manifest.json] [--out packages/shared/data/hunts]
 ```
 
 - `inspect` resume assinaturas, contagens e avisos sem escrever nada.
 - `extract` escreve todos os PNGs e o `catalog.json`.
 - `contact-sheet` gera o `index.html` usado para descobrir ids de outfit e item.
 - `build` valida o manifest contra o catálogo e gera os atlases.
-- `map-import` converte um mapa exportado do Tiled; com `--manifest` também confere
-  os nomes de espécie dos spawns.
+- `map-import` converte um mapa exportado do Tiled e grava em `packages/shared/data/hunts`
+  por padrão; sem `--manifest`, confere os nomes de espécie dos spawns contra
+  `loadRegistry().species` do `@pokeidle/shared` (com `--manifest`, usa os nomes do
+  manifest em vez do registro).
 
 Efeitos e mísseis são opcionais: se o `.dat` estiver corrompido nessas seções, a leitura
 segue e um `aviso: ...` é impresso.
@@ -109,9 +111,9 @@ o id local de cada tile é a posição no manifest e o nome vai na propriedade `
 O schema exige camadas com exatamente `width * height` entradas, `minLevel <= maxLevel`
 e todas as posições (`spawnPoint`, `pokecenter`, cada spawn) dentro do mapa.
 
-> `HuntMapSchema` mora aqui **apenas na fase zero**. Na fase 2 ele se muda para
-> `packages/shared`, para ser compartilhado entre servidor e cliente; este pacote
-> passará a importá-lo de lá.
+> `HuntMapSchema` mora em `@pokeidle/shared` (compartilhado entre servidor e cliente).
+> `hunt-map.ts` e `parse-or-throw.ts` aqui são apenas re-exports de lá — veja
+> `packages/shared/README.md`.
 
 ## Desenvolvimento
 

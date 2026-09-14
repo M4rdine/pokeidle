@@ -128,4 +128,66 @@ describe('program', () => {
     expect(written).toMatchObject({ id: 'rota-1', name: 'Rota 1', width: 2, height: 1, spawns: [] })
     expect(stdout.lines()).toMatch(/hunt gravada em/)
   })
+
+  it('map-import sem --manifest valida speciesName contra o registro do shared', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-cli-'))
+    const tiledPath = join(dir, 'route.tmj')
+    const tilesetPath = join(dir, 'tiles.tsj')
+    const outDir = join(dir, 'hunts')
+    const tiledWithSpawn = {
+      ...tiledMap,
+      layers: [
+        tiledMap.layers[0],
+        tiledMap.layers[1],
+        tiledMap.layers[2],
+        {
+          type: 'objectgroup',
+          name: 'objects',
+          objects: [
+            { id: 1, class: 'spawnPoint', x: 0, y: 0, width: 32, height: 32 },
+            { id: 2, class: 'pokecenter', x: 32, y: 0, width: 32, height: 32 },
+            {
+              id: 3,
+              class: 'spawn',
+              x: 0,
+              y: 0,
+              width: 32,
+              height: 32,
+              properties: [
+                { name: 'species', type: 'string', value: 'mewtwo-x' },
+                { name: 'minLevel', type: 'int', value: 1 },
+                { name: 'maxLevel', type: 'int', value: 1 },
+                { name: 'count', type: 'int', value: 1 },
+                { name: 'respawnSeconds', type: 'int', value: 10 },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    await writeFile(tiledPath, JSON.stringify(tiledWithSpawn))
+    await writeFile(tilesetPath, JSON.stringify(tileset))
+
+    await expect(
+      program.parseAsync([
+        'node',
+        'cli',
+        'map-import',
+        tiledPath,
+        '--id',
+        'rota-1',
+        '--name',
+        'Rota 1',
+        '--tileset',
+        tilesetPath,
+        '--out',
+        outDir,
+      ]),
+    ).rejects.toThrow(/espécie desconhecida/)
+  })
+
+  it('map-import usa packages/shared/data/hunts como pasta de saída padrão', () => {
+    const mapImport = program.commands.find((c) => c.name() === 'map-import')
+    expect(mapImport?.options.find((o) => o.long === '--out')?.defaultValue).toBe('packages/shared/data/hunts')
+  })
 })

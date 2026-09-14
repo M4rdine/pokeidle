@@ -47,7 +47,13 @@ export function removeWild(state: HuntState, deps: EngineDeps, wild: WildState):
     ...state,
     wilds: state.wilds.filter((w) => w.id !== wild.id),
     respawns: [...state.respawns, { spawnIndex: wild.spawnIndex, atTick: state.tick + spawn.respawnSeconds * TICKS_PER_SECOND }],
-    player: { ...state.player, mode: 'searching', targetWildId: null, path: [] },
+    player: {
+      ...state.player,
+      mode: 'searching',
+      targetWildId: null,
+      path: [],
+      skippedWildIds: state.player.skippedWildIds.filter((id) => id !== wild.id),
+    },
   }
 }
 

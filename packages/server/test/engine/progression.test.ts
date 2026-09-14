@@ -42,6 +42,14 @@ describe('removeWild', () => {
     expect(next.respawns).toEqual([{ spawnIndex: 0, atTick: 40 + 2 * 5 }])
     expect(next.player).toMatchObject({ mode: 'searching', targetWildId: null, path: [] })
   })
+  it('poda o id do selvagem removido de skippedWildIds', () => {
+    const deps = miniDeps()
+    const base = baseState({}, deps)
+    const s = { ...base, tick: 40, player: { ...base.player, mode: 'fighting' as const, targetWildId: 1, skippedWildIds: [1, 2] } }
+    const wild = s.wilds[0]!
+    const next = removeWild(s, deps, wild)
+    expect(next.player.skippedWildIds).toEqual([2])
+  })
 })
 
 describe('applyDefeat', () => {

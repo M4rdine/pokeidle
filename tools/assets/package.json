@@ -1,0 +1,23 @@
+{
+  "name": "@pokeidle/assets-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "cli": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "pngjs": "^7.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.0",
+    "@types/pngjs": "^6.0.5",
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.0"
+  }
+}

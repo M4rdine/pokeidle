@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { Command } from 'commander'
+import { buildAtlases } from './build-atlases.js'
 import { parseDat, type DatVersion } from './dat.js'
 import { extractAll } from './extract.js'
 import { parseSpr } from './spr.js'
@@ -38,6 +39,15 @@ program
   .option('--version <v>', 'versão do .dat (860 ou 854)', '860')
   .action(async (sprPath: string, datPath: string, opts: { out: string; version: string }) => {
     await extractAll({ sprPath, datPath, outDir: opts.out, version: parseVersion(opts.version) }, out)
+  })
+
+program
+  .command('build')
+  .option('--extracted <dir>', 'pasta com PNGs extraídos e catalog.json', 'assets/extracted')
+  .option('--manifest <file>', 'manifest de curadoria', 'tools/assets/manifest.json')
+  .option('--out <dir>', 'pasta de saída dos atlases', 'assets/atlas')
+  .action(async (opts: { extracted: string; manifest: string; out: string }) => {
+    await buildAtlases({ extractedDir: opts.extracted, manifestPath: opts.manifest, outDir: opts.out }, out)
   })
 
 export { program }

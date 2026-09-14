@@ -37,6 +37,15 @@ type TiledMap = z.infer<typeof TiledMapSchema>
 
 const GID_FLAG_MASK = 0x1fff_ffff // remove bits de flip/rotação do Tiled
 
+function parseTiledMap(json: unknown): TiledMap {
+  const result = TiledMapSchema.safeParse(json)
+  if (result.success) return result.data
+  const lines = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`)
+  throw new Error(
+    `mapa Tiled inválido:\n${lines.join('\n')}\ndica: exporte como JSON com "Tile Layer Format" = CSV e mapa não infinito (sem chunks)`,
+  )
+}
+
 function tileNameLookup(tileset: TiledTileset): Map<number, string> {
   return new Map(tileset.tiles.map((t) => [t.id, t.properties.find((p) => p.name === 'name')?.value ?? `tile-${t.id}`]))
 }
@@ -92,7 +101,10 @@ function toSpawn(o: TiledObject): HuntSpawn {
 }
 
 export function importTiledMap(tiledJson: unknown, tileset: TiledTileset, meta: { id: string; name: string }): HuntMap {
-  const map = TiledMapSchema.parse(tiledJson)
+  const map = parseTiledMap(tiledJson)
+  if (map.tilesets.length !== 1) {
+    throw new Error(`mapa usa ${map.tilesets.length} tilesets; o importador aceita exatamente 1 (o tiles.tsj gerado pelo build)`)
+  }
   const firstgid = map.tilesets[0]!.firstgid
   const names = tileNameLookup(tileset)
   const toNames = (data: number[]): Array<string | null> => data.map((gid) => gidToName(gid, firstgid, names))

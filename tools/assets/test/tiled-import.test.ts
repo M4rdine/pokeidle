@@ -92,6 +92,16 @@ describe('importTiledMap', () => {
     const bad = { ...tiled, layers: [{ ...tiled.layers[0]!, data: [1, 1, 1, 9] }, ...tiled.layers.slice(1)] }
     expect(() => importTiledMap(bad, tileset, { id: 'x', name: 'x' })).toThrow(/gid 9/)
   })
+
+  it('falha com mais de um tileset', () => {
+    const multi = { ...tiled, tilesets: [{ firstgid: 1, source: 'a.tsj' }, { firstgid: 50, source: 'b.tsj' }] }
+    expect(() => importTiledMap(multi, tileset, { id: 'x', name: 'x' })).toThrow(/2 tilesets/)
+  })
+
+  it('falha com mensagem explicativa em mapa exportado com formato incompatível', () => {
+    const compressed = { ...tiled, layers: [{ ...tiled.layers[0]!, data: 'AAAA' }, ...tiled.layers.slice(1)] }
+    expect(() => importTiledMap(compressed, tileset, { id: 'x', name: 'x' })).toThrow(/mapa Tiled inválido[\s\S]*CSV/)
+  })
 })
 
 describe('parseHuntMap', () => {

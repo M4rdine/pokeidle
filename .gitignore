@@ -3,7 +3,7 @@ dist/
 .env
 .env.*
 !.env.example
-assets/
+/assets/
 coverage/
 .DS_Store
 .superpowers/

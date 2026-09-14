@@ -1,6 +1,9 @@
+import { mkdtemp, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
 import { describe, expect, it } from 'vitest'
 import type { Catalog } from '../src/catalog.js'
-import { parseManifest, validateManifest } from '../src/manifest.js'
+import { loadManifest, parseManifest, validateManifest } from '../src/manifest.js'
 
 const catalog: Catalog = {
   version: 860,
@@ -64,5 +67,24 @@ describe('validateManifest', () => {
     expect(problems.some((p) => /nome de espécie duplicado.*dup/.test(p))).toBe(true)
     expect(problems.some((p) => /id de espécie duplicado.*1/.test(p))).toBe(true)
     expect(problems.some((p) => /grass.*patternX 2/.test(p))).toBe(true)
+  })
+})
+
+describe('loadManifest', () => {
+  it('rejeita JSON malformado nomeando o arquivo', async () => {
+    const tempDir = await mkdtemp(join(tmpdir(), 'manifest-'))
+    const filePath = join(tempDir, 'manifest.json')
+    await writeFile(filePath, '{ not json')
+    await expect(loadManifest(filePath)).rejects.toThrow(/manifest .*manifest\.json/)
+  })
+
+  it('carrega manifest válido de arquivo', async () => {
+    const tempDir = await mkdtemp(join(tmpdir(), 'manifest-'))
+    const filePath = join(tempDir, 'manifest.json')
+    const validManifest = { version: 1, species: [{ id: 42, name: 'test-species', outfitId: 10 }], tiles: [] }
+    await writeFile(filePath, JSON.stringify(validManifest))
+    const loaded = await loadManifest(filePath)
+    expect(loaded.species).toHaveLength(1)
+    expect(loaded.species[0]!.name).toBe('test-species')
   })
 })

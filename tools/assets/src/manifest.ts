@@ -37,7 +37,13 @@ export function parseManifest(json: unknown): Manifest {
 }
 
 export async function loadManifest(path: string): Promise<Manifest> {
-  return parseManifest(JSON.parse(await readFile(path, 'utf8')))
+  const text = await readFile(path, 'utf8')
+  try {
+    return parseManifest(JSON.parse(text))
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error)
+    throw new Error(`manifest ${path}: ${reason}`)
+  }
 }
 
 function duplicates<T>(values: readonly T[]): T[] {

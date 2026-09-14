@@ -6,6 +6,13 @@ const MIN_COOLDOWN_S = 1
 const MAX_COOLDOWN_S = 8
 const TICKS_PER_SECOND = 5
 
+/**
+ * Golpe de emergência: usado quando `availableMoves` não encontra nenhum golpe aprendido
+ * até o nível atual (ex.: espécie cujo primeiro golpe do learnset é em nível alto).
+ * `availableMoves` nunca retorna array vazio — o servidor pode sempre golpear.
+ */
+export const STRUGGLE: Move = { name: 'struggle', type: 'normal', power: 50, accuracy: null, damageClass: 'physical' }
+
 export function availableMoves(species: Species, level: number, moves: ReadonlyMap<string, Move>): Move[] {
   const seen = new Set<string>()
   const result: Move[] = []
@@ -16,7 +23,7 @@ export function availableMoves(species: Species, level: number, moves: ReadonlyM
     seen.add(entry.move)
     result.push(move)
   }
-  return result
+  return result.length > 0 ? result : [STRUGGLE]
 }
 
 export function cooldownTicks(move: Pick<Move, 'power'>): number {

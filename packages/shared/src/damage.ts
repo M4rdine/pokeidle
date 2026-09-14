@@ -40,7 +40,21 @@ function modifiers(attacker: Combatant, defender: Combatant, move: Move, chart: 
 }
 
 export function computeDamage({ attacker, defender, move, chart, rng }: DamageInput): number {
+  if (typeMultiplier(chart, move.type, defender.types) === 0) return 0
   const random = RANDOM_MIN + rng.next() * RANDOM_SPAN
+  const total = Math.floor(baseDamage(attacker, defender, move) * modifiers(attacker, defender, move, chart) * random)
+  return Math.max(MIN_DAMAGE, total)
+}
+
+/**
+ * Igual a `computeDamage`, mas determinístico (fator aleatório fixo no máximo, 1,0) e sem
+ * exigir um `Rng`. Segue a mesma regra de imunidade (multiplicador de tipo 0 → 0). Usado
+ * pelo servidor para detectar dano esperado zero (ex.: trocar de alvo) sem reimplementar a
+ * fórmula de dano.
+ */
+export function expectedDamage(attacker: Combatant, defender: Combatant, move: Move, chart: TypeChart): number {
+  if (typeMultiplier(chart, move.type, defender.types) === 0) return 0
+  const random = RANDOM_MIN + RANDOM_SPAN
   const total = Math.floor(baseDamage(attacker, defender, move) * modifiers(attacker, defender, move, chart) * random)
   return Math.max(MIN_DAMAGE, total)
 }

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { TYPE_NAMES, createRng, type Move, type TypeChart } from '../src/index.js'
-import { bestMove, computeDamage, typeMultiplier, type Combatant } from '../src/damage.js'
+import { bestMove, computeDamage, expectedDamage, typeMultiplier, type Combatant } from '../src/damage.js'
 import { statsAt } from '../src/stats.js'
 
 const chart = Object.fromEntries(TYPE_NAMES.map((a) => [a, Object.fromEntries(TYPE_NAMES.map((d) => [d, 1]))])) as TypeChart
-chart.fire.grass = 2; chart.fire.water = 0.5; chart.electric.ground = 0; chart.fire.bug = 2
+chart.fire.grass = 2; chart.fire.water = 0.5; chart.fire.fire = 0.5; chart.electric.ground = 0; chart.fire.bug = 2
 
 const ember: Move = { name: 'ember', type: 'fire', power: 40, accuracy: 100, damageClass: 'special' }
 const scratch: Move = { name: 'scratch', type: 'normal', power: 40, accuracy: 100, damageClass: 'physical' }
@@ -29,9 +29,13 @@ describe('computeDamage', () => {
     // scratch: A=11, D=11 → floor(floor(4*40*11/11)/50)+2 = floor(160/50)+2 = 5
     expect(computeDamage({ attacker: charmander5, defender: bulbasaur5, move: scratch, chart, rng: fixed(1) })).toBe(5)
   })
-  it('imunidade nunca desce abaixo de 1', () => {
+  it('imunidade dá dano 0', () => {
     const thunder: Move = { name: 'thunder-shock', type: 'electric', power: 40, accuracy: 100, damageClass: 'special' }
-    expect(computeDamage({ attacker: charmander5, defender: { ...bulbasaur5, types: ['ground'] }, move: thunder, chart, rng: fixed(1) })).toBe(1)
+    expect(computeDamage({ attacker: charmander5, defender: { ...bulbasaur5, types: ['ground'] }, move: thunder, chart, rng: fixed(1) })).toBe(0)
+  })
+  it('resistência dupla (0,25x, não imunidade) ainda dá pelo menos 1 de dano', () => {
+    const doubleResist: Combatant = { ...bulbasaur5, types: ['water', 'fire'] }
+    expect(computeDamage({ attacker: charmander5, defender: doubleResist, move: ember, chart, rng: fixed(1) })).toBe(1)
   })
   it('com PRNG seedado é determinístico e fica entre 85% e 100% do máximo', () => {
     const a = createRng(9), b = createRng(9)
@@ -49,5 +53,15 @@ describe('bestMove', () => {
     expect(bestMove([scratch, ember], charmander5, bulbasaur5, chart)?.name).toBe('ember')
     expect(bestMove([scratch, { ...scratch, name: 'tackle' }], charmander5, bulbasaur5, chart)?.name).toBe('scratch')
     expect(bestMove([], charmander5, bulbasaur5, chart)).toBeUndefined()
+  })
+})
+
+describe('expectedDamage', () => {
+  it('Charmander 5 Ember em Bulbasaur 5 → 12 (determinístico, sem RNG injetado)', () => {
+    expect(expectedDamage(charmander5, bulbasaur5, ember, chart)).toBe(12)
+  })
+  it('imunidade → 0', () => {
+    const thunder: Move = { name: 'thunder-shock', type: 'electric', power: 40, accuracy: 100, damageClass: 'special' }
+    expect(expectedDamage(charmander5, { ...bulbasaur5, types: ['ground'] }, thunder, chart)).toBe(0)
   })
 })

@@ -16,7 +16,7 @@
 - Toda fórmula é pura e recebe ficha/registro como argumento; aleatoriedade só via `Rng` injetado (`createRng(seed)`, mulberry32).
 - `TICK_MS = 200`. Cooldown em ticks = `clamp(round(power / 20), 1, 8) * 5`.
 - Stat: `floor((2*base + 31) * L / 100) + 5`; HP: `floor((2*base + 31) * L / 100) + L + 10`. Sem teto de nível.
-- Dano: `floor(floor(floor(2*L/5 + 2) * power * A / D) / 50) + 2`, depois `× tipo × STAB(1,5) × rand[0,85..1,00]`, `floor`, mínimo 1. Sem crítico, sem precisão.
+- Dano: `floor(floor(floor(2*L/5 + 2) * power * A / D) / 50) + 2`, depois `× tipo × STAB(1,5) × rand[0,85..1,00]`, `floor`, mínimo 1, exceto imunidade (multiplicador de tipo 0), que dá 0. Sem crítico, sem precisão.
 - XP: `fast = 0,8L³`, `medium-fast = L³`, `medium-slow = 1,2L³ − 15L² + 100L − 140`, `slow = 1,25L³`; `xpForLevel(1) = 0`; negativos viram 0; `erratic`/`fluctuating` rejeitados pelo schema. XP por derrota `floor(baseExperience * L / 7)`.
 - Captura: `a = floor((3*hpMax − 2*hp) * captureRate * ballBonus / (3*hpMax))`, chance `min(1, a/255)`. Bolas 1,0 / 1,5 / 2,0.
 - Learnset: só `level-up` de `firered-leafgreen`, só golpes com `power` numérico. Evolução só `level-up` com `min_level` e alvo no manifest.

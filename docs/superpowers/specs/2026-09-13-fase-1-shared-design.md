@@ -84,7 +84,8 @@ Todas puras; `L` é o nível, `TICK_MS = 200`.
 - **Dano:** `bruto = floor(floor(floor(2·L/5 + 2) · power · A / D) / 50) + 2`, A/D físicos ou
   especiais pela `damageClass`. Multiplicadores em ordem: tabela de tipos (produto sobre os
   tipos do alvo), STAB 1,5 se o tipo do golpe está nos tipos do atacante, aleatório uniforme em
-  [0,85, 1,00] do PRNG. Mínimo 1. Sem crítico. Precisão não é aplicada no MVP.
+  [0,85, 1,00] do PRNG. Mínimo 1, exceto imunidade (multiplicador de tipo 0), que dá 0. Sem
+  crítico. Precisão não é aplicada no MVP.
 - **Golpes disponíveis:** learnset com `level ≤ L`. **Cooldown em ticks:**
   `clamp(round(power / 20), 1, 8) · 5` (poder 40 → 10 ticks, 90 → 25, 110 → 30).
 - **XP por nível:** curva oficial da `growthRate`, sem teto:

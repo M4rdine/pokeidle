@@ -21,6 +21,14 @@ describe('sync', () => {
     expect(warnings.some((w) => /growl/.test(w))).toBe(true)
   })
 
+  it('avisa quando o learnset filtrado (só golpes com poder) fica com menos de 2 golpes', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokedata-'))
+    const { api } = fakeApi(join(dir, 'cache'))
+    const warnings: string[] = []
+    await sync({ api, speciesNames: ['jigglypuff'], outDir: join(dir, 'out'), warn: (m) => warnings.push(m) })
+    expect(warnings.some((w) => /jigglypuff: só 1 golpe\(s\) com poder no learnset/.test(w))).toBe(true)
+  })
+
   it('usa o cache em disco na segunda chamada', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'pokedata-'))
     const { api, calls } = fakeApi(join(dir, 'cache'))

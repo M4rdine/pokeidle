@@ -42,8 +42,12 @@ levelFromXp(rate: GrowthRate, xp: number): number
 xpOnDefeat(defeated: Pick<Species, 'baseExperience'>, defeatedLevel: number): number
 
 availableMoves(species: Species, level: number, moves: ReadonlyMap<string, Move>): Move[]
+  // nunca retorna []: se nenhum golpe do learnset foi aprendido até o nível, devolve [STRUGGLE]
 cooldownTicks(move: Pick<Move, 'power'>): number
 computeDamage(input: DamageInput): number
+expectedDamage(attacker: Combatant, defender: Combatant, move: Move, chart: TypeChart): number
+  // igual a computeDamage mas determinístico (aleatório fixo em 1,0); usado para detectar
+  // imunidade de tipo (retorna 0) sem reimplementar a fórmula
 
 captureChance(input: CaptureInput): number
 rollCapture(input: CaptureInput, rng: Rng): boolean
@@ -61,7 +65,12 @@ createRng(seed): Rng // único gerador aleatório do jogo
 - **xp**: curvas `fast`/`medium-fast`/`medium-slow`/`slow` (sem `erratic`/`fluctuating`,
   rejeitadas pelo schema); XP ao derrotar = `floor(baseExperience * nível / 7)`.
 - **golpes**: cooldown = `clamp(round(power / 20), 1, 8)` segundos, em ticks de 5/s.
-- **dano**: STAB 1.5x, fator aleatório entre 0.85 e 1.0, dano mínimo 1.
+  `availableMoves` nunca retorna `[]`: quando o learnset ainda não tem golpe disponível no
+  nível atual, cai no golpe fixo `STRUGGLE` (normal, físico, poder 50 → cooldown 15 ticks).
+- **dano**: STAB 1.5x, fator aleatório entre 0.85 e 1.0, dano mínimo 1, exceto imunidade
+  (multiplicador de tipo 0), que dá 0. `bestMove` não filtra candidatos imunes: se todos os
+  golpes disponíveis forem imunes contra o alvo, ele retorna o primeiro candidato com dano
+  esperado 0 — cabe ao servidor detectar isso (com `expectedDamage`) e trocar de alvo.
 - **captura**: fórmula clássica sobre `hpMax`/`hpCurrent`/`captureRate`/`ballBonus`, dividida
   por 255.
 - **loot**: sem tabela explícita, ouro = `[baseExperience/10, baseExperience/5]` e 5% de

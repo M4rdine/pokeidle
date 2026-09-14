@@ -16,9 +16,7 @@ const chainIdFromUrl = (url: string): string => url.replace(/\/$/, '').split('/'
 async function fetchSpecies(api: PokeApi, name: string, manifest: ReadonlySet<string>, warn: (m: string) => void): Promise<Species> {
   const [pokemon, species] = await Promise.all([api.get<PokeApiPokemon>(`pokemon/${name}`), api.get<PokeApiSpecies>(`pokemon-species/${name}`)])
   const chain = await api.get<PokeApiChain>(`evolution-chain/${chainIdFromUrl(species.evolution_chain.url)}`)
-  const result = toSpecies(pokemon, species, chain, manifest, warn)
-  if (result.learnset.length < 2) warn(`${name}: só ${result.learnset.length} golpe(s) com poder no learnset`)
-  return result
+  return toSpecies(pokemon, species, chain, manifest, warn)
 }
 
 async function fetchMoves(api: PokeApi, names: readonly string[], warn: (m: string) => void): Promise<Move[]> {
@@ -44,6 +42,7 @@ export async function sync(opts: SyncOptions): Promise<{ species: number; moves:
   const moves = await fetchMoves(opts.api, moveNames, warn)
   const kept = new Set(moves.map((m) => m.name))
   const species = sortedSpecies.map((s) => ({ ...s, learnset: s.learnset.filter((l) => kept.has(l.move)) }))
+  for (const s of species) if (s.learnset.length < 2) warn(`${s.name}: só ${s.learnset.length} golpe(s) com poder no learnset`)
 
   const types: PokeApiType[] = []
   for (const t of TYPE_NAMES) types.push(await opts.api.get<PokeApiType>(`type/${t}`))

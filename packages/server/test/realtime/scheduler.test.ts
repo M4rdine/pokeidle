@@ -240,6 +240,55 @@ describe('contenção de erros e seams de teste', () => {
     const [tr] = await db.select().from(trainers).where(eq(trainers.id, trainerId))
     expect(tr!.xp).toBe(0) // sem sync: xp nunca foi escrito na tabela trainers
   })
+  it('tick: falha no finish (persistência) notifica uma única vez, sem derrubar o processo', async () => {
+    const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
+    const failingFinish: typeof finishRunner = async () => { throw new Error('boom') }
+    const s2 = createScheduler({
+      db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
+      persistence: { flush: flushRunner, finish: failingFinish },
+    })
+    await db.update(pokemon).set({ level: 1, hp: 1, hpMax: 12 })
+    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 11 })
+    await s2.attach(trainerId)
+    let guard = 0
+    while (s2.size() > 0 && guard++ < 3000) s2.tick()
+    await s2.whenIdle(trainerId)
+    // Se `finishInBackground` deixasse a rejeição solta, o Node mataria o processo antes desta
+    // asserção sequer rodar (Node 22): o teste passar já prova que não houve unhandled rejection.
+    expect(s2.size()).toBe(0)
+    expect(msgs(s).filter((m) => m.t === 'error')).toEqual([{ t: 'error', code: 'internal', message: 'erro interno' }])
+    expect(msgs(s).map((m) => m.t)).not.toContain('hunt.stopped')
+    expect((await db.select().from(huntSessions)).length).toBe(1)
+  })
+  it('catch-up: falha no finish (persistência) rejeita o attach uma vez só, sem duplicar o broadcast', async () => {
+    const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
+    const failingFinish: typeof finishRunner = async () => { throw new Error('boom') }
+    const s2 = createScheduler({
+      db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
+      persistence: { flush: flushRunner, finish: failingFinish },
+    })
+    await db.update(pokemon).set({ level: 1, hp: 1, hpMax: 12 })
+    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 11 })
+    clock.now = new Date(T0.getTime() + 10 * 60 * 1000) // 3000 ticks de atraso: o time desmaia dentro do catch-up
+    await expect(s2.attach(trainerId)).rejects.toMatchObject({ code: 'internal' })
+    expect(s2.size()).toBe(0)
+    expect(msgs(s).filter((m) => m.t === 'error')).toEqual([{ t: 'error', code: 'internal', message: 'erro interno' }])
+  })
+  it('applyIntent: falha no finish (persistência) notifica uma única vez sem lançar da chamada síncrona', async () => {
+    const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
+    const failingFinish: typeof finishRunner = async () => { throw new Error('boom') }
+    const s2 = createScheduler({
+      db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
+      persistence: { flush: flushRunner, finish: failingFinish },
+    })
+    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 5 })
+    await s2.attach(trainerId)
+    const result = s2.applyIntent(trainerId, { type: 'stop' })
+    expect('error' in result).toBe(false)
+    await s2.whenIdle(trainerId)
+    expect(msgs(s).filter((m) => m.t === 'error')).toEqual([{ t: 'error', code: 'internal', message: 'erro interno' }])
+    expect(msgs(s).map((m) => m.t)).not.toContain('hunt.stopped')
+  })
   it('detach remove o runner sem persistir', async () => {
     await start()
     expect(scheduler.size()).toBe(1)

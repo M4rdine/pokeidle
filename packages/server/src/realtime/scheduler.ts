@@ -68,7 +68,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     if (!runner) return
     const failures = runner.persistFailures + 1
     runners.set(trainerId, { ...runner, persistFailures: failures })
-    if (failures >= PERSIST_MAX_FAILURES) void finish(trainerId, 'persist-failed')
+    if (failures >= PERSIST_MAX_FAILURES) finishInBackground(trainerId, 'persist-failed')
   }
 
   const persist = (runner: Runner, sync: boolean): Runner => {
@@ -87,14 +87,17 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
       const outcome = tickRunner(runner, engineDeps(runner, deps.registry))
       let next: Runner = { ...outcome.runner, lastSimulatedAt: deps.now() }
       if (outcome.events.length > 0) deps.sockets.broadcast(runner.trainerId, { t: 'hunt.tick', tick: runner.state.tick, events: outcome.events })
-      if (outcome.stopped) { runners.set(runner.trainerId, next); void finish(runner.trainerId, outcome.stopped.reason); return }
+      if (outcome.stopped) { runners.set(runner.trainerId, next); finishInBackground(runner.trainerId, outcome.stopped.reason); return }
       if (needsSync(next)) next = persist(next, true)
       else if (needsSave(next)) next = persist(next, false)
       runners.set(runner.trainerId, next)
     } catch (error) {
-      deps.logger.error({ err: error, trainerId: runner.trainerId }, 'erro no tick; runner removido, sessão preservada')
-      runners.delete(runner.trainerId)
-      deps.sockets.broadcast(runner.trainerId, { t: 'error', code: 'internal', message: 'erro interno' })
+      // Idempotente: se outra via (ex.: finishInBackground) já removeu o runner e tratou o erro, não duplica.
+      if (runners.has(runner.trainerId)) {
+        runners.delete(runner.trainerId)
+        deps.logger.error({ err: error, trainerId: runner.trainerId }, 'erro no tick; runner removido, sessão preservada')
+        deps.sockets.broadcast(runner.trainerId, { t: 'error', code: 'internal', message: 'erro interno' })
+      }
     }
   }
 
@@ -126,6 +129,9 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     return trainer
   }
 
+  // `finish` já loga e transmite o erro internamente antes de rejeitar; aqui só evitamos uma rejeição solta.
+  const finishInBackground = (trainerId: string, reason: StopReason): void => { void finish(trainerId, reason).catch(() => {}) }
+
   const runCatchUp = async (trainerId: string, base: Runner, owed: number): Promise<void> => {
     try {
       const result = await catchUp(base, owed, engineDeps(base, deps.registry), {
@@ -146,9 +152,12 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
       deps.sockets.broadcast(trainerId, { t: 'hunt.summary', summary: result.summary })
       deps.sockets.broadcast(trainerId, snapshotMessage(settled))
     } catch (error) {
-      runners.delete(trainerId)
-      deps.logger.error({ err: error, trainerId }, 'erro no catch-up; runner removido, sessão preservada')
-      deps.sockets.broadcast(trainerId, { t: 'error', code: 'internal', message: 'erro interno' })
+      // Idempotente: se `finish` (chamado acima, já awaited) já removeu o runner e tratou o erro, não duplica.
+      if (runners.has(trainerId)) {
+        runners.delete(trainerId)
+        deps.logger.error({ err: error, trainerId }, 'erro no catch-up; runner removido, sessão preservada')
+        deps.sockets.broadcast(trainerId, { t: 'error', code: 'internal', message: 'erro interno' })
+      }
       throw error
     }
   }
@@ -188,7 +197,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     runners.set(trainerId, next)
     if (result.events.length > 0) deps.sockets.broadcast(trainerId, { t: 'hunt.tick', tick: runner.state.tick, events: result.events })
     const stopped = result.events.find((e) => e.type === 'stopped')
-    if (stopped) void finish(trainerId, 'intent')
+    if (stopped) finishInBackground(trainerId, 'intent')
     return result
   }
 

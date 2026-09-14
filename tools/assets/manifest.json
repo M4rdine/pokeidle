@@ -1,0 +1,40 @@
+{
+  "_leiame": "ids do pack Pokeretro 8.54 extended (assets/raw); veja assets/extracted/index.html para conferir",
+  "version": 1,
+  "species": [
+    { "id": 1, "name": "bulbasaur", "outfitId": 376 },
+    { "id": 2, "name": "ivysaur", "outfitId": 375 },
+    { "id": 3, "name": "venusaur", "outfitId": 373 },
+    { "id": 4, "name": "charmander", "outfitId": 380 },
+    { "id": 5, "name": "charmeleon", "outfitId": 374 },
+    { "id": 6, "name": "charizard", "outfitId": 418 },
+    { "id": 7, "name": "squirtle", "outfitId": 353 },
+    { "id": 9, "name": "blastoise", "outfitId": 406 },
+    { "id": 25, "name": "pikachu", "outfitId": 410 },
+    { "id": 26, "name": "raichu", "outfitId": 401 },
+    { "id": 39, "name": "jigglypuff", "outfitId": 414 },
+    { "id": 40, "name": "wigglytuff", "outfitId": 415 },
+    { "id": 41, "name": "zubat", "outfitId": 395 },
+    { "id": 42, "name": "golbat", "outfitId": 361 },
+    { "id": 50, "name": "diglett", "outfitId": 433 },
+    { "id": 51, "name": "dugtrio", "outfitId": 434 },
+    { "id": 69, "name": "bellsprout", "outfitId": 382 },
+    { "id": 84, "name": "doduo", "outfitId": 377 },
+    { "id": 88, "name": "grimer", "outfitId": 359 },
+    { "id": 89, "name": "muk", "outfitId": 398 },
+    { "id": 92, "name": "gastly", "outfitId": 399 },
+    { "id": 93, "name": "haunter", "outfitId": 416 },
+    { "id": 116, "name": "horsea", "outfitId": 409 },
+    { "id": 120, "name": "staryu", "outfitId": 393 },
+    { "id": 143, "name": "snorlax", "outfitId": 402 },
+    { "id": 147, "name": "dratini", "outfitId": 384 }
+  ],
+  "tiles": [
+    { "name": "grass", "itemId": 106 },
+    { "name": "dirt", "itemId": 351 },
+    { "name": "stone-floor", "itemId": 509 },
+    { "name": "mountain", "itemId": 410 },
+    { "name": "water", "itemId": 629 },
+    { "name": "sand", "itemId": 615 }
+  ]
+}

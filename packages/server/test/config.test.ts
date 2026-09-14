@@ -21,4 +21,12 @@ describe('loadConfig', () => {
     expect(() => loadConfig({ ...base, PORT: '99999' })).toThrow(/PORT/)
     expect(() => loadConfig({ ...base, APP_ORIGIN: 'localhost' })).toThrow(/APP_ORIGIN/)
   })
+  it('TRUST_PROXY aceita "false", "true", inteiro de hops ou lista de IPs/CIDRs; rejeita o resto', () => {
+    expect(loadConfig(base).TRUST_PROXY).toBe(false)
+    expect(loadConfig({ ...base, TRUST_PROXY: 'false' }).TRUST_PROXY).toBe(false)
+    expect(loadConfig({ ...base, TRUST_PROXY: 'true' }).TRUST_PROXY).toBe(true)
+    expect(loadConfig({ ...base, TRUST_PROXY: '2' }).TRUST_PROXY).toBe(2)
+    expect(loadConfig({ ...base, TRUST_PROXY: '127.0.0.1,10.0.0.0/8' }).TRUST_PROXY).toBe('127.0.0.1,10.0.0.0/8')
+    expect(() => loadConfig({ ...base, TRUST_PROXY: 'sim' })).toThrow(/TRUST_PROXY/)
+  })
 })

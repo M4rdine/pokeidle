@@ -111,6 +111,26 @@ describe('segurança HTTP', () => {
     expect(register11.statusCode).toBe(429)
     expect(register11.json()).toMatchObject({ error: { code: 'rate-limited' } })
   })
+  it('TRUST_PROXY como hops confia no XFF fixo; TRUST_PROXY=false ignora XFF mesmo rotacionado (S10)', async () => {
+    const proxyApp = await freshApp(t, undefined, { TRUST_PROXY: '1' })
+    const xff = { 'x-forwarded-for': '203.0.113.9' }
+    for (let i = 0; i < 10; i++) {
+      const r = await api(proxyApp, undefined, { ip: '127.0.0.1' }).post('/auth/login', { email: 'proxy@test.dev', password: 'errada-errada' }, xff)
+      expect(r.statusCode).toBe(401)
+    }
+    const eleventh = await api(proxyApp, undefined, { ip: '127.0.0.1' }).post('/auth/login', { email: 'proxy@test.dev', password: 'errada-errada' }, xff)
+    expect(eleventh.statusCode).toBe(429)
+    await proxyApp.close()
+
+    const directApp = await freshApp(t, undefined, { TRUST_PROXY: 'false' })
+    for (let i = 0; i < 10; i++) {
+      const r = await api(directApp, undefined, { ip: '198.51.100.7' }).post('/auth/login', { email: 'direct@test.dev', password: 'errada-errada' }, { 'x-forwarded-for': `1.2.3.${i}` })
+      expect(r.statusCode).toBe(401)
+    }
+    const eleventh2 = await api(directApp, undefined, { ip: '198.51.100.7' }).post('/auth/login', { email: 'direct@test.dev', password: 'errada-errada' }, { 'x-forwarded-for': '1.2.3.99' })
+    expect(eleventh2.statusCode).toBe(429)
+    await directApp.close()
+  })
   it('corpo > 16 KB → 413; JSON inválido → 400; content-type errado → 400', async () => {
     const big = await api(t.app).post('/auth/login', { email: 'x@test.dev', password: 'a'.repeat(17 * 1024) })
     expect(big.statusCode).toBe(413)

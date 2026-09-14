@@ -147,3 +147,10 @@ estão descritos em
 `docs/superpowers/specs/2026-09-14-fase-2b-account-persistence-design.md` §9; os testes
 que os cobrem estão espalhados entre `test/security.test.ts`, `test/auth.test.ts` e
 `test/hunts.test.ts` (isolamento entre contas, S2/S3).
+
+`TRUST_PROXY` (S10) não é mais um boolean solto: `'false'` (padrão) ignora
+`X-Forwarded-For` e usa o IP da conexão TCP; `'true'` confia em toda a cadeia; um
+inteiro ≥ 1 confia nos N hops mais próximos; uma lista separada por vírgula de
+IPs/CIDRs confia só quando a conexão vem de um desses endereços. Só use `'true'` atrás
+de um proxy que sobrescreve o cabeçalho antes de repassar a requisição — do contrário
+qualquer cliente pode forjar `X-Forwarded-For` e escapar do rate limit por IP.

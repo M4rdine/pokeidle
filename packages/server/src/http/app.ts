@@ -27,7 +27,10 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   const now = deps.now ?? (() => new Date())
   const app = Fastify({
     bodyLimit: BODY_LIMIT,
-    trustProxy: config.TRUST_PROXY,
+    // O tipo de trustProxy do Fastify 5 instalado não inclui `number`: hop-count puro foi
+    // descontinuado lá (não valida o peer imediato, cai em "não confia" = `false`). O valor
+    // já foi validado e convertido em loadConfig; o cast é só para o TS aceitar o repasse.
+    trustProxy: config.TRUST_PROXY as boolean | string,
     logger: deps.logger === false ? false : { level: config.LOG_LEVEL, redact: [...REDACT_PATHS] },
   })
 

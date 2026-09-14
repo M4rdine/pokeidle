@@ -164,8 +164,15 @@ e `createRng(1, s.state())` produzem a mesma sequência a partir daí.
   (o motor carrega os absolutos desde o start); Pokédex: espécies do time recebem
   `caught_at` se ainda nulo, espécies em `settings.seen` idem, `seen_at` para as novas.
   Capturas com `toBox: true` não têm estado no motor (só evento) e não entram nesta fase.
+  Nota: uma captura com `toBox: true` não gera Pokémon nenhum no time do motor, mas a
+  espécie entra em `seen` e ganha `caught_at` mesmo assim; com `allowDuplicates: false`
+  o motor não tenta capturar de novo a mesma espécie — a box (2c/3) decide se esse
+  comportamento muda quando a persistência de captures em box existir.
 - `stopHunt(db, trainerId, now)`: `loadActive` (`no-hunt` se nulo) → `syncToTables` →
-  `DELETE` da sessão, tudo numa transação.
+  `DELETE` da sessão, tudo numa transação. Se `loadActive` encontrar um snapshot
+  corrompido (`CorruptSnapshotError`), `stopHunt` não relança: apaga a sessão SEM
+  `syncToTables` (não dá pra sincronizar um `state` ilegível) e devolve o treinador —
+  o jogador perde só o progresso desde o último sync.
 
 Contrato para a 2c (documentado, não implementado): o scheduler chama `saveSnapshot` a
 cada 10 s, `syncToTables` a cada 60 s e no stop, e escreve `hunt_log` a partir dos
@@ -253,8 +260,12 @@ Critérios desta fase, cada um com o teste que o prova (§8 ganha a lista abaixo
 - S9. Zod em todo corpo, query e params, com `.strict()` (campos desconhecidos → 400).
   `bodyLimit` 16 KB. Só `application/json` nas rotas com corpo.
 - S10. Rate limit por IP: `/auth/login` e `/auth/register` 10/min; demais rotas 300/min
-  (limite diário de registro entra junto com o captcha, se aparecer abuso). `trustProxy` ligado por config para o IP real atrás do
-  proxy. Teste: 11ª tentativa → 429.
+  (incluindo rotas inexistentes, via `preHandler` no `setNotFoundHandler`; limite diário
+  de registro entra junto com o captcha, se aparecer abuso). `TRUST_PROXY` não é um
+  boolean solto: `'false'` (padrão, ignora `X-Forwarded-For`) | `'true'` (confia em toda
+  a cadeia) | um inteiro ≥ 1 (hops) | uma lista separada por vírgula de IPs/CIDRs — só
+  use `'true'`/hops atrás de um proxy que de fato sobrescreve o cabeçalho, nunca exposto
+  direto à internet. Teste: 11ª tentativa → 429.
 - S11. CSRF: além de `SameSite=Lax`, toda rota que muda estado exige `Origin` (ou
   `Referer`) igual a `APP_ORIGIN` da config; ausente ou diferente → 403 `forbidden`.
   Formulários cross-site não conseguem enviar JSON sem preflight, e o preflight falha

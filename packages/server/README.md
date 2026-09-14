@@ -88,7 +88,10 @@ nenhum nesse caso — persistir a captura cabe a quem consome o evento.
 
 ### Subir localmente
 
-1. `pnpm db:up` — sobe o Postgres do `docker-compose.yml` (porta 5433).
+1. `pnpm db:up` — sobe o Postgres do `docker-compose.yml` (porta 5433). O usuário
+   `pokeidle` do Compose é superuser — conveniente só em dev (migrations, truncate
+   entre testes); em produção o usuário da aplicação NÃO é superuser e a porta 5432
+   não fica pública (S16).
 2. Copie `.env.example` (raiz) para `packages/server/.env` (arquivo ignorado pelo
    git): `pnpm server:dev`/`start` rodam com `cwd = packages/server` (via `pnpm
    --filter`), e `dotenv/config` em `main.ts` só lê `.env` do diretório atual.
@@ -104,7 +107,7 @@ nenhum nesse caso — persistir a captura cabe a quem consome o evento.
 | `POST /auth/login` | — | `validation`, `invalid-credentials`, `rate-limited` |
 | `POST /auth/logout` | — | — |
 | `GET /me` | sim | `unauthorized` |
-| `POST /trainer/starter` | sim | `validation`, `starter-already-chosen` |
+| `POST /trainer/starter` | sim | `validation`, `not-found`, `starter-already-chosen` |
 | `GET/PUT /trainer/team` | sim | `validation`, `not-found`, `hunt-active` |
 | `PATCH /trainer/settings` | sim | `validation` |
 | `GET /trainer/inventory` \| `/trainer/pokedex` | sim | — |
@@ -130,6 +133,13 @@ fase 2c: o scheduler de ticks chama `saveSnapshot` a cada 10 s (grava `state`/
 `rngState`), `syncToTables` a cada 60 s e no `stop` (grava em `pokemon`, `inventory`,
 `trainers`, `pokedex_entries` — idempotente), e registra eventos relevantes em
 `hunt_log` conforme ocorrem.
+
+Snapshot corrompido (`state` que não bate mais com `HuntStateSchema`): `loadActive`
+lança `CorruptSnapshotError` (`hunt-store/state-schema.ts`), que vira 500 genérico em
+qualquer rota que dependa dele — exceto em `stopHunt`, que trata esse caso especial:
+sem conseguir ler o `HuntState`, não dá pra sincronizar, então apaga a sessão sem
+`syncToTables` (o jogador perde só o progresso desde o último sync) e devolve o
+treinador normalmente, em vez de propagar o erro.
 
 ### Testes
 

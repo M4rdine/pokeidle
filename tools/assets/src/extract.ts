@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { buildCatalog, hasSprites, type Catalog } from './catalog.js'
+import { buildCatalog, hasSprites, parseCatalog, type Catalog } from './catalog.js'
 import { DIRECTION_NAMES, composeFrame } from './compose.js'
 import { parseDat, type DatVersion, type ThingType } from './dat.js'
 import { encodePng } from './png.js'
@@ -70,5 +70,5 @@ export async function extractAll(opts: ExtractOptions, log: Logger = () => {}): 
 }
 
 export async function loadCatalog(outDir: string): Promise<Catalog> {
-  return JSON.parse(await readFile(join(outDir, 'catalog.json'), 'utf8')) as Catalog
+  return parseCatalog(JSON.parse(await readFile(join(outDir, 'catalog.json'), 'utf8')))
 }

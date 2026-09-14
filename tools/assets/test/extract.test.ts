@@ -1,8 +1,8 @@
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { extractAll, itemFramePath, outfitFramePath } from '../src/extract.js'
+import { extractAll, itemFramePath, loadCatalog, outfitFramePath } from '../src/extract.js'
 import { decodePng } from '../src/png.js'
 import type { Rgb } from '../src/spr.js'
 import { buildDat, groundItemSpec, outfitSpec } from './fixtures/dat-fixture.js'
@@ -44,5 +44,15 @@ describe('extractAll', () => {
     const written = JSON.parse(await readFile(join(outDir, 'catalog.json'), 'utf8'))
     expect(written.outfits).toHaveLength(1)
     expect(written.version).toBe(860)
+
+    await expect(loadCatalog(outDir)).resolves.toEqual(catalog)
+  })
+
+  it('loadCatalog rejeita catalog.json inválido', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-catalog-'))
+    await mkdir(dir, { recursive: true })
+    await writeFile(join(dir, 'catalog.json'), JSON.stringify({ version: 860, outfits: 'nope' }))
+
+    await expect(loadCatalog(dir)).rejects.toThrow(/catalog.json inválido/)
   })
 })

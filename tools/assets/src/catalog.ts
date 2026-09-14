@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { FLAG_GROUND, FLAG_NOT_WALKABLE, type DatFile, type DatVersion, type ThingType } from './dat.js'
 import type { SprFile } from './spr.js'
 
@@ -67,4 +68,42 @@ export function buildCatalog(spr: SprFile, dat: DatFile): Catalog {
     outfits: dat.outfits.filter(hasSprites).map(toOutfit),
     items: dat.items.filter(hasSprites).map(toItem),
   }
+}
+
+const DisplacementSchema = z.object({ x: z.number().int(), y: z.number().int() })
+
+const CatalogOutfitSchema = z.object({
+  id: z.number().int().positive(),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  directions: z.number().int().positive(),
+  phases: z.number().int().positive(),
+  layers: z.number().int().positive(),
+  displacement: DisplacementSchema,
+})
+
+const CatalogItemSchema = z.object({
+  id: z.number().int().min(100),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  patternX: z.number().int().positive(),
+  patternY: z.number().int().positive(),
+  phases: z.number().int().positive(),
+  isGround: z.boolean(),
+  isBlocking: z.boolean(),
+})
+
+export const CatalogSchema = z.object({
+  version: z.union([z.literal(854), z.literal(860)]),
+  sprSignature: z.number().int(),
+  datSignature: z.number().int(),
+  outfits: z.array(CatalogOutfitSchema),
+  items: z.array(CatalogItemSchema),
+})
+
+export function parseCatalog(json: unknown): Catalog {
+  const result = CatalogSchema.safeParse(json)
+  if (result.success) return result.data
+  const lines = result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`)
+  throw new Error(`catalog.json inválido:\n${lines.join('\n')}`)
 }

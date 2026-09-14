@@ -45,7 +45,11 @@ async function pokemonFrames(extractedDir: string, manifest: Manifest, catalog: 
 }
 
 async function tileFrames(extractedDir: string, tiles: readonly TileEntry[]): Promise<AtlasFrame[]> {
-  return Promise.all(tiles.map((t) => readFrame(t.name, itemFramePath(extractedDir, t.itemId, t.patternX, t.patternY))))
+  const frames: AtlasFrame[] = []
+  for (const t of tiles) {
+    frames.push(await readFrame(t.name, itemFramePath(extractedDir, t.itemId, t.patternX, t.patternY)))
+  }
+  return frames
 }
 
 async function writeAtlas(outDir: string, baseName: string, frames: readonly AtlasFrame[]): Promise<ReturnType<typeof packGrid>> {
@@ -59,6 +63,8 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
   const [manifest, catalog] = await Promise.all([loadManifest(opts.manifestPath), loadCatalog(opts.extractedDir)])
   const problems = validateManifest(manifest, catalog)
   if (problems.length > 0) throw new Error(`manifest incoerente com o catálogo:\n${problems.join('\n')}`)
+  if (manifest.species.length === 0) throw new Error('manifest sem espécies: adicione ao menos uma entrada em "species"')
+  if (manifest.tiles.length === 0) throw new Error('manifest sem tiles: adicione ao menos uma entrada em "tiles"')
 
   await mkdir(opts.outDir, { recursive: true })
   const pokemon = await pokemonFrames(opts.extractedDir, manifest, catalog)

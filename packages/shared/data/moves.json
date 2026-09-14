@@ -1,0 +1,639 @@
+[
+  {
+    "name": "absorb",
+    "type": "grass",
+    "power": 20,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "acid",
+    "type": "poison",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "air-cutter",
+    "type": "flying",
+    "power": 60,
+    "accuracy": 95,
+    "damageClass": "special"
+  },
+  {
+    "name": "ancient-power",
+    "type": "rock",
+    "power": 60,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "astonish",
+    "type": "ghost",
+    "power": 30,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "barrage",
+    "type": "normal",
+    "power": 15,
+    "accuracy": 85,
+    "damageClass": "physical"
+  },
+  {
+    "name": "bite",
+    "type": "dark",
+    "power": 60,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "body-slam",
+    "type": "normal",
+    "power": 85,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "bubble",
+    "type": "water",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "bubble-beam",
+    "type": "water",
+    "power": 65,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "confusion",
+    "type": "psychic",
+    "power": 50,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "covet",
+    "type": "normal",
+    "power": 60,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "dig",
+    "type": "ground",
+    "power": 80,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "double-edge",
+    "type": "normal",
+    "power": 120,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "double-kick",
+    "type": "fighting",
+    "power": 30,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "double-slap",
+    "type": "normal",
+    "power": 15,
+    "accuracy": 85,
+    "damageClass": "physical"
+  },
+  {
+    "name": "dream-eater",
+    "type": "psychic",
+    "power": 100,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "drill-peck",
+    "type": "flying",
+    "power": 80,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "earthquake",
+    "type": "ground",
+    "power": 100,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "egg-bomb",
+    "type": "normal",
+    "power": 100,
+    "accuracy": 75,
+    "damageClass": "physical"
+  },
+  {
+    "name": "ember",
+    "type": "fire",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "extreme-speed",
+    "type": "normal",
+    "power": 80,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "false-swipe",
+    "type": "normal",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "fire-blast",
+    "type": "fire",
+    "power": 110,
+    "accuracy": 85,
+    "damageClass": "special"
+  },
+  {
+    "name": "fire-punch",
+    "type": "fire",
+    "power": 75,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "fire-spin",
+    "type": "fire",
+    "power": 35,
+    "accuracy": 85,
+    "damageClass": "special"
+  },
+  {
+    "name": "flame-wheel",
+    "type": "fire",
+    "power": 60,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "flamethrower",
+    "type": "fire",
+    "power": 90,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "fury-attack",
+    "type": "normal",
+    "power": 15,
+    "accuracy": 85,
+    "damageClass": "physical"
+  },
+  {
+    "name": "fury-cutter",
+    "type": "bug",
+    "power": 40,
+    "accuracy": 95,
+    "damageClass": "physical"
+  },
+  {
+    "name": "fury-swipes",
+    "type": "normal",
+    "power": 18,
+    "accuracy": 80,
+    "damageClass": "physical"
+  },
+  {
+    "name": "future-sight",
+    "type": "psychic",
+    "power": 120,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "gust",
+    "type": "flying",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "headbutt",
+    "type": "normal",
+    "power": 70,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "heat-wave",
+    "type": "fire",
+    "power": 95,
+    "accuracy": 90,
+    "damageClass": "special"
+  },
+  {
+    "name": "horn-attack",
+    "type": "normal",
+    "power": 65,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "hydro-pump",
+    "type": "water",
+    "power": 110,
+    "accuracy": 80,
+    "damageClass": "special"
+  },
+  {
+    "name": "hyper-beam",
+    "type": "normal",
+    "power": 150,
+    "accuracy": 90,
+    "damageClass": "special"
+  },
+  {
+    "name": "hyper-voice",
+    "type": "normal",
+    "power": 90,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "leech-life",
+    "type": "bug",
+    "power": 80,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "lick",
+    "type": "ghost",
+    "power": 30,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "mega-drain",
+    "type": "grass",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "mega-punch",
+    "type": "normal",
+    "power": 80,
+    "accuracy": 85,
+    "damageClass": "physical"
+  },
+  {
+    "name": "megahorn",
+    "type": "bug",
+    "power": 120,
+    "accuracy": 85,
+    "damageClass": "physical"
+  },
+  {
+    "name": "metal-claw",
+    "type": "steel",
+    "power": 50,
+    "accuracy": 95,
+    "damageClass": "physical"
+  },
+  {
+    "name": "mud-shot",
+    "type": "ground",
+    "power": 55,
+    "accuracy": 95,
+    "damageClass": "special"
+  },
+  {
+    "name": "mud-slap",
+    "type": "ground",
+    "power": 20,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "outrage",
+    "type": "dragon",
+    "power": 120,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "peck",
+    "type": "flying",
+    "power": 35,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "pin-missile",
+    "type": "bug",
+    "power": 25,
+    "accuracy": 95,
+    "damageClass": "physical"
+  },
+  {
+    "name": "poison-fang",
+    "type": "poison",
+    "power": 50,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "poison-sting",
+    "type": "poison",
+    "power": 15,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "pound",
+    "type": "normal",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "psybeam",
+    "type": "psychic",
+    "power": 65,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "psychic",
+    "type": "psychic",
+    "power": 90,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "pursuit",
+    "type": "dark",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "quick-attack",
+    "type": "normal",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "rage",
+    "type": "normal",
+    "power": 20,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "rapid-spin",
+    "type": "normal",
+    "power": 50,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "razor-leaf",
+    "type": "grass",
+    "power": 55,
+    "accuracy": 95,
+    "damageClass": "physical"
+  },
+  {
+    "name": "rock-blast",
+    "type": "rock",
+    "power": 25,
+    "accuracy": 90,
+    "damageClass": "physical"
+  },
+  {
+    "name": "rollout",
+    "type": "rock",
+    "power": 30,
+    "accuracy": 90,
+    "damageClass": "physical"
+  },
+  {
+    "name": "sand-tomb",
+    "type": "ground",
+    "power": 35,
+    "accuracy": 85,
+    "damageClass": "physical"
+  },
+  {
+    "name": "scratch",
+    "type": "normal",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "shadow-ball",
+    "type": "ghost",
+    "power": 80,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "shadow-punch",
+    "type": "ghost",
+    "power": 60,
+    "accuracy": null,
+    "damageClass": "physical"
+  },
+  {
+    "name": "silver-wind",
+    "type": "bug",
+    "power": 60,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "skull-bash",
+    "type": "normal",
+    "power": 130,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "slam",
+    "type": "normal",
+    "power": 80,
+    "accuracy": 75,
+    "damageClass": "physical"
+  },
+  {
+    "name": "slash",
+    "type": "normal",
+    "power": 70,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "sludge",
+    "type": "poison",
+    "power": 65,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "sludge-bomb",
+    "type": "poison",
+    "power": 90,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "smog",
+    "type": "poison",
+    "power": 30,
+    "accuracy": 70,
+    "damageClass": "special"
+  },
+  {
+    "name": "snore",
+    "type": "normal",
+    "power": 50,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "solar-beam",
+    "type": "grass",
+    "power": 120,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "stomp",
+    "type": "normal",
+    "power": 65,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "swift",
+    "type": "normal",
+    "power": 60,
+    "accuracy": null,
+    "damageClass": "special"
+  },
+  {
+    "name": "tackle",
+    "type": "normal",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "take-down",
+    "type": "normal",
+    "power": 90,
+    "accuracy": 85,
+    "damageClass": "physical"
+  },
+  {
+    "name": "thrash",
+    "type": "normal",
+    "power": 120,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "thunder",
+    "type": "electric",
+    "power": 110,
+    "accuracy": 70,
+    "damageClass": "special"
+  },
+  {
+    "name": "thunder-shock",
+    "type": "electric",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "thunderbolt",
+    "type": "electric",
+    "power": 90,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "tri-attack",
+    "type": "normal",
+    "power": 80,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "twineedle",
+    "type": "bug",
+    "power": 25,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "twister",
+    "type": "dragon",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "uproar",
+    "type": "normal",
+    "power": 90,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "vine-whip",
+    "type": "grass",
+    "power": 45,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "water-gun",
+    "type": "water",
+    "power": 40,
+    "accuracy": 100,
+    "damageClass": "special"
+  },
+  {
+    "name": "wing-attack",
+    "type": "flying",
+    "power": 60,
+    "accuracy": 100,
+    "damageClass": "physical"
+  },
+  {
+    "name": "wrap",
+    "type": "normal",
+    "power": 15,
+    "accuracy": 90,
+    "damageClass": "physical"
+  }
+]

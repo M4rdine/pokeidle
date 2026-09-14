@@ -1,0 +1,7 @@
+[
+  { "species": "zubat", "gold": [4, 9], "drops": [{ "item": "potion", "chance": 0.08 }] },
+  { "species": "bellsprout", "gold": [5, 11], "drops": [{ "item": "potion", "chance": 0.08 }] },
+  { "species": "diglett", "gold": [6, 12], "drops": [{ "item": "potion", "chance": 0.06 }, { "item": "poke-ball", "chance": 0.03 }] },
+  { "species": "horsea", "gold": [7, 14], "drops": [{ "item": "potion", "chance": 0.1 }] },
+  { "species": "gastly", "gold": [10, 20], "drops": [{ "item": "super-potion", "chance": 0.04 }, { "item": "great-ball", "chance": 0.02 }] }
+]

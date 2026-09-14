@@ -1,0 +1,1750 @@
+[
+  {
+    "id": 1,
+    "name": "bulbasaur",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 49,
+      "defense": 49,
+      "spAttack": 65,
+      "spDefense": 65,
+      "speed": 45
+    },
+    "baseExperience": 64,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "tackle",
+        "level": 1
+      },
+      {
+        "move": "vine-whip",
+        "level": 10
+      },
+      {
+        "move": "razor-leaf",
+        "level": 20
+      },
+      {
+        "move": "solar-beam",
+        "level": 46
+      }
+    ],
+    "evolvesTo": {
+      "species": "ivysaur",
+      "level": 16
+    }
+  },
+  {
+    "id": 2,
+    "name": "ivysaur",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 62,
+      "defense": 63,
+      "spAttack": 80,
+      "spDefense": 80,
+      "speed": 60
+    },
+    "baseExperience": 142,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "tackle",
+        "level": 1
+      },
+      {
+        "move": "vine-whip",
+        "level": 10
+      },
+      {
+        "move": "razor-leaf",
+        "level": 22
+      },
+      {
+        "move": "solar-beam",
+        "level": 56
+      }
+    ],
+    "evolvesTo": {
+      "species": "venusaur",
+      "level": 32
+    }
+  },
+  {
+    "id": 3,
+    "name": "venusaur",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 82,
+      "defense": 83,
+      "spAttack": 100,
+      "spDefense": 100,
+      "speed": 80
+    },
+    "baseExperience": 236,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "tackle",
+        "level": 1
+      },
+      {
+        "move": "vine-whip",
+        "level": 1
+      },
+      {
+        "move": "razor-leaf",
+        "level": 22
+      },
+      {
+        "move": "solar-beam",
+        "level": 65
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "charmander",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 39,
+      "attack": 52,
+      "defense": 43,
+      "spAttack": 60,
+      "spDefense": 50,
+      "speed": 65
+    },
+    "baseExperience": 62,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "scratch",
+        "level": 1
+      },
+      {
+        "move": "ember",
+        "level": 7
+      },
+      {
+        "move": "metal-claw",
+        "level": 13
+      },
+      {
+        "move": "flamethrower",
+        "level": 31
+      },
+      {
+        "move": "slash",
+        "level": 37
+      },
+      {
+        "move": "fire-spin",
+        "level": 49
+      }
+    ],
+    "evolvesTo": {
+      "species": "charmeleon",
+      "level": 16
+    }
+  },
+  {
+    "id": 5,
+    "name": "charmeleon",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 58,
+      "attack": 64,
+      "defense": 58,
+      "spAttack": 80,
+      "spDefense": 65,
+      "speed": 80
+    },
+    "baseExperience": 142,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "ember",
+        "level": 1
+      },
+      {
+        "move": "scratch",
+        "level": 1
+      },
+      {
+        "move": "metal-claw",
+        "level": 13
+      },
+      {
+        "move": "flamethrower",
+        "level": 34
+      },
+      {
+        "move": "slash",
+        "level": 41
+      },
+      {
+        "move": "fire-spin",
+        "level": 55
+      }
+    ],
+    "evolvesTo": {
+      "species": "charizard",
+      "level": 36
+    }
+  },
+  {
+    "id": 6,
+    "name": "charizard",
+    "types": [
+      "fire",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 78,
+      "attack": 84,
+      "defense": 78,
+      "spAttack": 109,
+      "spDefense": 85,
+      "speed": 100
+    },
+    "baseExperience": 240,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "ember",
+        "level": 1
+      },
+      {
+        "move": "heat-wave",
+        "level": 1
+      },
+      {
+        "move": "metal-claw",
+        "level": 1
+      },
+      {
+        "move": "scratch",
+        "level": 1
+      },
+      {
+        "move": "flamethrower",
+        "level": 34
+      },
+      {
+        "move": "wing-attack",
+        "level": 36
+      },
+      {
+        "move": "slash",
+        "level": 44
+      },
+      {
+        "move": "fire-spin",
+        "level": 64
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "name": "squirtle",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 44,
+      "attack": 48,
+      "defense": 65,
+      "spAttack": 50,
+      "spDefense": 64,
+      "speed": 43
+    },
+    "baseExperience": 63,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "tackle",
+        "level": 1
+      },
+      {
+        "move": "bubble",
+        "level": 7
+      },
+      {
+        "move": "water-gun",
+        "level": 13
+      },
+      {
+        "move": "bite",
+        "level": 18
+      },
+      {
+        "move": "rapid-spin",
+        "level": 23
+      },
+      {
+        "move": "skull-bash",
+        "level": 40
+      },
+      {
+        "move": "hydro-pump",
+        "level": 47
+      }
+    ],
+    "evolvesTo": {
+      "species": "wartortle",
+      "level": 16
+    }
+  },
+  {
+    "id": 8,
+    "name": "wartortle",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 59,
+      "attack": 63,
+      "defense": 80,
+      "spAttack": 65,
+      "spDefense": 80,
+      "speed": 58
+    },
+    "baseExperience": 142,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "bubble",
+        "level": 1
+      },
+      {
+        "move": "tackle",
+        "level": 1
+      },
+      {
+        "move": "water-gun",
+        "level": 13
+      },
+      {
+        "move": "bite",
+        "level": 19
+      },
+      {
+        "move": "rapid-spin",
+        "level": 25
+      },
+      {
+        "move": "skull-bash",
+        "level": 45
+      },
+      {
+        "move": "hydro-pump",
+        "level": 53
+      }
+    ],
+    "evolvesTo": {
+      "species": "blastoise",
+      "level": 36
+    }
+  },
+  {
+    "id": 9,
+    "name": "blastoise",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 79,
+      "attack": 83,
+      "defense": 100,
+      "spAttack": 85,
+      "spDefense": 105,
+      "speed": 78
+    },
+    "baseExperience": 239,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "bubble",
+        "level": 1
+      },
+      {
+        "move": "tackle",
+        "level": 1
+      },
+      {
+        "move": "water-gun",
+        "level": 13
+      },
+      {
+        "move": "bite",
+        "level": 19
+      },
+      {
+        "move": "rapid-spin",
+        "level": 25
+      },
+      {
+        "move": "skull-bash",
+        "level": 55
+      },
+      {
+        "move": "hydro-pump",
+        "level": 68
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "name": "butterfree",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 45,
+      "defense": 50,
+      "spAttack": 90,
+      "spDefense": 80,
+      "speed": 70
+    },
+    "baseExperience": 178,
+    "growthRate": "medium-fast",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "confusion",
+        "level": 1
+      },
+      {
+        "move": "gust",
+        "level": 28
+      },
+      {
+        "move": "psybeam",
+        "level": 34
+      },
+      {
+        "move": "silver-wind",
+        "level": 47
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "name": "beedrill",
+    "types": [
+      "bug",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 90,
+      "defense": 40,
+      "spAttack": 45,
+      "spDefense": 80,
+      "speed": 75
+    },
+    "baseExperience": 178,
+    "growthRate": "medium-fast",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "fury-attack",
+        "level": 1
+      },
+      {
+        "move": "twineedle",
+        "level": 20
+      },
+      {
+        "move": "rage",
+        "level": 25
+      },
+      {
+        "move": "pursuit",
+        "level": 30
+      },
+      {
+        "move": "pin-missile",
+        "level": 35
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "name": "pidgeot",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 83,
+      "attack": 80,
+      "defense": 75,
+      "spAttack": 70,
+      "spDefense": 70,
+      "speed": 101
+    },
+    "baseExperience": 216,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "gust",
+        "level": 1
+      },
+      {
+        "move": "quick-attack",
+        "level": 1
+      },
+      {
+        "move": "tackle",
+        "level": 1
+      },
+      {
+        "move": "wing-attack",
+        "level": 27
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "name": "arbok",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 95,
+      "defense": 69,
+      "spAttack": 65,
+      "spDefense": 79,
+      "speed": 80
+    },
+    "baseExperience": 157,
+    "growthRate": "medium-fast",
+    "captureRate": 90,
+    "learnset": [
+      {
+        "move": "bite",
+        "level": 1
+      },
+      {
+        "move": "poison-sting",
+        "level": 1
+      },
+      {
+        "move": "wrap",
+        "level": 1
+      },
+      {
+        "move": "acid",
+        "level": 38
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "name": "pikachu",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 55,
+      "defense": 40,
+      "spAttack": 50,
+      "spDefense": 50,
+      "speed": 90
+    },
+    "baseExperience": 112,
+    "growthRate": "medium-fast",
+    "captureRate": 190,
+    "learnset": [
+      {
+        "move": "thunder-shock",
+        "level": 1
+      },
+      {
+        "move": "quick-attack",
+        "level": 11
+      },
+      {
+        "move": "slam",
+        "level": 20
+      },
+      {
+        "move": "thunderbolt",
+        "level": 26
+      },
+      {
+        "move": "thunder",
+        "level": 41
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "name": "raichu",
+    "types": [
+      "electric"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 90,
+      "defense": 55,
+      "spAttack": 90,
+      "spDefense": 80,
+      "speed": 110
+    },
+    "baseExperience": 218,
+    "growthRate": "medium-fast",
+    "captureRate": 75,
+    "learnset": [
+      {
+        "move": "quick-attack",
+        "level": 1
+      },
+      {
+        "move": "thunder-shock",
+        "level": 1
+      },
+      {
+        "move": "thunderbolt",
+        "level": 1
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "name": "nidoking",
+    "types": [
+      "poison",
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 81,
+      "attack": 102,
+      "defense": 77,
+      "spAttack": 85,
+      "spDefense": 75,
+      "speed": 85
+    },
+    "baseExperience": 227,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "double-kick",
+        "level": 1
+      },
+      {
+        "move": "peck",
+        "level": 1
+      },
+      {
+        "move": "poison-sting",
+        "level": 1
+      },
+      {
+        "move": "thrash",
+        "level": 22
+      },
+      {
+        "move": "megahorn",
+        "level": 43
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "name": "vulpix",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 38,
+      "attack": 41,
+      "defense": 40,
+      "spAttack": 50,
+      "spDefense": 65,
+      "speed": 65
+    },
+    "baseExperience": 60,
+    "growthRate": "medium-fast",
+    "captureRate": 190,
+    "learnset": [
+      {
+        "move": "ember",
+        "level": 1
+      },
+      {
+        "move": "quick-attack",
+        "level": 13
+      },
+      {
+        "move": "flamethrower",
+        "level": 29
+      },
+      {
+        "move": "fire-spin",
+        "level": 41
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "name": "jigglypuff",
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 115,
+      "attack": 45,
+      "defense": 20,
+      "spAttack": 45,
+      "spDefense": 25,
+      "speed": 20
+    },
+    "baseExperience": 95,
+    "growthRate": "fast",
+    "captureRate": 170,
+    "learnset": [
+      {
+        "move": "pound",
+        "level": 9
+      },
+      {
+        "move": "rollout",
+        "level": 19
+      },
+      {
+        "move": "double-slap",
+        "level": 24
+      },
+      {
+        "move": "body-slam",
+        "level": 34
+      },
+      {
+        "move": "hyper-voice",
+        "level": 44
+      },
+      {
+        "move": "double-edge",
+        "level": 49
+      }
+    ]
+  },
+  {
+    "id": 40,
+    "name": "wigglytuff",
+    "types": [
+      "normal",
+      "fairy"
+    ],
+    "baseStats": {
+      "hp": 140,
+      "attack": 70,
+      "defense": 45,
+      "spAttack": 85,
+      "spDefense": 50,
+      "speed": 45
+    },
+    "baseExperience": 196,
+    "growthRate": "fast",
+    "captureRate": 50,
+    "learnset": [
+      {
+        "move": "double-slap",
+        "level": 1
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "name": "zubat",
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 40,
+      "attack": 45,
+      "defense": 35,
+      "spAttack": 30,
+      "spDefense": 40,
+      "speed": 55
+    },
+    "baseExperience": 49,
+    "growthRate": "medium-fast",
+    "captureRate": 255,
+    "learnset": [
+      {
+        "move": "leech-life",
+        "level": 1
+      },
+      {
+        "move": "astonish",
+        "level": 6
+      },
+      {
+        "move": "bite",
+        "level": 16
+      },
+      {
+        "move": "wing-attack",
+        "level": 21
+      },
+      {
+        "move": "air-cutter",
+        "level": 31
+      },
+      {
+        "move": "poison-fang",
+        "level": 41
+      }
+    ],
+    "evolvesTo": {
+      "species": "golbat",
+      "level": 22
+    }
+  },
+  {
+    "id": 42,
+    "name": "golbat",
+    "types": [
+      "poison",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 75,
+      "attack": 80,
+      "defense": 70,
+      "spAttack": 65,
+      "spDefense": 75,
+      "speed": 90
+    },
+    "baseExperience": 159,
+    "growthRate": "medium-fast",
+    "captureRate": 90,
+    "learnset": [
+      {
+        "move": "astonish",
+        "level": 1
+      },
+      {
+        "move": "leech-life",
+        "level": 1
+      },
+      {
+        "move": "bite",
+        "level": 16
+      },
+      {
+        "move": "wing-attack",
+        "level": 21
+      },
+      {
+        "move": "air-cutter",
+        "level": 35
+      },
+      {
+        "move": "poison-fang",
+        "level": 49
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "name": "diglett",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 10,
+      "attack": 55,
+      "defense": 25,
+      "spAttack": 35,
+      "spDefense": 45,
+      "speed": 95
+    },
+    "baseExperience": 53,
+    "growthRate": "medium-fast",
+    "captureRate": 255,
+    "learnset": [
+      {
+        "move": "scratch",
+        "level": 1
+      },
+      {
+        "move": "dig",
+        "level": 17
+      },
+      {
+        "move": "fury-swipes",
+        "level": 21
+      },
+      {
+        "move": "mud-slap",
+        "level": 25
+      },
+      {
+        "move": "slash",
+        "level": 33
+      },
+      {
+        "move": "earthquake",
+        "level": 41
+      }
+    ],
+    "evolvesTo": {
+      "species": "dugtrio",
+      "level": 26
+    }
+  },
+  {
+    "id": 51,
+    "name": "dugtrio",
+    "types": [
+      "ground"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 100,
+      "defense": 50,
+      "spAttack": 50,
+      "spDefense": 70,
+      "speed": 120
+    },
+    "baseExperience": 149,
+    "growthRate": "medium-fast",
+    "captureRate": 50,
+    "learnset": [
+      {
+        "move": "scratch",
+        "level": 1
+      },
+      {
+        "move": "tri-attack",
+        "level": 1
+      },
+      {
+        "move": "dig",
+        "level": 17
+      },
+      {
+        "move": "fury-swipes",
+        "level": 21
+      },
+      {
+        "move": "mud-slap",
+        "level": 25
+      },
+      {
+        "move": "sand-tomb",
+        "level": 26
+      },
+      {
+        "move": "slash",
+        "level": 38
+      },
+      {
+        "move": "earthquake",
+        "level": 51
+      }
+    ]
+  },
+  {
+    "id": 58,
+    "name": "growlithe",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 55,
+      "attack": 70,
+      "defense": 45,
+      "spAttack": 70,
+      "spDefense": 50,
+      "speed": 60
+    },
+    "baseExperience": 70,
+    "growthRate": "slow",
+    "captureRate": 190,
+    "learnset": [
+      {
+        "move": "bite",
+        "level": 1
+      },
+      {
+        "move": "ember",
+        "level": 7
+      },
+      {
+        "move": "take-down",
+        "level": 25
+      },
+      {
+        "move": "flame-wheel",
+        "level": 31
+      },
+      {
+        "move": "flamethrower",
+        "level": 49
+      }
+    ]
+  },
+  {
+    "id": 59,
+    "name": "arcanine",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 90,
+      "attack": 110,
+      "defense": 80,
+      "spAttack": 100,
+      "spDefense": 80,
+      "speed": 95
+    },
+    "baseExperience": 194,
+    "growthRate": "slow",
+    "captureRate": 75,
+    "learnset": [
+      {
+        "move": "bite",
+        "level": 1
+      },
+      {
+        "move": "ember",
+        "level": 1
+      },
+      {
+        "move": "extreme-speed",
+        "level": 49
+      }
+    ]
+  },
+  {
+    "id": 69,
+    "name": "bellsprout",
+    "types": [
+      "grass",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 50,
+      "attack": 75,
+      "defense": 35,
+      "spAttack": 70,
+      "spDefense": 30,
+      "speed": 40
+    },
+    "baseExperience": 60,
+    "growthRate": "medium-slow",
+    "captureRate": 255,
+    "learnset": [
+      {
+        "move": "vine-whip",
+        "level": 1
+      },
+      {
+        "move": "wrap",
+        "level": 11
+      },
+      {
+        "move": "acid",
+        "level": 23
+      },
+      {
+        "move": "razor-leaf",
+        "level": 37
+      },
+      {
+        "move": "slam",
+        "level": 45
+      }
+    ]
+  },
+  {
+    "id": 84,
+    "name": "doduo",
+    "types": [
+      "normal",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 35,
+      "attack": 85,
+      "defense": 45,
+      "spAttack": 35,
+      "spDefense": 35,
+      "speed": 75
+    },
+    "baseExperience": 62,
+    "growthRate": "medium-fast",
+    "captureRate": 190,
+    "learnset": [
+      {
+        "move": "peck",
+        "level": 1
+      },
+      {
+        "move": "pursuit",
+        "level": 9
+      },
+      {
+        "move": "fury-attack",
+        "level": 13
+      },
+      {
+        "move": "tri-attack",
+        "level": 21
+      },
+      {
+        "move": "rage",
+        "level": 25
+      },
+      {
+        "move": "uproar",
+        "level": 33
+      },
+      {
+        "move": "drill-peck",
+        "level": 37
+      }
+    ]
+  },
+  {
+    "id": 88,
+    "name": "grimer",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 80,
+      "attack": 80,
+      "defense": 50,
+      "spAttack": 40,
+      "spDefense": 50,
+      "speed": 25
+    },
+    "baseExperience": 65,
+    "growthRate": "medium-fast",
+    "captureRate": 190,
+    "learnset": [
+      {
+        "move": "pound",
+        "level": 1
+      },
+      {
+        "move": "sludge",
+        "level": 13
+      },
+      {
+        "move": "sludge-bomb",
+        "level": 43
+      }
+    ],
+    "evolvesTo": {
+      "species": "muk",
+      "level": 38
+    }
+  },
+  {
+    "id": 89,
+    "name": "muk",
+    "types": [
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "attack": 105,
+      "defense": 75,
+      "spAttack": 65,
+      "spDefense": 100,
+      "speed": 50
+    },
+    "baseExperience": 175,
+    "growthRate": "medium-fast",
+    "captureRate": 75,
+    "learnset": [
+      {
+        "move": "pound",
+        "level": 1
+      },
+      {
+        "move": "sludge",
+        "level": 13
+      },
+      {
+        "move": "sludge-bomb",
+        "level": 47
+      }
+    ]
+  },
+  {
+    "id": 92,
+    "name": "gastly",
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 35,
+      "defense": 30,
+      "spAttack": 100,
+      "spDefense": 35,
+      "speed": 80
+    },
+    "baseExperience": 62,
+    "growthRate": "medium-slow",
+    "captureRate": 190,
+    "learnset": [
+      {
+        "move": "lick",
+        "level": 1
+      },
+      {
+        "move": "dream-eater",
+        "level": 28
+      },
+      {
+        "move": "shadow-ball",
+        "level": 36
+      }
+    ],
+    "evolvesTo": {
+      "species": "haunter",
+      "level": 25
+    }
+  },
+  {
+    "id": 93,
+    "name": "haunter",
+    "types": [
+      "ghost",
+      "poison"
+    ],
+    "baseStats": {
+      "hp": 45,
+      "attack": 50,
+      "defense": 45,
+      "spAttack": 115,
+      "spDefense": 55,
+      "speed": 95
+    },
+    "baseExperience": 142,
+    "growthRate": "medium-slow",
+    "captureRate": 90,
+    "learnset": [
+      {
+        "move": "lick",
+        "level": 1
+      },
+      {
+        "move": "shadow-punch",
+        "level": 25
+      },
+      {
+        "move": "dream-eater",
+        "level": 31
+      },
+      {
+        "move": "shadow-ball",
+        "level": 45
+      }
+    ]
+  },
+  {
+    "id": 103,
+    "name": "exeggutor",
+    "types": [
+      "grass",
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 95,
+      "attack": 95,
+      "defense": 85,
+      "spAttack": 125,
+      "spDefense": 75,
+      "speed": 55
+    },
+    "baseExperience": 186,
+    "growthRate": "slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "barrage",
+        "level": 1
+      },
+      {
+        "move": "confusion",
+        "level": 1
+      },
+      {
+        "move": "stomp",
+        "level": 19
+      },
+      {
+        "move": "egg-bomb",
+        "level": 31
+      }
+    ]
+  },
+  {
+    "id": 112,
+    "name": "rhydon",
+    "types": [
+      "ground",
+      "rock"
+    ],
+    "baseStats": {
+      "hp": 105,
+      "attack": 130,
+      "defense": 120,
+      "spAttack": 45,
+      "spDefense": 45,
+      "speed": 40
+    },
+    "baseExperience": 170,
+    "growthRate": "slow",
+    "captureRate": 60,
+    "learnset": [
+      {
+        "move": "fury-attack",
+        "level": 1
+      },
+      {
+        "move": "horn-attack",
+        "level": 1
+      },
+      {
+        "move": "stomp",
+        "level": 1
+      },
+      {
+        "move": "rock-blast",
+        "level": 29
+      },
+      {
+        "move": "take-down",
+        "level": 46
+      },
+      {
+        "move": "earthquake",
+        "level": 58
+      },
+      {
+        "move": "megahorn",
+        "level": 66
+      }
+    ]
+  },
+  {
+    "id": 116,
+    "name": "horsea",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 40,
+      "defense": 70,
+      "spAttack": 70,
+      "spDefense": 25,
+      "speed": 60
+    },
+    "baseExperience": 59,
+    "growthRate": "medium-fast",
+    "captureRate": 225,
+    "learnset": [
+      {
+        "move": "bubble",
+        "level": 1
+      },
+      {
+        "move": "water-gun",
+        "level": 22
+      },
+      {
+        "move": "twister",
+        "level": 29
+      },
+      {
+        "move": "hydro-pump",
+        "level": 43
+      }
+    ]
+  },
+  {
+    "id": 120,
+    "name": "staryu",
+    "types": [
+      "water"
+    ],
+    "baseStats": {
+      "hp": 30,
+      "attack": 45,
+      "defense": 55,
+      "spAttack": 70,
+      "spDefense": 55,
+      "speed": 85
+    },
+    "baseExperience": 68,
+    "growthRate": "slow",
+    "captureRate": 225,
+    "learnset": [
+      {
+        "move": "tackle",
+        "level": 1
+      },
+      {
+        "move": "water-gun",
+        "level": 6
+      },
+      {
+        "move": "rapid-spin",
+        "level": 10
+      },
+      {
+        "move": "swift",
+        "level": 24
+      },
+      {
+        "move": "bubble-beam",
+        "level": 28
+      },
+      {
+        "move": "hydro-pump",
+        "level": 46
+      }
+    ]
+  },
+  {
+    "id": 123,
+    "name": "scyther",
+    "types": [
+      "bug",
+      "flying"
+    ],
+    "baseStats": {
+      "hp": 70,
+      "attack": 110,
+      "defense": 80,
+      "spAttack": 55,
+      "spDefense": 80,
+      "speed": 105
+    },
+    "baseExperience": 100,
+    "growthRate": "medium-fast",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "quick-attack",
+        "level": 1
+      },
+      {
+        "move": "pursuit",
+        "level": 11
+      },
+      {
+        "move": "false-swipe",
+        "level": 16
+      },
+      {
+        "move": "wing-attack",
+        "level": 26
+      },
+      {
+        "move": "slash",
+        "level": 31
+      },
+      {
+        "move": "fury-cutter",
+        "level": 46
+      }
+    ]
+  },
+  {
+    "id": 126,
+    "name": "magmar",
+    "types": [
+      "fire"
+    ],
+    "baseStats": {
+      "hp": 65,
+      "attack": 95,
+      "defense": 57,
+      "spAttack": 100,
+      "spDefense": 85,
+      "speed": 93
+    },
+    "baseExperience": 173,
+    "growthRate": "medium-fast",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "ember",
+        "level": 1
+      },
+      {
+        "move": "fire-punch",
+        "level": 1
+      },
+      {
+        "move": "smog",
+        "level": 1
+      },
+      {
+        "move": "flamethrower",
+        "level": 41
+      },
+      {
+        "move": "fire-blast",
+        "level": 57
+      }
+    ]
+  },
+  {
+    "id": 141,
+    "name": "kabutops",
+    "types": [
+      "rock",
+      "water"
+    ],
+    "baseStats": {
+      "hp": 60,
+      "attack": 115,
+      "defense": 105,
+      "spAttack": 65,
+      "spDefense": 70,
+      "speed": 80
+    },
+    "baseExperience": 173,
+    "growthRate": "medium-fast",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "absorb",
+        "level": 1
+      },
+      {
+        "move": "fury-cutter",
+        "level": 1
+      },
+      {
+        "move": "scratch",
+        "level": 1
+      },
+      {
+        "move": "mud-shot",
+        "level": 25
+      },
+      {
+        "move": "slash",
+        "level": 40
+      },
+      {
+        "move": "mega-drain",
+        "level": 55
+      },
+      {
+        "move": "ancient-power",
+        "level": 65
+      }
+    ]
+  },
+  {
+    "id": 143,
+    "name": "snorlax",
+    "types": [
+      "normal"
+    ],
+    "baseStats": {
+      "hp": 160,
+      "attack": 110,
+      "defense": 65,
+      "spAttack": 65,
+      "spDefense": 110,
+      "speed": 30
+    },
+    "baseExperience": 189,
+    "growthRate": "slow",
+    "captureRate": 25,
+    "learnset": [
+      {
+        "move": "tackle",
+        "level": 1
+      },
+      {
+        "move": "headbutt",
+        "level": 17
+      },
+      {
+        "move": "snore",
+        "level": 29
+      },
+      {
+        "move": "body-slam",
+        "level": 33
+      },
+      {
+        "move": "covet",
+        "level": 45
+      },
+      {
+        "move": "rollout",
+        "level": 49
+      },
+      {
+        "move": "hyper-beam",
+        "level": 53
+      }
+    ]
+  },
+  {
+    "id": 147,
+    "name": "dratini",
+    "types": [
+      "dragon"
+    ],
+    "baseStats": {
+      "hp": 41,
+      "attack": 64,
+      "defense": 45,
+      "spAttack": 50,
+      "spDefense": 50,
+      "speed": 50
+    },
+    "baseExperience": 60,
+    "growthRate": "slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "wrap",
+        "level": 1
+      },
+      {
+        "move": "twister",
+        "level": 15
+      },
+      {
+        "move": "slam",
+        "level": 29
+      },
+      {
+        "move": "outrage",
+        "level": 50
+      },
+      {
+        "move": "hyper-beam",
+        "level": 57
+      }
+    ]
+  },
+  {
+    "id": 150,
+    "name": "mewtwo",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 106,
+      "attack": 110,
+      "defense": 90,
+      "spAttack": 154,
+      "spDefense": 90,
+      "speed": 130
+    },
+    "baseExperience": 306,
+    "growthRate": "slow",
+    "captureRate": 3,
+    "learnset": [
+      {
+        "move": "confusion",
+        "level": 1
+      },
+      {
+        "move": "swift",
+        "level": 33
+      },
+      {
+        "move": "psychic",
+        "level": 66
+      },
+      {
+        "move": "future-sight",
+        "level": 88
+      }
+    ]
+  },
+  {
+    "id": 151,
+    "name": "mew",
+    "types": [
+      "psychic"
+    ],
+    "baseStats": {
+      "hp": 100,
+      "attack": 100,
+      "defense": 100,
+      "spAttack": 100,
+      "spDefense": 100,
+      "speed": 100
+    },
+    "baseExperience": 270,
+    "growthRate": "medium-slow",
+    "captureRate": 45,
+    "learnset": [
+      {
+        "move": "pound",
+        "level": 1
+      },
+      {
+        "move": "mega-punch",
+        "level": 20
+      },
+      {
+        "move": "psychic",
+        "level": 40
+      },
+      {
+        "move": "ancient-power",
+        "level": 50
+      }
+    ]
+  }
+]

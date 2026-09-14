@@ -14,7 +14,7 @@
   "tilesets": [
     {
       "firstgid": 1,
-      "source": "../../assets/atlas/tiles.tsj"
+      "source": "../../../../assets/atlas/tiles.tsj"
     }
   ],
   "layers": [

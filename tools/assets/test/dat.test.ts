@@ -52,10 +52,10 @@ describe('parseDat (860)', () => {
 
 describe('parseDat (854)', () => {
   it('trata a flag 8 como Chargeable sem dados e desloca as demais', () => {
-    // em 854: 0x17 = Displacement (0x18 em 860), 0x08 = Chargeable
+    // em 854: 0x19 = Displacement (0x18 em 860), 0x08 = Chargeable
     const file = buildDat({
       items: [{ ...groundItemSpec(1), flags: [0x00, 100, 0, 0x08] }],
-      outfits: [outfitSpec(1, 10, [0x17, 4, 0, 4, 0])],
+      outfits: [outfitSpec(1, 10, [0x19, 4, 0, 4, 0])],
     })
     const dat = parseDat(file, 854)
     expect(dat.items[0]?.groundSpeed).toBe(100)

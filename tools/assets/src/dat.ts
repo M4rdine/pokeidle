@@ -54,7 +54,7 @@ interface FlagBlock {
 function normalizeFlag(raw: number, version: DatVersion): number {
   if (version === 860) return raw
   if (raw === 0x08) return FLAG_CHARGEABLE_854
-  return raw > 0x08 ? raw + 1 : raw
+  return raw > 0x08 ? raw - 1 : raw
 }
 
 function skipMarketData(reader: BinaryReader): void {

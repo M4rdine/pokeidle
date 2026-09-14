@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "species": [
+    { "id": 1, "name": "bulbasaur", "outfitId": 0 },
+    { "id": 4, "name": "charmander", "outfitId": 0 },
+    { "id": 7, "name": "squirtle", "outfitId": 0 },
+    { "id": 16, "name": "pidgey", "outfitId": 0 },
+    { "id": 19, "name": "rattata", "outfitId": 0 }
+  ],
+  "tiles": [
+    { "name": "grass", "itemId": 0 },
+    { "name": "dirt", "itemId": 0 },
+    { "name": "stone-floor", "itemId": 0 },
+    { "name": "mountain", "itemId": 0 },
+    { "name": "water", "itemId": 0 }
+  ]
+}

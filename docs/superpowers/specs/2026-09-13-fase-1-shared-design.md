@@ -33,7 +33,7 @@ dependência do formato externo).
 packages/shared/
 ├── package.json            # @pokeidle/shared, ESM, dependência: zod
 ├── data/
-│   ├── species/<name>.json # gerado
+│   ├── species.json        # gerado: array com as 42 fichas (um arquivo, import estático)
 │   ├── moves.json          # gerado: golpes com poder usados por alguma espécie
 │   ├── type-chart.json     # gerado: 18x18
 │   ├── items.json          # autoral
@@ -80,7 +80,7 @@ Golpe gerado: `{ "name": "flamethrower", "type": "fire", "power": 90, "accuracy"
 Todas puras; `L` é o nível, `TICK_MS = 200`.
 
 - **Stat:** `stat = floor((2·base + 31) · L / 100) + 5`; `hp = floor((2·base + 31) · L / 100) + L + 10`.
-  Charizard L100: HP 297, Attack 204. L300: HP 671.
+  Charizard L100: HP 297, Attack 204. L300: HP 871.
 - **Dano:** `bruto = floor(floor(floor(2·L/5 + 2) · power · A / D) / 50) + 2`, A/D físicos ou
   especiais pela `damageClass`. Multiplicadores em ordem: tabela de tipos (produto sobre os
   tipos do alvo), STAB 1,5 se o tipo do golpe está nos tipos do atacante, aleatório uniforme em
@@ -89,12 +89,12 @@ Todas puras; `L` é o nível, `TICK_MS = 200`.
   `clamp(round(power / 20), 1, 8) · 5` (poder 40 → 10 ticks, 90 → 25, 110 → 30).
 - **XP por nível:** curva oficial da `growthRate`, sem teto:
   `fast = 0,8·L³`, `medium-fast = L³`, `medium-slow = 1,2·L³ − 15·L² + 100·L − 140`,
-  `slow = 1,25·L³`, `erratic` e `fluctuating` pelas fórmulas oficiais por faixa, estendidas
-  com a última faixa acima de 100. `levelFromXp` é a inversa por busca binária.
+  `slow = 1,25·L³`. `erratic` e `fluctuating` não ocorrem na Gen 1 e são rejeitadas pelo schema
+  (nenhuma das 42 espécies as usa). `xpForLevel(1) = 0`; valores negativos da fórmula viram 0. `levelFromXp` é a inversa por busca binária.
   **XP por derrota:** `floor(baseExperience · L_derrotado / 7)`, igual para treinador e Pokémon.
 - **Captura:** `a = floor((3·hpMax − 2·hpAtual) · captureRate · ballBonus / (3·hpMax))`,
   chance `min(1, a / 255)`. Bolas: poke 1,0, great 1,5, ultra 2,0.
-  Charmander meio HP + Poké Bola ≈ 12 %; Ultra Bola com HP quase cheio ≈ 47 %.
+  Charmander meio HP + Poké Bola ≈ 12 % (a = 30); Ultra Bola com 1 de HP ≈ 35 % (a = 89).
 - **Evolução:** `nextEvolution(species, L)` devolve a ficha alvo se `L ≥ evolvesTo.level`.
 - **Loot:** `rollLoot(species, rng)` → `{ gold, drops: [{ item, quantity }] }`.
 

@@ -55,9 +55,18 @@ export function cookieOf(res: LightMyRequestResponse): string {
   return first.split(';')[0]!
 }
 
+// Contador de módulo: cada chamada de registerAndLogin usa um IP novo, nunca reaproveitado, pra
+// nunca esbarrar no rate limit de /auth/register (10/min por IP) só por causa de quantos testes
+// existem no arquivo. `n` continua sendo só o e-mail/nome, não o IP.
+let ipCallCount = 0
+const nextTestIp = (): string => {
+  const c = ipCallCount++
+  return `10.1.${Math.floor(c / 250)}.${(c % 250) + 1}`
+}
+
 export async function registerAndLogin(app: FastifyInstance, n = 1): Promise<{ cookie: string; trainerId: string; email: string }> {
   const email = `user${n}@test.dev`
-  const res = await api(app, undefined, { ip: `10.1.0.${n}` }).post('/auth/register', { email, password: 'senha-forte-123', name: `Trainer${n}` })
+  const res = await api(app, undefined, { ip: nextTestIp() }).post('/auth/register', { email, password: 'senha-forte-123', name: `Trainer${n}` })
   if (res.statusCode !== 201) throw new Error(`registro falhou: ${res.body}`)
   return { cookie: cookieOf(res), trainerId: (res.json() as { trainer: { id: string } }).trainer.id, email }
 }

@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { huntSessions, pokemon } from '../src/db/schema.js'
 import { truncateAll } from './helpers/db.js'
@@ -48,6 +49,23 @@ describe('start / active / stop', () => {
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
     await t.db.update(pokemon).set({ hp: 0 })
     expect((await api(t.app, cookie).post('/hunts/route-1/start')).statusCode).toBe(400)
+  })
+  it('snapshot corrompido: active → 500 genérico; stop apaga sem sync e permite iniciar de novo', async () => {
+    await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
+    await api(t.app, cookie).post('/hunts/route-1/start')
+    await t.db.update(huntSessions).set({ state: { lixo: 1 } }).where(eq(huntSessions.trainerId, trainerId))
+
+    const active = await api(t.app, cookie).get('/hunts/active')
+    expect(active.statusCode).toBe(500)
+    expect(active.json()).toEqual({ error: { code: 'internal', message: 'erro interno' } })
+
+    const stop = await api(t.app, cookie).post('/hunts/stop')
+    expect(stop.statusCode).toBe(200)
+    expect(stop.json()).toMatchObject({ trainer: { id: trainerId, activeHuntId: null } })
+    expect(await t.db.select().from(huntSessions)).toEqual([])
+
+    const start2 = await api(t.app, cookie).post('/hunts/route-1/start')
+    expect(start2.statusCode).toBe(201)
   })
 })
 

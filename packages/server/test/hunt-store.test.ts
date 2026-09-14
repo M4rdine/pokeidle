@@ -5,7 +5,7 @@ import { chooseStarter } from '../src/account/starter.js'
 import type { Db } from '../src/db/client.js'
 import { huntSessions, inventory, pokedexEntries, pokemon, trainers, users } from '../src/db/schema.js'
 import { simulate } from '../src/engine/index.js'
-import { loadActive, saveSnapshot, startHunt, stopHunt, syncToTables } from '../src/hunt-store/index.js'
+import { CorruptSnapshotError, loadActive, saveSnapshot, startHunt, stopHunt, syncToTables } from '../src/hunt-store/index.js'
 import { openTestDb, truncateAll } from './helpers/db.js'
 
 const registry = loadRegistry()
@@ -122,10 +122,20 @@ describe('snapshot e sync', () => {
     await syncToTables(db, trainerId, state, T1)
     expect(await snapshotRows()).toEqual(again)
   })
-  it('loadActive rejeita jsonb corrompido', async () => {
+  it('loadActive rejeita jsonb corrompido com CorruptSnapshotError e issues do Zod', async () => {
     await startHunt(db, registry, trainerId, 'route-1', T0)
     await db.update(huntSessions).set({ state: { lixo: 1 } }).where(eq(huntSessions.trainerId, trainerId))
-    await expect(loadActive(db, trainerId)).rejects.toThrow()
+    await expect(loadActive(db, trainerId)).rejects.toThrow(CorruptSnapshotError)
+    let error: unknown
+    try {
+      await loadActive(db, trainerId)
+    } catch (e) {
+      error = e
+    }
+    expect(error).toBeInstanceOf(CorruptSnapshotError)
+    const corrupt = error as CorruptSnapshotError
+    expect(corrupt.code).toBe('internal')
+    expect(corrupt.issues.length).toBeGreaterThan(0)
   })
 })
 
@@ -150,5 +160,15 @@ describe('stopHunt', () => {
     expect(rejected).toHaveLength(1)
     expect((rejected[0] as PromiseRejectedResult).reason).toMatchObject({ code: 'no-hunt' })
     expect(await loadActive(db, trainerId)).toBeNull()
+  })
+  it('snapshot corrompido: apaga a sessão sem sync e devolve o treinador (não relança)', async () => {
+    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 9 })
+    await db.update(huntSessions).set({ state: { lixo: 1 } }).where(eq(huntSessions.trainerId, trainerId))
+    const before = await snapshotRows()
+    const trainer = await stopHunt(db, trainerId, T0)
+    expect(trainer.id).toBe(trainerId)
+    expect(await loadActive(db, trainerId)).toBeNull()
+    expect(await db.select().from(huntSessions)).toEqual([])
+    expect(await snapshotRows()).toEqual(before) // sem sync: nada mudou além da sessão apagada
   })
 })

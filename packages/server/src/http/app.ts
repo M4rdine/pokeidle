@@ -6,6 +6,7 @@ import { ZodError } from 'zod'
 import { authPlugin } from '../auth/plugin.js'
 import type { Config } from '../config.js'
 import type { Db } from '../db/client.js'
+import { CorruptSnapshotError } from '../hunt-store/state-schema.js'
 import { AppError, errorBody } from './errors.js'
 import { authRoutes } from './routes/auth.js'
 import { huntRoutes } from './routes/hunts.js'
@@ -56,6 +57,14 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   // martelar o servidor sem esbarrar em rate limit nenhum).
   app.setNotFoundHandler({ preHandler: app.rateLimit() }, (_request, reply) => reply.status(404).send(errorBody('not-found', 'rota não encontrada')))
   app.setErrorHandler((error, request, reply) => {
+    // Snapshot corrompido é um 500 genérico igual a qualquer outro erro inesperado (S13: sem
+    // detalhe pro cliente). `issues` não precisa ser logado à parte: o serializer padrão do
+    // pino (`pino-std-serializers`) copia as próprias propriedades enumeráveis do erro — então
+    // `err.issues` já aparece na linha de log a partir só de `{ err: error }`.
+    if (error instanceof CorruptSnapshotError) {
+      request.log.error({ err: error }, 'snapshot da hunt corrompido')
+      return reply.status(500).send(errorBody('internal', 'erro interno'))
+    }
     if (error instanceof AppError) return reply.status(error.status).send(errorBody(error.code, error.message))
     if (error instanceof ZodError) return reply.status(400).send(errorBody('validation', error.issues[0]?.message ?? 'entrada inválida'))
     const status = (error as { statusCode?: number }).statusCode

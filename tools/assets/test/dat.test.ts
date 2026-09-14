@@ -48,6 +48,11 @@ describe('parseDat (860)', () => {
     const broken = buildDat({ items: [{ ...groundItemSpec(1), flags: [0x7e] }], outfits: [] })
     expect(() => parseDat(broken, 860)).toThrow(/flag desconhecida 0x7e.*item 100/)
   })
+
+  it('lança erro para 0xfe em 860 (não é a flag Chargeable de 854)', () => {
+    const broken = buildDat({ items: [{ ...groundItemSpec(1), flags: [0xfe] }], outfits: [] })
+    expect(() => parseDat(broken, 860)).toThrow(/flag desconhecida 0xfe.*item 100/)
+  })
 })
 
 describe('parseDat (854)', () => {

@@ -17,8 +17,8 @@ export const FLAG_CLOTH = 0x20
 export const FLAG_MARKET = 0x21
 export const FLAG_END = 0xff
 const FLAG_MAX_KNOWN = 0x25
-/** Sentinela interna para a flag Chargeable do formato 8.54, que não existe em 8.60. */
-const FLAG_CHARGEABLE_854 = 0xfe
+/** Sentinela interna para a flag Chargeable do formato 8.54, que não existe em 8.60. Valor negativo nunca iguala um byte bruto lido do arquivo. */
+const FLAG_CHARGEABLE_854 = -1
 
 export interface ThingType {
   readonly id: number

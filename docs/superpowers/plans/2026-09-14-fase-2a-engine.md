@@ -30,11 +30,11 @@ packages/server/
   package.json  tsconfig.json  vitest.config.ts
   src/engine/
     constants.ts   types.ts   grid.ts   spawn.ts   progression.ts   combat.ts
-    player.ts      step.ts    intents.ts   create.ts   simulate.ts   index.ts
+    items.ts       player.ts  step.ts   intents.ts   create.ts   simulate.ts   index.ts
   test/engine/
     fixtures/mini.ts           # registro mínimo + mapa 5x5 + estado base
     grid.test.ts  spawn.test.ts  progression.test.ts  combat.test.ts
-    player.test.ts  step.test.ts  intents.test.ts  simulate.test.ts  route1.test.ts
+    step.test.ts  intents.test.ts  simulate.test.ts  route1.test.ts
 ```
 
 ---

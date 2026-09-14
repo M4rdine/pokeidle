@@ -47,8 +47,10 @@ Pokécenter; sem rota possível até o Centro nem tile adjacente, para em `stopp
 também é limpo ao trocar de ativo
 (`setActive`, fainted) e ao subir de nível/evoluir. Em `stopped`, `step` só roda
 `processRespawns` e avança o tick — nenhum outro efeito colateral se repete enquanto a
-hunt fica parada; sair desse modo é assunto de uma intenção de reinício, que ainda não
-existe no motor (fica para a fase 2b/2c).
+hunt fica parada; `stopped` é absorvente nesta fase, o motor não tem intenção de
+reinício. Sair desse modo é responsabilidade do servidor, que recria a sessão chamando
+`createHuntState` de novo; a política de o que fazer com um time inteiramente caído
+(ex.: cura automática, tela de derrota) fica para a fase 2b.
 
 ## Constantes (`constants.ts`)
 
@@ -69,6 +71,12 @@ Um scheduler no servidor roda `step` a 5 ticks/s por hunt ativa; o snapshot pers
 o próprio `HuntState` (serializável, sem estado escondido). Ao reconectar, o servidor faz
 catch-up com `simulate(state, ticks, deps)`, com teto de 12 h de ticks perdidos por
 chamada.
+
+Nota para a 2c: `simulate` materializa todos os eventos em memória (~1 evento/tick); um
+catch-up de 12 h a 5 ticks/s é da ordem de 200 mil eventos numa única chamada, então o
+servidor deve fatiar essa chamada e resumir cada lote incrementalmente com
+`summarizeEvents` em vez de acumular tudo de uma vez — isso fica para a fase 2c, o motor
+em si não faz esse recorte.
 
 ## Fora do motor
 

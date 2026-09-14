@@ -102,6 +102,23 @@ describe('returning e healing', () => {
   })
 })
 
+describe('returning sem rota até o Centro', () => {
+  it('Centro cercado de selvagens para a hunt com stopped/no-route', () => {
+    const deps = miniDeps()
+    const s = baseState({}, deps)
+    const blockers = [
+      { ...s.wilds[0]!, id: 1, position: { x: 3, y: 4 } },
+      { ...s.wilds[0]!, id: 2, position: { x: 4, y: 3 } },
+    ]
+    const st = { ...s, wilds: blockers, player: { ...s.player, mode: 'returning' as const } }
+    const r = step(st, deps)
+    expect(r.events).toEqual([{ type: 'stopped', tick: 0, reason: 'no-route' }])
+    expect(r.state.player.mode).toBe('stopped')
+    expect(r.state.player.targetWildId).toBeNull()
+    expect(r.state.player.path).toEqual([])
+  })
+})
+
 describe('alvo imune', () => {
   it('pula o selvagem e não fica preso', () => {
     const deps = miniDeps()

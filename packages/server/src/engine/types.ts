@@ -49,7 +49,7 @@ export type Event =
   | { type: 'itemUsed'; tick: number; itemId: string; pokemonId: string; hp: number }
   | { type: 'returning'; tick: number }
   | { type: 'healed'; tick: number }
-  | { type: 'stopped'; tick: number; reason: 'team-fainted' | 'intent' }
+  | { type: 'stopped'; tick: number; reason: 'team-fainted' | 'intent' | 'no-route' }
   | { type: 'skipped'; tick: number; wildId: number }
 
 export type Intent =

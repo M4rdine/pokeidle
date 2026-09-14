@@ -38,8 +38,10 @@ faixa.
 `searching` (procura o selvagem vivo mais próximo, ignorando `skippedWildIds`) →
 `walking` (segue o caminho A*) → `fighting` (captura se aplicável, senão ataca; um golpe
 imune marca o alvo em `skippedWildIds` e volta a `searching`) → `returning` (a caminho do
-Pokécenter) → `healing` (cura o time e limpa `skippedWildIds`) → `stopped` (time inteiro
-caído ou intenção `stop`). `skippedWildIds` também é limpo ao trocar de ativo
+Pokécenter; sem rota possível até o Centro nem tile adjacente, para em `stopped` com evento
+`stopped`/`reason: 'no-route'`) → `healing` (cura o time e limpa `skippedWildIds`) →
+`stopped` (time inteiro caído, sem rota até o Centro ou intenção `stop`). `skippedWildIds`
+também é limpo ao trocar de ativo
 (`setActive`, fainted) e ao subir de nível/evoluir. Em `stopped`, `step` só roda
 `processRespawns` e avança o tick — nenhum outro efeito colateral se repete enquanto a
 hunt fica parada; sair desse modo é assunto de uma intenção de reinício, que ainda não

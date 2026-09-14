@@ -63,12 +63,23 @@ function fighting(state: HuntState, deps: EngineDeps): StepResult {
   return { state: toSearching(withPlayer(state, { skippedWildIds: [...state.player.skippedWildIds, wild.id] })), events: [skipped] }
 }
 
+function stopNoRoute(state: HuntState): StepResult {
+  const event: Event = { type: 'stopped', tick: state.tick, reason: 'no-route' }
+  return { state: withPlayer(state, { mode: 'stopped', targetWildId: null, path: [] }), events: [event] }
+}
+
 function returning(state: HuntState, deps: EngineDeps): StepResult {
   const center = deps.hunt.pokecenter
   const atCenter = (p: Point) => samePoint(p, center) || isAdjacent(p, center)
   if (atCenter(state.player.position)) return idle(withPlayer(state, { mode: 'healing', healingUntilTick: state.tick + HEAL_TICKS, path: [] }))
-  const path = state.player.path.length > 0 ? state.player.path : pathTo(state, deps, center, atCenter, null)
-  const [next, ...rest] = path ?? []
+  if (state.player.path.length > 0) {
+    const [next, ...rest] = state.player.path
+    if (next && isWalkable(state, deps.hunt, next)) return advance(state, next, rest)
+    return idle(withPlayer(state, { path: [] }))
+  }
+  const path = pathTo(state, deps, center, atCenter, null)
+  if (path === null) return stopNoRoute(state)
+  const [next, ...rest] = path
   if (!next || !isWalkable(state, deps.hunt, next)) return idle(withPlayer(state, { path: [] }))
   return advance(state, next, rest)
 }

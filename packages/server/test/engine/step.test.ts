@@ -12,6 +12,8 @@ function run(state: HuntState, deps = miniDeps(), ticks = 1) {
   return cur
 }
 
+const fixed = (v: number) => ({ next: () => v, int: (min: number) => min })
+
 describe('pickTarget e caminhada', () => {
   it('escolhe o zubat e traça caminho até ficar adjacente', () => {
     const deps = miniDeps()
@@ -230,5 +232,30 @@ describe('skippedWildIds é limpo quando a imunidade pode ter mudado', () => {
     const r = resolveConsequences(st, deps)
     expect(r.events.some((e) => e.type === 'levelUp')).toBe(true)
     expect(r.state.player.skippedWildIds).toEqual([])
+  })
+})
+
+describe('derrota e captura no mesmo tick', () => {
+  it('selvagem com hp 1 morre no ataque do jogador; nenhum ataque do selvagem no mesmo tick', () => {
+    const deps = { ...miniDeps(), rng: fixed(1) }
+    const s = baseState({}, deps)
+    const wild = { ...s.wilds[0]!, hp: 1, captureTried: true }
+    const st = { ...s, wilds: [wild], player: { ...s.player, mode: 'fighting' as const, targetWildId: 1, position: { x: 3, y: 0 } } }
+    const r = step(st, deps)
+    const attacks = r.events.filter((e) => e.type === 'attack')
+    expect(attacks).toHaveLength(1)
+    expect(attacks[0]).toMatchObject({ attacker: 'player' })
+    expect(r.events.some((e) => e.type === 'wildDefeated')).toBe(true)
+    expect(r.events.some((e) => e.type === 'attack' && (e as { attacker: string }).attacker === 'wild')).toBe(false)
+  })
+  it('captura acontece no mesmo tick: nenhum ataque do selvagem, modo final searching', () => {
+    const deps = { ...miniDeps(), rng: fixed(0) }
+    const s = baseState({}, deps)
+    const wild = { ...s.wilds[0]!, hp: 3, hpMax: 16 } // 20% do hpMax
+    const st = { ...s, wilds: [wild], player: { ...s.player, mode: 'fighting' as const, targetWildId: 1, position: { x: 3, y: 0 } } }
+    const r = step(st, deps)
+    expect(r.events.some((e) => e.type === 'captured')).toBe(true)
+    expect(r.events.some((e) => e.type === 'attack')).toBe(false)
+    expect(r.state.player.mode).toBe('searching')
   })
 })

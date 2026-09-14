@@ -32,6 +32,7 @@ packages/server/src/http/app.ts        (+ realtime em AppDeps, registra wsRoutes
 packages/server/src/http/security.ts   (+ sameOrigin)
 packages/server/src/http/routes/{hunts,trainer,auth}.ts  (via actions / sockets)
 packages/server/src/main.ts            (scheduler, recoverSessions, shutdown)
+packages/server/src/http/routes/debug.ts + public/debug/{index.html,viewer.js,viewer.css}  (Task 7, atrás de DEBUG_VIEWER)
 packages/server/test/helpers/app.ts    (+ scheduler/sockets no TestApp, silentLogger)
 packages/server/test/helpers/ws.ts     (cliente ws de teste)
 packages/server/test/realtime/{runner,catchup,protocol,sockets,scheduler,actions,ws,boot}.test.ts
@@ -58,6 +59,7 @@ Em `packages/server/package.json` acrescente em `dependencies`: `"@fastify/webso
 
 `test/realtime/runner.test.ts`:
 ```ts
+import { createRng } from '@pokeidle/shared'
 import { describe, expect, it } from 'vitest'
 import { simulate } from '../../src/engine/simulate.js'
 import type { Event } from '../../src/engine/types.js'
@@ -96,7 +98,7 @@ describe('tickRunner', () => {
     let r = r0
     const collected: Event[] = []
     for (let i = 0; i < 200; i++) { const o = tickRunner(r, engineDeps(r, registry)); r = o.runner; collected.push(...o.events) }
-    const ref = simulate(active.state, 200, miniDeps(3))
+    const ref = simulate(active.state, 200, { ...miniDeps(3), rng: createRng(3, active.rngState) }) // mesma sequência que o runner retoma
     expect(r.state).toEqual(ref.state)
     expect(collected).toEqual(ref.events)
     const expectedLog = logEntriesOf(ref.events, active.huntId)
@@ -154,7 +156,7 @@ describe('save/sync', () => {
 
 `test/realtime/catchup.test.ts`:
 ```ts
-import { TICK_MS } from '@pokeidle/shared'
+import { createRng, TICK_MS } from '@pokeidle/shared'
 import { describe, expect, it } from 'vitest'
 import { simulate, summarizeEvents } from '../../src/engine/simulate.js'
 import { addSummaries, catchUp, emptySummary, ticksOwedSince } from '../../src/realtime/catchup.js'
@@ -188,7 +190,7 @@ describe('catchUp', () => {
     const r0 = createRunner('t1', active)
     const slices: number[] = []
     const res = await catchUp(r0, 4500, engineDeps(r0, miniRegistry()), { onSlice: (n) => slices.push(n), yieldNow: () => Promise.resolve() })
-    const ref = simulate(active.state, 4500, miniDeps(9))
+    const ref = simulate(active.state, 4500, { ...miniDeps(9), rng: createRng(9, active.rngState) })
     expect(res.runner.state).toEqual(ref.state)
     expect(res.summary).toEqual(summarizeEvents(ref.events, 4500))
     expect(res.ticksDone).toBe(4500)
@@ -1666,3 +1668,344 @@ git commit -m "feat(server): recuperação de sessões no boot, shutdown com flu
 **Consistência de tipos:** `Runner`/`PersistSnapshot`/`StopReason` (T1) usados em T3/T4/T5; `ServerMessage` (T2) usado por `snapshotMessage` (T3), `sockets` (T2), `ws` (T5); `Scheduler` (T3) consumido por `actions` (T4), `ws` (T5), `boot` (T6); `RealtimeDeps` (T4) usado em T5; `RouteDeps` ganha `realtime` e `registry` em T4 e é o tipo de `wsRoutes` em T5; `TestApp` ganha `scheduler`/`sockets`/`registry` em T4 e `testApp(opts)` ganha `ws` em T5; `silentLogger` criado em T3 e usado em T3/T4/T6; `sameOrigin` criado em T4 e usado em T5; `applyIntent` do scheduler devolve `IntentResult` com códigos `no-hunt`/`catching-up` além dos do motor.
 
 **Decisões registradas:** `hunt.catchup { ticksRemaining: -1 }` ao conectar durante um catch-up (o valor exato só o laço sabe); `HARD_MAX_PAYLOAD` de 64 KB no `ws` e 4 KB por `parseClientMessage` (para o erro ser `validation` e não um close 1009); `pino` vira dependência de produção para o scheduler ter logger antes do app (`loggerInstance`); `attach` aguarda o catch-up (boot recupera em série, mais antigas primeiro).
+
+---
+
+### Task 7: Visualizador de depuração (`/debug`)
+
+Pedido do usuário em 2026-09-14: uma página descartável para ver a hunt acontecer antes do cliente da fase 3. Não é o cliente; é uma ferramenta de validação. Fica atrás de `DEBUG_VIEWER=true`.
+
+**Files:**
+- Create: `packages/server/public/debug/index.html`, `public/debug/viewer.css`, `public/debug/viewer.js`, `src/http/routes/debug.ts`
+- Modify: `src/config.ts` (`DEBUG_VIEWER`, `ASSETS_DIR`), `src/http/app.ts` (registrar `debugRoutes` quando `DEBUG_VIEWER`), `.env.example`, `packages/server/README.md`
+- Test: `test/debug.test.ts`, `test/config.test.ts` (dois casos)
+
+**Interfaces:**
+- Consumes: `RouteDeps` (Task 4: `registry`), `loadConfig`, `errorBody`, `freshApp(t, extraRoutes?, configOverrides?)` do helper.
+- Produces: `Config.DEBUG_VIEWER: boolean` (padrão `false`), `Config.ASSETS_DIR: string` (padrão `<packages/server>/../../assets/atlas`); `debugRoutes: FastifyPluginAsync<RouteDeps>` com `GET /debug/` (HTML), `GET /debug/viewer.js`, `GET /debug/viewer.css`, `GET /debug/map/:id` (HuntMap JSON do registro; 404 se não existe), `GET /debug/atlas/:file` com `file` numa allowlist fixa (`tiles.png`, `tiles.json`, `pokemon.png`, `pokemon.json`) lido de `ASSETS_DIR` (404 se o arquivo não existe); `DEBUG_ALLOWED_ATLAS` exportado.
+
+- [ ] **Step 1: Testes**
+
+Em `test/config.test.ts`, no teste "aplica os padrões", acrescente ao objeto esperado `DEBUG_VIEWER: false` e `ASSETS_DIR: expect.stringMatching(/assets[\/\\]atlas$/)`; e um caso: `loadConfig({ ...base, DEBUG_VIEWER: 'true', ASSETS_DIR: '/tmp/x' })` → `{ DEBUG_VIEWER: true, ASSETS_DIR: '/tmp/x' }`.
+
+`test/debug.test.ts`:
+```ts
+import { mkdtemp, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import path from 'node:path'
+import type { FastifyInstance } from 'fastify'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { api, freshApp, testApp, type TestApp } from './helpers/app.js'
+
+let t: TestApp
+let on: FastifyInstance
+let off: FastifyInstance
+let assetsDir: string
+beforeAll(async () => {
+  t = await testApp()
+  assetsDir = await mkdtemp(path.join(tmpdir(), 'pokeidle-atlas-'))
+  await writeFile(path.join(assetsDir, 'tiles.json'), JSON.stringify({ frames: { grass: { frame: { x: 0, y: 0, w: 32, h: 32 } } }, meta: { image: 'tiles.png' } }))
+  await writeFile(path.join(assetsDir, 'secret.txt'), 'x')
+  on = await freshApp(t, undefined, { DEBUG_VIEWER: 'true', ASSETS_DIR: assetsDir })
+  off = await freshApp(t, undefined, { DEBUG_VIEWER: 'false' })
+})
+afterAll(async () => { await on.close(); await off.close(); await t.close() })
+
+describe('DEBUG_VIEWER desligado', () => {
+  it('nenhuma rota /debug existe', async () => {
+    for (const url of ['/debug/', '/debug/viewer.js', '/debug/map/route-1', '/debug/atlas/tiles.json']) expect((await api(off).get(url)).statusCode, url).toBe(404)
+  })
+})
+
+describe('DEBUG_VIEWER ligado', () => {
+  it('serve a página, o script e o css com os tipos certos e o CSP do helmet', async () => {
+    const html = await api(on).get('/debug/')
+    expect(html.statusCode).toBe(200)
+    expect(String(html.headers['content-type'])).toMatch(/text\/html/)
+    expect(html.body).toContain('<canvas')
+    expect(html.body).toContain('viewer.js')
+    expect(String(html.headers['content-security-policy'])).toContain("default-src 'self'")
+    const js = await api(on).get('/debug/viewer.js')
+    expect(js.statusCode).toBe(200)
+    expect(String(js.headers['content-type'])).toMatch(/javascript/)
+    expect(String((await api(on).get('/debug/viewer.css')).headers['content-type'])).toMatch(/text\/css/)
+  })
+  it('mapa do registro e 404 para desconhecido', async () => {
+    const r = await api(on).get('/debug/map/route-1')
+    expect(r.statusCode).toBe(200)
+    expect(r.json()).toMatchObject({ id: 'route-1', width: 40, height: 30, tileSize: 32 })
+    expect((await api(on).get('/debug/map/nope')).statusCode).toBe(404)
+  })
+  it('atlas só da allowlist e só o que existe; sem path traversal', async () => {
+    const ok = await api(on).get('/debug/atlas/tiles.json')
+    expect(ok.statusCode).toBe(200)
+    expect(ok.json()).toMatchObject({ frames: { grass: expect.anything() } })
+    expect((await api(on).get('/debug/atlas/tiles.png')).statusCode).toBe(404) // não existe no dir de teste
+    expect((await api(on).get('/debug/atlas/secret.txt')).statusCode).toBe(404)
+    expect((await api(on).get('/debug/atlas/..%2Fsecret.txt')).statusCode).toBe(404)
+  })
+})
+```
+
+- [ ] **Step 2: Rodar e ver falhar**
+
+Run: `pnpm --filter @pokeidle/server test -- debug config`
+
+- [ ] **Step 3: Config e rotas**
+
+`src/config.ts`: acrescente ao schema `DEBUG_VIEWER: bool.default('false')` e `ASSETS_DIR: z.string().min(1).default(DEFAULT_ASSETS_DIR)` com
+```ts
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+const DEFAULT_ASSETS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../assets/atlas')
+```
+(`src/config.ts` → `packages/server/src` → três níveis acima é a raiz do repo.)
+
+`src/http/routes/debug.ts`:
+```ts
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import type { FastifyPluginAsync } from 'fastify'
+import { z } from 'zod'
+import { errorBody } from '../errors.js'
+import { parseBody } from '../validate.js'
+import type { RouteDeps } from './auth.js'
+
+const PUBLIC_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../public/debug')
+export const DEBUG_ALLOWED_ATLAS: Readonly<Record<string, string>> = { 'tiles.png': 'image/png', 'tiles.json': 'application/json', 'pokemon.png': 'image/png', 'pokemon.json': 'application/json' }
+const PAGE_FILES: Readonly<Record<string, string>> = { 'index.html': 'text/html; charset=utf-8', 'viewer.js': 'application/javascript; charset=utf-8', 'viewer.css': 'text/css; charset=utf-8' }
+const MapParams = z.object({ id: z.string().min(1).max(64) }).strict()
+const AtlasParams = z.object({ file: z.string().min(1).max(64) }).strict()
+
+async function fileOr404(filePath: string): Promise<Buffer | null> {
+  try { return await readFile(filePath) } catch { return null }
+}
+
+/** Ferramenta de depuração (DEBUG_VIEWER=true): página estática + dados públicos do jogo. Nunca expõe estado de jogador. */
+export const debugRoutes: FastifyPluginAsync<RouteDeps> = async (app, { registry, config }) => {
+  const servePage = (name: string) => async (_request: unknown, reply: import('fastify').FastifyReply) => {
+    const body = await fileOr404(path.join(PUBLIC_DIR, name))
+    if (!body) return reply.status(404).send(errorBody('not-found', 'arquivo não encontrado'))
+    return reply.type(PAGE_FILES[name]!).send(body)
+  }
+  app.get('/debug/', servePage('index.html'))
+  app.get('/debug/viewer.js', servePage('viewer.js'))
+  app.get('/debug/viewer.css', servePage('viewer.css'))
+
+  app.get('/debug/map/:id', async (request, reply) => {
+    const { id } = parseBody(MapParams, request.params)
+    const hunt = registry.hunts.get(id)
+    if (!hunt) return reply.status(404).send(errorBody('not-found', `hunt ${id} não existe`))
+    return hunt
+  })
+
+  app.get('/debug/atlas/:file', async (request, reply) => {
+    const { file } = parseBody(AtlasParams, request.params)
+    const type = DEBUG_ALLOWED_ATLAS[file]
+    if (!type) return reply.status(404).send(errorBody('not-found', 'arquivo não permitido'))
+    const body = await fileOr404(path.join(config.ASSETS_DIR, file))
+    if (!body) return reply.status(404).send(errorBody('not-found', 'atlas não encontrado; gere com pnpm assets build'))
+    return reply.type(type).send(body)
+  })
+}
+```
+Em `app.ts`: `if (config.DEBUG_VIEWER) await app.register(debugRoutes, routeDeps)` depois das rotas de hunt. `.env.example`: `DEBUG_VIEWER=true` e `# ASSETS_DIR=` comentado. Troque o `import('fastify').FastifyReply` inline por `import type { FastifyReply } from 'fastify'` no topo.
+
+- [ ] **Step 4: Página**
+
+`public/debug/index.html`:
+```html
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Pokeidle — visualizador de hunt</title>
+  <link rel="stylesheet" href="/debug/viewer.css" />
+</head>
+<body>
+  <header>
+    <form id="auth">
+      <input id="email" type="email" placeholder="e-mail" required />
+      <input id="password" type="password" placeholder="senha (8+)" required />
+      <input id="name" placeholder="nome (só p/ registrar)" />
+      <button type="button" id="register">Registrar</button>
+      <button type="submit" id="login">Entrar</button>
+      <button type="button" id="logout">Sair</button>
+    </form>
+    <div id="controls">
+      <select id="starter"><option value="charmander">Charmander</option><option value="bulbasaur">Bulbasaur</option><option value="squirtle">Squirtle</option></select>
+      <button type="button" id="choose">Escolher inicial</button>
+      <button type="button" id="start">Iniciar Rota 1</button>
+      <button type="button" id="stop">Parar</button>
+      <label><input type="checkbox" id="showBlocking" /> bloqueio</label>
+      <span id="status">desconectado</span>
+    </div>
+  </header>
+  <main>
+    <canvas id="map" width="1280" height="960"></canvas>
+    <aside>
+      <h2>Treinador</h2>
+      <pre id="trainer">—</pre>
+      <h2>Eventos</h2>
+      <ol id="log"></ol>
+    </aside>
+  </main>
+  <script src="/debug/viewer.js"></script>
+</body>
+</html>
+```
+
+`public/debug/viewer.css`:
+```css
+body { margin: 0; font: 13px/1.4 system-ui, sans-serif; background: #1b1b1b; color: #eee; }
+header { display: flex; gap: 16px; flex-wrap: wrap; padding: 8px 12px; background: #262626; align-items: center; }
+form, #controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+input, select, button { font: inherit; padding: 4px 8px; background: #333; color: #eee; border: 1px solid #555; border-radius: 4px; }
+button { cursor: pointer; } button:hover { background: #444; }
+#status { margin-left: 8px; color: #9fd; }
+main { display: grid; grid-template-columns: 1fr 320px; gap: 12px; padding: 12px; }
+canvas { width: 100%; max-width: 960px; image-rendering: pixelated; background: #000; border: 1px solid #444; }
+aside { min-width: 0; } pre { white-space: pre-wrap; background: #111; padding: 8px; border-radius: 4px; }
+#log { max-height: 640px; overflow: auto; padding-left: 24px; margin: 0; font-family: ui-monospace, monospace; font-size: 12px; }
+#log li.attack { color: #f9a; } #log li.wildDefeated { color: #9f9; } #log li.captured { color: #9cf; } #log li.stopped { color: #fc6; }
+```
+
+`public/debug/viewer.js` (JS puro, sem build; tudo o que o servidor manda é reproduzido do estado + eventos):
+```js
+const TILE = 32
+const $ = (id) => document.getElementById(id)
+const state = { map: null, atlas: null, atlasImg: null, snapshot: null, wilds: new Map(), player: null, targetWildId: null, flashes: [], ws: null }
+
+const api = async (method, url, body) => {
+  const res = await fetch(url, { method, headers: body ? { 'content-type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined })
+  const json = res.status === 204 ? null : await res.json().catch(() => null)
+  if (!res.ok) throw new Error(json?.error ? `${json.error.code}: ${json.error.message}` : `${res.status}`)
+  return json
+}
+const setStatus = (text) => { $('status').textContent = text }
+const log = (cls, text) => {
+  const li = document.createElement('li'); li.className = cls; li.textContent = text
+  const ol = $('log'); ol.prepend(li); while (ol.children.length > 200) ol.lastChild.remove()
+}
+
+async function loadMap(huntId) {
+  if (state.map?.id === huntId) return
+  state.map = await api('GET', `/debug/map/${huntId}`)
+  state.atlas = await api('GET', '/debug/atlas/tiles.json')
+  state.atlasImg = await new Promise((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = '/debug/atlas/tiles.png' })
+  const canvas = $('map'); canvas.width = state.map.width * TILE; canvas.height = state.map.height * TILE
+}
+
+function applySnapshot(msg) {
+  state.snapshot = msg
+  state.wilds = new Map(msg.state.wilds.map((w) => [w.id, w]))
+  const p = msg.state.player
+  state.player = { position: p.position, mode: p.mode, team: p.team, activeIndex: p.activeIndex }
+  state.targetWildId = p.targetWildId
+  $('trainer').textContent = JSON.stringify({ xp: msg.state.trainer.xp, gold: msg.state.trainer.gold, inventory: msg.state.inventory, team: p.team.map((m) => `${m.speciesName} L${m.level} ${m.hp}/${m.hpMax}`), mode: p.mode }, null, 1)
+}
+
+function applyEvent(e) {
+  const p = state.player
+  switch (e.type) {
+    case 'moved': p.position = e.to; break
+    case 'spawned': state.wilds.set(e.wildId, { id: e.wildId, speciesName: e.speciesName, level: e.level, position: e.position, hp: null, hpMax: null }); break
+    case 'attack': {
+      if (e.attacker === 'player') { const w = state.wilds.get(Number(e.targetId)); if (w) { w.hp = e.targetHp; state.targetWildId = w.id } }
+      else { const m = p.team.find((x) => x.id === e.targetId); if (m) m.hp = e.targetHp; state.targetWildId = Number(e.attackerId) }
+      state.flashes.push({ at: e.attacker === 'player' ? state.wilds.get(Number(e.targetId))?.position : p.position, until: performance.now() + 250 })
+      break
+    }
+    case 'wildDefeated': case 'captured': case 'skipped': if (e.type !== 'skipped') state.wilds.delete(e.wildId); if (state.targetWildId === e.wildId) state.targetWildId = null; break
+    case 'itemUsed': { const m = p.team.find((x) => x.id === e.pokemonId); if (m) m.hp = e.hp; break }
+    case 'switched': p.activeIndex = p.team.findIndex((x) => x.id === e.pokemonId); break
+    case 'healed': p.team.forEach((m) => { m.hp = m.hpMax }); p.mode = 'searching'; break
+    case 'returning': p.mode = 'returning'; state.targetWildId = null; break
+    case 'levelUp': { const m = p.team.find((x) => x.id === e.pokemonId); if (m) m.level = e.level; break }
+    case 'evolved': { const m = p.team.find((x) => x.id === e.pokemonId); if (m) m.speciesName = e.to; break }
+    case 'stopped': p.mode = 'stopped'; break
+  }
+}
+
+function draw() {
+  const canvas = $('map'), ctx = canvas.getContext('2d')
+  if (!state.map || !state.atlasImg) { requestAnimationFrame(draw); return }
+  const { map, atlas } = state
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  const blit = (name, x, y) => { const f = atlas.frames[name]; if (!f) return; ctx.drawImage(state.atlasImg, f.frame.x, f.frame.y, f.frame.w, f.frame.h, x * TILE, y * TILE, TILE, TILE) }
+  for (let i = 0; i < map.width * map.height; i++) {
+    const x = i % map.width, y = Math.floor(i / map.width)
+    if (map.layers.ground[i]) blit(map.layers.ground[i], x, y)
+    if (map.layers.detail[i]) blit(map.layers.detail[i], x, y)
+    if ($('showBlocking').checked && map.layers.blocking[i]) { ctx.fillStyle = 'rgba(255,0,0,.35)'; ctx.fillRect(x * TILE, y * TILE, TILE, TILE) }
+  }
+  ctx.fillStyle = 'rgba(80,160,255,.6)'; ctx.fillRect(map.pokecenter.x * TILE, map.pokecenter.y * TILE, TILE, TILE)
+  ctx.font = '11px monospace'
+  const bar = (x, y, hp, hpMax, color) => { if (hp == null || !hpMax) return; ctx.fillStyle = '#000'; ctx.fillRect(x * TILE, y * TILE - 6, TILE, 4); ctx.fillStyle = color; ctx.fillRect(x * TILE, y * TILE - 6, TILE * Math.max(0, hp / hpMax), 4) }
+  for (const w of state.wilds.values()) {
+    ctx.fillStyle = w.id === state.targetWildId ? '#ff4' : '#f66'
+    ctx.beginPath(); ctx.arc(w.position.x * TILE + 16, w.position.y * TILE + 16, 10, 0, Math.PI * 2); ctx.fill()
+    ctx.fillStyle = '#fff'; ctx.fillText(`${w.speciesName} L${w.level}`, w.position.x * TILE - 4, w.position.y * TILE + 30)
+    bar(w.position.x, w.position.y, w.hp, w.hpMax, '#f66')
+  }
+  if (state.player) {
+    const p = state.player, m = p.team[p.activeIndex]
+    ctx.fillStyle = p.mode === 'fighting' ? '#f90' : p.mode === 'returning' ? '#9cf' : p.mode === 'healing' ? '#6f6' : '#fff'
+    ctx.fillRect(p.position.x * TILE + 6, p.position.y * TILE + 6, 20, 20)
+    ctx.fillStyle = '#fff'; ctx.fillText(`${m.speciesName} ${p.mode}`, p.position.x * TILE - 8, p.position.y * TILE - 8)
+    bar(p.position.x, p.position.y, m.hp, m.hpMax, '#6f6')
+  }
+  const now = performance.now()
+  state.flashes = state.flashes.filter((f) => f.until > now && f.at)
+  for (const f of state.flashes) { ctx.strokeStyle = '#ff0'; ctx.lineWidth = 3; ctx.strokeRect(f.at.x * TILE, f.at.y * TILE, TILE, TILE) }
+  requestAnimationFrame(draw)
+}
+
+function connect() {
+  if (state.ws) state.ws.close()
+  const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`)
+  state.ws = ws
+  ws.onopen = () => setStatus('conectado')
+  ws.onclose = (e) => setStatus(`fechado ${e.code} ${e.reason}`)
+  ws.onmessage = async (ev) => {
+    const msg = JSON.parse(ev.data)
+    switch (msg.t) {
+      case 'hunt.idle': setStatus('sem hunt'); break
+      case 'hunt.catchup': setStatus(`catch-up: ${msg.ticksRemaining} ticks restantes`); break
+      case 'hunt.summary': log('stopped', `resumo do catch-up: ${JSON.stringify(msg.summary)}`); break
+      case 'hunt.snapshot': await loadMap(msg.session.huntId); applySnapshot(msg); setStatus(`hunt ${msg.session.huntId} tick ${msg.state.tick}`); break
+      case 'hunt.tick': for (const e of msg.events) { applyEvent(e); if (e.type !== 'moved') log(e.type, `#${e.tick} ${JSON.stringify(e)}`) } break
+      case 'hunt.stopped': log('stopped', `hunt parada: ${msg.reason}${msg.healed ? ' (time curado)' : ''}`); setStatus(`parada: ${msg.reason}`); break
+      case 'error': log('attack', `erro: ${msg.code} ${msg.message}`); break
+    }
+  }
+}
+
+const send = (obj) => state.ws?.readyState === 1 && state.ws.send(JSON.stringify(obj))
+const creds = () => ({ email: $('email').value, password: $('password').value })
+$('auth').addEventListener('submit', async (e) => { e.preventDefault(); try { await api('POST', '/auth/login', creds()); setStatus('logado'); connect() } catch (err) { setStatus(String(err.message)) } })
+$('register').addEventListener('click', async () => { try { await api('POST', '/auth/register', { ...creds(), name: $('name').value }); setStatus('registrado'); connect() } catch (err) { setStatus(String(err.message)) } })
+$('logout').addEventListener('click', async () => { await api('POST', '/auth/logout'); state.ws?.close(); setStatus('saiu') })
+$('choose').addEventListener('click', async () => { try { const r = await api('POST', '/trainer/starter', { species: $('starter').value }); log('captured', `inicial: ${r.pokemon.speciesName} L${r.pokemon.level}`) } catch (err) { setStatus(String(err.message)) } })
+$('start').addEventListener('click', async () => { try { await api('POST', '/hunts/route-1/start') } catch (err) { setStatus(String(err.message)) } })
+$('stop').addEventListener('click', () => send({ t: 'hunt.stop' }))
+requestAnimationFrame(draw)
+```
+Regras: sem bibliotecas, sem inline script/style (CSP), os `fetch` são same-origin (o navegador manda `Origin`, então o check S11 passa). O `id` dos selvagens vem como número no snapshot e como string em `attackerId`/`targetId` dos eventos `attack` (o motor usa `String(wild.id)` lá): por isso o `Number(...)`. Confira em `src/engine/combat.ts` como `attackerId`/`targetId` são preenchidos e ajuste se for diferente.
+
+- [ ] **Step 5: README e verificação**
+
+README: subseção "Visualizador de depuração" (DEBUG_VIEWER, `pnpm assets build` para gerar `assets/atlas` se ainda não existir, abrir `http://localhost:3000/debug/`, registrar, inicial, iniciar, o que cada cor significa; não é o cliente da fase 3).
+Run: `pnpm --filter @pokeidle/server test && pnpm --filter @pokeidle/server typecheck`. Smoke manual (obrigatório, com evidência no relatório): subir o servidor com `DEBUG_VIEWER=true`, abrir a página, registrar, escolher inicial, iniciar a Rota 1, ver o marcador andar e o log receber `attack`/`wildDefeated`; tirar um screenshot e salvar em `.superpowers/sdd/2026-09-14-fase-2c-realtime/debug-viewer.png` (fora do repo). Se o atlas não existir em `assets/atlas`, gere com o comando do README de `tools/assets` (`pnpm assets build --extracted assets/extracted-otp2019 ...`, ver `tools/assets/README.md`) e diga no relatório.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add packages/server .env.example
+git commit -m "feat(server): visualizador de depuração da hunt em /debug"
+```
+
+## Adendo à autorrevisão (Task 7)
+
+Cobre o pedido do usuário de validar visualmente a hunt antes da fase 3. Consome só dados públicos (mapa, atlas) e as rotas já existentes; não cria estado nem contorna auth (a página usa o cookie como qualquer cliente). Estrutura de arquivos ganha `public/debug/*` e `routes/debug.ts`; `Config` ganha `DEBUG_VIEWER`/`ASSETS_DIR`; `app.ts` registra sob a flag. Tipos: `RouteDeps.registry` (Task 4) é o que `debugRoutes` lê.

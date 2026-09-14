@@ -35,6 +35,7 @@ Decisões desta fase (respostas do usuário em 2026-09-14):
 | `ws.ts` | Rota `GET /ws` (`@fastify/websocket`): Origin check e `requireAuth` no handshake; loop de mensagens com rate limit, contador de inválidas, ping/pong, revalidação de sessão; despacho para `actions`. |
 | `actions.ts` | Compartilhado por REST e WS: `startAndAttach(deps, trainerId, huntId)`, `stopViaScheduler(deps, trainerId)` (fallback `stopHunt` do banco se não há runner), `applySettings(deps, trainerId, patch)` (banco + intent se há runner), `useItem(deps, trainerId, itemId)`, `setActive(deps, trainerId, pokemonId)`, `activeView(deps, trainerId)` (runner se existe, senão banco). |
 | `scheduler.ts` | `createScheduler({ db, registry, now, logger, sockets }): Scheduler` com `start()`, `stop()`, `tick(): Promise<void>` (um tick de todos os runners; exposto para testes), `attach(trainerId): Promise<void>` (carrega `loadActive`, cria runner, decide catch-up), `detach(trainerId)`, `applyIntent(trainerId, intent): IntentResult`, `finish(trainerId, reason)`, `get(trainerId): Runner \| undefined`, `flushAll(): Promise<void>`. Um `setInterval(TICK_MS)`; mede lag e loga aviso acima de `TICK_LAG_WARN_MS`. |
+| `http/routes/debug.ts` + `public/debug/` | Visualizador de depuração (pedido do usuário em 2026-09-14): página estática servida só com `DEBUG_VIEWER=true` que faz login pelo REST, abre o `/ws` e desenha o mapa (atlas de tiles de `ASSETS_DIR`) com marcadores do jogador e dos selvagens a partir de `hunt.snapshot` + eventos. Dados servidos: `GET /debug/map/:id` (HuntMap do registro) e `GET /debug/atlas/:file` (allowlist fixa). Não é o cliente da fase 3; não cria estado nem contorna auth. |
 | `boot.ts` | `recoverSessions(scheduler, db, now)`: lê `hunt_sessions` por `last_simulated_at` asc e faz `attach` de cada; snapshot corrompido → `finish` sem sync + log. `installShutdown(app, scheduler, close)`: SIGINT/SIGTERM → `scheduler.stop()` → `flushAll` → `closeAll(1001)` → `app.close()` → pool. |
 
 Regra de dependência: `http → actions → scheduler → persist | catchup → hunt-store | engine`;
@@ -177,6 +178,6 @@ tenta de novo); três falhas seguidas → `finish` sem sync.
 
 ## 9. Fora do escopo
 
-Cliente (fase 3), box para capturas com time cheio, compensação de drift, partição por
+Cliente de verdade (fase 3; o `/debug` é só validação), box para capturas com time cheio, compensação de drift, partição por
 processo/worker (as sessões não compartilham estado, então é possível depois), `trainer.update`
 como mensagem separada (os eventos e o snapshot já carregam xp/ouro), chat, ranking.

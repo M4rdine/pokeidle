@@ -93,7 +93,10 @@ describe('attach / tick / persist', () => {
     expect(scheduler.get(trainerId)!.state).toEqual(ref.state)
     expect(scheduler.get(trainerId)!.catchingUp).toBe(false)
     const types = msgs(s).map((m) => m.t)
-    expect(msgs(s).filter((m) => m.t === 'hunt.catchup').map((m) => (m as unknown as { ticksRemaining: number }).ticksRemaining)).toEqual([3000, 1000, 0])
+    const catchupTicks = msgs(s).filter((m) => m.t === 'hunt.catchup').map((m) => (m as unknown as { ticksRemaining: number }).ticksRemaining)
+    expect(catchupTicks[0]).toBe(3000)
+    expect(catchupTicks.at(-1)).toBe(0)
+    expect(catchupTicks.length).toBe(13) // 1 inicial (attach) + 12 fatias (3000 / CATCHUP_SLICE_TICKS)
     expect(types.slice(-2)).toEqual(['hunt.summary', 'hunt.snapshot'])
     await scheduler.whenIdle(trainerId)
     expect((await loadActive(db, trainerId))!.state.tick).toBe(3000)
@@ -310,8 +313,8 @@ describe('contenção de erros e seams de teste', () => {
     expect(types).not.toContain('hunt.snapshot')
     await abortingScheduler.idle()
     const active = (await loadActive(db, trainerId))!
-    expect(active.state.tick).toBe(2000)
-    expect(active.lastSimulatedAt).toEqual(new Date(T0.getTime() + 2000 * TICK_MS))
+    expect(active.state.tick).toBe(250) // uma fatia (CATCHUP_SLICE_TICKS): stop() dispara no 1º yieldNow
+    expect(active.lastSimulatedAt).toEqual(new Date(T0.getTime() + 250 * TICK_MS))
   })
   it('tick: erro no motor remove o runner, preserva a sessão e notifica o socket', async () => {
     const s2 = createScheduler({ db, registry: brokenRegistry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve() })

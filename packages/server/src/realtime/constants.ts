@@ -1,6 +1,6 @@
 export const SNAPSHOT_EVERY_TICKS = 50
 export const SYNC_EVERY_TICKS = 300
-export const CATCHUP_SLICE_TICKS = 2000
+export const CATCHUP_SLICE_TICKS = 250
 export const MAX_CATCHUP_TICKS = 216_000
 export const MIN_CATCHUP_TICKS = 5
 export const INTENT_MIN_INTERVAL_MS = 200

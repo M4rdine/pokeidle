@@ -116,8 +116,8 @@ cada 30 s, sem `pong` em 60 s → fecha com 1001; a cada 5 min o socket revalida
 
 `attach(trainerId)`: `loadActive` → `ticksOwed = ticksOwedSince(lastSimulatedAt, now)`. Se
 `ticksOwed < MIN_CATCHUP_TICKS`, o runner entra direto. Senão nasce com `catchingUp: true`
-(o timer o ignora) e `catchUp` roda: fatias de 2 000 ticks separadas por `setImmediate`
-(≈10 ms de CPU cada; 12 h ≈ 108 fatias), `Summary` e `pendingLog` acumulados, `hunt.catchup
+(o timer o ignora) e `catchUp` roda: fatias de 250 ticks separadas por `setImmediate`
+(≈7 ms de CPU cada; 12 h ≈ 864 fatias), `Summary` e `pendingLog` acumulados, `hunt.catchup
 { ticksRemaining }` por fatia. Ao terminar: `flushRunner({ sync: true })`, `hunt.summary`,
 `hunt.snapshot`, `catchingUp: false`. `stopped` no meio → `finish` com a mesma regra de cura.
 Mesma seed e mesmo `rngState` do snapshot ⇒ resultado idêntico ao que teria acontecido online.

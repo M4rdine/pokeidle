@@ -5,7 +5,8 @@ import './styles/modals.css'
 import { loadRegistry } from '@pokeidle/shared'
 import { HuntsSchema, MeSchema } from './api/dto.js'
 import { ApiError, createHttp } from './api/http.js'
-import { createContext, type AppContext } from './app-context.js'
+import { createContext, type AppContext, type ModalName } from './app-context.js'
+import { createGameLoop, type GameLoop } from './game-loop.js'
 import { loadAtlas } from './scene/atlas.js'
 import { emptyHuntView } from './state/hunt-view.js'
 import { initialSession, withMe } from './state/session.js'
@@ -64,6 +65,14 @@ async function boot(): Promise<void> {
     go: refreshMe,
     ...(atlas && { atlas }),
   })
+  const loop: GameLoop = createGameLoop(ctx, {
+    makeSocket: (url) => new WebSocket(url) as unknown as import('./api/ws.js').WebSocketLike,
+    setTimeout: (fn, ms) => setTimeout(fn, ms),
+    clearTimeout: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
+    random: Math.random,
+  })
+  ctx = { ...ctx, loop, sendIntent: loop.send, openModal: (_name: ModalName) => {} }
+  ctx.session.subscribe((s) => s.me !== null, (logged) => { if (logged) loop.start(); else loop.stop() })
   ctx.session.subscribe((s) => s.screen, () => render())
   await refreshMe()
 }

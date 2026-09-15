@@ -1,6 +1,7 @@
 import { loadRegistry, type Registry } from '@pokeidle/shared'
 import type { ClientMessage } from '@pokeidle/shared/protocol'
 import type { Http } from './api/http.js'
+import type { GameLoop } from './game-loop.js'
 import type { AtlasData } from './scene/atlas.js'
 import { emptyHuntView, type HuntView } from './state/hunt-view.js'
 import type { LogLine } from './state/log.js'
@@ -23,6 +24,7 @@ export interface AppContext {
   readonly go: () => Promise<void>
   readonly openModal?: (name: ModalName) => void
   readonly sendIntent?: (message: ClientMessage) => void
+  readonly loop?: GameLoop
 }
 
 const emptySheet = { frames: {}, animations: {}, meta: { image: 'pokemon.png', size: { w: 0, h: 0 }, scale: '1' } }

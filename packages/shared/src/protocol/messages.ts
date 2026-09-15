@@ -3,6 +3,7 @@ import { z } from 'zod'
 const percent = z.number().int().min(0).max(100)
 export const SettingsPatchSchema = z.object({
   returnHpPercent: percent.optional(),
+  potionHpPercent: percent.optional(),
   capture: z.object({ ballTier: z.enum(['poke', 'great', 'ultra', 'best']).optional(), maxWildHpPercent: percent.optional(), allowDuplicates: z.boolean().optional() }).strict().optional(),
 }).strict()
 export type SettingsPatch = z.infer<typeof SettingsPatchSchema>

@@ -18,7 +18,7 @@ export const trainerRoutes: FastifyPluginAsync<RouteDeps> = async (app, deps) =>
   const { db, now, registry } = deps
   const guard = { preHandler: requireAuth }
 
-  app.get('/me', guard, async (request) => getMe(db, authOf(request)))
+  app.get('/me', guard, async (request) => getMe(db, registry, authOf(request)))
 
   app.post('/trainer/starter', guard, async (request, reply) => {
     const { species } = parseBody(StarterSchema, request.body)
@@ -30,7 +30,7 @@ export const trainerRoutes: FastifyPluginAsync<RouteDeps> = async (app, deps) =>
 
   app.put('/trainer/team', guard, async (request) => {
     const { slots } = parseBody(TeamOrderSchema, request.body)
-    return teamDto(await setTeamOrder(db, authOf(request).trainer.id, slots, now()))
+    return teamDto(await setTeamOrder(db, registry, authOf(request).trainer.id, slots, now()))
   })
 
   app.patch('/trainer/settings', guard, async (request) => {

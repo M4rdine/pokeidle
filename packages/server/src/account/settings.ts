@@ -10,6 +10,7 @@ export async function updateSettings(db: Db, trainerId: string, patch: SettingsP
   const set = {
     updatedAt: now,
     ...(patch.returnHpPercent !== undefined && { returnHpPercent: patch.returnHpPercent }),
+    ...(patch.potionHpPercent !== undefined && { potionHpPercent: patch.potionHpPercent }),
     ...(patch.capture?.ballTier !== undefined && { ballTier: patch.capture.ballTier }),
     ...(patch.capture?.maxWildHpPercent !== undefined && { maxWildHpPercent: patch.capture.maxWildHpPercent }),
     ...(patch.capture?.allowDuplicates !== undefined && { allowDuplicates: patch.capture.allowDuplicates }),

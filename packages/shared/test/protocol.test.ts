@@ -16,8 +16,11 @@ describe('HuntStateSchema', () => {
     expect(() => HuntStateSchema.parse({ ...state, hack: 1 })).toThrow()
   })
   it('aplica padrões aos campos novos de snapshots antigos', () => {
-    const old = JSON.parse(JSON.stringify(state)) as Record<string, unknown>
-    const parsed = HuntStateSchema.parse(old)
+    const old = JSON.parse(JSON.stringify(state)) as Record<string, unknown> & { settings: Record<string, unknown> }
+    // Remove os campos novos de forma imutável para simular um snapshot salvo antes deles existirem.
+    const { box: _b, ...rest } = old
+    const { potionHpPercent: _p, teamSlots: _t, ...settings } = old.settings
+    const parsed = HuntStateSchema.parse({ ...rest, settings })
     expect(parsed.box).toEqual([])
     expect(parsed.settings.potionHpPercent).toBe(50)
     expect(parsed.settings.teamSlots).toBe(6)

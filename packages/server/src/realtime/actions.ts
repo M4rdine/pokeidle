@@ -31,6 +31,7 @@ type UpdateSettingsPatch = Extract<Intent, { type: 'updateSettings' }>['patch']
 function toIntentPatch(patch: SettingsPatch): UpdateSettingsPatch {
   return {
     ...(patch.returnHpPercent !== undefined && { returnHpPercent: patch.returnHpPercent }),
+    ...(patch.potionHpPercent !== undefined && { potionHpPercent: patch.potionHpPercent }),
     ...(patch.capture !== undefined && {
       capture: {
         ...(patch.capture.ballTier !== undefined && { ballTier: patch.capture.ballTier }),

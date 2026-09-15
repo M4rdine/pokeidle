@@ -14,7 +14,7 @@ describe('schema', () => {
   it('cria usuário e treinador e apaga em cascata', async () => {
     const [u] = await db.insert(users).values({ email: 'a@a.com', passwordHash: 'x' }).returning()
     const [t] = await db.insert(trainers).values({ userId: u!.id, name: 'Ash' }).returning()
-    expect(t).toMatchObject({ xp: 0, gold: 0, returnHpPercent: 30, ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false })
+    expect(t).toMatchObject({ xp: 0, gold: 0, returnHpPercent: 50, ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false })
     await db.delete(users).where(eq(users.id, u!.id))
     expect(await db.select().from(trainers)).toEqual([])
   })

@@ -22,6 +22,13 @@ async function syncInventory(tx: Tx, trainerId: string, state: HuntState, now: D
   await tx.delete(inventory).where(and(eq(inventory.trainerId, trainerId), eq(inventory.quantity, 0)))
 }
 
+async function syncBox(tx: Tx, trainerId: string, state: HuntState, now: Date): Promise<void> {
+  for (const p of state.box) {
+    await tx.insert(pokemon).values({ id: p.id, trainerId, speciesName: p.speciesName, level: p.level, xp: p.xp, hp: p.hp, hpMax: p.hpMax, teamSlot: null, updatedAt: now })
+      .onConflictDoUpdate({ target: pokemon.id, set: { speciesName: p.speciesName, level: p.level, xp: p.xp, hp: p.hp, hpMax: p.hpMax, updatedAt: now } })
+  }
+}
+
 async function syncPokedex(tx: Tx, trainerId: string, state: HuntState, now: Date): Promise<void> {
   const species = new Set([...state.player.team.map((p) => p.speciesName), ...state.settings.seen])
   for (const speciesName of species) {
@@ -33,6 +40,7 @@ async function syncPokedex(tx: Tx, trainerId: string, state: HuntState, now: Dat
 /** Mesma coisa que syncToTables, mas dentro de uma transação já aberta (usado por stopHunt). */
 export async function syncWithin(tx: Tx, trainerId: string, state: HuntState, now: Date): Promise<void> {
   await syncTeam(tx, trainerId, state, now)
+  await syncBox(tx, trainerId, state, now)
   await syncInventory(tx, trainerId, state, now)
   await tx.update(trainers).set({ xp: state.trainer.xp, gold: state.trainer.gold, updatedAt: now }).where(eq(trainers.id, trainerId))
   await syncPokedex(tx, trainerId, state, now)

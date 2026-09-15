@@ -1,5 +1,5 @@
 import { createRng, loadRegistry } from '@pokeidle/shared'
-import { eq } from 'drizzle-orm'
+import { and, eq, isNotNull } from 'drizzle-orm'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { chooseStarter } from '../src/account/starter.js'
 import type { Db } from '../src/db/client.js'
@@ -40,7 +40,7 @@ describe('startHunt', () => {
     const active = await loadActive(db, trainerId)
     expect(active?.state).toMatchObject({
       huntId: 'route-1', sessionId: 'sess-1', tick: 0, trainer: { xp: 10, gold: 7 }, inventory: { 'poke-ball': 5, potion: 3 },
-      settings: { returnHpPercent: 30, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false }, seen: ['charmander'] },
+      settings: { returnHpPercent: 50, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false }, seen: ['charmander'] },
     })
     expect(active?.state.player.team).toEqual([{ id: expect.stringMatching(/^st-/), speciesName: 'charmander', level: 10, xp: expect.any(Number), hp: expect.any(Number), hpMax: expect.any(Number) }])
     expect(active?.state.wilds.length).toBeGreaterThan(0)
@@ -73,6 +73,13 @@ describe('startHunt', () => {
     const rows = await db.select().from(huntSessions).where(eq(huntSessions.trainerId, trainerId))
     expect(rows).toHaveLength(1)
   })
+  it('settings da hunt carregam potionHpPercent e as vagas do nível do treinador', async () => {
+    await db.update(trainers).set({ potionHpPercent: 60, xp: 8000 }).where(eq(trainers.id, trainerId)) // nível 20 → 5 vagas
+    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 1 })
+    const active = (await loadActive(db, trainerId))!
+    expect(active.state.settings).toMatchObject({ potionHpPercent: 60, teamSlots: 5 })
+    expect(active.state.box).toEqual([])
+  })
 })
 
 describe('snapshot e sync', () => {
@@ -82,6 +89,19 @@ describe('snapshot e sync', () => {
     const active = (await loadActive(db, trainerId))!
     await syncToTables(db, trainerId, active.state, new Date(T0.getTime() + 1000))
     expect(await snapshotRows()).toEqual(before)
+  })
+  it('box sincroniza como mochila de Pokémon (team_slot nulo) e é idempotente', async () => {
+    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 1 })
+    const active = (await loadActive(db, trainerId))!
+    const boxed = { id: 's-w99', speciesName: 'zubat', level: 4, xp: 100, hp: 18, hpMax: 18 }
+    const state = { ...active.state, box: [boxed] }
+    await syncToTables(db, trainerId, state, T0)
+    await syncToTables(db, trainerId, state, T0)
+    const rows = await db.select().from(pokemon).where(eq(pokemon.id, 's-w99'))
+    expect(rows).toHaveLength(1)
+    expect(rows[0]).toMatchObject({ trainerId, speciesName: 'zubat', level: 4, teamSlot: null })
+    const team = await db.select().from(pokemon).where(and(eq(pokemon.trainerId, trainerId), isNotNull(pokemon.teamSlot)))
+    expect(team).toHaveLength(1) // o inicial continua no time
   })
   it('após 3000 ticks o banco reflete xp, nível, hp, captura, inventário, ouro e pokédex', async () => {
     // seed 1: a seed 42 sugerida pelo brief não captura nada com Charmander nível 10 (inicial);

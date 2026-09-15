@@ -39,7 +39,12 @@ function resolveLowHp(state: HuntState, deps: EngineDeps): StepResult {
   const hpPercent = (active.hp / active.hpMax) * 100
   if (hpPercent < state.settings.potionHpPercent) {
     const potion = choosePotion(state, deps.registry, active)
-    if (potion) { const r = applyPotion(state, deps.registry, potion.id); return 'error' in r ? { state, events: [] } : r }
+    if (potion) {
+      const r = applyPotion(state, deps.registry, potion.id)
+      // Erro de applyPotion (estoque zerado entre a escolha e a aplicação etc.) é engolido de
+      // propósito aqui: o tick segue como se não houvesse poção, sem lançar nem entrar em returning.
+      return 'error' in r ? { state, events: [] } : r
+    }
   }
   if (hpPercent >= state.settings.returnHpPercent) return { state, events: [] }
   return { state: { ...state, player: { ...state.player, mode: 'returning', targetWildId: null, path: [] } }, events: [{ type: 'returning', tick: state.tick }] }

@@ -23,6 +23,15 @@ describe('createHuntState', () => {
     expect(s.settings.returnHpPercent).toBe(100)
     expect(s.settings.capture.maxWildHpPercent).toBe(0)
   })
+  it('clampa potionHpPercent para [0, 100] e teamSlots para [1, 6] arredondando', () => {
+    const deps = miniDeps()
+    const make = (over: Partial<ReturnType<typeof defaultSettings>>) =>
+      createHuntState({ hunt: deps.hunt, sessionId: 'mini', team: [charmander5()], inventory: {}, settings: { ...defaultSettings(), ...over } }, deps).settings
+    expect(make({ potionHpPercent: 150 }).potionHpPercent).toBe(100)
+    expect(make({ teamSlots: 0 }).teamSlots).toBe(1)
+    expect(make({ teamSlots: 9 }).teamSlots).toBe(6)
+    expect(make({ teamSlots: 2.6 }).teamSlots).toBe(3)
+  })
   it('carrega xp e ouro absolutos do treinador quando informados', () => {
     const deps = miniDeps()
     const s = createHuntState({ hunt: deps.hunt, sessionId: 'mini', team: [charmander5()], inventory: {}, trainer: { xp: 120, gold: 45 } }, deps)

@@ -2,7 +2,7 @@ import { loadRegistry } from '@pokeidle/shared'
 import { eq } from 'drizzle-orm'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { chooseStarter } from '../src/account/starter.js'
-import { huntSessions, pokedexEntries, pokemon } from '../src/db/schema.js'
+import { huntSessions, pokedexEntries, pokemon, trainers } from '../src/db/schema.js'
 import { AppError } from '../src/http/errors.js'
 import { truncateAll } from './helpers/db.js'
 import { api, registerAndLogin, T0, testApp, type TestApp } from './helpers/app.js'
@@ -84,9 +84,9 @@ describe('settings, inventário e pokédex', () => {
   it('PATCH settings mescla e valida', async () => {
     const empty = await api(t.app, cookie).patch('/trainer/settings', {})
     expect(empty.statusCode).toBe(200)
-    expect(empty.json()).toEqual({ settings: { returnHpPercent: 30, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false } } })
+    expect(empty.json()).toEqual({ settings: { returnHpPercent: 50, potionHpPercent: 50, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false } } })
     const r = await api(t.app, cookie).patch('/trainer/settings', { returnHpPercent: 50, capture: { ballTier: 'great' } })
-    expect(r.json()).toEqual({ settings: { returnHpPercent: 50, capture: { ballTier: 'great', maxWildHpPercent: 30, allowDuplicates: false } } })
+    expect(r.json()).toEqual({ settings: { returnHpPercent: 50, potionHpPercent: 50, capture: { ballTier: 'great', maxWildHpPercent: 30, allowDuplicates: false } } })
     expect((await api(t.app, cookie).patch('/trainer/settings', { returnHpPercent: 101 })).statusCode).toBe(400)
     expect((await api(t.app, cookie).patch('/trainer/settings', { capture: { ballTier: 'master' } })).statusCode).toBe(400)
     expect((await api(t.app, cookie).patch('/trainer/settings', { xp: 1 })).statusCode).toBe(400)
@@ -105,5 +105,27 @@ describe('settings, inventário e pokédex', () => {
     expect((await api(t.app).post('/trainer/starter', { species: 'charmander' })).statusCode).toBe(401)
     expect((await api(t.app).put('/trainer/team', { slots: ['x-w1'] })).statusCode).toBe(401)
     expect((await api(t.app).patch('/trainer/settings', { returnHpPercent: 50 })).statusCode).toBe(401)
+  })
+})
+
+describe('nível e destraves', () => {
+  it('/me expõe nível, xpToNext, vagas e próximo destrave', async () => {
+    await t.db.update(trainers).set({ xp: 1000 }).where(eq(trainers.id, trainerId))
+    const me = (await api(t.app, cookie).get('/me')).json() as { trainer: Record<string, unknown> }
+    expect(me.trainer).toMatchObject({ level: 10, xpToNext: 331, teamSlots: 4, nextUnlock: { level: 20, what: expect.stringContaining('5 vagas') }, settings: { potionHpPercent: 50 } })
+  })
+  it('PUT /trainer/team respeita as vagas do nível', async () => {
+    await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
+    await t.db.insert(pokemon).values([1, 2, 3].map((i) => ({ id: `x-w${i}`, trainerId, speciesName: 'zubat', level: 4, xp: 100, hp: 10, hpMax: 18, teamSlot: null })))
+    const ids = (await t.db.select({ id: pokemon.id }).from(pokemon).where(eq(pokemon.trainerId, trainerId))).map((r) => r.id)
+    const r = await api(t.app, cookie).put('/trainer/team', { slots: ids }) // 4 no nível 1 (3 vagas)
+    expect(r.statusCode).toBe(400)
+    expect((r.json() as { error: { message: string } }).error.message).toMatch(/3 vagas/)
+    expect((await api(t.app, cookie).put('/trainer/team', { slots: ids.slice(0, 3) })).statusCode).toBe(200)
+  })
+  it('PATCH settings aceita potionHpPercent', async () => {
+    const r = await api(t.app, cookie).patch('/trainer/settings', { potionHpPercent: 65 })
+    expect(r.json()).toMatchObject({ settings: { potionHpPercent: 65 } })
+    expect((await api(t.app, cookie).patch('/trainer/settings', { potionHpPercent: 101 })).statusCode).toBe(400)
   })
 })

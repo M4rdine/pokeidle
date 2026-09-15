@@ -15,7 +15,7 @@ describe('registro', () => {
   it('cria usuário, treinador, inventário inicial e sessão; e-mail normalizado', async () => {
     const res = await api(t.app).post('/auth/register', good)
     expect(res.statusCode).toBe(201)
-    expect(res.json()).toMatchObject({ user: { email: 'ash@test.dev', role: 'player' }, trainer: { name: 'Ash', xp: 0, gold: 0, hasStarter: false, activeHuntId: null, settings: { returnHpPercent: 30, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false } } } })
+    expect(res.json()).toMatchObject({ user: { email: 'ash@test.dev', role: 'player' }, trainer: { name: 'Ash', xp: 0, gold: 0, hasStarter: false, activeHuntId: null, settings: { returnHpPercent: 50, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false } } } })
     const setCookie = String(res.headers['set-cookie'])
     expect(setCookie).toMatch(/^sid=[A-Za-z0-9_-]{43}; Max-Age=2592000; Path=\/; HttpOnly; SameSite=Lax$/)
     expect(await t.db.select().from(inventory)).toEqual(expect.arrayContaining([expect.objectContaining({ itemId: 'poke-ball', quantity: 5 }), expect.objectContaining({ itemId: 'potion', quantity: 3 })]))

@@ -26,13 +26,14 @@ export const trainers = pgTable('trainers', {
   name: text('name').notNull().unique(),
   xp: integer('xp').notNull().default(0),
   gold: integer('gold').notNull().default(0),
-  returnHpPercent: integer('return_hp_percent').notNull().default(30),
+  returnHpPercent: integer('return_hp_percent').notNull().default(50),
+  potionHpPercent: integer('potion_hp_percent').notNull().default(50),
   ballTier: text('ball_tier', { enum: ['poke', 'great', 'ultra', 'best'] }).notNull().default('best'),
   maxWildHpPercent: integer('max_wild_hp_percent').notNull().default(30),
   allowDuplicates: boolean('allow_duplicates').notNull().default(false),
   createdAt: tsNow('created_at'),
   updatedAt: tsNow('updated_at'),
-})
+}, (t) => [check('trainers_gold_check', sql`${t.gold} >= 0`)])
 
 export const pokemon = pgTable('pokemon', {
   id: text('id').primaryKey(),

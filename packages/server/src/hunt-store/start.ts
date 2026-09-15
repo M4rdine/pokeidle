@@ -1,5 +1,5 @@
 import { randomInt, randomUUID } from 'node:crypto'
-import { createRng, type Registry } from '@pokeidle/shared'
+import { createRng, teamSlotsFor, trainerLevel, type Registry } from '@pokeidle/shared'
 import { and, asc, eq, isNotNull } from 'drizzle-orm'
 import { hasActiveHunt } from '../account/team.js'
 import type { Db } from '../db/client.js'
@@ -28,6 +28,8 @@ export async function startHunt(
   const teamRows = await db.select().from(pokemon).where(and(eq(pokemon.trainerId, trainerId), isNotNull(pokemon.teamSlot))).orderBy(asc(pokemon.teamSlot))
   if (teamRows.length === 0) throw new AppError('no-starter', 'escolha um Pokémon antes de caçar')
   if (!teamRows.some((p) => p.hp > 0)) throw new AppError('validation', 'todo o time está sem HP')
+  const slots = teamSlotsFor(registry.unlocks, trainerLevel(registry.unlocks, trainer.xp))
+  if (teamRows.length > slots) throw new AppError('validation', `o time tem ${slots} vagas no nível atual`)
   const items = await db.select().from(inventory).where(eq(inventory.trainerId, trainerId))
   const dex = await db.select({ species: pokedexEntries.speciesName }).from(pokedexEntries).where(and(eq(pokedexEntries.trainerId, trainerId), isNotNull(pokedexEntries.caughtAt)))
   const sessionId = ids.sessionId ?? randomUUID()
@@ -36,7 +38,7 @@ export async function startHunt(
   const state = createHuntState({
     hunt, sessionId, team: teamRows.map(toPokemonState),
     inventory: Object.fromEntries(items.filter((i) => i.quantity > 0).map((i) => [i.itemId, i.quantity])),
-    settings: toHuntSettings(trainer, dex.map((d) => d.species)), trainer: { xp: trainer.xp, gold: trainer.gold },
+    settings: toHuntSettings(trainer, dex.map((d) => d.species), slots), trainer: { xp: trainer.xp, gold: trainer.gold },
   }, { registry, hunt, rng })
   const [row] = await db.insert(huntSessions).values({ trainerId, huntId, sessionId, state, seed, rngState: rng.state(), startedAt: now, lastSimulatedAt: now })
     .onConflictDoNothing({ target: huntSessions.trainerId }).returning()

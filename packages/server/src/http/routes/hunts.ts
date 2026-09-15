@@ -1,8 +1,7 @@
 import type { HuntMap } from '@pokeidle/shared'
 import type { FastifyPluginAsync } from 'fastify'
 import { z } from 'zod'
-import { trainerDto } from '../../account/dto.js'
-import { trainerExtra } from '../../account/me.js'
+import { trainerView } from '../../account/me.js'
 import { authOf, requireAuth } from '../../auth/plugin.js'
 import { activeView, startAndAttach, stopViaScheduler, toRealtimeDeps, type SessionView } from '../../realtime/actions.js'
 import { parseBody } from '../validate.js'
@@ -32,7 +31,7 @@ export const huntRoutes: FastifyPluginAsync<RouteDeps> = async (app, deps) => {
 
   app.post('/hunts/stop', guard, async (request) => {
     const trainer = await stopViaScheduler(toRealtimeDeps(deps), authOf(request).trainer.id)
-    return { trainer: trainerDto(trainer, await trainerExtra(db, trainer.id)) }
+    return { trainer: await trainerView(db, registry, trainer) }
   })
 
   app.get('/hunts/active', guard, async (request) => {

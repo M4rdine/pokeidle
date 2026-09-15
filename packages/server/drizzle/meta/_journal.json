@@ -8,6 +8,13 @@
       "when": 1789399550806,
       "tag": "0000_freezing_thunderbolts",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789479220999,
+      "tag": "0001_special_network",
+      "breakpoints": true
     }
   ]
 }

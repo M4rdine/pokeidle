@@ -1,7 +1,8 @@
+import { teamSlotsFor, trainerLevel, type Registry } from '@pokeidle/shared'
 import { and, asc, eq, inArray, isNotNull } from 'drizzle-orm'
 import { z } from 'zod'
 import type { Db, DbLike } from '../db/client.js'
-import { huntSessions, pokemon, type PokemonRow } from '../db/schema.js'
+import { huntSessions, pokemon, trainers, type PokemonRow } from '../db/schema.js'
 import { AppError } from '../http/errors.js'
 
 export const TEAM_MAX = 6
@@ -17,8 +18,13 @@ export async function listTeam(db: DbLike, trainerId: string): Promise<{ team: P
   return { team: rows.filter((p) => p.teamSlot !== null), box: rows.filter((p) => p.teamSlot === null) }
 }
 
-export async function setTeamOrder(db: Db, trainerId: string, ids: readonly string[], now: Date): Promise<{ team: PokemonRow[]; box: PokemonRow[] }> {
+export async function setTeamOrder(db: Db, registry: Registry, trainerId: string, ids: readonly string[], now: Date): Promise<{ team: PokemonRow[]; box: PokemonRow[] }> {
   if (await hasActiveHunt(db, trainerId)) throw new AppError('hunt-active', 'pare a hunt antes de mexer no time')
+  const [trainerRow] = await db.select({ xp: trainers.xp }).from(trainers).where(eq(trainers.id, trainerId))
+  if (!trainerRow) throw new AppError('not-found', 'treinador não encontrado')
+  const level = trainerLevel(registry.unlocks, trainerRow.xp)
+  const slots = teamSlotsFor(registry.unlocks, level)
+  if (ids.length > slots) throw new AppError('validation', `o time tem ${slots} vagas no nível ${level}`)
   const owned = await db.select({ id: pokemon.id }).from(pokemon).where(and(eq(pokemon.trainerId, trainerId), inArray(pokemon.id, [...ids])))
   if (owned.length !== ids.length) throw new AppError('not-found', 'Pokémon não encontrado')
   await db.transaction(async (tx) => {

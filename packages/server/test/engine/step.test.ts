@@ -189,6 +189,13 @@ describe('poções e limiares', () => {
     expect(r.state.player.mode).toBe('fighting')
     expect(r.events[0]?.type).toBe('itemUsed')
   })
+  it('limiar exato (hp = 50 % de 20): o < é estrito, então nada acontece com ou sem poção', () => {
+    const withPotion = resolveConsequences(at(10, { potion: 1 }), deps) // 50 % não é < potionHpPercent(50) nem < returnHpPercent(50)
+    expect(withPotion.events).toEqual([])
+    expect(withPotion.state.player.team[0]!.hp).toBe(10)
+    const withoutPotion = resolveConsequences(at(10, {}, { returnHpPercent: 50 }), deps)
+    expect(withoutPotion.events).toEqual([])
+  })
   it('potionHpPercent 150 com HP cheio não lança nem muda o estado', () => {
     const s = at(20, { potion: 1 }, { potionHpPercent: 150 })
     const r = resolveConsequences(s, deps)

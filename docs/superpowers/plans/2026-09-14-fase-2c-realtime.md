@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- `TICK_MS = 200` (do `shared`); `SNAPSHOT_EVERY_TICKS = 50`; `SYNC_EVERY_TICKS = 300`; `CATCHUP_SLICE_TICKS = 2000`; `MAX_CATCHUP_TICKS = 216_000`; `MIN_CATCHUP_TICKS = 5`; `INTENT_MIN_INTERVAL_MS = 200`; `WS_MAX_MESSAGE_BYTES = 4096`; `WS_MAX_INVALID_IN_A_ROW = 3`; `WS_PING_MS = 30_000`; `WS_PONG_TIMEOUT_MS = 60_000`; `WS_SESSION_RECHECK_MS = 300_000`; `TICK_LAG_WARN_MS = 1000`; `PERSIST_MAX_FAILURES = 3`.
+- `TICK_MS = 200` (do `shared`); `SNAPSHOT_EVERY_TICKS = 50`; `SYNC_EVERY_TICKS = 300`; `CATCHUP_SLICE_TICKS = 250`; `MAX_CATCHUP_TICKS = 216_000`; `MIN_CATCHUP_TICKS = 5`; `INTENT_MIN_INTERVAL_MS = 200`; `WS_MAX_MESSAGE_BYTES = 4096`; `WS_MAX_INVALID_IN_A_ROW = 3`; `WS_PING_MS = 30_000`; `WS_PONG_TIMEOUT_MS = 60_000`; `WS_SESSION_RECHECK_MS = 300_000`; `TICK_LAG_WARN_MS = 1000`; `PERSIST_MAX_FAILURES = 3`.
 - Ordem no tick: `step` → eventos aos sockets (`hunt.tick`) → save/sync encadeados (o tick não espera o banco) → `stopped` ⇒ `finish`. Parada por `team-fainted` cura o time (`hp = hp_max`) no flush final; `intent`, `no-route`, `corrupt`, `persist-failed` não curam. `corrupt` e `persist-failed` não sincronizam.
 - Toda escrita de um treinador passa pela cadeia `persistChain` daquele treinador; `finishRunner` bloqueia a linha de `hunt_sessions` com `FOR UPDATE`; o `rngState` gravado é o capturado no momento de enfileirar, nunca lido depois.
 - Catch-up: `ticksOwed = min(MAX_CATCHUP_TICKS, floor((now − lastSimulatedAt) / TICK_MS))`; abaixo de `MIN_CATCHUP_TICKS` entra direto; fatias de `CATCHUP_SLICE_TICKS` com `setImmediate` entre elas; `Summary` acumulado por soma, nunca um array de eventos; `stopped` no meio encerra; resultado idêntico a `simulate(N)` com a mesma seed e `rngState`.

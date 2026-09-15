@@ -149,6 +149,12 @@ treinador normalmente, em vez de propagar o erro.
 banco de teste; `test/helpers/db.ts` roda as migrations e trunca todas as tabelas
 entre os testes.
 
+Runs de teste concorrentes contra o mesmo Postgres se truncam: o `truncate ... restart
+identity cascade` de um `beforeEach` pode rodar no meio de uma transação em voo de outro
+processo de teste e as duas colidem (foreign key error ou deadlock 40P01), além de um
+apagar dados que o outro ainda está usando. Rode um `vitest run` por vez neste pacote —
+nunca dois em paralelo (nem em background) contra o mesmo `DATABASE_URL_TEST`.
+
 ### Segurança
 
 Critérios S1–S20 (números só do servidor, isolamento entre contas, segredo do PRNG,
@@ -194,7 +200,7 @@ o nono é fechado com 1013.
 |---|---|
 | `hunt.idle` | ao conectar sem hunt ativa |
 | `hunt.snapshot` | ao conectar com hunt ativa (sem catch-up pendente) |
-| `hunt.catchup` | ao conectar durante um catch-up, e a cada fatia dele |
+| `hunt.catchup` | ao conectar durante um catch-up, e a cada fatia dele; `ticksRemaining` é sempre o restante real (nunca `-1`) |
 | `hunt.tick` | a cada tick com eventos (`spawned`, `attack`, `captured`, etc.) |
 | `hunt.summary` | ao fim de um catch-up, resumo agregado do período perdido |
 | `hunt.stopped` | a hunt terminou (`reason` + `healed`) |
@@ -214,7 +220,16 @@ de ticks simulados; sync completo nas tabelas relacionais (`pokemon`, `inventory
 `trainers`, `pokedex_entries`, `hunt_log`) a cada 60 s e sempre que a hunt para. Ao
 reconectar (ou no boot) depois de um hiato, o servidor faz catch-up determinístico do
 tempo perdido em fatias de `CATCHUP_SLICE_TICKS`, com teto de 12 h por sessão
-(`MAX_CATCHUP_TICKS`); cada fatia manda `hunt.catchup` com o tanto que ainda falta.
+(`MAX_CATCHUP_TICKS`); cada fatia manda `hunt.catchup` com o tanto que ainda falta. Um
+`hunt.stop` (ou qualquer `finish`) que chega enquanto o catch-up ainda está em voo espera
+ele terminar antes de agir — encerra com o estado que o catch-up de fato alcançou, nunca
+com o estado de antes dele começar.
+
+Um sync que falha (banco fora do ar, por exemplo) devolve as entradas de `hunt_log`
+daquele período ao runner em memória em vez de perdê-las — o próximo sync bem-sucedido as
+grava de novo, na ordem original, sem duplicar. `hunt_log` é gravado em lotes de
+`LOG_INSERT_CHUNK` (500) linhas dentro da mesma transação, para não estourar o teto de
+65 535 parâmetros por `statement` do Postgres num catch-up longo.
 
 ### Fim de hunt
 

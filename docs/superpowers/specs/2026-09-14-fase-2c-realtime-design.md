@@ -79,7 +79,10 @@ número de runners; sem compensação. O relógio de parede do save (`now()`) é
 Handshake `GET /ws`: `Origin` igual a `APP_ORIGIN` (senão 403, sem upgrade); cookie `sid`
 válido (senão 401). Vários sockets por treinador são permitidos; todos recebem o mesmo
 broadcast. Ao abrir, o servidor envia um destes: `hunt.snapshot` (há runner),
-`hunt.catchup { ticksRemaining }` (em catch-up) ou `hunt.idle` (sem hunt).
+`hunt.catchup { ticksRemaining }` (em catch-up) ou `hunt.idle` (sem hunt). `ticksRemaining`
+é sempre o restante real do catch-up em andamento (lido do runner em memória), nunca um
+valor sentinela como `-1` — um cliente que conecta no meio de um catch-up já sabe quanto
+falta desde a primeira mensagem.
 
 Envelope `{ t: string, ...campos }`, JSON, ≤ 4 KB, Zod `.strict()`.
 
@@ -122,6 +125,14 @@ cada 30 s, sem `pong` em 60 s → fecha com 1001; a cada 5 min o socket revalida
 `hunt.snapshot`, `catchingUp: false`. `stopped` no meio → `finish` com a mesma regra de cura.
 Mesma seed e mesmo `rngState` do snapshot ⇒ resultado idêntico ao que teria acontecido online.
 
+Um `finish` (ex.: `hunt.stop` do cliente) que chega enquanto o catch-up ainda está em voo
+espera o catch-up terminar antes de agir, em vez de apagar a sessão com o runner de antes do
+catch-up (que ainda estava no tick 0): o scheduler guarda a promise do `attach` em andamento
+por treinador e uma geração por treinador; `finish`/`detach` esperam essa promise (quando
+existir) e então invalidam a geração, de forma que nenhuma fatia de catch-up que ainda não
+rodou ressuscite um runner que acabou de ser removido. `finish` encerra com o estado que o
+catch-up de fato alcançou (xp, log, etc.), não com o estado com que a hunt entrou no catch-up.
+
 Boot: `main.ts` → migrations → `buildApp` → `listen` → `recoverSessions` (mais antigas
 primeiro; snapshot corrompido → `finish` sem sync e log de erro). Shutdown: `scheduler.stop()`
 (para o timer, sinaliza os catch-ups a parar após a fatia atual), `flushAll` com sync
@@ -154,7 +165,13 @@ que enviou. Erro inesperado dentro de `step` é bug do motor e poderia corromper
 de erro com `trainerId`, o runner é removido da memória SEM apagar a sessão
 (o snapshot anterior fica) e os sockets recebem `error { code: 'internal' }`; o próximo boot
 tenta de novo. Erros de banco no `persistChain`: logados, a cadeia continua (o próximo save
-tenta de novo); três falhas seguidas → `finish` sem sync.
+tenta de novo); três falhas seguidas → `finish` sem sync. Um sync que falha (ex.: banco fora
+do ar) devolve as entradas de `pendingLog` daquele snapshot ao runner em memória — sem isto,
+`markSaved` já tinha zerado o log antes do flush rodar, e as derrotas/capturas daquele
+período seriam perdidas para sempre; o próximo sync bem-sucedido as inclui de novo, na ordem
+original. `insertLog` grava `hunt_log` em lotes de `LOG_INSERT_CHUNK` (500) linhas, todos na
+mesma transação: um `pendingLog` grande (acumulado num catch-up longo) facilmente passa do
+teto de 65 535 parâmetros por `statement` do Postgres numa única chamada.
 
 ## 8. Testes
 

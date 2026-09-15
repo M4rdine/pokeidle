@@ -108,9 +108,12 @@ nenhum nesse caso — persistir a captura cabe a quem consome o evento.
 | `POST /auth/logout` | — | — |
 | `GET /me` | sim | `unauthorized` |
 | `POST /trainer/starter` | sim | `validation`, `not-found`, `starter-already-chosen` |
-| `GET/PUT /trainer/team` | sim | `validation`, `not-found`, `hunt-active` |
+| `GET/PUT /trainer/team` | sim | `validation`, `not-found`, `hunt-active` (limitado às vagas do nível, `unlocks.json`) |
 | `PATCH /trainer/settings` | sim | `validation` |
 | `GET /trainer/inventory` \| `/trainer/pokedex` | sim | — |
+| `GET /shop` | sim | — |
+| `POST /shop/buy` | sim | `validation`, `not-found`, `locked`, `insufficient-gold`, `hunt-active` |
+| `POST /shop/sell` | sim | `validation`, `not-found`, `hunt-active` |
 | `GET /hunts` | sim | — |
 | `POST /hunts/:id/start` | sim | `not-found`, `no-starter`, `hunt-active`, `validation` |
 | `POST /hunts/stop` | sim | `no-hunt` |
@@ -122,6 +125,14 @@ Rotas que mudam estado exigem o cabeçalho `Origin` igual a `APP_ORIGIN` (S11); 
 o erro é `forbidden` (403). `GET /hunts/active` e `POST /hunts/:id/start` nunca
 devolvem `seed`/`rngState` — só `huntId`, `sessionId`, `startedAt` e o `state` público
 do motor (S3).
+
+`GET /me` devolve, além dos dados básicos do treinador, `level`, `xpToNext`,
+`teamSlots` e `nextUnlock` (calculados de `unlocks.json` via `trainerProgress`) e
+`settings.potionHpPercent`; `PATCH /trainer/settings` aceita `potionHpPercent` no
+corpo. A loja do Centro Pokémon (`GET /shop`, `POST /shop/buy`, `POST /shop/sell`) só
+funciona sem hunt ativa (S31) e roda inteira dentro de uma transação com
+`SELECT ... FOR UPDATE` no treinador e preço sempre lido do registro, nunca do corpo
+(S30); a coluna `trainers.gold` tem `check (gold >= 0)` como rede de segurança.
 
 ### `hunt-store`
 
@@ -212,6 +223,13 @@ mensagem inválida gera `error validation` sem fechar a conexão, mas três segu
 fecham com 1008. Intenções (tudo exceto `ping`) têm limite de uma a cada 200 ms por
 conexão; a excedente recebe `error rate-limited`. `hunt.snapshot`/`hunt.tick` nunca
 carregam `seed` nem `rngState` (S25).
+
+Os tipos e schemas Zod do fio (mensagens cliente↔servidor, estado público) agora vivem
+em `@pokeidle/shared/protocol`, não mais duplicados no servidor; `settings.update`
+aceita `patch: { returnHpPercent?, potionHpPercent?, capture?: { ballTier?,
+maxWildHpPercent?, allowDuplicates? } }` (`SettingsPatchSchema`) — `potionHpPercent` é
+o novo limiar de HP para escolher poção durante a hunt, espelhando
+`PATCH /trainer/settings` no REST.
 
 ### Ritmo
 

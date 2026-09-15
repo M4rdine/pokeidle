@@ -1,11 +1,13 @@
 export type ErrorCode =
   | 'validation' | 'invalid-credentials' | 'unauthorized' | 'forbidden' | 'not-found'
   | 'email-taken' | 'name-taken' | 'starter-already-chosen' | 'no-starter' | 'hunt-active' | 'no-hunt'
+  | 'locked' | 'insufficient-gold'
   | 'payload-too-large' | 'rate-limited' | 'internal'
 
 export const STATUS_BY_CODE: Readonly<Record<ErrorCode, number>> = {
   validation: 400, 'invalid-credentials': 401, unauthorized: 401, forbidden: 403, 'not-found': 404,
   'email-taken': 409, 'name-taken': 409, 'starter-already-chosen': 409, 'no-starter': 409, 'hunt-active': 409, 'no-hunt': 409,
+  locked: 409, 'insufficient-gold': 409,
   'payload-too-large': 413, 'rate-limited': 429, internal: 500,
 }
 

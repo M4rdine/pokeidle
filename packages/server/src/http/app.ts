@@ -1,6 +1,7 @@
 import cookie from '@fastify/cookie'
 import helmet from '@fastify/helmet'
 import rateLimit from '@fastify/rate-limit'
+import websocket from '@fastify/websocket'
 import { loadRegistry } from '@pokeidle/shared'
 import Fastify, { type FastifyInstance } from 'fastify'
 import { ZodError } from 'zod'
@@ -16,7 +17,12 @@ import { AppError, errorBody } from './errors.js'
 import { authRoutes } from './routes/auth.js'
 import { huntRoutes } from './routes/hunts.js'
 import { trainerRoutes } from './routes/trainer.js'
-import { checkOrigin, REDACT_PATHS } from './security.js'
+import { checkOrigin, REDACT_PATHS, sameOrigin } from './security.js'
+
+// O `ws` fecha a conexão com 1009 acima disto; o limite de negócio de verdade (4 KB, `error
+// validation` sem fechar a conexão) é aplicado dentro de `parseClientMessage`. Este é só uma
+// rede de segurança contra payloads absurdos.
+const WS_HARD_MAX_PAYLOAD = 64 * 1024
 
 export interface AppDeps {
   readonly db: Db
@@ -50,12 +56,22 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     hsts: config.COOKIE_SECURE ? { maxAge: 15552000 } : false,
   })
   await app.register(cookie)
+  // Registrado uma única vez na raiz: o listener de upgrade HTTP do `ws` é do servidor inteiro
+  // (não por rota), então se o plugin só existisse dentro de `wsRoutes` uma requisição de upgrade
+  // pra uma rota fora de `/ws` (ex.: `/naoexiste`, `/me`) nunca seria limpa pelo hook de resposta
+  // do plugin e deixaria o socket bruto pendurado, sem autenticação, pra sempre.
+  await app.register(websocket, { options: { maxPayload: WS_HARD_MAX_PAYLOAD } })
 
   // S11 ANTES da sessão: rejeita origem errada sem tocar o banco (nem SELECT nem o touch de
   // `last_seen_at`). Hooks de instância (addHook aqui, e o de authPlugin via fastify-plugin)
-  // rodam na ordem de registro, então este precisa vir antes de `authPlugin`.
+  // rodam na ordem de registro, então este precisa vir antes de `authPlugin`. Upgrades de
+  // WebSocket são sempre GET (método "seguro" pro `checkOrigin` de cima), então exigimos
+  // `sameOrigin` à parte pra qualquer tentativa de upgrade — inclusive pra rotas que não são
+  // `/ws` — antes que o authPlugin chegue a tocar o banco.
   app.addHook('onRequest', async (request) => {
     if (!checkOrigin(request, config.APP_ORIGIN)) throw new AppError('forbidden', 'origem não permitida')
+    const isWsUpgrade = request.headers.upgrade?.toLowerCase() === 'websocket'
+    if (isWsUpgrade && !sameOrigin(request, config.APP_ORIGIN)) throw new AppError('forbidden', 'origem não permitida')
   })
 
   await app.register(rateLimit, { max: 300, timeWindow: '1 minute' })

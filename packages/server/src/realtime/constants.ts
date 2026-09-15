@@ -9,5 +9,6 @@ export const WS_MAX_INVALID_IN_A_ROW = 3
 export const WS_PING_MS = 30_000
 export const WS_PONG_TIMEOUT_MS = 60_000
 export const WS_SESSION_RECHECK_MS = 300_000
+export const WS_MAX_SOCKETS_PER_TRAINER = 8
 export const TICK_LAG_WARN_MS = 1000
 export const PERSIST_MAX_FAILURES = 3

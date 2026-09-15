@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { xpForLevel } from '@pokeidle/shared'
 import { applyPotion, choosePotion } from '../../src/engine/items.js'
 import { pickTarget, stepPlayer } from '../../src/engine/player.js'
-import { resolveConsequences, step } from '../../src/engine/step.js'
+import { engagedWildAttack, resolveConsequences, step } from '../../src/engine/step.js'
 import type { HuntState } from '../../src/engine/types.js'
 import { baseState, charmander5, miniDeps } from './fixtures/mini.js'
 
@@ -215,6 +215,35 @@ describe('quem chega ataca primeiro', () => {
     const wildAttacks = (r: ReturnType<typeof step>) => r.events.filter((e) => e.type === 'attack' && e.attacker === 'wild')
     expect(wildAttacks(arrival!)).toHaveLength(0)
     expect(wildAttacks(step(arrival!.state, deps))).toHaveLength(1)
+  })
+  it('troca de alvo no meio da luta: o novo alvo não revida no tick da troca', () => {
+    // Nenhum caminho de produção troca de alvo com o antigo ainda vivo (o motor só re-escolhe
+    // alvo a partir de `searching`), então o cenário é exercitado chamando `engagedWildAttack`
+    // diretamente (exportada só para este teste — ver comentário em `step.ts`).
+    const deps = miniDeps()
+    const s = baseState({}, deps)
+    const wildA = { ...s.wilds[0]!, id: 1 }
+    const wildB = { ...s.wilds[0]!, id: 2, position: { x: 3, y: 0 } } // adjacente ao jogador, como A
+    const st = { ...s, wilds: [wildA, wildB], player: { ...s.player, mode: 'fighting' as const, targetWildId: 2 } }
+    // engagedBefore (1) é o alvo do tick anterior; o alvo já mudou para B (2) neste tick.
+    const r = engagedWildAttack(st, deps, 1)
+    expect(r.events).toEqual([])
+    expect(r.state).toBe(st)
+  })
+  it('kill no tick de chegada: selvagem com 1 de HP morre no primeiro ataque e nunca revida', () => {
+    const deps = miniDeps()
+    let s = baseState({}, deps)
+    // Sem bolas: força playerAttack em vez de attemptCapture (hp% baixo dispararia captura).
+    s = { ...s, inventory: {}, wilds: s.wilds.map((w) => ({ ...w, hp: 1 })) }
+    const events: unknown[] = []
+    for (let i = 0; i < 8; i++) {
+      const r = step(s, deps)
+      s = r.state
+      events.push(...r.events)
+    }
+    const asType = (e: unknown) => (e as { type: string }).type
+    expect(events.some((e) => asType(e) === 'wildDefeated')).toBe(true)
+    expect(events.filter((e) => asType(e) === 'attack' && (e as { attacker: string }).attacker === 'wild')).toHaveLength(0)
   })
 })
 

@@ -1,6 +1,8 @@
 import { and, eq } from 'drizzle-orm'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { buy } from '../src/account/shop.js'
 import { inventory, trainers } from '../src/db/schema.js'
+import { loadActive, startHunt, stopHunt } from '../src/hunt-store/index.js'
 import { truncateAll } from './helpers/db.js'
 import { api, registerAndLogin, T0, testApp, type TestApp } from './helpers/app.js'
 
@@ -62,6 +64,28 @@ describe('POST /shop/buy', () => {
     expect((await api(t.app, cookie).post('/shop/buy', { itemId: 'potion', quantity: 1 })).json()).toMatchObject({ error: { code: 'hunt-active' } })
     expect((await api(t.app, cookie).post('/shop/sell', { itemId: 'potion', quantity: 1 })).json()).toMatchObject({ error: { code: 'hunt-active' } })
     await api(t.app, cookie).post('/hunts/stop')
+  })
+  it('corrida entre início de hunt e compra: nunca há item sem débito', async () => {
+    await setTrainer({ gold: 1000 })
+    await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
+    const [startResult, buyResult] = await Promise.allSettled([
+      startHunt(t.db, t.registry, trainerId, 'route-1', T0),
+      buy(t.db, t.registry, trainerId, 'potion', 1, T0),
+    ])
+    expect(startResult.status).toBe('fulfilled') // só a compra pode perder a corrida aqui
+    const gold = await goldOf()
+    if (buyResult.status === 'fulfilled') {
+      // Compra aceita: o ouro foi debitado e a snapshot da hunt (lida ou criada depois, com o
+      // trainer já atualizado dentro da mesma transação) reflete a compra — nunca item sem débito.
+      expect(gold).toBe(900)
+      const active = await loadActive(t.db, trainerId)
+      expect(active?.state.inventory['potion']).toBe(1)
+      expect(active?.state.trainer.gold).toBe(gold)
+    } else {
+      expect((buyResult.reason as { code: string }).code).toBe('hunt-active')
+      expect(gold).toBe(1000)
+    }
+    await stopHunt(t.db, trainerId, T0)
   })
   it('compras concorrentes nunca deixam o ouro negativo', async () => {
     await setTrainer({ gold: 250 })

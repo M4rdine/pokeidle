@@ -12,11 +12,12 @@ para o `shared` para o cliente da 3b consumir. Nenhuma tela; tudo por REST e mot
 
 ## 2. Contrato de fio no `shared` (substitui o §3 da spec 3b)
 
-`packages/shared/src/protocol/`: `hunt-state.ts` (schema Zod `.strict()` + tipos `Point`,
-`PlayerMode`, `BallTier`, `PokemonState`, `WildState`, `PlayerState`, `CaptureSettings`,
-`HuntSettings`, `HuntState`), `events.ts` (`EventSchema` discriminado por `type`, tipo `Event`),
-`messages.ts` (`SettingsPatchSchema`, `ClientMessageSchema`, `ServerMessage`, `SessionInfo`,
-`Summary`, `StopReason`), `index.ts`. `shared/package.json` ganha `"./protocol":
+`packages/shared/src/protocol/`: `types.ts` (tipos `Point`, `PlayerMode`, `BallTier`,
+`PokemonState`, `WildState`, `PlayerState`, `CaptureSettings`, `HuntSettings`, `HuntState`,
+`Event`, `StopReason`, `Summary`, `SessionInfo`, `ServerMessage`), `schema.ts` (schema Zod
+`.strict()`: `PokemonStateSchema`, `HuntStateSchema`, `EventSchema` discriminado por `type`),
+`messages.ts` (`SettingsPatchSchema`, `ClientMessageSchema`), `index.ts`. `shared/package.json`
+ganha `"./protocol":
 "./src/protocol/index.ts"`. O servidor importa de lá: `engine/types.ts` vira reexport dos tipos
 (o código do motor não muda), `hunt-store/state-schema.ts` usa `HuntStateSchema` do shared,
 `realtime/protocol.ts` usa `ClientMessageSchema`/`ServerMessage`, `account/settings.ts` usa

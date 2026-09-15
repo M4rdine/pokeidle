@@ -55,6 +55,23 @@ describe('startHunt', () => {
     await db.delete(pokemon)
     await expect(startHunt(db, registry, trainerId, 'route-1', T0)).rejects.toMatchObject({ code: 'no-starter' })
   })
+  it('teamSlot legado além das vagas do nível: rebaixa o excedente (maior team_slot primeiro) para a mochila e começa com o time truncado', async () => {
+    // O treinador do beforeEach está em xp: 10 → nível 1 → 3 vagas (tabela do GDD). O inicial já
+    // ocupa o team_slot 0; simula uma sessão anterior à 3a (antes do limite de vagas por nível
+    // existir) inserindo mais 3 Pokémon direto no banco, estourando as 3 vagas atuais.
+    await db.insert(pokemon).values([
+      { id: 'extra-1', trainerId, speciesName: 'charmander', level: 5, xp: 100, hp: 10, hpMax: 10, teamSlot: 1 },
+      { id: 'extra-2', trainerId, speciesName: 'charmander', level: 5, xp: 100, hp: 10, hpMax: 10, teamSlot: 2 },
+      { id: 'extra-3', trainerId, speciesName: 'charmander', level: 5, xp: 100, hp: 10, hpMax: 10, teamSlot: 3 },
+    ])
+    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 1 })
+    const active = (await loadActive(db, trainerId))!
+    expect(active.state.player.team).toHaveLength(3)
+    expect(active.state.player.team.map((p) => p.id)).not.toContain('extra-3')
+    const rows = await db.select({ id: pokemon.id, teamSlot: pokemon.teamSlot }).from(pokemon).where(eq(pokemon.trainerId, trainerId))
+    expect(rows.find((r) => r.id === 'extra-3')).toMatchObject({ teamSlot: null })
+    expect(rows.find((r) => r.id === 'extra-2')).toMatchObject({ teamSlot: 2 })
+  })
   it('gera sessionId e seed quando não informados', async () => {
     const row = await startHunt(db, registry, trainerId, 'route-1', T0)
     expect(row.sessionId).toMatch(/^[0-9a-f-]{36}$/)

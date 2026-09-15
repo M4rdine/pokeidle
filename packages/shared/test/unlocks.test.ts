@@ -29,7 +29,7 @@ describe('unlocks', () => {
     expect(nextUnlock(u, 40, items)).toEqual({ level: 50, what: 'hunt route-2' })
     expect(nextUnlock(u, 50, items)).toBeNull()
   })
-  it('schema rejeita item inexistente no registro', () => {
+  it('schema valida growthRate e teamSlots', () => {
     expect(() => UnlocksSchema.parse({ growthRate: 'medium-fast', teamSlots: [{ level: 1, slots: 3 }], items: {}, hunts: {} })).not.toThrow()
     expect(() => UnlocksSchema.parse({ growthRate: 'nope', teamSlots: [], items: {}, hunts: {} })).toThrow()
   })

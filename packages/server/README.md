@@ -132,7 +132,11 @@ do motor (S3).
 corpo. A loja do Centro Pokémon (`GET /shop`, `POST /shop/buy`, `POST /shop/sell`) só
 funciona sem hunt ativa (S31) e roda inteira dentro de uma transação com
 `SELECT ... FOR UPDATE` no treinador e preço sempre lido do registro, nunca do corpo
-(S30); a coluna `trainers.gold` tem `check (gold >= 0)` como rede de segurança.
+(S30); a coluna `trainers.gold` tem `check (gold >= 0)` como rede de segurança. A
+venda não é limitada por nível (um item obtido por drop pode ser vendido em qualquer
+nível). Compra e venda travam a linha do treinador (`FOR UPDATE`) antes de checar hunt
+ativa, na mesma ordem global de locks usada pelo sync (`trainers` antes das tabelas
+dependentes).
 
 ### `hunt-store`
 

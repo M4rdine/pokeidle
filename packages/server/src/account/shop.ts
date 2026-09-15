@@ -5,7 +5,7 @@ import type { Db, DbLike } from '../db/client.js'
 import { inventory, trainers, type TrainerRow } from '../db/schema.js'
 import { AppError } from '../http/errors.js'
 import { trainerProgress } from './progress.js'
-import { hasActiveHunt } from './team.js'
+import { withLockedTrainer } from './team.js'
 
 export const ShopTradeSchema = z.object({ itemId: kebab, quantity: z.number().int().min(1).max(99) }).strict()
 export interface TradeResult { readonly gold: number; readonly item: { readonly itemId: string; readonly quantity: number } }
@@ -30,13 +30,14 @@ const itemOrThrow = (registry: Registry, itemId: string): Item => {
   return item
 }
 
-/** S30: preço do registro, treinador travado com FOR UPDATE, ouro nunca negativo. S31: só sem hunt. */
+/**
+ * S30: preço do registro, treinador travado com FOR UPDATE, ouro nunca negativo. S31: só sem
+ * hunt. Ordem de locks: trainers (via withLockedTrainer, que já checa hunt-active) → inventory;
+ * o item só é resolvido (404 se não existir) DEPOIS da checagem de hunt ativa (spec §6).
+ */
 export async function buy(db: Db, registry: Registry, trainerId: string, itemId: string, quantity: number, now: Date): Promise<TradeResult> {
-  const item = itemOrThrow(registry, itemId)
-  return db.transaction(async (tx) => {
-    if (await hasActiveHunt(tx, trainerId)) throw new AppError('hunt-active', 'pare a hunt antes de usar a loja')
-    const [trainer] = await tx.select().from(trainers).where(eq(trainers.id, trainerId)).for('update')
-    if (!trainer) throw new AppError('not-found', 'treinador não encontrado')
+  return withLockedTrainer(db, trainerId, async (tx, trainer) => {
+    const item = itemOrThrow(registry, itemId)
     const { level } = trainerProgress(registry, trainer)
     const unlockLevel = itemUnlockLevel(registry.unlocks, item.id)
     if (level < unlockLevel) throw new AppError('locked', `${item.name} destrava no nível ${unlockLevel}`)
@@ -50,12 +51,10 @@ export async function buy(db: Db, registry: Registry, trainerId: string, itemId:
   })
 }
 
+/** Venda não é limitada por nível (um item obtido por drop pode ser vendido em qualquer nível). */
 export async function sell(db: Db, registry: Registry, trainerId: string, itemId: string, quantity: number, now: Date): Promise<TradeResult> {
-  const item = itemOrThrow(registry, itemId)
-  return db.transaction(async (tx) => {
-    if (await hasActiveHunt(tx, trainerId)) throw new AppError('hunt-active', 'pare a hunt antes de usar a loja')
-    const [trainer] = await tx.select().from(trainers).where(eq(trainers.id, trainerId)).for('update')
-    if (!trainer) throw new AppError('not-found', 'treinador não encontrado')
+  return withLockedTrainer(db, trainerId, async (tx, trainer) => {
+    const item = itemOrThrow(registry, itemId)
     const [owned] = await tx.select({ quantity: inventory.quantity }).from(inventory).where(and(eq(inventory.trainerId, trainerId), eq(inventory.itemId, item.id)))
     const have = owned?.quantity ?? 0
     if (have < quantity) throw new AppError('validation', `você tem ${have} de ${item.name}`)

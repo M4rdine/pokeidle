@@ -8,8 +8,13 @@ import type { EngineDeps, Event, HuntState, StepResult } from './types.js'
 
 const chain = (a: StepResult, f: (s: HuntState) => StepResult): StepResult => { const b = f(a.state); return { state: b.state, events: [...a.events, ...b.events] } }
 
-/** Só o selvagem já engajado no tick anterior revida: quem chega ataca primeiro (GDD §3.1). */
-function engagedWildAttack(state: HuntState, deps: EngineDeps, engagedBefore: number | null): StepResult {
+/**
+ * Só o selvagem já engajado no tick anterior revida: quem chega ataca primeiro (GDD §3.1).
+ * Exportada só para teste direto (`step.test.ts`, troca de alvo no meio da luta): construir esse
+ * cenário via `step`/geometria da fixture exigiria um selvagem defendido de forma artificial, já
+ * que o motor não troca de alvo com o antigo ainda vivo em nenhum caminho de produção.
+ */
+export function engagedWildAttack(state: HuntState, deps: EngineDeps, engagedBefore: number | null): StepResult {
   if (state.player.mode !== 'fighting' || engagedBefore === null || state.player.targetWildId !== engagedBefore) return { state, events: [] }
   const wild = state.wilds.find((w) => w.id === state.player.targetWildId)
   if (!wild || wild.hp <= 0 || !isAdjacent(state.player.position, wild.position)) return { state, events: [] }

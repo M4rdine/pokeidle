@@ -39,10 +39,11 @@ async function syncPokedex(tx: Tx, trainerId: string, state: HuntState, now: Dat
 
 /** Mesma coisa que syncToTables, mas dentro de uma transação já aberta (usado por stopHunt). */
 export async function syncWithin(tx: Tx, trainerId: string, state: HuntState, now: Date): Promise<void> {
+  // Ordem global de locks: hunt_sessions → trainers → pokemon → inventory → pokedex_entries → hunt_log.
+  await tx.update(trainers).set({ xp: state.trainer.xp, gold: state.trainer.gold, updatedAt: now }).where(eq(trainers.id, trainerId))
   await syncTeam(tx, trainerId, state, now)
   await syncBox(tx, trainerId, state, now)
   await syncInventory(tx, trainerId, state, now)
-  await tx.update(trainers).set({ xp: state.trainer.xp, gold: state.trainer.gold, updatedAt: now }).where(eq(trainers.id, trainerId))
   await syncPokedex(tx, trainerId, state, now)
 }
 

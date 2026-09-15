@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MeSchema, ShopSchema } from '../../src/api/dto.js'
+import { ActiveHuntSchema, MeSchema, ShopSchema, StartHuntSchema } from '../../src/api/dto.js'
 
 const meFixture = {
   user: { id: 'u1', email: 'a@b.com', role: 'player' },
@@ -23,5 +23,12 @@ describe('dto', () => {
   it('ShopSchema.parse aceita o formato do catálogo da loja', () => {
     const shop = { level: 1, gold: 0, items: [{ itemId: 'potion', name: 'Poção', kind: 'potion', buyPrice: 100, sellPrice: 50, unlockLevel: 0, unlocked: true, owned: 2 }] }
     expect(ShopSchema.parse(shop)).toEqual(shop)
+  })
+  it('StartHuntSchema.parse aceita a resposta real de POST /hunts/:id/start, sem state', () => {
+    const started = { session: { huntId: 'route-1', sessionId: 's', startedAt: '2026-09-14T12:00:00.000Z' } }
+    expect(StartHuntSchema.parse(started)).toEqual(started)
+  })
+  it('ActiveHuntSchema.parse aceita { session: null }', () => {
+    expect(ActiveHuntSchema.parse({ session: null })).toEqual({ session: null })
   })
 })

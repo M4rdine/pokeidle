@@ -24,7 +24,8 @@ export async function flushRunner(db: Db, snap: PersistSnapshot, now: Date, opts
 /** Encerra a hunt a partir do estado em memória: lock da linha, sync opcional, cura opcional, apaga a sessão. */
 export async function finishRunner(db: Db, snap: PersistSnapshot, now: Date, opts: { readonly sync: boolean; readonly healTeam: boolean }): Promise<TrainerRow> {
   return db.transaction(async (tx) => {
-    await tx.select({ trainerId: huntSessions.trainerId }).from(huntSessions).where(eq(huntSessions.trainerId, snap.trainerId)).for('update')
+    const locked = await tx.select({ trainerId: huntSessions.trainerId }).from(huntSessions).where(eq(huntSessions.trainerId, snap.trainerId)).for('update')
+    if (locked.length === 0) throw new AppError('no-hunt', 'não há hunt ativa')
     if (opts.sync) { await syncWithin(tx, snap.trainerId, snap.state, now); await insertLog(tx, snap.trainerId, snap.pendingLog) }
     if (opts.healTeam) await tx.update(pokemon).set({ hp: sql`${pokemon.hpMax}`, updatedAt: now }).where(eq(pokemon.trainerId, snap.trainerId))
     await tx.delete(huntSessions).where(eq(huntSessions.trainerId, snap.trainerId))

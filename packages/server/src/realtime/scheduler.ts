@@ -50,6 +50,16 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
   const runners = new Map<string, Runner>()
   const chains = new Map<string, Promise<void>>()
   const inFlight = new Set<Promise<void>>()
+  // Infraestrutura do attach single-flight (C1): `attaching` guarda a promise em voo por
+  // treinador (concorrentes recebem a mesma); `attachGen` invalida um catch-up em andamento
+  // quando `finish`/`detach` assumem a sessão antes dele terminar.
+  const attaching = new Map<string, Promise<void>>()
+  const attachGen = new Map<string, number>()
+  const bumpGen = (trainerId: string): number => {
+    const gen = (attachGen.get(trainerId) ?? 0) + 1
+    attachGen.set(trainerId, gen)
+    return gen
+  }
   const flush = deps.persistence?.flush ?? flushRunner
   const finishFn = deps.persistence?.finish ?? finishRunner
   let timer: ReturnType<typeof setInterval> | null = null
@@ -108,7 +118,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     for (const runner of [...runners.values()]) if (!runner.catchingUp) tickOne(runner)
   }
 
-  const finish = async (trainerId: string, reason: StopReason): Promise<TrainerRow | null> => {
+  const finishInner = async (trainerId: string, reason: StopReason): Promise<TrainerRow | null> => {
     const runner = runners.get(trainerId)
     if (!runner) return null
     runners.delete(trainerId)
@@ -129,17 +139,38 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     return trainer
   }
 
+  /**
+   * Se um catch-up estiver em voo para este treinador, espera ele terminar (ignorando
+   * rejeição) antes de finalizar — evita apagar a sessão com o runner pré-catch-up enquanto
+   * `runCatchUp` ainda está simulando o tempo perdido (C1). Em seguida invalida a geração:
+   * qualquer fatia de catch-up que ainda não rodou (não deveria haver nenhuma, já que
+   * esperamos o catch-up acabar) não resiste o runner que acabamos de apagar.
+   */
+  const finish = async (trainerId: string, reason: StopReason): Promise<TrainerRow | null> => {
+    const pending = attaching.get(trainerId)
+    if (pending) await pending.catch(() => {})
+    bumpGen(trainerId)
+    return finishInner(trainerId, reason)
+  }
+
   // `finish` já loga e transmite o erro internamente antes de rejeitar; aqui só evitamos uma rejeição solta.
   const finishInBackground = (trainerId: string, reason: StopReason): void => { void finish(trainerId, reason).catch(() => {}) }
 
-  const runCatchUp = async (trainerId: string, base: Runner, owed: number): Promise<void> => {
+  const runCatchUp = async (trainerId: string, base: Runner, owed: number, gen: number): Promise<void> => {
     try {
       const result = await catchUp(base, owed, engineDeps(base, deps.registry), {
         onSlice: (remaining) => deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: remaining }),
         shouldAbort: () => stopping,
         ...(deps.yieldNow && { yieldNow: deps.yieldNow }),
       })
-      if (result.stopped) { runners.set(trainerId, result.runner); await finish(trainerId, result.stopped.reason); return }
+      if (result.stopped) {
+        // Chamada interna (mesmo fluxo de `attachInner`, não concorrente): usa `finishInner`
+        // direto — `finish` esperaria por esta própria promise em `attaching` e travaria.
+        runners.set(trainerId, result.runner)
+        await finishInner(trainerId, result.stopped.reason)
+        return
+      }
+      if (attachGen.get(trainerId) !== gen) return // geração mudou: quem mudou já cuidou da sessão
       if (result.ticksDone < owed) {
         // Abortado (processo encerrando): persiste o tempo realmente simulado e sai da memória,
         // sem sumário nem snapshot — o próximo attach retoma o catch-up de onde parou.
@@ -152,8 +183,8 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
       deps.sockets.broadcast(trainerId, { t: 'hunt.summary', summary: result.summary })
       deps.sockets.broadcast(trainerId, snapshotMessage(settled))
     } catch (error) {
-      // Idempotente: se `finish` (chamado acima, já awaited) já removeu o runner e tratou o erro, não duplica.
-      if (runners.has(trainerId)) {
+      // Idempotente: se `finishInner` (chamado acima, já awaited) já removeu o runner e tratou o erro, não duplica.
+      if (attachGen.get(trainerId) === gen && runners.has(trainerId)) {
         runners.delete(trainerId)
         deps.logger.error({ err: error, trainerId }, 'erro no catch-up; runner removido, sessão preservada')
         deps.sockets.broadcast(trainerId, { t: 'error', code: 'internal', message: 'erro interno' })
@@ -162,7 +193,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     }
   }
 
-  const attachInner = async (trainerId: string): Promise<void> => {
+  const attachInner = async (trainerId: string, gen: number): Promise<void> => {
     let active
     try { active = await loadActive(deps.db, trainerId) } catch (error) {
       if (!(error instanceof CorruptSnapshotError)) throw error
@@ -172,18 +203,25 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
       return
     }
     if (!active) throw new AppError('no-hunt', 'não há hunt ativa')
+    if (attachGen.get(trainerId) !== gen) return // finish/detach assumiu a sessão enquanto líamos o banco
     const base = createRunner(trainerId, active)
     const owed = ticksOwedSince(active.lastSimulatedAt, deps.now())
     if (owed < MIN_CATCHUP_TICKS) { runners.set(trainerId, base); deps.sockets.broadcast(trainerId, snapshotMessage(base)); return }
     runners.set(trainerId, { ...base, catchingUp: true })
     deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: owed })
-    await runCatchUp(trainerId, base, owed)
+    await runCatchUp(trainerId, base, owed, gen)
   }
 
   const attach = (trainerId: string): Promise<void> => {
-    const p = attachInner(trainerId)
+    if (runners.has(trainerId)) return Promise.resolve()
+    const existing = attaching.get(trainerId)
+    if (existing) return existing
+    const gen = bumpGen(trainerId)
+    const p = attachInner(trainerId, gen)
+    attaching.set(trainerId, p)
     inFlight.add(p)
-    p.finally(() => inFlight.delete(p)).catch(() => {})
+    const cleanup = (): void => { attaching.delete(trainerId); inFlight.delete(p) }
+    p.then(cleanup, cleanup)
     return p
   }
 
@@ -207,7 +245,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     isStopping: () => stopping,
     tick,
     attach,
-    detach: (trainerId) => { runners.delete(trainerId) },
+    detach: (trainerId) => { runners.delete(trainerId); bumpGen(trainerId) },
     get: (trainerId) => runners.get(trainerId),
     size: () => runners.size,
     applyIntent,

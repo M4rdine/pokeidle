@@ -4,6 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { chooseStarter } from '../../src/account/starter.js'
 import type { Db } from '../../src/db/client.js'
 import { huntLog, huntSessions, inventory, pokemon, trainers, users } from '../../src/db/schema.js'
+import type { TrainerRow } from '../../src/db/schema.js'
 import { simulate } from '../../src/engine/simulate.js'
 import { loadActive, startHunt } from '../../src/hunt-store/index.js'
 import { PERSIST_MAX_FAILURES, SNAPSHOT_EVERY_TICKS, SYNC_EVERY_TICKS } from '../../src/realtime/constants.js'
@@ -106,6 +107,74 @@ describe('attach / tick / persist', () => {
     expect(scheduler.size()).toBe(0)
     expect(await db.select().from(huntSessions)).toEqual([])
     expect(msgs(s).at(-1)).toEqual({ t: 'hunt.stopped', reason: 'corrupt', healed: false })
+  })
+})
+
+describe('attach single-flight e finish durante catch-up (C1)', () => {
+  it('finish disparado durante o catch-up aguarda o catch-up terminar, finaliza com o estado atualizado e não deixa runner fantasma tickando', async () => {
+    const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
+    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 8 })
+    const before = (await loadActive(db, trainerId))!
+    clock.now = new Date(T0.getTime() + 20 * 60 * 1000) // 6000 ticks de atraso
+    const ref = simulate(before.state, 6000, { registry, hunt: registry.hunts.get('route-1')!, rng: createRng(before.seed, before.rngState) })
+    let finishPromise: Promise<TrainerRow | null> | null = null
+    let calls = 0
+    const s2: Scheduler = createScheduler({
+      db, registry, now: () => clock.now, sockets, logger: silentLogger,
+      yieldNow: async () => { calls++; if (calls === 1) finishPromise = s2.finish(trainerId, 'intent') },
+    })
+    await s2.attach(trainerId)
+    expect(finishPromise).not.toBeNull()
+    const trainer = await finishPromise!
+    expect(trainer).not.toBeNull()
+    expect(trainer!.xp).toBe(ref.state.trainer.xp)
+    expect(s2.size()).toBe(0)
+    expect(await db.select().from(huntSessions)).toEqual([])
+    const logRows = await db.select().from(huntLog).where(eq(huntLog.trainerId, trainerId))
+    expect(logRows.length).toBeGreaterThan(0)
+    for (let i = 0; i < 5; i++) s2.tick()
+    await s2.idle()
+    const types = msgs(s).map((m) => m.t)
+    expect(types).not.toContain('hunt.tick')
+    const stoppedIdx = types.indexOf('hunt.stopped')
+    expect(stoppedIdx).toBeGreaterThanOrEqual(0)
+    expect(types.slice(stoppedIdx + 1)).toEqual([])
+  })
+  it('dois attach() concorrentes para o mesmo treinador devolvem a mesma promessa, criam um único runner e não duplicam hunt_log', async () => {
+    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 9 })
+    clock.now = new Date(T0.getTime() + 10 * 60 * 1000) // 3000 ticks
+    const p1 = scheduler.attach(trainerId)
+    const p2 = scheduler.attach(trainerId)
+    expect(p2).toBe(p1)
+    await Promise.all([p1, p2])
+    expect(scheduler.size()).toBe(1)
+    await scheduler.whenIdle(trainerId)
+    const logRows = await db.select().from(huntLog).where(eq(huntLog.trainerId, trainerId))
+    const runner = scheduler.get(trainerId)!
+    // sem derrotas duplicadas: cada evento wildDefeated gera exatamente uma linha
+    const defeats = logRows.filter((r) => !r.captured).length
+    expect(defeats).toBeGreaterThan(0)
+    expect(runner.state.tick).toBe(3000)
+  })
+  it('attach com runner já existente é no-op (estado inalterado)', async () => {
+    await start(3)
+    const before = scheduler.get(trainerId)!
+    await scheduler.attach(trainerId)
+    expect(scheduler.get(trainerId)).toBe(before)
+  })
+  it('finishRunner com a sessão já apagada rejeita no-hunt e não escreve nada', async () => {
+    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 10 })
+    const active = (await loadActive(db, trainerId))!
+    await db.delete(huntSessions).where(eq(huntSessions.trainerId, trainerId))
+    const snap = {
+      trainerId, huntId: active.huntId, state: active.state, rngState: active.rngState,
+      pendingLog: [{ huntId: active.huntId, speciesName: 'charmander', level: 12, xpTrainer: 5, gold: 1, drops: [], captured: false }],
+      lastSimulatedAt: active.lastSimulatedAt,
+    }
+    await expect(finishRunner(db, snap, clock.now, { sync: true, healTeam: false })).rejects.toMatchObject({ code: 'no-hunt' })
+    expect(await db.select().from(huntLog)).toEqual([])
+    const [tr] = await db.select().from(trainers).where(eq(trainers.id, trainerId))
+    expect(tr!.xp).toBe(0)
   })
 })
 

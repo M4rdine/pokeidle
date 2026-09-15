@@ -17,7 +17,7 @@ describe('createRunner / engineDeps', () => {
   it('nasce do ActiveHunt com rng retomado do rngState', () => {
     const active = activeOf(7)
     const r = createRunner('t1', active)
-    expect(r).toMatchObject({ trainerId: 't1', huntId: active.huntId, sessionId: active.sessionId, seed: 7, pendingLog: [], lastSaveTick: 0, lastSyncTick: 0, catchingUp: false, persistFailures: 0, lastSimulatedAt: T0 })
+    expect(r).toMatchObject({ trainerId: 't1', huntId: active.huntId, sessionId: active.sessionId, seed: 7, pendingLog: [], lastSaveTick: 0, lastSyncTick: 0, catchingUp: false, catchupRemaining: null, persistFailures: 0, lastSimulatedAt: T0 })
     expect(r.rng.state()).toBe(active.rngState)
     const deps = engineDeps(r, miniRegistry())
     expect(deps.hunt.id).toBe(active.huntId)

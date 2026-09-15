@@ -23,6 +23,8 @@ export interface Runner {
   readonly pendingLog: readonly LogEntry[]
   readonly lastSaveTick: number; readonly lastSyncTick: number
   readonly catchingUp: boolean
+  /** Ticks que ainda faltam no catch-up em andamento; `null` fora de um catch-up. */
+  readonly catchupRemaining: number | null
   readonly lastSimulatedAt: Date; readonly startedAt: Date
   readonly persistFailures: number
 }
@@ -37,7 +39,7 @@ export function createRunner(trainerId: string, active: ActiveHunt): Runner {
   return {
     trainerId, huntId: active.huntId, sessionId: active.sessionId, seed: active.seed,
     rng: createRng(active.seed, active.rngState), state: active.state, pendingLog: [],
-    lastSaveTick: active.state.tick, lastSyncTick: active.state.tick, catchingUp: false,
+    lastSaveTick: active.state.tick, lastSyncTick: active.state.tick, catchingUp: false, catchupRemaining: null,
     lastSimulatedAt: active.lastSimulatedAt, startedAt: active.startedAt, persistFailures: 0,
   }
 }

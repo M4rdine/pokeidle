@@ -169,7 +169,7 @@ function handleConnection(conn: Conn): void {
   const runner = rt.scheduler.get(trainerId)
   const initial: ServerMessage = runner
     ? runner.catchingUp
-      ? { t: 'hunt.catchup', ticksRemaining: -1 }
+      ? { t: 'hunt.catchup', ticksRemaining: runner.catchupRemaining ?? 0 }
       : snapshotMessage(runner)
     : { t: 'hunt.idle' }
   rt.sockets.send(socket, initial)

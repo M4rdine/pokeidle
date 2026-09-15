@@ -5,9 +5,14 @@ import { eq } from 'drizzle-orm'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { pokemon, sessions } from '../../src/db/schema.js'
 import { hashToken, resolveSession, TOUCH_INTERVAL_MS } from '../../src/auth/session.js'
+import { loadConfig } from '../../src/config.js'
+import { startHunt } from '../../src/hunt-store/index.js'
+import { buildApp } from '../../src/http/app.js'
 import { WS_MAX_MESSAGE_BYTES } from '../../src/realtime/constants.js'
+import { createScheduler } from '../../src/realtime/scheduler.js'
+import { createSocketRegistry } from '../../src/realtime/sockets.js'
 import { truncateAll } from '../helpers/db.js'
-import { api, ORIGIN, registerAndLogin, T0, testApp, type TestApp } from '../helpers/app.js'
+import { api, ORIGIN, registerAndLogin, silentLogger, T0, testApp, type TestApp } from '../helpers/app.js'
 import { connectWs, listen } from '../helpers/ws.js'
 
 const WS_OPEN = 1 // WebSocket.OPEN
@@ -192,6 +197,41 @@ describe('hunt pelo socket', () => {
     t.scheduler.tick(); t.scheduler.tick() // idem: só o 2º tick produz eventos
     expect(await a.nextOf('hunt.tick')).toEqual(await b.nextOf('hunt.tick'))
     a.close(); b.close()
+  })
+})
+
+describe('catch-up pelo socket (I4)', () => {
+  it('conectar durante o catch-up recebe hunt.catchup com o restante real (nunca -1), depois hunt.summary e hunt.snapshot', async () => {
+    // App/scheduler próprios: precisamos de um catch-up que ainda esteja em voo quando o
+    // socket conecta, então usamos um `yieldNow` com um atraso real entre fatias (o
+    // `yieldNow` padrão dos outros testes, `Promise.resolve()`, é só microtask e deixaria o
+    // catch-up inteiro rodar antes de qualquer I/O real — como o handshake do WebSocket — ter
+    // a chance de acontecer).
+    const clock2 = { now: T0 }
+    const sockets2 = createSocketRegistry()
+    const scheduler2 = createScheduler({
+      db: t.db, registry: t.registry, now: () => clock2.now, sockets: sockets2, logger: silentLogger,
+      yieldNow: () => new Promise((resolve) => setTimeout(resolve, 5)),
+    })
+    const config2 = loadConfig({ DATABASE_URL: 'postgres://x:x@localhost:1/x', APP_ORIGIN: ORIGIN, ARGON2_MEMORY_KIB: '4096', ARGON2_TIME_COST: '1' })
+    const app2 = await buildApp({ db: t.db, config: config2, now: () => clock2.now, logger: false, realtime: { scheduler: scheduler2, sockets: sockets2 } })
+    const base2 = await listen(app2)
+    try {
+      await startHunt(t.db, t.registry, trainerId, 'route-1', T0, { seed: 9 })
+      clock2.now = new Date(T0.getTime() + 10 * 60 * 1000) // 3000 ticks de atraso: várias fatias de CATCHUP_SLICE_TICKS
+      void scheduler2.attach(trainerId) // não aguarda: o catch-up roda em segundo plano
+      const r = await connectWs(base2, cookie)
+      if (!('client' in r)) throw new Error(`rejeitado ${r.rejected}`)
+      const first = await r.client.next()
+      expect(first['t']).toBe('hunt.catchup')
+      expect(first['ticksRemaining']).toBeGreaterThan(0)
+      expect(await r.client.nextOf('hunt.summary')).toMatchObject({ t: 'hunt.summary' })
+      expect(await r.client.nextOf('hunt.snapshot')).toMatchObject({ t: 'hunt.snapshot' })
+      r.client.close()
+    } finally {
+      scheduler2.stop()
+      await app2.close()
+    }
   })
 })
 

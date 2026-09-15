@@ -170,28 +170,35 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
   const finishInBackground = (trainerId: string, reason: StopReason): void => { void finish(trainerId, reason).catch(() => {}) }
 
   const runCatchUp = async (trainerId: string, base: Runner, owed: number, gen: number): Promise<void> => {
+    const isCurrent = (): boolean => attachGen.get(trainerId) === gen && runners.has(trainerId)
     try {
       const result = await catchUp(base, owed, engineDeps(base, deps.registry), {
-        onSlice: (remaining) => deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: remaining }),
+        onSlice: (remaining) => {
+          // Por fatia, só atualiza o runner em memória (`hunt.catchup` do `ws.ts` no connect
+          // lê `catchupRemaining` dali) se ainda formos a geração corrente (C1): se um
+          // `finish`/`detach` concorrente já assumiu a sessão, quem assumiu já cuidou dela.
+          if (isCurrent()) runners.set(trainerId, { ...runners.get(trainerId)!, catchupRemaining: remaining })
+          deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: remaining })
+        },
         shouldAbort: () => stopping,
         ...(deps.yieldNow && { yieldNow: deps.yieldNow }),
       })
       if (result.stopped) {
         // Chamada interna (mesmo fluxo de `attachInner`, não concorrente): usa `finishInner`
         // direto — `finish` esperaria por esta própria promise em `attaching` e travaria.
-        runners.set(trainerId, result.runner)
+        runners.set(trainerId, { ...result.runner, catchupRemaining: null })
         await finishInner(trainerId, result.stopped.reason)
         return
       }
-      if (attachGen.get(trainerId) !== gen) return // geração mudou: quem mudou já cuidou da sessão
+      if (!isCurrent()) return // geração mudou: quem mudou já cuidou da sessão, sem persistir nem transmitir
       if (result.ticksDone < owed) {
         // Abortado (processo encerrando): persiste o tempo realmente simulado e sai da memória,
         // sem sumário nem snapshot — o próximo attach retoma o catch-up de onde parou.
-        persist({ ...result.runner, catchingUp: false }, true)
+        persist({ ...result.runner, catchingUp: false, catchupRemaining: null }, true)
         runners.delete(trainerId)
         return
       }
-      const settled = persist({ ...result.runner, catchingUp: false }, true)
+      const settled = persist({ ...result.runner, catchingUp: false, catchupRemaining: null }, true)
       runners.set(trainerId, settled)
       deps.sockets.broadcast(trainerId, { t: 'hunt.summary', summary: result.summary })
       deps.sockets.broadcast(trainerId, snapshotMessage(settled))
@@ -220,7 +227,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     const base = createRunner(trainerId, active)
     const owed = ticksOwedSince(active.lastSimulatedAt, deps.now())
     if (owed < MIN_CATCHUP_TICKS) { runners.set(trainerId, base); deps.sockets.broadcast(trainerId, snapshotMessage(base)); return }
-    runners.set(trainerId, { ...base, catchingUp: true })
+    runners.set(trainerId, { ...base, catchingUp: true, catchupRemaining: owed })
     deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: owed })
     await runCatchUp(trainerId, base, owed, gen)
   }

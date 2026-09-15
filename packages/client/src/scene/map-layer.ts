@@ -19,7 +19,9 @@ export function buildMapSprite(renderer: Renderer, map: HuntMap, sheets: Sheets)
   draw(map.layers.ground)
   draw(map.layers.detail)
   const frame = new Rectangle(0, 0, map.width * TILE_SIZE, map.height * TILE_SIZE)
-  const texture = renderer.generateTexture({ target: layer, frame })
+  // resolution: 1 — o mapa já é pixel art em escala 1:1; sem isso o Pixi usa o DPR da tela (2x em
+  // telas retina) e o mapa pode passar de MAX_TEXTURE_SIZE em mapas grandes.
+  const texture = renderer.generateTexture({ target: layer, frame, resolution: 1 })
   layer.destroy({ children: true })
   return new Sprite(texture)
 }

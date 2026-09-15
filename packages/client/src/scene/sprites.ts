@@ -1,9 +1,13 @@
-import { AnimatedSprite, Assets, Container, Graphics, Spritesheet, Text, type SpritesheetData, type Texture } from 'pixi.js'
+import { AnimatedSprite, Assets, Container, Graphics, Spritesheet, TextureStyle, type SpritesheetData, type Texture } from 'pixi.js'
+import { ATLAS_URL } from '../config.js'
 import type { AtlasData } from './atlas.js'
 import { animationKey } from './atlas.js'
 import type { Direction } from './interpolate.js'
 
 export interface Sheets { readonly pokemon: Spritesheet; readonly tiles: Spritesheet }
+
+// Mesmo diretório do JSON do atlas (ATLAS_URL), nunca uma constante duplicada.
+const dirOf = (url: string): string => url.slice(0, url.lastIndexOf('/') + 1)
 
 /**
  * Carrega as duas imagens do atlas e parseia os spritesheets a partir do JSON já baixado
@@ -11,9 +15,11 @@ export interface Sheets { readonly pokemon: Spritesheet; readonly tiles: Sprites
  * (só que imutáveis); o cast abaixo é seguro porque os objetos vêm de `JSON.parse`.
  */
 export async function loadSheets(atlas: AtlasData): Promise<Sheets> {
+  // Padrão do Pixi é 'linear' (borra pixel art); nearest antes de qualquer Assets.load.
+  TextureStyle.defaultOptions.scaleMode = 'nearest'
   const [pokemonTex, tilesTex] = await Promise.all([
-    Assets.load<Texture>('/assets/atlas/pokemon.png'),
-    Assets.load<Texture>('/assets/atlas/tiles.png'),
+    Assets.load<Texture>(dirOf(ATLAS_URL.pokemon) + atlas.pokemon.meta.image),
+    Assets.load<Texture>(dirOf(ATLAS_URL.tiles) + atlas.tiles.meta.image),
   ])
   const pokemon = new Spritesheet(pokemonTex, atlas.pokemon as SpritesheetData)
   const tiles = new Spritesheet(tilesTex, atlas.tiles as SpritesheetData)
@@ -31,9 +37,10 @@ export interface EntitySprite {
 
 /**
  * AnimatedSprite com as animações `walk_<direção>` da espécie, âncora no pé. Se a espécie não
- * tiver frames no atlas, cai para um marcador colorido com rótulo (nunca lança).
+ * tiver frames no atlas, cai para um marcador colorido (nunca lança); o nome já aparece no
+ * rótulo do overlay (`app.ts`), então o marcador não repete um rótulo próprio.
  */
-export function makeEntitySprite(sheets: Sheets, species: string, label: string): EntitySprite {
+export function makeEntitySprite(sheets: Sheets, species: string): EntitySprite {
   const root = new Container()
   const first = sheets.pokemon.animations[animationKey(species, 'south')]
   if (first && first.length > 0) {
@@ -64,9 +71,6 @@ export function makeEntitySprite(sheets: Sheets, species: string, label: string)
     }
   }
   const marker = new Graphics().rect(-12, -28, 24, 28).fill(0xaa44aa).stroke({ width: 2, color: 0xffffff })
-  const text = new Text({ text: label, style: { fontSize: 10, fill: 0xffffff } })
-  text.anchor.set(0.5, 1)
-  text.y = -30
-  root.addChild(marker, text)
+  root.addChild(marker)
   return { root, body: marker, hasFrames: false, setDirection: () => {}, setMoving: () => {} }
 }

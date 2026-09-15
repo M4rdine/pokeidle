@@ -20,4 +20,14 @@ describe('atlas', () => {
     const missing = async () => new Response('{}', { status: 404 })
     await expect(loadAtlas(missing as typeof fetch)).rejects.toThrow(/atlas/)
   })
+
+  it('loadAtlas normaliza tiles.json sem "animations" para {}', async () => {
+    // tiles.json de verdade só tem frames de tile (grass, dirt, ...), sem seção "animations".
+    const tilesWithoutAnimations = { frames: sheet.frames, meta: sheet.meta }
+    const fetchFn = async (url: string) =>
+      new Response(JSON.stringify(url.includes('tiles') ? tilesWithoutAnimations : sheet), { status: 200, headers: { 'content-type': 'application/json' } })
+    const atlas = await loadAtlas(fetchFn as typeof fetch)
+    expect(atlas.tiles.animations).toEqual({})
+    expect(atlas.pokemon.animations['charmander/walk_south']).toHaveLength(2)
+  })
 })

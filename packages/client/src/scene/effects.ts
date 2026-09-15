@@ -1,6 +1,8 @@
-import { Container, Graphics, Text, type Ticker } from 'pixi.js'
+import { ColorMatrixFilter, Container, Graphics, Text, type Ticker } from 'pixi.js'
 
 export type Updater = (dtMs: number) => boolean // devolve false quando termina
+
+const MAX_ACTIVE_EFFECTS = 200
 
 export function createEffectRunner(ticker: Ticker): { add(u: Updater): void; destroy(): void } {
   let updaters: Updater[] = []
@@ -10,7 +12,12 @@ export function createEffectRunner(ticker: Ticker): { add(u: Updater): void; des
   }
   ticker.add(tick)
   return {
-    add: (u) => { updaters = [...updaters, u] },
+    // Acima do teto, o efeito não entra na lista viva: é avançado até o fim de uma vez
+    // (o que já destrói o que ele criou via `done`) em vez de renderizar indefinidamente.
+    add: (u) => {
+      if (updaters.length >= MAX_ACTIVE_EFFECTS) { u(Number.MAX_SAFE_INTEGER); return }
+      updaters = [...updaters, u]
+    },
     destroy: () => { ticker.remove(tick); updaters = [] },
   }
 }
@@ -26,28 +33,56 @@ const over = (ms: number, fn: (k: number) => void, done?: () => void): Updater =
   }
 }
 
-/** Avança 8 px na direção (dx, dy) e volta, em 150 ms. */
-export const lunge = (target: Container, dx: number, dy: number): Updater => {
-  const x0 = target.x
-  const y0 = target.y
+/**
+ * Avança 8 px na direção (dx, dy) e volta, em 150 ms. Recebe `body` (o sprite/gráfico dentro do
+ * `root` da entidade), nunca `root`: o ticker de posição em `app.ts` escreve `root.x/y` a cada
+ * frame para seguir o tween, e sobrescreveria qualquer deslocamento aplicado ali.
+ */
+export const lunge = (body: Container, dx: number, dy: number): Updater => {
+  const x0 = body.x
+  const y0 = body.y
   return over(150, (k) => {
     const a = Math.sin(k * Math.PI) * 8
-    target.x = x0 + dx * a
-    target.y = y0 + dy * a
-  }, () => { target.x = x0; target.y = y0 })
+    body.x = x0 + dx * a
+    body.y = y0 + dy * a
+  }, () => { body.x = x0; body.y = y0 })
 }
 
-export const flash = (target: Container, color = 0xffffff, ms = 100): Updater => {
-  const t = target.tint
-  target.tint = color
-  return over(ms, () => {}, () => { target.tint = t })
-}
-
-export const shake = (target: Container, px = 2, ms = 120): Updater => {
-  const x0 = target.x
+export const shake = (body: Container, px = 2, ms = 120): Updater => {
+  const x0 = body.x
   return over(ms, (k) => {
-    target.x = k < 1 ? x0 + (Math.round(k * 6) % 2 === 0 ? px : -px) : x0
-  }, () => { target.x = x0 })
+    body.x = k < 1 ? x0 + (Math.round(k * 6) % 2 === 0 ? px : -px) : x0
+  }, () => { body.x = x0 })
+}
+
+// Contagem de flashes sobrepostos por body: o filtro só some quando o último termina (nunca
+// fica preso caso um segundo flash comece antes do primeiro acabar).
+const flashCount = new WeakMap<Container, number>()
+const flashFilterOf = new WeakMap<Container, ColorMatrixFilter>()
+
+/**
+ * Clareia o `body` por `ms` usando `ColorMatrixFilter.brightness` (no Pixi 8, `tint = 0xffffff`
+ * é "sem tint" e não produz efeito visual nenhum).
+ */
+export function flash(body: Container, ms = 100): Updater {
+  let filter = flashFilterOf.get(body)
+  if (!filter) {
+    filter = new ColorMatrixFilter()
+    flashFilterOf.set(body, filter)
+  }
+  filter.brightness(2, false)
+  flashCount.set(body, (flashCount.get(body) ?? 0) + 1)
+  body.filters = [filter]
+  return over(ms, () => {}, () => {
+    const remaining = (flashCount.get(body) ?? 1) - 1
+    if (remaining <= 0) {
+      flashCount.delete(body)
+      flashFilterOf.delete(body)
+      body.filters = []
+    } else {
+      flashCount.set(body, remaining)
+    }
+  })
 }
 
 export const fadeOut = (target: Container, ms = 300, done?: () => void): Updater =>

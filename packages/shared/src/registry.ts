@@ -6,6 +6,7 @@ import { LootListSchema, type LootTable } from './schemas/loot.js'
 import { MoveListSchema, type Move } from './schemas/moves.js'
 import { SpeciesListSchema, type Species } from './schemas/species.js'
 import { TypeChartSchema, type TypeChart } from './schemas/type-chart.js'
+import { UnlocksSchema, type Unlocks } from './schemas/unlocks.js'
 
 export interface Registry {
   readonly species: ReadonlyMap<string, Species>
@@ -15,6 +16,7 @@ export interface Registry {
   readonly loot: ReadonlyMap<string, LootTable>
   readonly hunts: ReadonlyMap<string, HuntMap>
   readonly typeChart: TypeChart
+  readonly unlocks: Unlocks
 }
 
 export interface RawRegistry {
@@ -23,6 +25,7 @@ export interface RawRegistry {
   readonly typeChart: unknown
   readonly items: unknown
   readonly loot: unknown
+  readonly unlocks: unknown
   readonly hunts: readonly unknown[]
 }
 
@@ -48,6 +51,9 @@ function checkReferences(r: Registry, problems: string[]): void {
   for (const h of r.hunts.values()) {
     for (const sp of h.spawns) if (!r.species.has(sp.speciesName)) problems.push(`hunt ${h.id}: espécie ${sp.speciesName} não existe`)
   }
+  for (const itemId of Object.keys(r.unlocks.items)) {
+    if (!r.items.has(itemId)) problems.push(`unlocks: item ${itemId} não existe`)
+  }
 }
 
 export function buildRegistry(raw: RawRegistry): Registry {
@@ -56,6 +62,7 @@ export function buildRegistry(raw: RawRegistry): Registry {
   const typeChart = parseOrThrow(TypeChartSchema, raw.typeChart, 'type-chart.json')
   const itemList = parseOrThrow(ItemListSchema, raw.items, 'items.json')
   const lootList = parseOrThrow(LootListSchema, raw.loot, 'loot.json')
+  const unlocks = parseOrThrow(UnlocksSchema, raw.unlocks, 'unlocks.json')
   const huntList = raw.hunts.map((h, i) => parseOrThrow(HuntMapSchema, h, `hunts[${i}]`))
 
   const problems: string[] = []
@@ -67,6 +74,7 @@ export function buildRegistry(raw: RawRegistry): Registry {
     loot: indexBy(lootList, (l) => l.species, 'loot', problems),
     hunts: indexBy(huntList, (h) => h.id, 'hunt', problems),
     typeChart,
+    unlocks,
   }
   checkReferences(registry, problems)
   if (problems.length > 0) throw new Error(`registro inconsistente:\n${problems.join('\n')}`)

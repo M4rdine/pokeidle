@@ -32,6 +32,7 @@ export function miniRegistry(): Registry {
       { id: 'ultra-ball', name: 'Ultra Bola', kind: 'ball', ballBonus: 2, buyPrice: 1200, sellPrice: 600 },
     ],
     loot: [{ species: 'zubat', gold: [4, 9], drops: [{ item: 'potion', chance: 0.08 }] }],
+    unlocks: { growthRate: 'medium-fast', teamSlots: [{ level: 1, slots: 6 }], items: {}, hunts: {} },
     hunts: [miniHunt()],
   })
 }

@@ -1,7 +1,9 @@
 import { z } from 'zod'
 import type { AppContext, ModalName } from '../../app-context.js'
 import { MODAL_LABELS } from '../../config.js'
+import { PokedexSchema } from '../../api/dto.js'
 import { trainerProgress } from '../../state/progress.js'
+import { huntPokedexCount } from '../../state/tips.js'
 import { el, pct } from '../dom.js'
 import { intentButton } from './intent-button.js'
 
@@ -16,6 +18,7 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
   const gold = el('span', { 'data-gold': '' }, '0')
   const tick = el('span', { class: 'muted', 'data-tick': '' }, '0')
   const conn = el('span', { class: 'conn', 'data-conn': 'closed' }, CONN_TEXT['closed']!)
+  const dex = el('span', { class: 'muted', 'data-dex': '' })
   const stop = intentButton('Parar', () => ctx.sendIntent?.({ t: 'hunt.stop' }), ctx)
   const leave = el('button', { type: 'button' }, 'Sair')
   leave.addEventListener('click', () => {
@@ -28,7 +31,7 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
     el('button', { type: 'button', 'data-open': modal, onclick: () => ctx.openModal?.(modal) }, MODAL_LABELS[modal]))
 
   root.append(el('header', { class: 'top-bar panel' },
-    name, level, xpBar, nextUnlock, el('span', {}, 'ouro:'), gold, el('span', {}, 'tick:'), tick, conn, ...shortcuts, stop, leave))
+    name, level, xpBar, nextUnlock, el('span', {}, 'ouro:'), gold, dex, el('span', {}, 'tick:'), tick, conn, ...shortcuts, stop, leave))
 
   const offMe = ctx.session.subscribe((s) => s.me, (me) => {
     if (!me) return
@@ -42,6 +45,18 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
     if (value !== null) gold.textContent = String(value)
   })
   const offTick = ctx.hunt.subscribe((v) => v.tick, (value) => { tick.textContent = String(value) })
+  // Contador "Rota 1: n/m": a Pokédex do servidor é lida uma vez e `seen` da sessão atualiza ao vivo.
+  let entries: Awaited<ReturnType<typeof loadEntries>> = []
+  async function loadEntries() { return (await ctx.http.get('/trainer/pokedex', PokedexSchema)).entries }
+  const renderDex = (): void => {
+    const huntId = ctx.hunt.get().session?.huntId
+    const map = huntId ? ctx.registry.hunts.get(huntId) : undefined
+    if (!map) { dex.textContent = ''; return }
+    const { n, m } = huntPokedexCount(ctx.hunt.get(), entries, map)
+    dex.textContent = `${map.name}: ${n}/${m}`
+  }
+  void loadEntries().then((loaded) => { entries = loaded; renderDex() }).catch(() => {})
+  const offDex = ctx.hunt.subscribe((v) => v.state?.settings.seen, renderDex)
   const offConn = ctx.session.subscribe((s) => s.socket, (status) => {
     const phase = ctx.hunt.get().phase
     const key = phase === 'catching-up' ? 'catching-up' : status
@@ -54,5 +69,5 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
     conn.setAttribute('data-conn', key)
     conn.textContent = key === 'catching-up' ? 'recuperando tempo' : CONN_TEXT[status] ?? status
   })
-  return () => { offMe(); offGold(); offTick(); offConn(); offPhase() }
+  return () => { offMe(); offGold(); offTick(); offDex(); offConn(); offPhase() }
 }

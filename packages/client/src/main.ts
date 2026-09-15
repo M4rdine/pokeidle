@@ -16,6 +16,12 @@ import { mountAuth } from './ui/screens/auth.js'
 import { mountGame } from './ui/screens/game.js'
 import { mountHunts } from './ui/screens/hunts.js'
 import { mountStarter } from './ui/screens/starter.js'
+import { openBag } from './ui/modals/bag.js'
+import { openPokedex } from './ui/modals/pokedex.js'
+import { openSettings } from './ui/modals/settings.js'
+import { openShop } from './ui/modals/shop.js'
+import { openTeam } from './ui/modals/team.js'
+import { createTipShower } from './ui/tips.js'
 import { createToasts } from './ui/toast.js'
 
 const root = document.querySelector<HTMLElement>('#app')
@@ -71,7 +77,9 @@ async function boot(): Promise<void> {
     clearTimeout: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
     random: Math.random,
   })
-  ctx = { ...ctx, loop, sendIntent: loop.send, openModal: (_name: ModalName) => {} }
+  const modals: Record<ModalName, (context: AppContext) => unknown> = { bag: openBag, team: openTeam, settings: openSettings, pokedex: openPokedex, shop: openShop }
+  ctx = { ...ctx, loop, sendIntent: loop.send, openModal: (name: ModalName) => { modals[name](ctx) } }
+  loop.onEvent(createTipShower(ctx))
   ctx.session.subscribe((s) => s.me !== null, (logged) => { if (logged) loop.start(); else loop.stop() })
   ctx.session.subscribe((s) => s.screen, () => render())
   await refreshMe()

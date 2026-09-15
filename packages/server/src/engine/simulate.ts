@@ -1,5 +1,8 @@
+import type { Summary } from '@pokeidle/shared/protocol'
 import { step } from './step.js'
 import type { EngineDeps, Event, HuntState, StepResult } from './types.js'
+
+export type { Summary } from '@pokeidle/shared/protocol'
 
 export function simulate(state: HuntState, ticks: number, deps: EngineDeps): StepResult {
   if (!Number.isInteger(ticks) || ticks < 0) throw new RangeError(`ticks inválido: ${ticks}`)
@@ -11,20 +14,6 @@ export function simulate(state: HuntState, ticks: number, deps: EngineDeps): Ste
     current = next.state
   }
   return { state: current, events }
-}
-
-export interface Summary {
-  readonly ticks: number
-  readonly defeats: number
-  readonly captures: number
-  readonly captureFailures: number
-  readonly faints: number
-  readonly xpTrainer: number
-  readonly gold: number
-  readonly drops: Readonly<Record<string, number>>
-  readonly levelUps: number
-  readonly evolutions: number
-  readonly returns: number
 }
 
 export function summarizeEvents(events: readonly Event[], ticks: number): Summary {

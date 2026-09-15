@@ -6,7 +6,7 @@ import { AppError } from '../http/errors.js'
 import { SNAPSHOT_EVERY_TICKS, SYNC_EVERY_TICKS } from './constants.js'
 
 export type StoppedEvent = Extract<Event, { type: 'stopped' }>
-export type StopReason = StoppedEvent['reason'] | 'corrupt' | 'persist-failed'
+export type { StopReason } from '@pokeidle/shared/protocol'
 
 export interface LogEntry {
   readonly huntId: string; readonly speciesName: string; readonly level: number

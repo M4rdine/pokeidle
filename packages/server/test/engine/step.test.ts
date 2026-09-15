@@ -177,8 +177,10 @@ describe('poções e limiares', () => {
     expect(r.events).toEqual([{ type: 'itemUsed', tick: 0, itemId: 'super-potion', pokemonId: 'p1', hp: 19 }])
   })
   it('entre os limiares sem poção não faz nada; abaixo do retorno sem poção volta', () => {
-    expect(resolveConsequences(at(9, {}), deps).events).toEqual([]) // 45 %: < 50 mas sem poção; ≥ 30
-    const r = resolveConsequences(at(5, {}), deps) // 25 % < 30
+    // returnHpPercent fixado em 30 aqui (o padrão real é 50 desde a fase 3a) para exercitar os
+    // dois limiares como valores distintos.
+    expect(resolveConsequences(at(9, {}, { returnHpPercent: 30 }), deps).events).toEqual([]) // 45 %: < 50 mas sem poção; ≥ 30
+    const r = resolveConsequences(at(5, {}, { returnHpPercent: 30 }), deps) // 25 % < 30
     expect(r.state.player.mode).toBe('returning')
     expect(r.events).toEqual([{ type: 'returning', tick: 0 }])
   })

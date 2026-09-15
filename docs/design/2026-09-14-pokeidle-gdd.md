@@ -50,9 +50,10 @@ time caído no primeiro minuto. Com as regras deste documento, zero quedas em 3 
 
 ### 3.2 Cura e poções
 - Dois limiares por treinador, configuráveis: **usar poção abaixo de X %** (padrão 50) e
-  **voltar ao Centro abaixo de Y %** (padrão 30). Abaixo de X com poção: usa a mais fraca que
+  **voltar ao Centro abaixo de Y %** (padrão 50). Abaixo de X com poção: usa a mais fraca que
   cubra o HP faltante, senão a mais forte que tiver. Sem poção e abaixo de Y: volta ao Centro
-  (cura completa em 5 s, grátis).
+  (cura completa em 5 s, grátis). Padrão 50 (não 30): medido em 8 seeds, 30 % derruba o inicial
+  em metade delas.
 - Poções em três níveis, por percentual do HP máximo: Poção 20 % (100 ouro), Super Poção 50 %
   (400), Hiper Poção 100 % (1 500). Venda pela metade.
 - Medido: retorno em 50 % + poção de 50 % dá ~180 derrotas em 10 min sem quedas.

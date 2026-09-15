@@ -50,6 +50,8 @@ nascem no schema com `.default()` para snapshots antigos continuarem legíveis (
   > 0, a mais fraca cujo `ceil(hpMax·healPercent/100) ≥ hpMax − hp`; se nenhuma cobre, a mais
   forte. `resolveLowHp`: com `hp% < potionHpPercent` e alguma poção → `applyPotion(choosePotion)`;
   senão com `hp% < returnHpPercent` → `returning`; senão nada. `weakestPotion` sai.
+  `RETURN_HP_PERCENT_DEFAULT` agora é `50` (não `30`), o padrão para voltar ao Centro. Padrão 50
+  (não 30): medido em 8 seeds, 30 % derruba o inicial em metade delas.
 - **Quem chega ataca primeiro** (`step.ts`): `step` guarda `engagedBefore = mode === 'fighting'
   ? targetWildId : null` antes de `stepPlayer`; `engagedWildAttack(s, deps, engagedBefore)` só
   ataca se `s.player.targetWildId === engagedBefore` (o selvagem já estava engajado no tick

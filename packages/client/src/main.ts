@@ -80,6 +80,7 @@ async function boot(): Promise<void> {
     setTimeout: (fn, ms) => setTimeout(fn, ms),
     clearTimeout: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>),
     random: Math.random,
+    onAuthLost: onUnauthorized, // sessão expirada com o jogador parado: o socket avisa, o HTTP não
   })
   const modals: Record<ModalName, (context: AppContext) => unknown> = { bag: openBag, team: openTeam, settings: openSettings, pokedex: openPokedex, shop: openShop }
   ctx = { ...ctx, loop, sendIntent: loop.send, openModal: (name: ModalName) => { if (ctx) modals[name](ctx) } }

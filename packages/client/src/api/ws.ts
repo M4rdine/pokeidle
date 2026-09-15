@@ -1,16 +1,21 @@
 import { ServerMessageSchema, type ClientMessage, type ServerMessage } from '@pokeidle/shared/protocol'
 import { BACKOFF_MAX_MS, BACKOFF_MIN_MS, INTENT_MIN_INTERVAL_MS } from '../config.js'
 
+/** O servidor usa 1008 quando a sessão sumiu ou nunca existiu. */
+const SESSION_LOST_CODE = 1008
+
 export type SocketStatus = 'connecting' | 'open' | 'reconnecting' | 'closed'
 
 export interface WebSocketLike {
   send(data: string): void; close(): void
-  onopen: (() => void) | null; onmessage: ((ev: { data: string }) => void) | null; onclose: (() => void) | null; onerror: (() => void) | null
+  onopen: (() => void) | null; onmessage: ((ev: { data: string }) => void) | null; onclose: ((ev?: { code?: number }) => void) | null; onerror: (() => void) | null
 }
 export interface HuntSocketDeps {
   readonly url: string; readonly makeSocket: (url: string) => WebSocketLike; readonly now: () => number; readonly random: () => number
   readonly setTimeout: (fn: () => void, ms: number) => unknown; readonly clearTimeout: (handle: unknown) => void
   readonly onMessage: (m: ServerMessage) => void; readonly onStatus: (s: SocketStatus) => void; readonly onInvalid: (reason: string) => void
+  /** Sessão perdida (o servidor fecha com 1008): reconectar não adianta, quem chama decide. */
+  readonly onAuthLost?: () => void
 }
 export interface HuntSocket { connect(): void; send(m: ClientMessage): void; close(): void }
 
@@ -60,11 +65,12 @@ export function createHuntSocket(d: HuntSocketDeps): HuntSocket {
     s.onopen = () => { open = true; attempts = 0; d.onStatus('open'); flush() }
     s.onmessage = (ev) => handleMessage(ev.data)
     s.onerror = () => {}
-    s.onclose = () => {
+    s.onclose = (ev) => {
       open = false
       if (socket !== s) return
       socket = null
       if (closedByUs) { d.onStatus('closed'); return }
+      if (ev?.code === SESSION_LOST_CODE) { closedByUs = true; d.onStatus('closed'); d.onAuthLost?.(); return }
       scheduleReconnect()
     }
   }

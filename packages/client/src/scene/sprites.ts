@@ -1,3 +1,4 @@
+import { loadTextures } from 'pixi.js'
 import { AnimatedSprite, Assets, Container, Graphics, Spritesheet, TextureStyle, type SpritesheetData, type Texture } from 'pixi.js'
 import { ATLAS_URL } from '../config.js'
 import type { AtlasData } from './atlas.js'
@@ -14,6 +15,10 @@ const dirOf = (url: string): string => url.slice(0, url.lastIndexOf('/') + 1)
  * (`loadAtlas`). `atlas.pokemon`/`atlas.tiles` são o mesmo shape que `SpritesheetData` do Pixi
  * (só que imutáveis); o cast abaixo é seguro porque os objetos vêm de `JSON.parse`.
  */
+// O Pixi decodifica texturas num worker criado por blob:, que a CSP (`script-src 'self'`) bloqueia.
+// Decodificar na thread principal evita o erro no console; são dois PNGs, carregados uma vez.
+if (loadTextures.config) loadTextures.config.preferWorkers = false
+
 export async function loadSheets(atlas: AtlasData): Promise<Sheets> {
   // Padrão do Pixi é 'linear' (borra pixel art); nearest antes de qualquer Assets.load.
   TextureStyle.defaultOptions.scaleMode = 'nearest'

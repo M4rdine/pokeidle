@@ -2,6 +2,7 @@ import { cooldownTicks, loadRegistry } from '@pokeidle/shared'
 import type { ServerMessage } from '@pokeidle/shared/protocol'
 import { describe, expect, it, vi } from 'vitest'
 import type { Me } from '../../../src/api/dto.js'
+import { appendLog, type LogLine } from '../../../src/state/log.js'
 import { createContext, type AppContext } from '../../../src/app-context.js'
 import { applySnapshot, emptyHuntView, type HuntView } from '../../../src/state/hunt-view.js'
 import { initialSession, withMe } from '../../../src/state/session.js'
@@ -103,6 +104,18 @@ describe('time e log', () => {
     expect(r.querySelectorAll('.slot-locked')).toHaveLength(3)
     r.querySelector<HTMLButtonElement>('.slot-active')!.click()
     expect(sendIntent).toHaveBeenCalledWith({ t: 'team.setActive', pokemonId: view.state!.player.team[0]!.id })
+  })
+  it('continua recebendo linhas depois que o store atinge o teto de 200', () => {
+    const start = Array.from({ length: 200 }, (_unused, i) => ({ tick: i, kind: 'combat' as const, text: `l${i}` }))
+    const log = createStore<readonly LogLine[]>(start)
+    const r = root()
+    mountLog(r, ctxWith({ log }))
+    expect(r.querySelectorAll('.log-line')).toHaveLength(200)
+    for (let i = 200; i < 205; i++) log.set(appendLog(log.get(), { tick: i, kind: 'combat', text: `l${i}` }))
+    const lines = [...r.querySelectorAll('.log-line')].map((node) => node.textContent)
+    expect(lines).toHaveLength(200)
+    expect(lines.at(-1)).toBe('l204') // o store rotaciona: a tela precisa acompanhar
+    expect(lines[0]).toBe('l5')
   })
   it('o filtro "só combate" esconde as outras linhas', () => {
     const log = createStore([

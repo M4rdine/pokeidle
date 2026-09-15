@@ -14,7 +14,6 @@ export const PokedexSchema = z.object({ entries: z.array(z.object({ speciesName:
 export const HuntSummarySchema = z.object({ id: z.string(), name: z.string(), width: z.number(), height: z.number(), minLevel: z.number(), maxLevel: z.number() })
 export const HuntsSchema = z.object({ hunts: z.array(HuntSummarySchema) })
 // `kind` é string aberta de propósito: um tipo de item novo no servidor não pode quebrar a loja.
-// `kind` é string aberta de propósito: um tipo de item novo no servidor não pode quebrar a loja.
 export const ShopItemSchema = z.object({ itemId: z.string(), name: z.string(), kind: z.string(), buyPrice: z.number(), sellPrice: z.number(), unlockLevel: z.number(), unlocked: z.boolean(), owned: z.number() })
 export const ShopSchema = z.object({ level: z.number(), gold: z.number(), items: z.array(ShopItemSchema) })
 export const TradeSchema = z.object({ gold: z.number(), item: z.object({ itemId: z.string(), quantity: z.number() }) })

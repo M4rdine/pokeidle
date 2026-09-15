@@ -8,6 +8,7 @@ import { trainerProgress, unlockedBetween } from './state/progress.js'
 
 export type EventListener = (event: Event, view: HuntView) => void
 export interface GameLoopDeps {
+  readonly onAuthLost?: () => void
   readonly makeSocket: (url: string) => WebSocketLike
   readonly setTimeout: (fn: () => void, ms: number) => unknown
   readonly clearTimeout: (handle: unknown) => void
@@ -65,6 +66,7 @@ export function createGameLoop(ctx: AppContext, deps: GameLoopDeps): GameLoop {
     onMessage,
     onStatus: (status) => ctx.session.update((s) => ({ ...s, socket: status })),
     onInvalid: (reason) => alert(`Mensagem ignorada: ${reason}`),
+    ...(deps.onAuthLost && { onAuthLost: deps.onAuthLost }),
   })
 
   return {

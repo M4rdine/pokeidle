@@ -7,7 +7,7 @@ class FakeSocket implements WebSocketLike {
   sent: string[] = []
   onopen: (() => void) | null = null
   onmessage: ((ev: { data: string }) => void) | null = null
-  onclose: (() => void) | null = null
+  onclose: ((ev?: { code?: number }) => void) | null = null
   onerror: (() => void) | null = null
   constructor(readonly url: string) { FakeSocket.all.push(this) }
   send(data: string): void { this.sent.push(data) }
@@ -86,5 +86,31 @@ describe('createHuntSocket', () => {
     h.advance(60_000)
     expect(h.sockets).toHaveLength(11)
     expect(h.onStatus).toHaveBeenLastCalledWith('closed')
+  })
+})
+
+describe('sessão perdida', () => {
+  it('fechamento 1008 não reconecta, vira closed e avisa quem chamou', () => {
+    FakeSocket.all = []
+    const onAuthLost = vi.fn()
+    const onStatus = vi.fn()
+    const timers: { at: number; fn: () => void; id: number }[] = []
+    let now = 0
+    let nextId = 1
+    const ws = createHuntSocket({
+      url: '/ws', makeSocket: (url) => new FakeSocket(url), now: () => now, random: () => 0.5,
+      setTimeout: (fn, ms) => { const id = nextId++; timers.push({ at: now + ms, fn, id }); return id },
+      clearTimeout: (id) => { const i = timers.findIndex((t) => t.id === id); if (i >= 0) timers.splice(i, 1) },
+      onMessage: () => {}, onStatus, onInvalid: () => {}, onAuthLost,
+    })
+    ws.connect()
+    const socket = FakeSocket.all[0]!
+    socket.open()
+    socket.onclose?.({ code: 1008 })
+    expect(onAuthLost).toHaveBeenCalledTimes(1)
+    expect(onStatus).toHaveBeenLastCalledWith('closed')
+    now += 60_000
+    for (const timer of [...timers]) timer.fn()
+    expect(FakeSocket.all).toHaveLength(1) // nenhuma reconexão
   })
 })

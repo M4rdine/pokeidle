@@ -13,7 +13,8 @@ export function openBag(ctx: AppContext): Modal {
   const body = el('div', { class: 'bag' }, el('p', { class: 'muted' }, 'Carregando…'))
   const view = ctx.hunt.get()
   const active = activePokemon(view)
-  const inHunt = hasActiveHunt(ctx) && view.state !== null
+  // `phase` importa: depois de uma parada involuntária o estado continua espelhado na tela.
+  const inHunt = hasActiveHunt(ctx) && view.state !== null && view.phase === 'active'
 
   const render = (items: readonly { itemId: string; quantity: number }[]): void => {
     if (items.length === 0) { body.replaceChildren(el('p', { class: 'muted' }, 'Mochila vazia')); return }

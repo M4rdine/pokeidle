@@ -20,7 +20,9 @@ test('registrar, inicial, Rota 1, derrota, mochila, parar e comprar na loja', as
   await expect(page.locator('.log-line', { hasText: 'derrotado' }).first()).toBeVisible({ timeout: 120_000 })
 
   await page.getByRole('button', { name: 'Mochila' }).click()
-  await expect(page.locator('.modal')).toContainText('Poção')
+  // As poções podem ter acabado durante a caçada; as bolas continuam lá.
+  await expect(page.locator('.modal .bag-item').first()).toBeVisible()
+  await expect(page.locator('.modal')).toContainText('Bola')
   await page.keyboard.press('Escape')
   await expect(page.locator('.modal')).toHaveCount(0)
 

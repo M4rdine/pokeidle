@@ -5,7 +5,7 @@ import { activePokemon, applyEvent, applyServerMessage, applySnapshot, emptyHunt
 import fixture from './fixtures/route1-300.json' with { type: 'json' }
 
 const registry = loadRegistry()
-const rec = fixture as unknown as { snapshot: Extract<ServerMessage, { t: 'hunt.snapshot' }>; ticks: Extract<ServerMessage, { t: 'hunt.tick' }>[]; final: HuntState }
+const rec = fixture as { snapshot: Extract<ServerMessage, { t: 'hunt.snapshot' }>; ticks: Extract<ServerMessage, { t: 'hunt.tick' }>[]; final: HuntState }
 const base = (): HuntView => applySnapshot(emptyHuntView(), rec.snapshot)
 const ev = (e: Event, v: HuntView = base()) => applyEvent(v, e, registry)
 const wildId = rec.snapshot.state.wilds[0]!.id
@@ -36,6 +36,8 @@ describe('applyEvent (tabela da spec §4)', () => {
     expect(v.state!.wilds.find((w) => w.id === wildId)!.hp).toBe(7)
     expect(v.derived).toEqual({ cooldownUntil: { ember: 7 + cooldownTicks(registry.moves.get('ember')!) }, targetWildId: wildId })
     expect(v.state!.player.mode).toBe('fighting')
+    // state.player.cooldowns fica em sincronia com derived.cooldownUntil (Fix round 1).
+    expect(v.state!.player.cooldowns['ember']).toBe(v.derived.cooldownUntil['ember'])
   })
   it('attack do selvagem: hp do Pokémon alvo', () => {
     const v = ev({ type: 'attack', tick: 8, attacker: 'wild', attackerId: String(wildId), targetId: 'p1', move: 'tackle', damage: 4, targetHp: 20 })
@@ -73,6 +75,8 @@ describe('applyEvent (tabela da spec §4)', () => {
     const switched = ev({ type: 'switched', tick: 1, pokemonId: 'p2' }, { ...fainted, derived: { cooldownUntil: { ember: 50 }, targetWildId: null } })
     expect(switched.state!.player.activeIndex).toBe(1)
     expect(switched.derived.cooldownUntil).toEqual({})
+    // switched limpa state.player.cooldowns também, não só derived (Fix round 1).
+    expect(switched.state!.player.cooldowns).toEqual({})
     const p1 = activePokemon(base())!
     const up = ev({ type: 'levelUp', tick: 1, pokemonId: 'p1', level: p1.level + 1 })
     const hpMax = hpAt(registry.species.get('charmander')!.baseStats.hp, p1.level + 1)
@@ -93,6 +97,7 @@ describe('applyEvent (tabela da spec §4)', () => {
     expect(healed.state!.player.team[0]!.hp).toBe(healed.state!.player.team[0]!.hpMax)
     expect(healed.state!.player.mode).toBe('searching')
     expect(healed.derived.cooldownUntil).toEqual({})
+    expect(healed.state!.player.cooldowns).toEqual({})
     const stopped = ev({ type: 'stopped', tick: 31, reason: 'team-fainted' })
     expect(stopped).toMatchObject({ phase: 'stopped', stoppedInfo: { reason: 'team-fainted', healed: false } })
     expect(stopped.state!.player.mode).toBe('stopped')
@@ -109,6 +114,8 @@ describe('applyServerMessage', () => {
     v = applyServerMessage(v, rec.ticks[0]!, registry)
     expect(v.tick).toBe(rec.ticks[0]!.tick)
     expect(v.serverTime).toBe(rec.ticks[0]!.serverTime)
+    // state.tick fica em sincronia com view.tick após um hunt.tick (Fix round 1).
+    expect(v.state!.tick).toBe(rec.ticks[0]!.tick)
     expect(applyServerMessage(v, { t: 'hunt.catchup', ticksRemaining: 500 }, registry)).toMatchObject({ phase: 'catching-up', catchup: { remaining: 500 } })
     const summary = { ticks: 1, defeats: 0, captures: 0, captureFailures: 0, faints: 0, xpTrainer: 0, gold: 0, drops: {}, levelUps: 0, evolutions: 0, returns: 0 }
     expect(applyServerMessage(v, { t: 'hunt.summary', summary }, registry).lastSummary).toEqual(summary)
@@ -116,11 +123,28 @@ describe('applyServerMessage', () => {
     const idle = applyServerMessage(v, { t: 'hunt.idle' }, registry)
     expect(idle).toMatchObject({ phase: 'idle', state: null, session: null })
     expect(applyServerMessage(v, { t: 'pong' }, registry)).toBe(v)
+    expect(applyServerMessage(v, { t: 'error', code: 'x', message: 'y' }, registry)).toBe(v)
   })
   it('replay da gravação: o espelho bate com o estado final do motor', () => {
     const v = rec.ticks.reduce((acc, m) => applyServerMessage(acc, m, registry), base())
+    /**
+     * Campos deliberadamente fora da projeção, em dois grupos:
+     * (a) bookkeeping só do servidor — o cliente nunca recebe nem precisa destes: `respawns`,
+     *     `nextWildId`, `player.path`, `player.skippedWildIds`, `player.healingUntilTick`,
+     *     `wilds[].spawnIndex`, `wilds[].cooldowns`, `wilds[].captureTried`.
+     * (b) aproximados pelo espelho porque não há evento para a transição: `player.mode` (o motor
+     *     volta a 'searching' depois de `removeWild` sem emitir evento, e a transição
+     *     'returning' → 'healing' também não tem evento próprio — só `healed` fecha o ciclo) e
+     *     `player.targetWildId` (o motor mira o selvagem antes do primeiro golpe; o espelho só
+     *     sabe o alvo a partir do primeiro `attack`).
+     * `tick` e `player.cooldowns` ENTRARAM na projeção (Fix round 1): agora são mantidos em
+     * sincronia pelo espelho (ver `applyServerMessage`/`attack`/`switched`/`healed`) e devem
+     * bater 1:1 com o motor — se não baterem, o diff abaixo mostra exatamente onde.
+     */
     const project = (s: HuntState) => ({
-      trainer: s.trainer, inventory: s.inventory, box: s.box, team: s.player.team, activeIndex: s.player.activeIndex, position: s.player.position,
+      tick: s.tick,
+      trainer: s.trainer, inventory: s.inventory, box: s.box,
+      team: s.player.team, activeIndex: s.player.activeIndex, position: s.player.position, cooldowns: s.player.cooldowns,
       wilds: s.wilds.map((w) => ({ id: w.id, speciesName: w.speciesName, level: w.level, hp: w.hp, hpMax: w.hpMax, position: w.position })), seen: s.settings.seen,
     })
     expect(project(v.state!)).toEqual(project(rec.final))

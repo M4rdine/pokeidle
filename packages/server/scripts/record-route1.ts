@@ -12,8 +12,12 @@ import { writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createRng, hpAt, loadRegistry, TICK_MS, xpForLevel } from '@pokeidle/shared'
+import type { ServerMessage } from '@pokeidle/shared/protocol'
 import { createHuntState, defaultSettings } from '../src/engine/create.js'
 import { step } from '../src/engine/step.js'
+
+type HuntSnapshotMsg = Extract<ServerMessage, { t: 'hunt.snapshot' }>
+type HuntTickMsg = Extract<ServerMessage, { t: 'hunt.tick' }>
 
 const registry = loadRegistry()
 const hunt = registry.hunts.get('route-1')!
@@ -23,8 +27,8 @@ const deps = { registry, hunt, rng: createRng(42) }
 const T0 = Date.UTC(2026, 8, 14, 12, 0, 0)
 let state = createHuntState({ hunt, sessionId: 'rec', team, inventory: { potion: 3, 'poke-ball': 5 }, settings: defaultSettings() }, deps)
 const session = { huntId: 'route-1', sessionId: 'rec', startedAt: new Date(T0).toISOString() }
-const snapshot = { t: 'hunt.snapshot', session, state, serverTime: T0 }
-const ticks = []
+const snapshot: HuntSnapshotMsg = { t: 'hunt.snapshot', session, state, serverTime: T0 }
+const ticks: HuntTickMsg[] = []
 for (let i = 0; i < 300; i++) {
   const r = step(state, deps)
   state = r.state

@@ -51,6 +51,7 @@ export function applyEvent(view: HuntView, e: Event, registry: Registry): HuntVi
   const s = view.state
   switch (e.type) {
     case 'spawned': {
+      // spawnIndex: -1 — o cliente não conhece o índice do ponto de spawn no mapa, só o motor.
       const hpMax = hpAt(baseHp(registry, e.speciesName), e.level)
       return withState(view, { ...s, wilds: [...s.wilds, { id: e.wildId, spawnIndex: -1, speciesName: e.speciesName, level: e.level, hp: hpMax, hpMax, position: e.position, cooldowns: {}, captureTried: false }] })
     }
@@ -59,8 +60,9 @@ export function applyEvent(view: HuntView, e: Event, registry: Registry): HuntVi
       if (e.attacker === 'wild') return mapTeam(view, e.targetId, (p) => ({ ...p, hp: e.targetHp }))
       const wildId = Number(e.targetId)
       const move = registry.moves.get(e.move) ?? STRUGGLE
-      const hit = withPlayer(mapWild(view, wildId, (w) => ({ ...w, hp: e.targetHp })), { mode: 'fighting', targetWildId: wildId })
-      return withDerived(hit, { targetWildId: wildId, cooldownUntil: { ...view.derived.cooldownUntil, [e.move]: e.tick + cooldownTicks(move) } })
+      const readyAt = e.tick + cooldownTicks(move)
+      const hit = withPlayer(mapWild(view, wildId, (w) => ({ ...w, hp: e.targetHp })), { mode: 'fighting', targetWildId: wildId, cooldowns: { ...s.player.cooldowns, [e.move]: readyAt } })
+      return withDerived(hit, { targetWildId: wildId, cooldownUntil: { ...view.derived.cooldownUntil, [e.move]: readyAt } })
     }
     case 'wildDefeated': {
       const active = activePokemon(view)
@@ -72,12 +74,13 @@ export function applyEvent(view: HuntView, e: Event, registry: Registry): HuntVi
     case 'captured': return capture(view, e, registry)
     case 'captureFailed': return addItem(view, e.ball, -1)
     case 'pokemonFainted': return mapTeam(view, e.pokemonId, (p) => ({ ...p, hp: 0 }))
-    case 'switched': return withDerived(withPlayer(view, { activeIndex: Math.max(0, s.player.team.findIndex((p) => p.id === e.pokemonId)) }), { cooldownUntil: {} })
+    case 'switched': return withDerived(withPlayer(view, { activeIndex: Math.max(0, s.player.team.findIndex((p) => p.id === e.pokemonId)), cooldowns: {} }), { cooldownUntil: {} })
     case 'levelUp': return mapTeam(view, e.pokemonId, (p) => rescale({ ...p, level: e.level }, hpAt(baseHp(registry, p.speciesName), e.level)))
     case 'evolved': return mapTeam(view, e.pokemonId, (p) => rescale({ ...p, speciesName: e.to }, hpAt(baseHp(registry, e.to), p.level)))
     case 'itemUsed': return addItem(mapTeam(view, e.pokemonId, (p) => ({ ...p, hp: e.hp })), e.itemId, -1)
     case 'returning': return clearTarget(withPlayer(view, { mode: 'returning' }))
-    case 'healed': return withDerived(withPlayer(view, { mode: 'searching', team: s.player.team.map((p) => ({ ...p, hp: p.hpMax })) }), { cooldownUntil: {} })
+    case 'healed': return withDerived(withPlayer(view, { mode: 'searching', team: s.player.team.map((p) => ({ ...p, hp: p.hpMax })), cooldowns: {} }), { cooldownUntil: {} })
+    // healed: false é placeholder — o valor real chega depois no `hunt.stopped` (evento `stopped` não carrega essa info).
     case 'stopped': return { ...clearTarget(withPlayer(view, { mode: 'stopped' })), phase: 'stopped', stoppedInfo: { reason: e.reason, healed: false } }
     case 'skipped': return clearTarget(view)
   }
@@ -86,7 +89,11 @@ export function applyEvent(view: HuntView, e: Event, registry: Registry): HuntVi
 export function applyServerMessage(view: HuntView, msg: ServerMessage, registry: Registry): HuntView {
   switch (msg.t) {
     case 'hunt.snapshot': return applySnapshot(view, msg)
-    case 'hunt.tick': return msg.events.reduce((v, e) => applyEvent(v, e, registry), { ...view, tick: msg.tick, serverTime: msg.serverTime })
+    case 'hunt.tick': {
+      // state.tick precisa avançar junto com view.tick — Task 9 lê os dois.
+      const ticked = { ...view, state: view.state && { ...view.state, tick: msg.tick }, tick: msg.tick, serverTime: msg.serverTime }
+      return msg.events.reduce((v, e) => applyEvent(v, e, registry), ticked)
+    }
     case 'hunt.catchup': return { ...view, phase: 'catching-up', catchup: { remaining: msg.ticksRemaining } }
     case 'hunt.summary': return { ...view, lastSummary: msg.summary }
     case 'hunt.stopped': return { ...view, phase: 'stopped', catchup: null, stoppedInfo: { reason: msg.reason, healed: msg.healed } }

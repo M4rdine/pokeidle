@@ -164,3 +164,98 @@ inteiro ≥ 1 confia nos N hops mais próximos; uma lista separada por vírgula 
 IPs/CIDRs confia só quando a conexão vem de um desses endereços. Só use `'true'` atrás
 de um proxy que sobrescreve o cabeçalho antes de repassar a requisição — do contrário
 qualquer cliente pode forjar `X-Forwarded-For` e escapar do rate limit por IP.
+
+## Tempo real (fase 2c)
+
+Enquanto uma hunt está ativa, o progresso roda num scheduler em memória (`src/realtime`)
+que simula a hunt a 5 ticks/s independente de haver alguém conectado; o WebSocket só
+transmite o que já está acontecendo, não é ele quem impulsiona a simulação.
+
+### Conectar
+
+`GET /ws` (upgrade WebSocket). Exige o mesmo cookie de sessão `sid` das rotas REST
+(S21) — sem ele, 401 antes mesmo do upgrade — e o cabeçalho `Origin` igual a
+`APP_ORIGIN`, senão 403; não há CORS nem token na URL. Uma conexão nunca inicia uma
+hunt sozinha: o cliente chama `POST /hunts/:id/start` primeiro (ou já tem uma ativa) e
+só então conecta. Até 8 sockets simultâneos por treinador (`WS_MAX_SOCKETS_PER_TRAINER`);
+o nono é fechado com 1013.
+
+### Mensagens
+
+| Cliente → servidor | Quando usar |
+|---|---|
+| `ping` | keepalive do lado do cliente; servidor responde `pong` |
+| `hunt.stop` | encerra a hunt ativa (equivalente a `POST /hunts/stop`) |
+| `item.use` | usa um item do inventário na hunt corrente |
+| `team.setActive` | troca o Pokémon ativo do time |
+| `settings.update` | atualiza `returnHpPercent`/`capture.maxWildHpPercent`/etc. |
+
+| Servidor → cliente | Quando chega |
+|---|---|
+| `hunt.idle` | ao conectar sem hunt ativa |
+| `hunt.snapshot` | ao conectar com hunt ativa (sem catch-up pendente) |
+| `hunt.catchup` | ao conectar durante um catch-up, e a cada fatia dele |
+| `hunt.tick` | a cada tick com eventos (`spawned`, `attack`, `captured`, etc.) |
+| `hunt.summary` | ao fim de um catch-up, resumo agregado do período perdido |
+| `hunt.stopped` | a hunt terminou (`reason` + `healed`) |
+| `error` | intenção rejeitada ou falha inesperada (`code` + `message`) |
+| `pong` | resposta a `ping` |
+
+Toda mensagem do cliente é validada com Zod `.strict()` e limitada a 4 KB (S22); uma
+mensagem inválida gera `error validation` sem fechar a conexão, mas três seguidas
+fecham com 1008. Intenções (tudo exceto `ping`) têm limite de uma a cada 200 ms por
+conexão; a excedente recebe `error rate-limited`. `hunt.snapshot`/`hunt.tick` nunca
+carregam `seed` nem `rngState` (S25).
+
+### Ritmo
+
+Tick a cada 200 ms (5/s). Snapshot (`hunt_sessions.state`/`rng_state`) salvo a cada 10 s
+de ticks simulados; sync completo nas tabelas relacionais (`pokemon`, `inventory`,
+`trainers`, `pokedex_entries`, `hunt_log`) a cada 60 s e sempre que a hunt para. Ao
+reconectar (ou no boot) depois de um hiato, o servidor faz catch-up determinístico do
+tempo perdido em fatias de `CATCHUP_SLICE_TICKS`, com teto de 12 h por sessão
+(`MAX_CATCHUP_TICKS`); cada fatia manda `hunt.catchup` com o tanto que ainda falta.
+
+### Fim de hunt
+
+`hunt.stopped` chega com `reason` (`intent`, `no-route`, `team-fainted`,
+`persist-failed`, `corrupt`) e `healed`. Só `team-fainted` cura o time automaticamente
+ao encerrar (`finishRunner`); nos demais casos o time fica como estava no último tick
+simulado.
+
+### Limites de abuso (S21–S28)
+
+Handshake exige `Origin`+cookie válidos, sem CORS (S21); mensagens `.strict()` ≤ 4 KB,
+três inválidas seguidas fecham 1008 (S22); uma intenção a cada 200 ms por conexão
+(S23); toda intenção só referencia ids do próprio treinador, validados pelo motor
+(S24); `seed`/`rngState` nunca saem (S25); escritas por treinador são serializadas
+numa fila só daquele treinador, e `finish`/`stopHunt` usam `SELECT ... FOR UPDATE`
+(S26); `hunt_log` recebe uma linha por derrota/captura com `created_at` do servidor
+(S27); logout fecha os sockets daquele token, e a sessão é revalidada a cada 5 min —
+uma sessão vencida fecha o socket com 1008 (S28).
+
+### REST durante uma hunt ativa
+
+Enquanto o scheduler é o único escritor de `hunt_sessions`/`pokemon`/`inventory` de um
+treinador com hunt ativa, as rotas REST de inventário e time (`GET /trainer/inventory`,
+`GET/PUT /trainer/team`) podem devolver dados com até 60 s de atraso em relação ao que
+o WebSocket já mostrou — elas leem as tabelas relacionais, sincronizadas no ritmo acima,
+não o snapshot em memória.
+
+### Boot e shutdown
+
+No boot (`src/main.ts`), depois de `app.listen` e `scheduler.start()`,
+`recoverSessions` (`src/realtime/boot.ts`) religa cada sessão ainda em
+`hunt_sessions` ao scheduler, da mais antiga (`last_simulated_at`) para a mais
+recente, fazendo o catch-up necessário de cada uma; uma sessão com snapshot corrompido
+é encerrada sem sync em vez de travar o boot. `SIGINT`/`SIGTERM` disparam
+`createShutdown`: para o timer de tick, dá flush com sync em tudo que está em memória,
+fecha os sockets abertos (1001), fecha o Fastify e por fim o pool do banco — idempotente,
+uma segunda chamada não repete o trabalho.
+
+### Smoke test manual
+
+`pnpm --filter @pokeidle/server smoke:ws` (com o servidor já rodando) registra um
+treinador aleatório, escolhe o inicial, inicia a Rota 1 e imprime os 20 primeiros
+`hunt.tick` recebidos pelo WebSocket — útil para checar visualmente handshake, ritmo
+dos ticks e o fechamento gracioso do servidor.

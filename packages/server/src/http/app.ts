@@ -3,7 +3,7 @@ import helmet from '@fastify/helmet'
 import rateLimit from '@fastify/rate-limit'
 import websocket from '@fastify/websocket'
 import { loadRegistry } from '@pokeidle/shared'
-import Fastify, { type FastifyInstance } from 'fastify'
+import Fastify, { type FastifyBaseLogger, type FastifyInstance } from 'fastify'
 import { ZodError } from 'zod'
 import { authPlugin } from '../auth/plugin.js'
 import type { Config } from '../config.js'
@@ -29,6 +29,8 @@ export interface AppDeps {
   readonly config: Config
   readonly now?: () => Date
   readonly logger?: boolean
+  /** Logger já criado fora do Fastify (ex.: o pino do `main.ts`, compartilhado com o scheduler antes do app existir). Quando presente, substitui `logger: { level, redact }`. */
+  readonly loggerInstance?: FastifyBaseLogger
   readonly realtime: { readonly scheduler: Scheduler; readonly sockets: SocketRegistry }
   readonly wsOptions?: Partial<WsOptions>
   /** @internal só para testes — a camada HTTP nunca deve passar isto. */
@@ -46,7 +48,10 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     // descontinuado lá (não valida o peer imediato, cai em "não confia" = `false`). O valor
     // já foi validado e convertido em loadConfig; o cast é só para o TS aceitar o repasse.
     trustProxy: config.TRUST_PROXY as boolean | string,
-    logger: deps.logger === false ? false : { level: config.LOG_LEVEL, redact: [...REDACT_PATHS] },
+    // `loggerInstance` (Fastify 5.12) tem prioridade: o `main.ts` cria o pino antes do app
+    // existir (o scheduler precisa de um logger primeiro) e reaproveita a mesma instância
+    // aqui, em vez de deixar o Fastify criar a dele a partir de `logger: { level, redact }`.
+    ...(deps.loggerInstance ? { loggerInstance: deps.loggerInstance } : { logger: deps.logger === false ? false : { level: config.LOG_LEVEL, redact: [...REDACT_PATHS] } }),
   })
 
   await app.register(helmet, {

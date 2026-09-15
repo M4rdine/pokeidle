@@ -8,7 +8,12 @@ describe('loadConfig', () => {
     expect(loadConfig(base)).toEqual({
       DATABASE_URL: base.DATABASE_URL, PORT: 3000, COOKIE_SECURE: false, APP_ORIGIN: 'http://localhost:3000',
       TRUST_PROXY: false, LOG_LEVEL: 'info', ARGON2_MEMORY_KIB: 65536, ARGON2_TIME_COST: 3,
+      DEBUG_VIEWER: false, ASSETS_DIR: expect.stringMatching(/assets[/\\]atlas$/),
     })
+  })
+  it('DEBUG_VIEWER e ASSETS_DIR aceitam override', () => {
+    const c = loadConfig({ ...base, DEBUG_VIEWER: 'true', ASSETS_DIR: '/tmp/x' })
+    expect(c).toMatchObject({ DEBUG_VIEWER: true, ASSETS_DIR: '/tmp/x' })
   })
   it('converte booleanos e números', () => {
     const c = loadConfig({ ...base, PORT: '8080', COOKIE_SECURE: 'true', TRUST_PROXY: 'true', ARGON2_MEMORY_KIB: '4096', ARGON2_TIME_COST: '1' })

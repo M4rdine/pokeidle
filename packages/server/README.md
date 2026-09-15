@@ -259,3 +259,31 @@ uma segunda chamada não repete o trabalho.
 treinador aleatório, escolhe o inicial, inicia a Rota 1 e imprime os 20 primeiros
 `hunt.tick` recebidos pelo WebSocket — útil para checar visualmente handshake, ritmo
 dos ticks e o fechamento gracioso do servidor.
+
+## Visualizador de depuração (`/debug`)
+
+Página descartável para ver uma hunt acontecer antes de existir um cliente de verdade
+(fase 3). Não é o cliente do jogo — só usa as rotas REST/WebSocket já públicas, com o
+mesmo cookie de sessão de qualquer outro cliente, e nunca expõe estado de jogador fora
+delas. Fica inteiramente atrás de `DEBUG_VIEWER` (padrão `false`): com a flag desligada,
+nenhuma rota `/debug/*` existe (404 em todas).
+
+1. `DEBUG_VIEWER=true` no `.env` (ver `.env.example`).
+2. Se `assets/atlas/` (raiz do repo) ainda não existir, gere com `pnpm assets build`
+   (ver `tools/assets/README.md`) — o visualizador serve `tiles.png`/`tiles.json` e
+   `pokemon.png`/`pokemon.json` de lá via `GET /debug/atlas/:file` (allowlist fixa,
+   sem path traversal; qualquer outro nome ou arquivo ausente é 404). `ASSETS_DIR`
+   aponta para esse diretório por padrão e pode ser sobrescrito.
+3. `pnpm server:dev` e abra `http://localhost:3000/debug/`.
+4. Registre uma conta (ou entre com uma existente), escolha um inicial e clique em
+   "Iniciar Rota 1". O mapa aparece no `<canvas>`, o treinador ativo anda até o
+   selvagem mais próximo e luta; o log à direita recebe cada evento do WebSocket
+   (`attack`, `wildDefeated`, `captured`, etc.).
+5. Cores: retângulo branco/laranja/azul-claro/verde é o jogador (`searching`/
+   `fighting`/`returning`/`healing`); círculos vermelhos são selvagens (amarelo = alvo
+   atual); o quadrado azul é o Pokécenter; a caixa "bloqueio" sobrepõe em vermelho os
+   tiles não andáveis do mapa; barras finas acima de cada sprite são HP.
+
+`GET /debug/map/:id` devolve o `HuntMap` do registro (404 se o id não existir); nenhuma
+rota sob `/debug` lê ou grava estado de jogador — isso continua só nas rotas normais que
+a própria página consome (`/auth/*`, `/trainer/*`, `/hunts/*`, `/ws`).

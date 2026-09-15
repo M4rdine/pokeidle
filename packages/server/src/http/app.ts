@@ -15,6 +15,7 @@ import type { WsOptions } from '../realtime/ws.js'
 import { wsRoutes } from '../realtime/ws.js'
 import { AppError, errorBody } from './errors.js'
 import { authRoutes } from './routes/auth.js'
+import { debugRoutes } from './routes/debug.js'
 import { huntRoutes } from './routes/hunts.js'
 import { trainerRoutes } from './routes/trainer.js'
 import { checkOrigin, REDACT_PATHS, sameOrigin } from './security.js'
@@ -109,6 +110,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   await app.register(authRoutes, routeDeps)
   await app.register(trainerRoutes, routeDeps)
   await app.register(huntRoutes, routeDeps)
+  if (config.DEBUG_VIEWER) await app.register(debugRoutes, routeDeps)
   await app.register(wsRoutes, { ...routeDeps, ...(deps.wsOptions && { ws: deps.wsOptions }) })
   deps.extraRoutes?.(app)
   return app

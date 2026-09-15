@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Pokeidle — visualizador de hunt</title>
+  <link rel="stylesheet" href="/debug/viewer.css" />
+</head>
+<body>
+  <header>
+    <form id="auth">
+      <input id="email" type="email" placeholder="e-mail" required />
+      <input id="password" type="password" placeholder="senha (8+)" required />
+      <input id="name" placeholder="nome (só p/ registrar)" />
+      <button type="button" id="register">Registrar</button>
+      <button type="submit" id="login">Entrar</button>
+      <button type="button" id="logout">Sair</button>
+    </form>
+    <div id="controls">
+      <select id="starter"><option value="charmander">Charmander</option><option value="bulbasaur">Bulbasaur</option><option value="squirtle">Squirtle</option></select>
+      <button type="button" id="choose">Escolher inicial</button>
+      <button type="button" id="start">Iniciar Rota 1</button>
+      <button type="button" id="stop">Parar</button>
+      <label><input type="checkbox" id="showBlocking" /> bloqueio</label>
+      <span id="status">desconectado</span>
+    </div>
+  </header>
+  <main>
+    <canvas id="map" width="1280" height="960"></canvas>
+    <aside>
+      <h2>Treinador</h2>
+      <pre id="trainer">—</pre>
+      <h2>Eventos</h2>
+      <ol id="log"></ol>
+    </aside>
+  </main>
+  <script src="/debug/viewer.js"></script>
+</body>
+</html>

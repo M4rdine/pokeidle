@@ -1,6 +1,11 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { z } from 'zod'
 
 const bool = z.enum(['true', 'false']).transform((v) => v === 'true')
+
+// `src/config.ts` → `packages/server/src` → três níveis acima é a raiz do repo.
+const DEFAULT_ASSETS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../assets/atlas')
 
 export type TrustProxy = boolean | number | string
 
@@ -32,6 +37,10 @@ export const ConfigSchema = z.object({
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   ARGON2_MEMORY_KIB: z.coerce.number().int().min(1024).default(65536),
   ARGON2_TIME_COST: z.coerce.number().int().min(1).default(3),
+  /** Liga o visualizador de depuração em `/debug` (ferramenta descartável, nunca em produção). */
+  DEBUG_VIEWER: bool.default('false'),
+  /** Diretório com o atlas de assets (`tiles.png`/`.json`, `pokemon.png`/`.json`) gerado por `pnpm assets build`. */
+  ASSETS_DIR: z.string().min(1).default(DEFAULT_ASSETS_DIR),
 })
 
 export type Config = z.infer<typeof ConfigSchema>

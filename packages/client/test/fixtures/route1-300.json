@@ -1,0 +1,4932 @@
+{
+ "snapshot": {
+  "t": "hunt.snapshot",
+  "session": {
+   "huntId": "route-1",
+   "sessionId": "rec",
+   "startedAt": "2026-09-14T12:00:00.000Z"
+  },
+  "state": {
+   "huntId": "route-1",
+   "sessionId": "rec",
+   "tick": 0,
+   "player": {
+    "team": [
+     {
+      "id": "p1",
+      "speciesName": "charmander",
+      "level": 10,
+      "xp": 560,
+      "hp": 30,
+      "hpMax": 30
+     }
+    ],
+    "activeIndex": 0,
+    "position": {
+     "x": 4,
+     "y": 24
+    },
+    "path": [],
+    "mode": "searching",
+    "targetWildId": null,
+    "healingUntilTick": null,
+    "cooldowns": {},
+    "skippedWildIds": []
+   },
+   "wilds": [
+    {
+     "id": 1,
+     "spawnIndex": 0,
+     "speciesName": "zubat",
+     "level": 4,
+     "hp": 18,
+     "hpMax": 18,
+     "position": {
+      "x": 30,
+      "y": 16
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 2,
+     "spawnIndex": 0,
+     "speciesName": "zubat",
+     "level": 5,
+     "hp": 20,
+     "hpMax": 20,
+     "position": {
+      "x": 30,
+      "y": 18
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 3,
+     "spawnIndex": 0,
+     "speciesName": "zubat",
+     "level": 2,
+     "hp": 14,
+     "hpMax": 14,
+     "position": {
+      "x": 27,
+      "y": 17
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 4,
+     "spawnIndex": 0,
+     "speciesName": "zubat",
+     "level": 3,
+     "hp": 16,
+     "hpMax": 16,
+     "position": {
+      "x": 26,
+      "y": 18
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 5,
+     "spawnIndex": 1,
+     "speciesName": "bellsprout",
+     "level": 6,
+     "hp": 23,
+     "hpMax": 23,
+     "position": {
+      "x": 6,
+      "y": 8
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 6,
+     "spawnIndex": 1,
+     "speciesName": "bellsprout",
+     "level": 3,
+     "hp": 16,
+     "hpMax": 16,
+     "position": {
+      "x": 13,
+      "y": 12
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 7,
+     "spawnIndex": 1,
+     "speciesName": "bellsprout",
+     "level": 5,
+     "hp": 21,
+     "hpMax": 21,
+     "position": {
+      "x": 7,
+      "y": 6
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 8,
+     "spawnIndex": 1,
+     "speciesName": "bellsprout",
+     "level": 3,
+     "hp": 16,
+     "hpMax": 16,
+     "position": {
+      "x": 12,
+      "y": 8
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 9,
+     "spawnIndex": 2,
+     "speciesName": "diglett",
+     "level": 7,
+     "hp": 20,
+     "hpMax": 20,
+     "position": {
+      "x": 26,
+      "y": 24
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 10,
+     "spawnIndex": 2,
+     "speciesName": "diglett",
+     "level": 4,
+     "hp": 16,
+     "hpMax": 16,
+     "position": {
+      "x": 32,
+      "y": 22
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 11,
+     "spawnIndex": 2,
+     "speciesName": "diglett",
+     "level": 8,
+     "hp": 22,
+     "hpMax": 22,
+     "position": {
+      "x": 31,
+      "y": 18
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 12,
+     "spawnIndex": 3,
+     "speciesName": "horsea",
+     "level": 7,
+     "hp": 23,
+     "hpMax": 23,
+     "position": {
+      "x": 15,
+      "y": 16
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 13,
+     "spawnIndex": 3,
+     "speciesName": "horsea",
+     "level": 6,
+     "hp": 21,
+     "hpMax": 21,
+     "position": {
+      "x": 17,
+      "y": 16
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 14,
+     "spawnIndex": 4,
+     "speciesName": "gastly",
+     "level": 8,
+     "hp": 25,
+     "hpMax": 25,
+     "position": {
+      "x": 29,
+      "y": 8
+     },
+     "cooldowns": {},
+     "captureTried": false
+    },
+    {
+     "id": 15,
+     "spawnIndex": 4,
+     "speciesName": "gastly",
+     "level": 10,
+     "hp": 29,
+     "hpMax": 29,
+     "position": {
+      "x": 27,
+      "y": 3
+     },
+     "cooldowns": {},
+     "captureTried": false
+    }
+   ],
+   "box": [],
+   "respawns": [],
+   "nextWildId": 16,
+   "trainer": {
+    "xp": 0,
+    "gold": 0
+   },
+   "inventory": {
+    "potion": 3,
+    "poke-ball": 5
+   },
+   "settings": {
+    "returnHpPercent": 50,
+    "potionHpPercent": 50,
+    "teamSlots": 6,
+    "capture": {
+     "ballTier": "best",
+     "maxWildHpPercent": 30,
+     "allowDuplicates": false
+    },
+    "seen": []
+   }
+  },
+  "serverTime": 1789387200000
+ },
+ "ticks": [
+  {
+   "t": "hunt.tick",
+   "tick": 2,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 1,
+     "from": {
+      "x": 4,
+      "y": 24
+     },
+     "to": {
+      "x": 4,
+      "y": 23
+     }
+    }
+   ],
+   "serverTime": 1789387200400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 3,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 2,
+     "from": {
+      "x": 4,
+      "y": 23
+     },
+     "to": {
+      "x": 4,
+      "y": 22
+     }
+    }
+   ],
+   "serverTime": 1789387200600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 4,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 3,
+     "from": {
+      "x": 4,
+      "y": 22
+     },
+     "to": {
+      "x": 4,
+      "y": 21
+     }
+    }
+   ],
+   "serverTime": 1789387200800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 5,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 4,
+     "from": {
+      "x": 4,
+      "y": 21
+     },
+     "to": {
+      "x": 4,
+      "y": 20
+     }
+    }
+   ],
+   "serverTime": 1789387201000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 6,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 5,
+     "from": {
+      "x": 4,
+      "y": 20
+     },
+     "to": {
+      "x": 4,
+      "y": 19
+     }
+    }
+   ],
+   "serverTime": 1789387201200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 7,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 6,
+     "from": {
+      "x": 4,
+      "y": 19
+     },
+     "to": {
+      "x": 4,
+      "y": 18
+     }
+    }
+   ],
+   "serverTime": 1789387201400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 8,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 7,
+     "from": {
+      "x": 4,
+      "y": 18
+     },
+     "to": {
+      "x": 4,
+      "y": 17
+     }
+    }
+   ],
+   "serverTime": 1789387201600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 9,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 8,
+     "from": {
+      "x": 4,
+      "y": 17
+     },
+     "to": {
+      "x": 4,
+      "y": 16
+     }
+    }
+   ],
+   "serverTime": 1789387201800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 10,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 9,
+     "from": {
+      "x": 4,
+      "y": 16
+     },
+     "to": {
+      "x": 4,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387202000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 11,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 10,
+     "from": {
+      "x": 4,
+      "y": 15
+     },
+     "to": {
+      "x": 4,
+      "y": 14
+     }
+    }
+   ],
+   "serverTime": 1789387202200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 12,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 11,
+     "from": {
+      "x": 4,
+      "y": 14
+     },
+     "to": {
+      "x": 4,
+      "y": 13
+     }
+    }
+   ],
+   "serverTime": 1789387202400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 13,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 12,
+     "from": {
+      "x": 4,
+      "y": 13
+     },
+     "to": {
+      "x": 4,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387202600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 14,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 13,
+     "from": {
+      "x": 4,
+      "y": 12
+     },
+     "to": {
+      "x": 4,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387202800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 15,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 14,
+     "from": {
+      "x": 4,
+      "y": 11
+     },
+     "to": {
+      "x": 4,
+      "y": 10
+     }
+    }
+   ],
+   "serverTime": 1789387203000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 16,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 15,
+     "from": {
+      "x": 4,
+      "y": 10
+     },
+     "to": {
+      "x": 4,
+      "y": 9
+     }
+    }
+   ],
+   "serverTime": 1789387203200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 17,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 16,
+     "from": {
+      "x": 4,
+      "y": 9
+     },
+     "to": {
+      "x": 5,
+      "y": 9
+     }
+    }
+   ],
+   "serverTime": 1789387203400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 18,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 17,
+     "from": {
+      "x": 5,
+      "y": 9
+     },
+     "to": {
+      "x": 6,
+      "y": 9
+     }
+    }
+   ],
+   "serverTime": 1789387203600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 19,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 18,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "5",
+     "move": "ember",
+     "damage": 28,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 18,
+     "wildId": 5,
+     "speciesName": "bellsprout",
+     "level": 6,
+     "xpTrainer": 51,
+     "xpPokemon": 51,
+     "gold": 10,
+     "drops": []
+    }
+   ],
+   "serverTime": 1789387203800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 21,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 20,
+     "from": {
+      "x": 6,
+      "y": 9
+     },
+     "to": {
+      "x": 6,
+      "y": 8
+     }
+    }
+   ],
+   "serverTime": 1789387204200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 22,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 21,
+     "from": {
+      "x": 6,
+      "y": 8
+     },
+     "to": {
+      "x": 6,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387204400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 23,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 22,
+     "from": {
+      "x": 6,
+      "y": 7
+     },
+     "to": {
+      "x": 7,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387204600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 24,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 23,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "7",
+     "move": "scratch",
+     "damage": 9,
+     "targetHp": 12
+    },
+    {
+     "type": "attack",
+     "tick": 23,
+     "attacker": "wild",
+     "attackerId": "7",
+     "targetId": "p1",
+     "move": "vine-whip",
+     "damage": 3,
+     "targetHp": 27
+    }
+   ],
+   "serverTime": 1789387204800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 29,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 28,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "7",
+     "move": "ember",
+     "damage": 33,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 28,
+     "wildId": 7,
+     "speciesName": "bellsprout",
+     "level": 5,
+     "xpTrainer": 42,
+     "xpPokemon": 42,
+     "gold": 5,
+     "drops": [
+      {
+       "item": "potion",
+       "quantity": 1
+      }
+     ]
+    }
+   ],
+   "serverTime": 1789387205800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 31,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 30,
+     "from": {
+      "x": 7,
+      "y": 7
+     },
+     "to": {
+      "x": 8,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387206200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 32,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 31,
+     "from": {
+      "x": 8,
+      "y": 7
+     },
+     "to": {
+      "x": 9,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387206400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 33,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 32,
+     "from": {
+      "x": 9,
+      "y": 7
+     },
+     "to": {
+      "x": 10,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387206600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 34,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 33,
+     "from": {
+      "x": 10,
+      "y": 7
+     },
+     "to": {
+      "x": 11,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387206800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 35,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 34,
+     "from": {
+      "x": 11,
+      "y": 7
+     },
+     "to": {
+      "x": 12,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387207000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 36,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 35,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "8",
+     "move": "scratch",
+     "damage": 11,
+     "targetHp": 5
+    },
+    {
+     "type": "attack",
+     "tick": 35,
+     "attacker": "wild",
+     "attackerId": "8",
+     "targetId": "p1",
+     "move": "vine-whip",
+     "damage": 2,
+     "targetHp": 25
+    }
+   ],
+   "serverTime": 1789387207200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 39,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 38,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "8",
+     "move": "ember",
+     "damage": 39,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 38,
+     "wildId": 8,
+     "speciesName": "bellsprout",
+     "level": 3,
+     "xpTrainer": 25,
+     "xpPokemon": 25,
+     "gold": 9,
+     "drops": []
+    }
+   ],
+   "serverTime": 1789387207800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 41,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 40,
+     "from": {
+      "x": 12,
+      "y": 7
+     },
+     "to": {
+      "x": 13,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387208200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 42,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 41,
+     "from": {
+      "x": 13,
+      "y": 7
+     },
+     "to": {
+      "x": 13,
+      "y": 8
+     }
+    }
+   ],
+   "serverTime": 1789387208400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 43,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 42,
+     "from": {
+      "x": 13,
+      "y": 8
+     },
+     "to": {
+      "x": 13,
+      "y": 9
+     }
+    }
+   ],
+   "serverTime": 1789387208600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 44,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 43,
+     "from": {
+      "x": 13,
+      "y": 9
+     },
+     "to": {
+      "x": 13,
+      "y": 10
+     }
+    }
+   ],
+   "serverTime": 1789387208800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 45,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 44,
+     "from": {
+      "x": 13,
+      "y": 10
+     },
+     "to": {
+      "x": 13,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387209000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 46,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 45,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "6",
+     "move": "scratch",
+     "damage": 10,
+     "targetHp": 6
+    },
+    {
+     "type": "attack",
+     "tick": 45,
+     "attacker": "wild",
+     "attackerId": "6",
+     "targetId": "p1",
+     "move": "vine-whip",
+     "damage": 2,
+     "targetHp": 23
+    }
+   ],
+   "serverTime": 1789387209200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 49,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 48,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "6",
+     "move": "ember",
+     "damage": 44,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 48,
+     "wildId": 6,
+     "speciesName": "bellsprout",
+     "level": 3,
+     "xpTrainer": 25,
+     "xpPokemon": 25,
+     "gold": 8,
+     "drops": []
+    }
+   ],
+   "serverTime": 1789387209800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 51,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 50,
+     "from": {
+      "x": 13,
+      "y": 11
+     },
+     "to": {
+      "x": 14,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387210200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 52,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 51,
+     "from": {
+      "x": 14,
+      "y": 11
+     },
+     "to": {
+      "x": 15,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387210400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 53,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 52,
+     "from": {
+      "x": 15,
+      "y": 11
+     },
+     "to": {
+      "x": 15,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387210600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 54,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 53,
+     "from": {
+      "x": 15,
+      "y": 12
+     },
+     "to": {
+      "x": 15,
+      "y": 13
+     }
+    }
+   ],
+   "serverTime": 1789387210800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 55,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 54,
+     "from": {
+      "x": 15,
+      "y": 13
+     },
+     "to": {
+      "x": 15,
+      "y": 14
+     }
+    }
+   ],
+   "serverTime": 1789387211000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 56,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 55,
+     "from": {
+      "x": 15,
+      "y": 14
+     },
+     "to": {
+      "x": 15,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387211200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 57,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 56,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "12",
+     "move": "scratch",
+     "damage": 6,
+     "targetHp": 17
+    },
+    {
+     "type": "attack",
+     "tick": 56,
+     "attacker": "wild",
+     "attackerId": "12",
+     "targetId": "p1",
+     "move": "bubble",
+     "damage": 10,
+     "targetHp": 13
+    },
+    {
+     "type": "itemUsed",
+     "tick": 56,
+     "itemId": "potion",
+     "pokemonId": "p1",
+     "hp": 19
+    }
+   ],
+   "serverTime": 1789387211400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 59,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 58,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "12",
+     "move": "ember",
+     "damage": 7,
+     "targetHp": 10
+    }
+   ],
+   "serverTime": 1789387211800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 67,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 66,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "12",
+     "move": "scratch",
+     "damage": 6,
+     "targetHp": 4
+    },
+    {
+     "type": "attack",
+     "tick": 66,
+     "attacker": "wild",
+     "attackerId": "12",
+     "targetId": "p1",
+     "move": "bubble",
+     "damage": 11,
+     "targetHp": 8
+    },
+    {
+     "type": "itemUsed",
+     "tick": 66,
+     "itemId": "potion",
+     "pokemonId": "p1",
+     "hp": 14
+    }
+   ],
+   "serverTime": 1789387213400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 68,
+   "events": [
+    {
+     "type": "captured",
+     "tick": 67,
+     "wildId": 12,
+     "speciesName": "horsea",
+     "level": 7,
+     "ball": "poke-ball",
+     "toBox": false
+    },
+    {
+     "type": "itemUsed",
+     "tick": 67,
+     "itemId": "potion",
+     "pokemonId": "p1",
+     "hp": 20
+    }
+   ],
+   "serverTime": 1789387213600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 70,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 69,
+     "from": {
+      "x": 15,
+      "y": 15
+     },
+     "to": {
+      "x": 16,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387214000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 71,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 70,
+     "from": {
+      "x": 16,
+      "y": 15
+     },
+     "to": {
+      "x": 17,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387214200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 72,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 71,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "13",
+     "move": "ember",
+     "damage": 8,
+     "targetHp": 13
+    },
+    {
+     "type": "attack",
+     "tick": 71,
+     "attacker": "wild",
+     "attackerId": "13",
+     "targetId": "p1",
+     "move": "bubble",
+     "damage": 10,
+     "targetHp": 10
+    },
+    {
+     "type": "itemUsed",
+     "tick": 71,
+     "itemId": "potion",
+     "pokemonId": "p1",
+     "hp": 16
+    }
+   ],
+   "serverTime": 1789387214400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 77,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 76,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "13",
+     "move": "scratch",
+     "damage": 6,
+     "targetHp": 7
+    }
+   ],
+   "serverTime": 1789387215400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 82,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 81,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "13",
+     "move": "ember",
+     "damage": 8,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 81,
+     "wildId": 13,
+     "speciesName": "horsea",
+     "level": 6,
+     "xpTrainer": 50,
+     "xpPokemon": 50,
+     "gold": 14,
+     "drops": []
+    },
+    {
+     "type": "levelUp",
+     "tick": 81,
+     "pokemonId": "p1",
+     "level": 11
+    }
+   ],
+   "serverTime": 1789387216400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 84,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 83,
+     "from": {
+      "x": 17,
+      "y": 15
+     },
+     "to": {
+      "x": 18,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387216800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 85,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 84,
+     "from": {
+      "x": 18,
+      "y": 15
+     },
+     "to": {
+      "x": 19,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387217000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 86,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 85,
+     "from": {
+      "x": 19,
+      "y": 15
+     },
+     "to": {
+      "x": 20,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387217200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 87,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 86,
+     "from": {
+      "x": 20,
+      "y": 15
+     },
+     "to": {
+      "x": 21,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387217400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 88,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 87,
+     "from": {
+      "x": 21,
+      "y": 15
+     },
+     "to": {
+      "x": 22,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387217600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 89,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 88,
+     "from": {
+      "x": 22,
+      "y": 15
+     },
+     "to": {
+      "x": 23,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387217800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 90,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 89,
+     "from": {
+      "x": 23,
+      "y": 15
+     },
+     "to": {
+      "x": 24,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387218000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 91,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 90,
+     "from": {
+      "x": 24,
+      "y": 15
+     },
+     "to": {
+      "x": 25,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387218200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 92,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 91,
+     "from": {
+      "x": 25,
+      "y": 15
+     },
+     "to": {
+      "x": 26,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387218400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 93,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 92,
+     "from": {
+      "x": 26,
+      "y": 15
+     },
+     "to": {
+      "x": 27,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387218600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 94,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 93,
+     "from": {
+      "x": 27,
+      "y": 15
+     },
+     "to": {
+      "x": 27,
+      "y": 16
+     }
+    }
+   ],
+   "serverTime": 1789387218800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 95,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 94,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "3",
+     "move": "ember",
+     "damage": 20,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 94,
+     "wildId": 3,
+     "speciesName": "zubat",
+     "level": 2,
+     "xpTrainer": 14,
+     "xpPokemon": 14,
+     "gold": 4,
+     "drops": []
+    }
+   ],
+   "serverTime": 1789387219000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 97,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 96,
+     "from": {
+      "x": 27,
+      "y": 16
+     },
+     "to": {
+      "x": 28,
+      "y": 16
+     }
+    }
+   ],
+   "serverTime": 1789387219400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 98,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 97,
+     "from": {
+      "x": 28,
+      "y": 16
+     },
+     "to": {
+      "x": 29,
+      "y": 16
+     }
+    }
+   ],
+   "serverTime": 1789387219600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 99,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 98,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "1",
+     "move": "scratch",
+     "damage": 11,
+     "targetHp": 7
+    },
+    {
+     "type": "attack",
+     "tick": 98,
+     "attacker": "wild",
+     "attackerId": "1",
+     "targetId": "p1",
+     "move": "leech-life",
+     "damage": 1,
+     "targetHp": 17
+    }
+   ],
+   "serverTime": 1789387219800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 105,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 104,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "1",
+     "move": "ember",
+     "damage": 19,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 104,
+     "wildId": 1,
+     "speciesName": "zubat",
+     "level": 4,
+     "xpTrainer": 28,
+     "xpPokemon": 28,
+     "gold": 4,
+     "drops": []
+    }
+   ],
+   "serverTime": 1789387221000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 107,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 106,
+     "from": {
+      "x": 29,
+      "y": 16
+     },
+     "to": {
+      "x": 30,
+      "y": 16
+     }
+    }
+   ],
+   "serverTime": 1789387221400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 108,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 107,
+     "from": {
+      "x": 30,
+      "y": 16
+     },
+     "to": {
+      "x": 30,
+      "y": 17
+     }
+    }
+   ],
+   "serverTime": 1789387221600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 109,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 108,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "2",
+     "move": "scratch",
+     "damage": 10,
+     "targetHp": 10
+    },
+    {
+     "type": "attack",
+     "tick": 108,
+     "attacker": "wild",
+     "attackerId": "2",
+     "targetId": "p1",
+     "move": "leech-life",
+     "damage": 2,
+     "targetHp": 15
+    },
+    {
+     "type": "returning",
+     "tick": 108
+    }
+   ],
+   "serverTime": 1789387221800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 110,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 109,
+     "from": {
+      "x": 30,
+      "y": 17
+     },
+     "to": {
+      "x": 30,
+      "y": 16
+     }
+    }
+   ],
+   "serverTime": 1789387222000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 111,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 110,
+     "from": {
+      "x": 30,
+      "y": 16
+     },
+     "to": {
+      "x": 30,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387222200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 112,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 111,
+     "from": {
+      "x": 30,
+      "y": 15
+     },
+     "to": {
+      "x": 30,
+      "y": 14
+     }
+    }
+   ],
+   "serverTime": 1789387222400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 113,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 112,
+     "from": {
+      "x": 30,
+      "y": 14
+     },
+     "to": {
+      "x": 30,
+      "y": 13
+     }
+    }
+   ],
+   "serverTime": 1789387222600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 114,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 113,
+     "from": {
+      "x": 30,
+      "y": 13
+     },
+     "to": {
+      "x": 30,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387222800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 115,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 114,
+     "from": {
+      "x": 30,
+      "y": 12
+     },
+     "to": {
+      "x": 30,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387223000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 116,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 115,
+     "from": {
+      "x": 30,
+      "y": 11
+     },
+     "to": {
+      "x": 30,
+      "y": 10
+     }
+    }
+   ],
+   "serverTime": 1789387223200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 117,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 116,
+     "from": {
+      "x": 30,
+      "y": 10
+     },
+     "to": {
+      "x": 30,
+      "y": 9
+     }
+    }
+   ],
+   "serverTime": 1789387223400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 118,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 117,
+     "from": {
+      "x": 30,
+      "y": 9
+     },
+     "to": {
+      "x": 30,
+      "y": 8
+     }
+    }
+   ],
+   "serverTime": 1789387223600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 119,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 118,
+     "from": {
+      "x": 30,
+      "y": 8
+     },
+     "to": {
+      "x": 30,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387223800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 120,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 119,
+     "from": {
+      "x": 30,
+      "y": 7
+     },
+     "to": {
+      "x": 30,
+      "y": 6
+     }
+    }
+   ],
+   "serverTime": 1789387224000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 121,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 120,
+     "from": {
+      "x": 30,
+      "y": 6
+     },
+     "to": {
+      "x": 30,
+      "y": 5
+     }
+    }
+   ],
+   "serverTime": 1789387224200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 122,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 121,
+     "from": {
+      "x": 30,
+      "y": 5
+     },
+     "to": {
+      "x": 31,
+      "y": 5
+     }
+    }
+   ],
+   "serverTime": 1789387224400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 123,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 122,
+     "from": {
+      "x": 31,
+      "y": 5
+     },
+     "to": {
+      "x": 32,
+      "y": 5
+     }
+    }
+   ],
+   "serverTime": 1789387224600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 124,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 123,
+     "from": {
+      "x": 32,
+      "y": 5
+     },
+     "to": {
+      "x": 33,
+      "y": 5
+     }
+    }
+   ],
+   "serverTime": 1789387224800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 125,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 124,
+     "from": {
+      "x": 33,
+      "y": 5
+     },
+     "to": {
+      "x": 34,
+      "y": 5
+     }
+    }
+   ],
+   "serverTime": 1789387225000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 144,
+   "events": [
+    {
+     "type": "spawned",
+     "tick": 143,
+     "wildId": 16,
+     "speciesName": "bellsprout",
+     "level": 5,
+     "position": {
+      "x": 15,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387228800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 151,
+   "events": [
+    {
+     "type": "healed",
+     "tick": 150
+    }
+   ],
+   "serverTime": 1789387230200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 153,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 152,
+     "from": {
+      "x": 34,
+      "y": 5
+     },
+     "to": {
+      "x": 34,
+      "y": 6
+     }
+    }
+   ],
+   "serverTime": 1789387230600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 154,
+   "events": [
+    {
+     "type": "spawned",
+     "tick": 153,
+     "wildId": 17,
+     "speciesName": "bellsprout",
+     "level": 5,
+     "position": {
+      "x": 5,
+      "y": 12
+     }
+    },
+    {
+     "type": "moved",
+     "tick": 153,
+     "from": {
+      "x": 34,
+      "y": 6
+     },
+     "to": {
+      "x": 34,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387230800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 155,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 154,
+     "from": {
+      "x": 34,
+      "y": 7
+     },
+     "to": {
+      "x": 33,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387231000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 156,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 155,
+     "from": {
+      "x": 33,
+      "y": 7
+     },
+     "to": {
+      "x": 32,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387231200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 157,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 156,
+     "from": {
+      "x": 32,
+      "y": 7
+     },
+     "to": {
+      "x": 31,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387231400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 158,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 157,
+     "from": {
+      "x": 31,
+      "y": 7
+     },
+     "to": {
+      "x": 30,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387231600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 159,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 158,
+     "from": {
+      "x": 30,
+      "y": 7
+     },
+     "to": {
+      "x": 29,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387231800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 160,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 159,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "14",
+     "move": "ember",
+     "damage": 11,
+     "targetHp": 14
+    },
+    {
+     "type": "attack",
+     "tick": 159,
+     "attacker": "wild",
+     "attackerId": "14",
+     "targetId": "p1",
+     "move": "lick",
+     "damage": 5,
+     "targetHp": 27
+    }
+   ],
+   "serverTime": 1789387232000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 161,
+   "events": [
+    {
+     "type": "skipped",
+     "tick": 160,
+     "wildId": 14
+    }
+   ],
+   "serverTime": 1789387232200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 163,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 162,
+     "from": {
+      "x": 29,
+      "y": 7
+     },
+     "to": {
+      "x": 29,
+      "y": 6
+     }
+    }
+   ],
+   "serverTime": 1789387232600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 164,
+   "events": [
+    {
+     "type": "spawned",
+     "tick": 163,
+     "wildId": 18,
+     "speciesName": "bellsprout",
+     "level": 5,
+     "position": {
+      "x": 6,
+      "y": 13
+     }
+    },
+    {
+     "type": "moved",
+     "tick": 163,
+     "from": {
+      "x": 29,
+      "y": 6
+     },
+     "to": {
+      "x": 29,
+      "y": 5
+     }
+    }
+   ],
+   "serverTime": 1789387232800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 165,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 164,
+     "from": {
+      "x": 29,
+      "y": 5
+     },
+     "to": {
+      "x": 29,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387233000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 166,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 165,
+     "from": {
+      "x": 29,
+      "y": 4
+     },
+     "to": {
+      "x": 29,
+      "y": 3
+     }
+    }
+   ],
+   "serverTime": 1789387233200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 167,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 166,
+     "from": {
+      "x": 29,
+      "y": 3
+     },
+     "to": {
+      "x": 28,
+      "y": 3
+     }
+    }
+   ],
+   "serverTime": 1789387233400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 168,
+   "events": [
+    {
+     "type": "skipped",
+     "tick": 167,
+     "wildId": 15
+    }
+   ],
+   "serverTime": 1789387233600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 170,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 169,
+     "from": {
+      "x": 28,
+      "y": 3
+     },
+     "to": {
+      "x": 28,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387234000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 171,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 170,
+     "from": {
+      "x": 28,
+      "y": 4
+     },
+     "to": {
+      "x": 27,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387234200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 172,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 171,
+     "from": {
+      "x": 27,
+      "y": 4
+     },
+     "to": {
+      "x": 26,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387234400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 173,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 172,
+     "from": {
+      "x": 26,
+      "y": 4
+     },
+     "to": {
+      "x": 25,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387234600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 174,
+   "events": [
+    {
+     "type": "spawned",
+     "tick": 173,
+     "wildId": 19,
+     "speciesName": "bellsprout",
+     "level": 4,
+     "position": {
+      "x": 9,
+      "y": 9
+     }
+    },
+    {
+     "type": "moved",
+     "tick": 173,
+     "from": {
+      "x": 25,
+      "y": 4
+     },
+     "to": {
+      "x": 24,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387234800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 175,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 174,
+     "from": {
+      "x": 24,
+      "y": 4
+     },
+     "to": {
+      "x": 23,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387235000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 176,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 175,
+     "from": {
+      "x": 23,
+      "y": 4
+     },
+     "to": {
+      "x": 22,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387235200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 177,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 176,
+     "from": {
+      "x": 22,
+      "y": 4
+     },
+     "to": {
+      "x": 21,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387235400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 178,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 177,
+     "from": {
+      "x": 21,
+      "y": 4
+     },
+     "to": {
+      "x": 20,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387235600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 179,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 178,
+     "from": {
+      "x": 20,
+      "y": 4
+     },
+     "to": {
+      "x": 19,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387235800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 180,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 179,
+     "from": {
+      "x": 19,
+      "y": 4
+     },
+     "to": {
+      "x": 18,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387236000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 181,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 180,
+     "from": {
+      "x": 18,
+      "y": 4
+     },
+     "to": {
+      "x": 17,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387236200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 182,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 181,
+     "from": {
+      "x": 17,
+      "y": 4
+     },
+     "to": {
+      "x": 16,
+      "y": 4
+     }
+    }
+   ],
+   "serverTime": 1789387236400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 183,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 182,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "16",
+     "move": "ember",
+     "damage": 35,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 182,
+     "wildId": 16,
+     "speciesName": "bellsprout",
+     "level": 5,
+     "xpTrainer": 42,
+     "xpPokemon": 42,
+     "gold": 9,
+     "drops": []
+    }
+   ],
+   "serverTime": 1789387236600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 185,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 184,
+     "from": {
+      "x": 16,
+      "y": 4
+     },
+     "to": {
+      "x": 16,
+      "y": 5
+     }
+    }
+   ],
+   "serverTime": 1789387237000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 186,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 185,
+     "from": {
+      "x": 16,
+      "y": 5
+     },
+     "to": {
+      "x": 16,
+      "y": 6
+     }
+    }
+   ],
+   "serverTime": 1789387237200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 187,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 186,
+     "from": {
+      "x": 16,
+      "y": 6
+     },
+     "to": {
+      "x": 16,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387237400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 188,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 187,
+     "from": {
+      "x": 16,
+      "y": 7
+     },
+     "to": {
+      "x": 15,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387237600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 189,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 188,
+     "from": {
+      "x": 15,
+      "y": 7
+     },
+     "to": {
+      "x": 14,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387237800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 190,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 189,
+     "from": {
+      "x": 14,
+      "y": 7
+     },
+     "to": {
+      "x": 13,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387238000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 191,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 190,
+     "from": {
+      "x": 13,
+      "y": 7
+     },
+     "to": {
+      "x": 12,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387238200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 192,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 191,
+     "from": {
+      "x": 12,
+      "y": 7
+     },
+     "to": {
+      "x": 11,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387238400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 193,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 192,
+     "from": {
+      "x": 11,
+      "y": 7
+     },
+     "to": {
+      "x": 10,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387238600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 194,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 193,
+     "from": {
+      "x": 10,
+      "y": 7
+     },
+     "to": {
+      "x": 9,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387238800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 195,
+   "events": [
+    {
+     "type": "spawned",
+     "tick": 194,
+     "wildId": 20,
+     "speciesName": "zubat",
+     "level": 4,
+     "position": {
+      "x": 26,
+      "y": 15
+     }
+    },
+    {
+     "type": "moved",
+     "tick": 194,
+     "from": {
+      "x": 9,
+      "y": 7
+     },
+     "to": {
+      "x": 9,
+      "y": 8
+     }
+    }
+   ],
+   "serverTime": 1789387239000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 196,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 195,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "19",
+     "move": "ember",
+     "damage": 38,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 195,
+     "wildId": 19,
+     "speciesName": "bellsprout",
+     "level": 4,
+     "xpTrainer": 34,
+     "xpPokemon": 34,
+     "gold": 10,
+     "drops": []
+    }
+   ],
+   "serverTime": 1789387239200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 198,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 197,
+     "from": {
+      "x": 9,
+      "y": 8
+     },
+     "to": {
+      "x": 9,
+      "y": 9
+     }
+    }
+   ],
+   "serverTime": 1789387239600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 199,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 198,
+     "from": {
+      "x": 9,
+      "y": 9
+     },
+     "to": {
+      "x": 9,
+      "y": 10
+     }
+    }
+   ],
+   "serverTime": 1789387239800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 200,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 199,
+     "from": {
+      "x": 9,
+      "y": 10
+     },
+     "to": {
+      "x": 9,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387240000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 201,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 200,
+     "from": {
+      "x": 9,
+      "y": 11
+     },
+     "to": {
+      "x": 8,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387240200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 202,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 201,
+     "from": {
+      "x": 8,
+      "y": 11
+     },
+     "to": {
+      "x": 7,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387240400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 203,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 202,
+     "from": {
+      "x": 7,
+      "y": 11
+     },
+     "to": {
+      "x": 6,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387240600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 204,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 203,
+     "from": {
+      "x": 6,
+      "y": 11
+     },
+     "to": {
+      "x": 5,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387240800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 205,
+   "events": [
+    {
+     "type": "spawned",
+     "tick": 204,
+     "wildId": 21,
+     "speciesName": "zubat",
+     "level": 5,
+     "position": {
+      "x": 22,
+      "y": 21
+     }
+    },
+    {
+     "type": "attack",
+     "tick": 204,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "17",
+     "move": "scratch",
+     "damage": 10,
+     "targetHp": 11
+    },
+    {
+     "type": "attack",
+     "tick": 204,
+     "attacker": "wild",
+     "attackerId": "17",
+     "targetId": "p1",
+     "move": "vine-whip",
+     "damage": 2,
+     "targetHp": 25
+    }
+   ],
+   "serverTime": 1789387241000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 206,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 205,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "17",
+     "move": "ember",
+     "damage": 34,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 205,
+     "wildId": 17,
+     "speciesName": "bellsprout",
+     "level": 5,
+     "xpTrainer": 42,
+     "xpPokemon": 42,
+     "gold": 5,
+     "drops": []
+    }
+   ],
+   "serverTime": 1789387241200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 208,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 207,
+     "from": {
+      "x": 5,
+      "y": 11
+     },
+     "to": {
+      "x": 6,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387241600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 209,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 208,
+     "from": {
+      "x": 6,
+      "y": 11
+     },
+     "to": {
+      "x": 6,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387241800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 210,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 209,
+     "attacker": "wild",
+     "attackerId": "18",
+     "targetId": "p1",
+     "move": "vine-whip",
+     "damage": 2,
+     "targetHp": 23
+    }
+   ],
+   "serverTime": 1789387242000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 215,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 214,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "18",
+     "move": "scratch",
+     "damage": 10,
+     "targetHp": 11
+    }
+   ],
+   "serverTime": 1789387243000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 216,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 215,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "18",
+     "move": "ember",
+     "damage": 38,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 215,
+     "wildId": 18,
+     "speciesName": "bellsprout",
+     "level": 5,
+     "xpTrainer": 42,
+     "xpPokemon": 42,
+     "gold": 5,
+     "drops": []
+    }
+   ],
+   "serverTime": 1789387243200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 218,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 217,
+     "from": {
+      "x": 6,
+      "y": 12
+     },
+     "to": {
+      "x": 7,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387243600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 219,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 218,
+     "from": {
+      "x": 7,
+      "y": 12
+     },
+     "to": {
+      "x": 8,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387243800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 220,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 219,
+     "from": {
+      "x": 8,
+      "y": 12
+     },
+     "to": {
+      "x": 9,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387244000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 221,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 220,
+     "from": {
+      "x": 9,
+      "y": 12
+     },
+     "to": {
+      "x": 10,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387244200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 222,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 221,
+     "from": {
+      "x": 10,
+      "y": 12
+     },
+     "to": {
+      "x": 11,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387244400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 223,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 222,
+     "from": {
+      "x": 11,
+      "y": 12
+     },
+     "to": {
+      "x": 12,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387244600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 224,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 223,
+     "from": {
+      "x": 12,
+      "y": 12
+     },
+     "to": {
+      "x": 13,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387244800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 225,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 224,
+     "from": {
+      "x": 13,
+      "y": 12
+     },
+     "to": {
+      "x": 14,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387245000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 226,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 225,
+     "from": {
+      "x": 14,
+      "y": 12
+     },
+     "to": {
+      "x": 15,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387245200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 227,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 226,
+     "from": {
+      "x": 15,
+      "y": 12
+     },
+     "to": {
+      "x": 16,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387245400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 228,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 227,
+     "from": {
+      "x": 16,
+      "y": 12
+     },
+     "to": {
+      "x": 17,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387245600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 229,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 228,
+     "from": {
+      "x": 17,
+      "y": 12
+     },
+     "to": {
+      "x": 18,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387245800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 230,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 229,
+     "from": {
+      "x": 18,
+      "y": 12
+     },
+     "to": {
+      "x": 19,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387246000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 231,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 230,
+     "from": {
+      "x": 19,
+      "y": 12
+     },
+     "to": {
+      "x": 20,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387246200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 232,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 231,
+     "from": {
+      "x": 20,
+      "y": 12
+     },
+     "to": {
+      "x": 21,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387246400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 233,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 232,
+     "from": {
+      "x": 21,
+      "y": 12
+     },
+     "to": {
+      "x": 22,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387246600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 234,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 233,
+     "from": {
+      "x": 22,
+      "y": 12
+     },
+     "to": {
+      "x": 23,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387246800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 235,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 234,
+     "from": {
+      "x": 23,
+      "y": 12
+     },
+     "to": {
+      "x": 24,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387247000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 236,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 235,
+     "from": {
+      "x": 24,
+      "y": 12
+     },
+     "to": {
+      "x": 25,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387247200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 237,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 236,
+     "from": {
+      "x": 25,
+      "y": 12
+     },
+     "to": {
+      "x": 26,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387247400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 238,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 237,
+     "from": {
+      "x": 26,
+      "y": 12
+     },
+     "to": {
+      "x": 26,
+      "y": 13
+     }
+    }
+   ],
+   "serverTime": 1789387247600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 239,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 238,
+     "from": {
+      "x": 26,
+      "y": 13
+     },
+     "to": {
+      "x": 26,
+      "y": 14
+     }
+    }
+   ],
+   "serverTime": 1789387247800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 240,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 239,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "20",
+     "move": "ember",
+     "damage": 18,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 239,
+     "wildId": 20,
+     "speciesName": "zubat",
+     "level": 4,
+     "xpTrainer": 28,
+     "xpPokemon": 28,
+     "gold": 4,
+     "drops": []
+    },
+    {
+     "type": "levelUp",
+     "tick": 239,
+     "pokemonId": "p1",
+     "level": 12
+    }
+   ],
+   "serverTime": 1789387248000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 242,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 241,
+     "from": {
+      "x": 26,
+      "y": 14
+     },
+     "to": {
+      "x": 26,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387248400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 243,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 242,
+     "from": {
+      "x": 26,
+      "y": 15
+     },
+     "to": {
+      "x": 26,
+      "y": 16
+     }
+    }
+   ],
+   "serverTime": 1789387248600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 244,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 243,
+     "from": {
+      "x": 26,
+      "y": 16
+     },
+     "to": {
+      "x": 26,
+      "y": 17
+     }
+    }
+   ],
+   "serverTime": 1789387248800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 245,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 244,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "4",
+     "move": "scratch",
+     "damage": 12,
+     "targetHp": 4
+    },
+    {
+     "type": "attack",
+     "tick": 244,
+     "attacker": "wild",
+     "attackerId": "4",
+     "targetId": "p1",
+     "move": "leech-life",
+     "damage": 1,
+     "targetHp": 25
+    }
+   ],
+   "serverTime": 1789387249000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 246,
+   "events": [
+    {
+     "type": "captured",
+     "tick": 245,
+     "wildId": 4,
+     "speciesName": "zubat",
+     "level": 3,
+     "ball": "poke-ball",
+     "toBox": false
+    }
+   ],
+   "serverTime": 1789387249200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 248,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 247,
+     "from": {
+      "x": 26,
+      "y": 17
+     },
+     "to": {
+      "x": 27,
+      "y": 17
+     }
+    }
+   ],
+   "serverTime": 1789387249600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 249,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 248,
+     "from": {
+      "x": 27,
+      "y": 17
+     },
+     "to": {
+      "x": 28,
+      "y": 17
+     }
+    }
+   ],
+   "serverTime": 1789387249800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 250,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 249,
+     "from": {
+      "x": 28,
+      "y": 17
+     },
+     "to": {
+      "x": 29,
+      "y": 17
+     }
+    }
+   ],
+   "serverTime": 1789387250000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 251,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 250,
+     "from": {
+      "x": 29,
+      "y": 17
+     },
+     "to": {
+      "x": 30,
+      "y": 17
+     }
+    }
+   ],
+   "serverTime": 1789387250200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 252,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 251,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "2",
+     "move": "ember",
+     "damage": 17,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 251,
+     "wildId": 2,
+     "speciesName": "zubat",
+     "level": 5,
+     "xpTrainer": 35,
+     "xpPokemon": 35,
+     "gold": 6,
+     "drops": []
+    }
+   ],
+   "serverTime": 1789387250400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 254,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 253,
+     "from": {
+      "x": 30,
+      "y": 17
+     },
+     "to": {
+      "x": 31,
+      "y": 17
+     }
+    }
+   ],
+   "serverTime": 1789387250800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 255,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 254,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "11",
+     "move": "scratch",
+     "damage": 10,
+     "targetHp": 12
+    },
+    {
+     "type": "attack",
+     "tick": 254,
+     "attacker": "wild",
+     "attackerId": "11",
+     "targetId": "p1",
+     "move": "scratch",
+     "damage": 4,
+     "targetHp": 21
+    }
+   ],
+   "serverTime": 1789387251000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 262,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 261,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "11",
+     "move": "ember",
+     "damage": 11,
+     "targetHp": 1
+    }
+   ],
+   "serverTime": 1789387252400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 263,
+   "events": [
+    {
+     "type": "captured",
+     "tick": 262,
+     "wildId": 11,
+     "speciesName": "diglett",
+     "level": 8,
+     "ball": "poke-ball",
+     "toBox": false
+    }
+   ],
+   "serverTime": 1789387252600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 265,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 264,
+     "from": {
+      "x": 31,
+      "y": 17
+     },
+     "to": {
+      "x": 32,
+      "y": 17
+     }
+    }
+   ],
+   "serverTime": 1789387253000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 266,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 265,
+     "from": {
+      "x": 32,
+      "y": 17
+     },
+     "to": {
+      "x": 32,
+      "y": 18
+     }
+    }
+   ],
+   "serverTime": 1789387253200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 267,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 266,
+     "from": {
+      "x": 32,
+      "y": 18
+     },
+     "to": {
+      "x": 32,
+      "y": 19
+     }
+    }
+   ],
+   "serverTime": 1789387253400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 268,
+   "events": [
+    {
+     "type": "spawned",
+     "tick": 267,
+     "wildId": 22,
+     "speciesName": "horsea",
+     "level": 9,
+     "position": {
+      "x": 15,
+      "y": 18
+     }
+    },
+    {
+     "type": "moved",
+     "tick": 267,
+     "from": {
+      "x": 32,
+      "y": 19
+     },
+     "to": {
+      "x": 32,
+      "y": 20
+     }
+    }
+   ],
+   "serverTime": 1789387253600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 269,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 268,
+     "from": {
+      "x": 32,
+      "y": 20
+     },
+     "to": {
+      "x": 32,
+      "y": 21
+     }
+    }
+   ],
+   "serverTime": 1789387253800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 270,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 269,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "10",
+     "move": "scratch",
+     "damage": 13,
+     "targetHp": 3
+    },
+    {
+     "type": "attack",
+     "tick": 269,
+     "attacker": "wild",
+     "attackerId": "10",
+     "targetId": "p1",
+     "move": "scratch",
+     "damage": 2,
+     "targetHp": 19
+    }
+   ],
+   "serverTime": 1789387254000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 272,
+   "events": [
+    {
+     "type": "attack",
+     "tick": 271,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "10",
+     "move": "ember",
+     "damage": 18,
+     "targetHp": 0
+    },
+    {
+     "type": "wildDefeated",
+     "tick": 271,
+     "wildId": 10,
+     "speciesName": "diglett",
+     "level": 4,
+     "xpTrainer": 30,
+     "xpPokemon": 30,
+     "gold": 12,
+     "drops": [
+      {
+       "item": "poke-ball",
+       "quantity": 1
+      }
+     ]
+    }
+   ],
+   "serverTime": 1789387254400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 274,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 273,
+     "from": {
+      "x": 32,
+      "y": 21
+     },
+     "to": {
+      "x": 32,
+      "y": 22
+     }
+    }
+   ],
+   "serverTime": 1789387254800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 275,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 274,
+     "from": {
+      "x": 32,
+      "y": 22
+     },
+     "to": {
+      "x": 32,
+      "y": 23
+     }
+    }
+   ],
+   "serverTime": 1789387255000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 276,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 275,
+     "from": {
+      "x": 32,
+      "y": 23
+     },
+     "to": {
+      "x": 31,
+      "y": 23
+     }
+    }
+   ],
+   "serverTime": 1789387255200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 277,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 276,
+     "from": {
+      "x": 31,
+      "y": 23
+     },
+     "to": {
+      "x": 30,
+      "y": 23
+     }
+    }
+   ],
+   "serverTime": 1789387255400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 278,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 277,
+     "from": {
+      "x": 30,
+      "y": 23
+     },
+     "to": {
+      "x": 29,
+      "y": 23
+     }
+    }
+   ],
+   "serverTime": 1789387255600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 279,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 278,
+     "from": {
+      "x": 29,
+      "y": 23
+     },
+     "to": {
+      "x": 28,
+      "y": 23
+     }
+    }
+   ],
+   "serverTime": 1789387255800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 280,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 279,
+     "from": {
+      "x": 28,
+      "y": 23
+     },
+     "to": {
+      "x": 27,
+      "y": 23
+     }
+    }
+   ],
+   "serverTime": 1789387256000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 281,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 280,
+     "from": {
+      "x": 27,
+      "y": 23
+     },
+     "to": {
+      "x": 26,
+      "y": 23
+     }
+    }
+   ],
+   "serverTime": 1789387256200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 282,
+   "events": [
+    {
+     "type": "spawned",
+     "tick": 281,
+     "wildId": 23,
+     "speciesName": "horsea",
+     "level": 8,
+     "position": {
+      "x": 17,
+      "y": 20
+     }
+    },
+    {
+     "type": "attack",
+     "tick": 281,
+     "attacker": "player",
+     "attackerId": "p1",
+     "targetId": "9",
+     "move": "ember",
+     "damage": 14,
+     "targetHp": 6
+    },
+    {
+     "type": "attack",
+     "tick": 281,
+     "attacker": "wild",
+     "attackerId": "9",
+     "targetId": "p1",
+     "move": "scratch",
+     "damage": 3,
+     "targetHp": 16
+    },
+    {
+     "type": "returning",
+     "tick": 281
+    }
+   ],
+   "serverTime": 1789387256400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 283,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 282,
+     "from": {
+      "x": 26,
+      "y": 23
+     },
+     "to": {
+      "x": 26,
+      "y": 22
+     }
+    }
+   ],
+   "serverTime": 1789387256600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 284,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 283,
+     "from": {
+      "x": 26,
+      "y": 22
+     },
+     "to": {
+      "x": 26,
+      "y": 21
+     }
+    }
+   ],
+   "serverTime": 1789387256800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 285,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 284,
+     "from": {
+      "x": 26,
+      "y": 21
+     },
+     "to": {
+      "x": 27,
+      "y": 21
+     }
+    }
+   ],
+   "serverTime": 1789387257000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 286,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 285,
+     "from": {
+      "x": 27,
+      "y": 21
+     },
+     "to": {
+      "x": 28,
+      "y": 21
+     }
+    }
+   ],
+   "serverTime": 1789387257200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 287,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 286,
+     "from": {
+      "x": 28,
+      "y": 21
+     },
+     "to": {
+      "x": 28,
+      "y": 20
+     }
+    }
+   ],
+   "serverTime": 1789387257400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 288,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 287,
+     "from": {
+      "x": 28,
+      "y": 20
+     },
+     "to": {
+      "x": 28,
+      "y": 19
+     }
+    }
+   ],
+   "serverTime": 1789387257600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 289,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 288,
+     "from": {
+      "x": 28,
+      "y": 19
+     },
+     "to": {
+      "x": 28,
+      "y": 18
+     }
+    }
+   ],
+   "serverTime": 1789387257800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 290,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 289,
+     "from": {
+      "x": 28,
+      "y": 18
+     },
+     "to": {
+      "x": 28,
+      "y": 17
+     }
+    }
+   ],
+   "serverTime": 1789387258000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 291,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 290,
+     "from": {
+      "x": 28,
+      "y": 17
+     },
+     "to": {
+      "x": 28,
+      "y": 16
+     }
+    }
+   ],
+   "serverTime": 1789387258200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 292,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 291,
+     "from": {
+      "x": 28,
+      "y": 16
+     },
+     "to": {
+      "x": 28,
+      "y": 15
+     }
+    }
+   ],
+   "serverTime": 1789387258400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 293,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 292,
+     "from": {
+      "x": 28,
+      "y": 15
+     },
+     "to": {
+      "x": 28,
+      "y": 14
+     }
+    }
+   ],
+   "serverTime": 1789387258600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 294,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 293,
+     "from": {
+      "x": 28,
+      "y": 14
+     },
+     "to": {
+      "x": 28,
+      "y": 13
+     }
+    }
+   ],
+   "serverTime": 1789387258800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 295,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 294,
+     "from": {
+      "x": 28,
+      "y": 13
+     },
+     "to": {
+      "x": 28,
+      "y": 12
+     }
+    }
+   ],
+   "serverTime": 1789387259000
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 296,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 295,
+     "from": {
+      "x": 28,
+      "y": 12
+     },
+     "to": {
+      "x": 28,
+      "y": 11
+     }
+    }
+   ],
+   "serverTime": 1789387259200
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 297,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 296,
+     "from": {
+      "x": 28,
+      "y": 11
+     },
+     "to": {
+      "x": 28,
+      "y": 10
+     }
+    }
+   ],
+   "serverTime": 1789387259400
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 298,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 297,
+     "from": {
+      "x": 28,
+      "y": 10
+     },
+     "to": {
+      "x": 28,
+      "y": 9
+     }
+    }
+   ],
+   "serverTime": 1789387259600
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 299,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 298,
+     "from": {
+      "x": 28,
+      "y": 9
+     },
+     "to": {
+      "x": 28,
+      "y": 8
+     }
+    }
+   ],
+   "serverTime": 1789387259800
+  },
+  {
+   "t": "hunt.tick",
+   "tick": 300,
+   "events": [
+    {
+     "type": "moved",
+     "tick": 299,
+     "from": {
+      "x": 28,
+      "y": 8
+     },
+     "to": {
+      "x": 28,
+      "y": 7
+     }
+    }
+   ],
+   "serverTime": 1789387260000
+  }
+ ],
+ "final": {
+  "huntId": "route-1",
+  "sessionId": "rec",
+  "tick": 300,
+  "player": {
+   "team": [
+    {
+     "id": "p1",
+     "speciesName": "charmander",
+     "level": 12,
+     "xp": 1048,
+     "hp": 16,
+     "hpMax": 35
+    },
+    {
+     "id": "rec-w12",
+     "speciesName": "horsea",
+     "level": 7,
+     "xp": 343,
+     "hp": 23,
+     "hpMax": 23
+    },
+    {
+     "id": "rec-w4",
+     "speciesName": "zubat",
+     "level": 3,
+     "xp": 27,
+     "hp": 4,
+     "hpMax": 16
+    },
+    {
+     "id": "rec-w11",
+     "speciesName": "diglett",
+     "level": 8,
+     "xp": 512,
+     "hp": 1,
+     "hpMax": 22
+    }
+   ],
+   "activeIndex": 0,
+   "position": {
+    "x": 28,
+    "y": 7
+   },
+   "path": [
+    {
+     "x": 28,
+     "y": 6
+    },
+    {
+     "x": 28,
+     "y": 5
+    },
+    {
+     "x": 29,
+     "y": 5
+    },
+    {
+     "x": 30,
+     "y": 5
+    },
+    {
+     "x": 31,
+     "y": 5
+    },
+    {
+     "x": 32,
+     "y": 5
+    },
+    {
+     "x": 33,
+     "y": 5
+    },
+    {
+     "x": 34,
+     "y": 5
+    }
+   ],
+   "mode": "returning",
+   "targetWildId": null,
+   "healingUntilTick": null,
+   "cooldowns": {
+    "ember": 291,
+    "scratch": 279
+   },
+   "skippedWildIds": []
+  },
+  "wilds": [
+   {
+    "id": 9,
+    "spawnIndex": 2,
+    "speciesName": "diglett",
+    "level": 7,
+    "hp": 6,
+    "hpMax": 20,
+    "position": {
+     "x": 26,
+     "y": 24
+    },
+    "cooldowns": {
+     "scratch": 291
+    },
+    "captureTried": false
+   },
+   {
+    "id": 14,
+    "spawnIndex": 4,
+    "speciesName": "gastly",
+    "level": 8,
+    "hp": 14,
+    "hpMax": 25,
+    "position": {
+     "x": 29,
+     "y": 8
+    },
+    "cooldowns": {
+     "lick": 169
+    },
+    "captureTried": false
+   },
+   {
+    "id": 15,
+    "spawnIndex": 4,
+    "speciesName": "gastly",
+    "level": 10,
+    "hp": 29,
+    "hpMax": 29,
+    "position": {
+     "x": 27,
+     "y": 3
+    },
+    "cooldowns": {},
+    "captureTried": false
+   },
+   {
+    "id": 21,
+    "spawnIndex": 0,
+    "speciesName": "zubat",
+    "level": 5,
+    "hp": 20,
+    "hpMax": 20,
+    "position": {
+     "x": 22,
+     "y": 21
+    },
+    "cooldowns": {},
+    "captureTried": false
+   },
+   {
+    "id": 22,
+    "spawnIndex": 3,
+    "speciesName": "horsea",
+    "level": 9,
+    "hp": 27,
+    "hpMax": 27,
+    "position": {
+     "x": 15,
+     "y": 18
+    },
+    "cooldowns": {},
+    "captureTried": false
+   },
+   {
+    "id": 23,
+    "spawnIndex": 3,
+    "speciesName": "horsea",
+    "level": 8,
+    "hp": 25,
+    "hpMax": 25,
+    "position": {
+     "x": 17,
+     "y": 20
+    },
+    "cooldowns": {},
+    "captureTried": false
+   }
+  ],
+  "box": [],
+  "respawns": [
+   {
+    "spawnIndex": 1,
+    "atTick": 307
+   },
+   {
+    "spawnIndex": 1,
+    "atTick": 320
+   },
+   {
+    "spawnIndex": 1,
+    "atTick": 330
+   },
+   {
+    "spawnIndex": 1,
+    "atTick": 340
+   },
+   {
+    "spawnIndex": 0,
+    "atTick": 339
+   },
+   {
+    "spawnIndex": 0,
+    "atTick": 345
+   },
+   {
+    "spawnIndex": 0,
+    "atTick": 351
+   },
+   {
+    "spawnIndex": 2,
+    "atTick": 412
+   },
+   {
+    "spawnIndex": 2,
+    "atTick": 421
+   }
+  ],
+  "nextWildId": 24,
+  "trainer": {
+   "xp": 488,
+   "gold": 105
+  },
+  "inventory": {
+   "potion": 0,
+   "poke-ball": 3
+  },
+  "settings": {
+   "returnHpPercent": 50,
+   "potionHpPercent": 50,
+   "teamSlots": 6,
+   "capture": {
+    "ballTier": "best",
+    "maxWildHpPercent": 30,
+    "allowDuplicates": false
+   },
+   "seen": [
+    "horsea",
+    "zubat",
+    "diglett"
+   ]
+  }
+ }
+}

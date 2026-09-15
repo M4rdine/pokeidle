@@ -24,8 +24,16 @@ const scheduler = createScheduler({ db, registry: loadRegistry(), now, sockets, 
 const app = await buildApp({ db, config, now, realtime: { scheduler, sockets }, loggerInstance })
 
 const shutdown = createShutdown({ app, scheduler, sockets, close, logger: loggerInstance })
-process.on('SIGINT', () => void shutdown().then(() => process.exit(0)))
-process.on('SIGTERM', () => void shutdown().then(() => process.exit(0)))
+// Se `shutdown()` rejeitar (ex.: `app.close()` ou o `close()` do pool lançando), a rejeição
+// precisa de um `onRejected` explícito: sem ele o processo morre como unhandled rejection,
+// sem log nenhum e sem o código de saída 1.
+const onShutdown = (): void => process.exit(0)
+const onShutdownError = (err: unknown): void => {
+  loggerInstance.error({ err }, 'falha no encerramento')
+  process.exit(1)
+}
+process.on('SIGINT', () => void shutdown().then(onShutdown, onShutdownError))
+process.on('SIGTERM', () => void shutdown().then(onShutdown, onShutdownError))
 
 await app.listen({ port: config.PORT, host: '0.0.0.0' })
 scheduler.start()

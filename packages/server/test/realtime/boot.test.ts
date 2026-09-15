@@ -4,7 +4,9 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { huntSessions, pokemon } from '../../src/db/schema.js'
 import { simulate } from '../../src/engine/simulate.js'
 import { loadActive, startHunt } from '../../src/hunt-store/index.js'
+import { AppError } from '../../src/http/errors.js'
 import { createShutdown, recoverSessions } from '../../src/realtime/boot.js'
+import type { Scheduler } from '../../src/realtime/scheduler.js'
 import { truncateAll } from '../helpers/db.js'
 import { api, registerAndLogin, silentLogger, T0, testApp, type TestApp } from '../helpers/app.js'
 
@@ -45,6 +47,21 @@ describe('recoverSessions', () => {
     expect(t.scheduler.get(b)).toBeDefined()
     expect(t.scheduler.get(c)).toBeUndefined()
     expect(await loadActive(t.db, c)).toBeNull()
+  })
+
+  it('conta como failed quando attach lança (não só quando o snapshot está corrompido) e continua para o próximo trainer', async () => {
+    const a = await trainerWithHunt(1, 5)
+    const b = await trainerWithHunt(2, 6)
+    // `t.scheduler` de verdade por baixo; só `attach` é substituído para simular uma falha
+    // qualquer (ex.: erro transitório de banco) só para `a` — `b` continua indo pro `attach`
+    // real, provando que o laço não para no primeiro erro.
+    const throwingScheduler: Scheduler = {
+      ...t.scheduler,
+      attach: (trainerId: string) => (trainerId === a ? Promise.reject(new AppError('no-hunt', 'sessão sumiu')) : t.scheduler.attach(trainerId)),
+    }
+    const res = await recoverSessions(throwingScheduler, t.db, () => t.clock.now, silentLogger)
+    expect(res).toEqual({ recovered: 1, failed: 1 })
+    expect(t.scheduler.get(b)).toBeDefined()
   })
 })
 

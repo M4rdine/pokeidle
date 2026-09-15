@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { trainerView } from '../../account/me.js'
 import { authOf, requireAuth } from '../../auth/plugin.js'
 import { activeView, startAndAttach, stopViaScheduler, toRealtimeDeps, type SessionView } from '../../realtime/actions.js'
+import { errorBody } from '../errors.js'
 import { parseBody } from '../validate.js'
 import type { RouteDeps } from './auth.js'
 
@@ -22,6 +23,13 @@ export const huntRoutes: FastifyPluginAsync<RouteDeps> = async (app, deps) => {
   const guard = { preHandler: requireAuth }
 
   app.get('/hunts', guard, async () => ({ hunts: [...registry.hunts.values()].map(huntSummary) }))
+
+  app.get('/hunts/:id/map', guard, async (request, reply) => {
+    const { id } = parseBody(HuntParams, request.params)
+    const hunt = registry.hunts.get(id)
+    if (!hunt) return reply.status(404).send(errorBody('not-found', `hunt ${id} não existe`))
+    return hunt
+  })
 
   app.post('/hunts/:id/start', guard, async (request, reply) => {
     const { id } = parseBody(HuntParams, request.params)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ClientMessageSchema, EventSchema, HuntStateSchema, SettingsPatchSchema, type Event, type HuntState } from '../src/protocol/index.js'
+import { ClientMessageSchema, EventSchema, HuntStateSchema, ServerMessageSchema, SettingsPatchSchema, type Event, type HuntState, type ServerMessage } from '../src/protocol/index.js'
 
 const state: HuntState = {
   huntId: 'h', sessionId: 's', tick: 3,
@@ -51,5 +51,26 @@ describe('mensagens', () => {
     expect(ClientMessageSchema.parse({ t: 'item.use', itemId: 'potion' })).toEqual({ t: 'item.use', itemId: 'potion' })
     expect(() => ClientMessageSchema.parse({ t: 'ping', x: 1 })).toThrow()
     expect(() => SettingsPatchSchema.parse({ returnHpPercent: 101 })).toThrow()
+  })
+})
+
+describe('ServerMessageSchema', () => {
+  it('aceita cada tipo de mensagem do servidor e rejeita campo extra ou tipo desconhecido', () => {
+    const session = { huntId: 'route-1', sessionId: 's', startedAt: '2026-09-14T12:00:00.000Z' }
+    const summary = { ticks: 10, defeats: 1, captures: 0, captureFailures: 0, faints: 0, xpTrainer: 21, gold: 5, drops: { potion: 1 }, levelUps: 0, evolutions: 0, returns: 0 }
+    const msgs: ServerMessage[] = [
+      { t: 'hunt.snapshot', session, state, serverTime: 1_000 },
+      { t: 'hunt.tick', tick: 4, events: [{ type: 'moved', tick: 3, from: { x: 0, y: 0 }, to: { x: 1, y: 0 } }], serverTime: 1_200 },
+      { t: 'hunt.stopped', reason: 'team-fainted', healed: true },
+      { t: 'hunt.catchup', ticksRemaining: 250 },
+      { t: 'hunt.summary', summary },
+      { t: 'hunt.idle' },
+      { t: 'error', code: 'no-hunt', message: 'não há hunt ativa' },
+      { t: 'pong' },
+    ]
+    for (const m of msgs) expect(ServerMessageSchema.parse(m), m.t).toEqual(m)
+    expect(() => ServerMessageSchema.parse({ t: 'pong', x: 1 })).toThrow()
+    expect(() => ServerMessageSchema.parse({ t: 'hunt.tick', tick: 1, events: [] })).toThrow() // sem serverTime
+    expect(() => ServerMessageSchema.parse({ t: 'nope' })).toThrow()
   })
 })

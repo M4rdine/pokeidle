@@ -72,6 +72,17 @@ describe('start / active / stop', () => {
   })
 })
 
+describe('GET /hunts/:id/map', () => {
+  it('devolve o HuntMap completo do registro; 404 para id desconhecido; exige sessão', async () => {
+    const r = await api(t.app, cookie).get('/hunts/route-1/map')
+    expect(r.statusCode).toBe(200)
+    expect(r.json()).toMatchObject({ id: 'route-1', width: 40, height: 30, tileSize: 32, spawnPoint: expect.any(Object), pokecenter: expect.any(Object) })
+    expect((r.json() as { layers: { ground: unknown[] } }).layers.ground).toHaveLength(1200)
+    expect((await api(t.app, cookie).get('/hunts/nope/map')).statusCode).toBe(404)
+    expect((await api(t.app).get('/hunts/route-1/map')).statusCode).toBe(401)
+  })
+})
+
 describe('S2: isolamento entre contas', () => {
   it('conta B não vê nem para a hunt de A; B não reordena o time de A', async () => {
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })

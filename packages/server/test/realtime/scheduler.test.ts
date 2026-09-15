@@ -316,6 +316,24 @@ describe('contenção de erros e seams de teste', () => {
     expect(active.state.tick).toBe(250) // uma fatia (CATCHUP_SLICE_TICKS): stop() dispara no 1º yieldNow
     expect(active.lastSimulatedAt).toEqual(new Date(T0.getTime() + 250 * TICK_MS))
   })
+  it('detach durante o catch-up: nenhuma fatia posterior ressuscita o runner nem transmite summary/snapshot', async () => {
+    const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
+    let detached = false
+    const s2: Scheduler = createScheduler({
+      db, registry, now: () => clock.now, sockets, logger: silentLogger,
+      yieldNow: async () => { if (!detached) { detached = true; s2.detach(trainerId) } },
+    })
+    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 42 })
+    clock.now = new Date(T0.getTime() + 10 * 60 * 1000) // 3000 ticks: várias fatias
+    await s2.attach(trainerId)
+    expect(s2.get(trainerId)).toBeUndefined()
+    const types = msgs(s).map((m) => m.t)
+    expect(types).not.toContain('hunt.summary')
+    expect(types).not.toContain('hunt.snapshot')
+    expect(types.filter((x) => x === 'hunt.catchup').length).toBeLessThanOrEqual(2) // o inicial do attach + no máximo a fatia já em voo
+    const active = await loadActive(db, trainerId)
+    expect(active?.state.tick).toBe(0) // quem fez detach assumiu a sessão: nada foi persistido por esta geração
+  })
   it('tick: erro no motor remove o runner, preserva a sessão e notifica o socket', async () => {
     const s2 = createScheduler({ db, registry: brokenRegistry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve() })
     const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })

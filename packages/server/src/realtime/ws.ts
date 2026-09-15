@@ -170,7 +170,7 @@ function handleConnection(conn: Conn): void {
   const initial: ServerMessage = runner
     ? runner.catchingUp
       ? { t: 'hunt.catchup', ticksRemaining: runner.catchupRemaining ?? 0 }
-      : snapshotMessage(runner)
+      : snapshotMessage(runner, rt.now())
     : { t: 'hunt.idle' }
   rt.sockets.send(socket, initial)
 

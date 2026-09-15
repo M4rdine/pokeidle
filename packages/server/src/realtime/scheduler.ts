@@ -38,8 +38,8 @@ export interface Scheduler {
   idle(): Promise<void>
 }
 
-export const snapshotMessage = (r: Runner): ServerMessage => ({
-  t: 'hunt.snapshot', session: { huntId: r.huntId, sessionId: r.sessionId, startedAt: r.startedAt.toISOString() }, state: r.state,
+export const snapshotMessage = (r: Runner, now: Date): ServerMessage => ({
+  t: 'hunt.snapshot', session: { huntId: r.huntId, sessionId: r.sessionId, startedAt: r.startedAt.toISOString() }, state: r.state, serverTime: now.getTime(),
 })
 
 const healsOn = (reason: StopReason): boolean => reason === 'team-fainted'
@@ -109,7 +109,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     try {
       const outcome = tickRunner(runner, engineDeps(runner, deps.registry))
       let next: Runner = { ...outcome.runner, lastSimulatedAt: deps.now() }
-      if (outcome.events.length > 0) deps.sockets.broadcast(runner.trainerId, { t: 'hunt.tick', tick: runner.state.tick, events: outcome.events })
+      if (outcome.events.length > 0) deps.sockets.broadcast(runner.trainerId, { t: 'hunt.tick', tick: runner.state.tick, events: outcome.events, serverTime: deps.now().getTime() })
       if (outcome.stopped) { runners.set(runner.trainerId, next); finishInBackground(runner.trainerId, outcome.stopped.reason); return }
       if (needsSync(next)) next = persist(next, true)
       else if (needsSave(next)) next = persist(next, false)
@@ -175,15 +175,19 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
       const result = await catchUp(base, owed, engineDeps(base, deps.registry), {
         onSlice: (remaining) => {
           // Por fatia, só atualiza o runner em memória (`hunt.catchup` do `ws.ts` no connect
-          // lê `catchupRemaining` dali) se ainda formos a geração corrente (C1): se um
-          // `finish`/`detach` concorrente já assumiu a sessão, quem assumiu já cuidou dela.
-          if (isCurrent()) runners.set(trainerId, { ...runners.get(trainerId)!, catchupRemaining: remaining })
+          // lê `catchupRemaining` dali) e transmite se ainda formos a geração corrente (C1):
+          // se um `finish`/`detach` concorrente já assumiu a sessão, quem assumiu já cuidou dela.
+          if (!isCurrent()) return
+          runners.set(trainerId, { ...runners.get(trainerId)!, catchupRemaining: remaining })
           deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: remaining })
         },
         shouldAbort: () => stopping,
         ...(deps.yieldNow && { yieldNow: deps.yieldNow }),
       })
       if (result.stopped) {
+        // Um `finish`/`detach` concorrente já assumiu a sessão durante o catch-up: quem assumiu
+        // já cuidou dela, e ressuscitar o runner aqui apagaria o que essa outra geração fez.
+        if (!isCurrent()) return
         // Chamada interna (mesmo fluxo de `attachInner`, não concorrente): usa `finishInner`
         // direto — `finish` esperaria por esta própria promise em `attaching` e travaria.
         runners.set(trainerId, { ...result.runner, catchupRemaining: null })
@@ -201,7 +205,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
       const settled = persist({ ...result.runner, catchingUp: false, catchupRemaining: null }, true)
       runners.set(trainerId, settled)
       deps.sockets.broadcast(trainerId, { t: 'hunt.summary', summary: result.summary })
-      deps.sockets.broadcast(trainerId, snapshotMessage(settled))
+      deps.sockets.broadcast(trainerId, snapshotMessage(settled, deps.now()))
     } catch (error) {
       // Idempotente: se `finishInner` (chamado acima, já awaited) já removeu o runner e tratou o erro, não duplica.
       if (attachGen.get(trainerId) === gen && runners.has(trainerId)) {
@@ -226,7 +230,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     if (attachGen.get(trainerId) !== gen) return // finish/detach assumiu a sessão enquanto líamos o banco
     const base = createRunner(trainerId, active)
     const owed = ticksOwedSince(active.lastSimulatedAt, deps.now())
-    if (owed < MIN_CATCHUP_TICKS) { runners.set(trainerId, base); deps.sockets.broadcast(trainerId, snapshotMessage(base)); return }
+    if (owed < MIN_CATCHUP_TICKS) { runners.set(trainerId, base); deps.sockets.broadcast(trainerId, snapshotMessage(base, deps.now())); return }
     runners.set(trainerId, { ...base, catchingUp: true, catchupRemaining: owed })
     deps.sockets.broadcast(trainerId, { t: 'hunt.catchup', ticksRemaining: owed })
     await runCatchUp(trainerId, base, owed, gen)
@@ -253,7 +257,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     if ('error' in result) return result
     const next: Runner = { ...runner, state: result.state, pendingLog: [...runner.pendingLog, ...logEntriesOf(result.events, runner.huntId)] }
     runners.set(trainerId, next)
-    if (result.events.length > 0) deps.sockets.broadcast(trainerId, { t: 'hunt.tick', tick: runner.state.tick, events: result.events })
+    if (result.events.length > 0) deps.sockets.broadcast(trainerId, { t: 'hunt.tick', tick: runner.state.tick, events: result.events, serverTime: deps.now().getTime() })
     const stopped = result.events.find((e) => e.type === 'stopped')
     if (stopped) finishInBackground(trainerId, 'intent')
     return result

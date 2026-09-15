@@ -61,8 +61,8 @@ export interface Summary {
 }
 export interface SessionInfo { readonly huntId: string; readonly sessionId: string; readonly startedAt: string }
 export type ServerMessage =
-  | { readonly t: 'hunt.snapshot'; readonly session: SessionInfo; readonly state: HuntState }
-  | { readonly t: 'hunt.tick'; readonly tick: number; readonly events: readonly Event[] }
+  | { readonly t: 'hunt.snapshot'; readonly session: SessionInfo; readonly state: HuntState; readonly serverTime: number }
+  | { readonly t: 'hunt.tick'; readonly tick: number; readonly events: readonly Event[]; readonly serverTime: number }
   | { readonly t: 'hunt.stopped'; readonly reason: StopReason; readonly healed: boolean }
   | { readonly t: 'hunt.catchup'; readonly ticksRemaining: number }
   | { readonly t: 'hunt.summary'; readonly summary: Summary }

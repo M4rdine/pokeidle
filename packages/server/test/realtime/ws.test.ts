@@ -169,10 +169,12 @@ describe('hunt pelo socket', () => {
     const snap = await c.nextOf('hunt.snapshot')
     expect(JSON.stringify(snap)).not.toMatch(/seed|rngState/)
     expect(snap['session']).toMatchObject({ huntId: 'route-1', startedAt: T0.toISOString() })
+    expect(snap['serverTime']).toBe(T0.getTime())
     t.scheduler.tick(); t.scheduler.tick() // tick 0 só escolhe alvo (sem eventos); o 1 já anda ou luta
     const tick = await c.nextOf('hunt.tick')
     expect(tick['tick']).toBe(1)
     expect(Array.isArray(tick['events'])).toBe(true)
+    expect(tick['serverTime']).toBe(t.clock.now.getTime())
     c.send({ t: 'ping' }); expect(await c.nextOf('pong')).toEqual({ t: 'pong' })
     c.send({ t: 'item.use', itemId: 'potion' })
     expect(await c.nextOf('error')).toMatchObject({ t: 'error', code: 'full-hp' })

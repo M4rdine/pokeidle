@@ -1,6 +1,7 @@
 import type { AppContext } from '../../app-context.js'
 import { TeamSchema, type PokemonDto } from '../../api/dto.js'
 import { displayName } from '../../state/log.js'
+import { hasActiveHunt } from '../../state/hunt-active.js'
 import { el } from '../dom.js'
 import { openModal, type Modal } from './modal.js'
 
@@ -18,7 +19,7 @@ const swap = (ids: readonly string[], a: number, b: number): string[] => {
 export function openTeam(ctx: AppContext): Modal {
   const body = el('div', { class: 'team-modal' }, el('p', { class: 'muted' }, 'Carregando…'))
   const error = el('p', { class: 'form-error', role: 'alert' })
-  const inHunt = ctx.hunt.get().state !== null
+  const inHunt = hasActiveHunt(ctx)
   const slots = ctx.session.get().me?.trainer.teamSlots ?? 6
 
   const save = (ids: readonly string[]): void => {

@@ -1,5 +1,6 @@
 import type { AppContext } from '../../app-context.js'
 import { ShopSchema, TradeSchema, type ShopItem } from '../../api/dto.js'
+import { hasActiveHunt } from '../../state/hunt-active.js'
 import { el } from '../dom.js'
 import { openModal, type Modal } from './modal.js'
 
@@ -7,7 +8,7 @@ import { openModal, type Modal } from './modal.js'
 export function openShop(ctx: AppContext): Modal {
   const body = el('div', { class: 'shop' }, el('p', { class: 'muted' }, 'Carregando…'))
   const error = el('p', { class: 'form-error', role: 'alert' })
-  const inHunt = ctx.hunt.get().state !== null
+  const inHunt = hasActiveHunt(ctx)
 
   const reload = (): void => {
     void ctx.http.get('/shop', ShopSchema).then(render).catch(() => {

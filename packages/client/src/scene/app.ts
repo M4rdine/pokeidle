@@ -1,5 +1,8 @@
 import { typeMultiplier, type HuntMap, type Registry } from '@pokeidle/shared'
 import type { Event } from '@pokeidle/shared/protocol'
+// A CSP do servidor (default-src 'self') proíbe unsafe-eval; este módulo troca os geradores de
+// código do Pixi por implementações equivalentes sem `new Function`.
+import 'pixi.js/unsafe-eval'
 import { Application, Container } from 'pixi.js'
 import { TILE_SIZE } from '../config.js'
 import { activePokemon, type HuntView } from '../state/hunt-view.js'

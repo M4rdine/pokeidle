@@ -20,6 +20,7 @@ const me = (patch: Partial<Me['trainer']> = {}): Me => ({
   user: { id: 'u', email: 'a@a.com', role: 'player' },
   trainer: { id: 't', name: 'Ash', xp: 0, gold: 500, settings: { returnHpPercent: 50, potionHpPercent: 50, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false } }, hasStarter: true, activeHuntId: null, level: 1, xpToNext: 8, teamSlots: 3, nextUnlock: null, ...patch },
 })
+const inHuntSession = () => createStore(withMe(initialSession(), me({ activeHuntId: 'route-1' })))
 const ctxWith = (over: Partial<AppContext> = {}): AppContext => createContext({
   registry,
   session: createStore(withMe(initialSession(), me())),
@@ -34,7 +35,7 @@ describe('mochila', () => {
   it('com hunt ativa usa o espelho e permite usar poção; fora da hunt busca no servidor', async () => {
     const sendIntent = vi.fn()
     const hurt = { ...inHuntView, state: { ...inHuntView.state!, player: { ...inHuntView.state!.player, team: [{ ...inHuntView.state!.player.team[0]!, hp: 5 }] } } }
-    openBag(ctxWith({ hunt: createStore(hurt), sendIntent }))
+    openBag(ctxWith({ hunt: createStore(hurt), sendIntent, session: inHuntSession() }))
     expect(modal().querySelector('[data-item=potion]')?.textContent).toContain('Poção')
     modal().querySelector<HTMLButtonElement>('[data-item=potion] button')!.click()
     expect(sendIntent).toHaveBeenCalledWith({ t: 'item.use', itemId: 'potion' })
@@ -69,7 +70,7 @@ describe('time', () => {
   })
   it('com hunt ativa os controles ficam bloqueados', async () => {
     const get = vi.fn(async () => ({ team: [{ id: 'a', speciesName: 'charmander', level: 10, xp: 0, hp: 5, hpMax: 10, teamSlot: 0 }], box: [] }))
-    openTeam(ctxWith({ http: { get } as never, hunt: createStore(inHuntView) }))
+    openTeam(ctxWith({ http: { get } as never, hunt: createStore(inHuntView), session: inHuntSession() }))
     await flush()
     expect(modal().textContent).toContain('pare a hunt para mexer no time')
     expect([...modal().querySelectorAll('button')].every((b) => b.hasAttribute('disabled'))).toBe(true)
@@ -129,9 +130,19 @@ describe('loja', () => {
     expect(modal().querySelector('.form-error')?.textContent).toBe('faltam 100 de ouro')
 
     document.querySelector('.modal-backdrop')!.remove()
-    openShop(ctxWith({ http: { get } as never, hunt: createStore(inHuntView) }))
+    openShop(ctxWith({ http: { get } as never, hunt: createStore(inHuntView), session: inHuntSession() }))
     await flush()
     expect(modal().textContent).toContain('pare a hunt para usar a loja')
     expect([...modal().querySelectorAll('button')].every((b) => b.hasAttribute('disabled'))).toBe(true)
+  })
+})
+
+describe('hunt parada mas estado ainda espelhado', () => {
+  it('a loja libera comprar assim que o /me diz que não há hunt ativa', async () => {
+    const get = vi.fn(async () => ({ level: 1, gold: 500, items: [{ itemId: 'potion', name: 'Poção', kind: 'potion' as const, buyPrice: 100, sellPrice: 50, unlockLevel: 0, unlocked: true, owned: 1 }] }))
+    const stopped = { ...inHuntView, phase: 'stopped' as const, stoppedInfo: { reason: 'intent' as const, healed: false } }
+    openShop(ctxWith({ http: { get } as never, hunt: createStore(stopped) }))
+    await flush()
+    expect(modal().querySelector<HTMLButtonElement>('[data-item=potion] button')?.hasAttribute('disabled')).toBe(false)
   })
 })

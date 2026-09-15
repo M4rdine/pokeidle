@@ -1,6 +1,7 @@
 import type { AppContext } from '../../app-context.js'
 import { InventorySchema } from '../../api/dto.js'
 import { activePokemon } from '../../state/hunt-view.js'
+import { hasActiveHunt } from '../../state/hunt-active.js'
 import { el } from '../dom.js'
 import { openModal, type Modal } from './modal.js'
 
@@ -12,7 +13,7 @@ export function openBag(ctx: AppContext): Modal {
   const body = el('div', { class: 'bag' }, el('p', { class: 'muted' }, 'Carregando…'))
   const view = ctx.hunt.get()
   const active = activePokemon(view)
-  const inHunt = view.state !== null
+  const inHunt = hasActiveHunt(ctx) && view.state !== null
 
   const render = (items: readonly { itemId: string; quantity: number }[]): void => {
     if (items.length === 0) { body.replaceChildren(el('p', { class: 'muted' }, 'Mochila vazia')); return }

@@ -320,6 +320,12 @@ outras rotas. `/assets/atlas/*` é público (allowlist fixa dos 4 arquivos do at
 outro nome ou arquivo ausente é 404), servido independente de `CLIENT_DIST` existir. A
 CSP do Helmet libera `img-src 'self' data: blob:` para os sprites/atlas do cliente.
 
+Smoke de ponta a ponta: `pnpm client:e2e` sobe o servidor na porta 3100 com o banco de teste,
+registra uma conta, escolhe o inicial, inicia a Rota 1, espera a primeira derrota no log, abre a
+mochila, para a hunt e compra uma Poção na loja. Nunca rode junto com `pnpm server:test`: os dois
+usam o mesmo Postgres. Depois de `pnpm client:build`, reinicie o servidor — os arquivos do build
+são registrados no boot.
+
 ## Visualizador de depuração (`/debug`)
 
 Página descartável para ver uma hunt acontecer antes de existir um cliente de verdade

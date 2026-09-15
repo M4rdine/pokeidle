@@ -5,7 +5,7 @@ import { TILE_SIZE } from '../config.js'
 import { activePokemon, type HuntView } from '../state/hunt-view.js'
 import type { AtlasData } from './atlas.js'
 import { cameraStep, type Camera } from './camera.js'
-import { createEffectRunner, fadeOut, flash, floatingText, lunge, ring, shake } from './effects.js'
+import { createEffectRunner, fadeOut, floatingText, lunge, ring, shake } from './effects.js'
 import { createEntityLayer } from './entities.js'
 import { isDone, positionAt } from './interpolate.js'
 import { buildMapSprite } from './map-layer.js'
@@ -30,6 +30,9 @@ export interface Scene {
 }
 
 const px = (tile: number): number => tile * TILE_SIZE + TILE_SIZE / 2
+// Janela para o flash de evolução "esperar" o swap de sprite (Task 9 chama onEvent antes de
+// applyView, então o body novo ainda não existe quando o evento 'evolved' chega).
+const PENDING_EVOLVE_FLASH_MS = 1000
 
 /** Cria a cena PixiJS: mapa numa textura, sprites do atlas, tween por tick, câmera e efeitos. Só a Task 9 chama isto. */
 export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise<Scene> {
@@ -54,7 +57,15 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
     effects.add(fadeOut(root, 300))
     effects.add(fadeOut(ov, 300, () => { root.destroy({ children: true }); ov.destroy({ children: true }) }))
   }
-  const entityLayer = createEntityLayer({ sheets, entities, overlay, now: deps.now, fadeOutRemoved })
+  // id -> prazo (deps.now()) do flash de evolução pendente; consumido em onSpeciesSwap.
+  const pendingEvoFlash = new Map<string, number>()
+  const onSpeciesSwap = (id: string, body: Container): void => {
+    const expiresAt = pendingEvoFlash.get(id)
+    if (expiresAt === undefined) return
+    pendingEvoFlash.delete(id)
+    if (deps.now() <= expiresAt) effects.flash(body, 400)
+  }
+  const entityLayer = createEntityLayer({ sheets, entities, overlay, now: deps.now, fadeOutRemoved, onSpeciesSwap })
 
   let prev: Entities = {}
   let cam: Camera = { x: 0, y: 0 }
@@ -75,9 +86,11 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
     }
     const player = entityLayer.live.get('player')
     const target = player ? { x: player.sprite.root.x, y: player.sprite.root.y } : { x: worldSize.w / 2, y: worldSize.h / 2 }
-    // No primeiro tick a câmera assume direto a posição clampada (lerp 1 = sem panorâmica do canto).
-    cam = cameraStep(cam, target, { w: app.screen.width, h: app.screen.height }, worldSize, zoom, firstCameraTick ? 1 : undefined)
-    firstCameraTick = false
+    // Só consome o "primeiro tick" quando o jogador já existe: sem isso, se o ticker rodar antes
+    // do primeiro applyView, a câmera snapa no centro do mapa e depois faz panorâmica até o
+    // jogador assim que ele aparecer — o oposto do que este snap deveria evitar.
+    cam = cameraStep(cam, target, { w: app.screen.width, h: app.screen.height }, worldSize, zoom, firstCameraTick && player ? 1 : undefined)
+    if (player) firstCameraTick = false
     world.scale.set(zoom)
     world.x = -cam.x * zoom
     world.y = -cam.y * zoom
@@ -94,7 +107,7 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
     const dx = Math.sign(targetRoot.x - attackerRoot.x)
     const dy = Math.sign(targetRoot.y - attackerRoot.y)
     effects.add(lunge(attackerLive.sprite.body, dx, dy))
-    effects.add(flash(targetLive.sprite.body))
+    effects.flash(targetLive.sprite.body)
     if (e.attacker === 'wild') effects.add(shake(targetLive.sprite.body))
     const move = deps.registry.moves.get(e.move)
     const defender = e.attacker === 'player' ? view.state?.wilds.find((w) => String(w.id) === e.targetId) : activePokemon(view)
@@ -108,7 +121,6 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
   const onEvent = (e: Event, view: HuntView): void => {
     if (isHidden()) return
     const player = spriteOf('player')
-    const playerLive = entityLayer.live.get('player')
     switch (e.type) {
       case 'attack': return onAttack(e, view)
       case 'wildDefeated': {
@@ -130,7 +142,9 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
         return
       }
       case 'evolved': {
-        if (playerLive) effects.add(flash(playerLive.sprite.body, 400))
+        // O body novo só existe depois do próximo applyView (Task 9 chama onEvent antes);
+        // onSpeciesSwap consome esta marca quando o swap acontecer (ou ela expira em 1 s).
+        pendingEvoFlash.set('player', deps.now() + PENDING_EVOLVE_FLASH_MS)
         return
       }
       case 'itemUsed': {

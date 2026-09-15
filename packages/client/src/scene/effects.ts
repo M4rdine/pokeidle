@@ -3,22 +3,64 @@ import { ColorMatrixFilter, Container, Graphics, Text, type Ticker } from 'pixi.
 export type Updater = (dtMs: number) => boolean // devolve false quando termina
 
 const MAX_ACTIVE_EFFECTS = 200
+const FLASH_BRIGHTNESS = 2
 
-export function createEffectRunner(ticker: Ticker): { add(u: Updater): void; destroy(): void } {
+export interface EffectRunner {
+  add(u: Updater): void
+  /** Clareia `body` usando o `ColorMatrixFilter` único da cena (ver `destroy`). */
+  flash(body: Container, ms?: number): void
+  destroy(): void
+}
+
+export function createEffectRunner(ticker: Ticker): EffectRunner {
   let updaters: Updater[] = []
+  // Um efeito quebrado (ex.: escreveu num Container já destruído por fora) nunca pode travar o
+  // loop de render inteiro — descarta só aquele efeito.
+  const safeRun = (u: Updater, dt: number): boolean => {
+    try {
+      return u(dt)
+    } catch {
+      return false
+    }
+  }
   const tick = (t: Ticker): void => {
     const dt = t.deltaMS
-    updaters = updaters.filter((u) => u(dt))
+    updaters = updaters.filter((u) => safeRun(u, dt))
   }
   ticker.add(tick)
+  const add = (u: Updater): void => {
+    // Acima do teto, o efeito não entra na lista viva: é avançado até o fim de uma vez (o que já
+    // destrói o que ele criou via `done`) em vez de renderizar indefinidamente.
+    if (updaters.length >= MAX_ACTIVE_EFFECTS) {
+      safeRun(u, Number.MAX_SAFE_INTEGER)
+      return
+    }
+    updaters = [...updaters, u]
+  }
+
+  // Um único filtro para toda a cena: compartilhar a mesma instância entre bodies é seguro (o
+  // ColorMatrixFilter não guarda estado por alvo) e evita criar/destruir um por flash.
+  const flashFilter = new ColorMatrixFilter()
+  flashFilter.brightness(FLASH_BRIGHTNESS, false)
+  const flashCount = new WeakMap<Container, number>()
+  const flash = (body: Container, ms = 100): void => {
+    flashCount.set(body, (flashCount.get(body) ?? 0) + 1)
+    body.filters = [flashFilter]
+    add(guardDestroyed(body, over(ms, () => {}, () => {
+      const remaining = (flashCount.get(body) ?? 1) - 1
+      if (remaining <= 0) {
+        flashCount.delete(body)
+        body.filters = []
+      } else {
+        flashCount.set(body, remaining)
+      }
+    })))
+  }
+
   return {
-    // Acima do teto, o efeito não entra na lista viva: é avançado até o fim de uma vez
-    // (o que já destrói o que ele criou via `done`) em vez de renderizar indefinidamente.
-    add: (u) => {
-      if (updaters.length >= MAX_ACTIVE_EFFECTS) { u(Number.MAX_SAFE_INTEGER); return }
-      updaters = [...updaters, u]
-    },
-    destroy: () => { ticker.remove(tick); updaters = [] },
+    add,
+    flash,
+    destroy: () => { ticker.remove(tick); updaters = []; flashFilter.destroy() },
   }
 }
 
@@ -34,56 +76,34 @@ const over = (ms: number, fn: (k: number) => void, done?: () => void): Updater =
 }
 
 /**
- * Avança 8 px na direção (dx, dy) e volta, em 150 ms. Recebe `body` (o sprite/gráfico dentro do
- * `root` da entidade), nunca `root`: o ticker de posição em `app.ts` escreve `root.x/y` a cada
- * frame para seguir o tween, e sobrescreveria qualquer deslocamento aplicado ali.
+ * `target` pode ser destruído por fora (ex.: troca de espécie no meio de um lunge/shake/flash).
+ * No Pixi 8, escrever `x`/`y`/`filters` num Container destruído lança — então, uma vez destruído,
+ * o efeito para (devolve `false`) sem tocar em mais nada.
  */
-export const lunge = (body: Container, dx: number, dy: number): Updater => {
-  const x0 = body.x
-  const y0 = body.y
-  return over(150, (k) => {
-    const a = Math.sin(k * Math.PI) * 8
-    body.x = x0 + dx * a
-    body.y = y0 + dy * a
-  }, () => { body.x = x0; body.y = y0 })
+const guardDestroyed = (target: Container, u: Updater): Updater => (dt) => {
+  if (target.destroyed) return false
+  return u(dt)
 }
-
-export const shake = (body: Container, px = 2, ms = 120): Updater => {
-  const x0 = body.x
-  return over(ms, (k) => {
-    body.x = k < 1 ? x0 + (Math.round(k * 6) % 2 === 0 ? px : -px) : x0
-  }, () => { body.x = x0 })
-}
-
-// Contagem de flashes sobrepostos por body: o filtro só some quando o último termina (nunca
-// fica preso caso um segundo flash comece antes do primeiro acabar).
-const flashCount = new WeakMap<Container, number>()
-const flashFilterOf = new WeakMap<Container, ColorMatrixFilter>()
 
 /**
- * Clareia o `body` por `ms` usando `ColorMatrixFilter.brightness` (no Pixi 8, `tint = 0xffffff`
- * é "sem tint" e não produz efeito visual nenhum).
+ * Avança 8 px na direção (dx, dy) e volta, em 150 ms. Recebe `body` (o sprite/gráfico dentro do
+ * `root` da entidade), nunca `root`: o ticker de posição em `app.ts` escreve `root.x/y` a cada
+ * frame para seguir o tween, e sobrescreveria qualquer deslocamento aplicado ali. O deslocamento
+ * é sempre relativo a 0 (nunca a um valor capturado no início): se dois efeitos se sobrepuserem
+ * no mesmo body, o último a escrever prevalece a cada frame, e o que terminar por último grava 0
+ * — nunca fica deslocado para sempre.
  */
-export function flash(body: Container, ms = 100): Updater {
-  let filter = flashFilterOf.get(body)
-  if (!filter) {
-    filter = new ColorMatrixFilter()
-    flashFilterOf.set(body, filter)
-  }
-  filter.brightness(2, false)
-  flashCount.set(body, (flashCount.get(body) ?? 0) + 1)
-  body.filters = [filter]
-  return over(ms, () => {}, () => {
-    const remaining = (flashCount.get(body) ?? 1) - 1
-    if (remaining <= 0) {
-      flashCount.delete(body)
-      flashFilterOf.delete(body)
-      body.filters = []
-    } else {
-      flashCount.set(body, remaining)
-    }
-  })
-}
+export const lunge = (body: Container, dx: number, dy: number): Updater =>
+  guardDestroyed(body, over(150, (k) => {
+    const a = Math.sin(k * Math.PI) * 8
+    body.x = dx * a
+    body.y = dy * a
+  }, () => { body.x = 0; body.y = 0 }))
+
+export const shake = (body: Container, px = 2, ms = 120): Updater =>
+  guardDestroyed(body, over(ms, (k) => {
+    body.x = k < 1 ? (Math.round(k * 6) % 2 === 0 ? px : -px) : 0
+  }, () => { body.x = 0 }))
 
 export const fadeOut = (target: Container, ms = 300, done?: () => void): Updater =>
   over(ms, (k) => { target.alpha = 1 - k }, done)

@@ -14,6 +14,9 @@ export interface EntityLayerDeps {
   readonly now: () => number
   /** app.ts decide como sumir (efeitos, ticker); aqui só avisamos quem foi removido. */
   readonly fadeOutRemoved: (root: Container, overlay: Container) => void
+  /** Avisa app.ts que `id` ganhou um `body` novo (troca de espécie): quem decide se há um
+   * flash de evolução pendente para esse id — e como aplicá-lo — é o `onEvent` em app.ts. */
+  readonly onSpeciesSwap: (id: string, body: Container) => void
 }
 
 function drawHp(l: Live): void {
@@ -43,13 +46,14 @@ export function createEntityLayer(deps: EntityLayerDeps): { readonly live: Reado
     drawHp(l)
   }
 
-  const swapSprite = (l: Live, speciesName: string): void => {
+  const swapSprite = (l: Live, id: string, speciesName: string): void => {
     deps.entities.removeChild(l.sprite.root)
     l.sprite.root.destroy({ children: true })
     const sprite = makeEntitySprite(deps.sheets, speciesName)
     sprite.setDirection(l.direction)
     deps.entities.addChild(sprite.root)
     l.sprite = sprite
+    deps.onSpeciesSwap(id, sprite.body)
   }
 
   const update = (e: Entity, before: Entity): void => {
@@ -57,7 +61,7 @@ export function createEntityLayer(deps: EntityLayerDeps): { readonly live: Reado
     if (!l) return create(e)
     // Evolução/troca de Pokémon ativo: mesmo id ('player'), espécie diferente — o AnimatedSprite
     // antigo (outra animação) não pode ficar; recria mantendo tween, overlay e direção.
-    if (e.speciesName !== before.speciesName) swapSprite(l, e.speciesName)
+    if (e.speciesName !== before.speciesName) swapSprite(l, e.id, e.speciesName)
     if (e.x !== before.x || e.y !== before.y) {
       l.tween = isDone(l.tween, deps.now())
         ? createTween({ x: before.x, y: before.y }, { x: e.x, y: e.y }, deps.now(), TICK_MS)

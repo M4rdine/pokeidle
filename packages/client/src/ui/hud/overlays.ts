@@ -7,17 +7,23 @@ import { showOverlay } from '../overlay.js'
 /** Catch-up com progresso, resumo em toast e a sobreposição de hunt parada com "Iniciar de novo". */
 export function mountOverlays(root: HTMLElement, ctx: AppContext): () => void {
   let hide: (() => void) | null = null
+  let catchupTotal = 0
   const clear = (): void => { hide?.(); hide = null }
 
   const offPhase = ctx.hunt.subscribe((v) => ({ phase: v.phase, remaining: v.catchup?.remaining ?? null, stopped: v.stoppedInfo }), (state) => {
     clear()
     if (state.phase === 'catching-up') {
+      const remaining = state.remaining ?? 0
+      // O primeiro valor visto vira o denominador: o servidor só manda quanto falta.
+      catchupTotal = Math.max(catchupTotal, remaining)
+      const done = catchupTotal > 0 ? 1 - remaining / catchupTotal : 0
       hide = showOverlay(root, el('div', { class: 'catchup' },
         el('h2', {}, 'Recuperando o tempo offline'),
-        el('progress', { max: '1', value: '0' }),
-        el('p', { 'data-remaining': '' }, `${state.remaining ?? 0} ticks restantes`)))
+        el('progress', { max: '1', value: done.toFixed(3) }),
+        el('p', { 'data-remaining': '' }, `${remaining} ticks restantes`)))
       return
     }
+    catchupTotal = 0
     if (state.phase === 'stopped' && state.stopped) {
       const again = el('button', { class: 'primary', type: 'button' }, 'Iniciar de novo')
       again.addEventListener('click', () => {

@@ -1,6 +1,7 @@
 import { Container, Graphics, Text } from 'pixi.js'
 import { TICK_MS } from '../config.js'
-import { createTween, directionOf, isDone, retarget, type Direction, type Tween } from './interpolate.js'
+import { createTween, directionOf, type Direction, type Tween } from './interpolate.js'
+import { hpColor, nextTween } from './tweening.js'
 import { entitiesOf, reconcile, type Entities, type Entity, type Op } from './reconcile.js'
 import { makeEntitySprite, type EntitySprite, type Sheets } from './sprites.js'
 import type { HuntView } from '../state/hunt-view.js'
@@ -21,7 +22,7 @@ export interface EntityLayerDeps {
 
 function drawHp(l: Live): void {
   const k = l.entity.hpMax > 0 ? Math.max(0, l.entity.hp / l.entity.hpMax) : 0
-  const color = k > 0.5 ? 0x44dd66 : k > 0.25 ? 0xffcc00 : 0xdd4444
+  const color = hpColor(l.entity.hp, l.entity.hpMax)
   l.hpBar.clear().rect(-16, -40, 32, 4).fill(0x000000).rect(-16, -40, 32 * k, 4).fill(color)
   l.label.style.fill = l.entity.targeted ? 0xffcc00 : 0xffffff
 }
@@ -63,9 +64,7 @@ export function createEntityLayer(deps: EntityLayerDeps): { readonly live: Reado
     // antigo (outra animação) não pode ficar; recria mantendo tween, overlay e direção.
     if (e.speciesName !== before.speciesName) swapSprite(l, e.id, e.speciesName)
     if (e.x !== before.x || e.y !== before.y) {
-      l.tween = isDone(l.tween, deps.now())
-        ? createTween({ x: before.x, y: before.y }, { x: e.x, y: e.y }, deps.now(), TICK_MS)
-        : retarget(l.tween, { x: e.x, y: e.y }, deps.now())
+      l.tween = nextTween(l.tween, { x: before.x, y: before.y }, { x: e.x, y: e.y }, deps.now())
       l.direction = directionOf({ x: before.x, y: before.y }, { x: e.x, y: e.y })
       l.sprite.setDirection(l.direction)
     }

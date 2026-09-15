@@ -13,7 +13,9 @@ export const InventorySchema = z.object({ items: z.array(z.object({ itemId: z.st
 export const PokedexSchema = z.object({ entries: z.array(z.object({ speciesName: z.string(), seenAt: z.string(), caughtAt: z.string().nullable() })) })
 export const HuntSummarySchema = z.object({ id: z.string(), name: z.string(), width: z.number(), height: z.number(), minLevel: z.number(), maxLevel: z.number() })
 export const HuntsSchema = z.object({ hunts: z.array(HuntSummarySchema) })
-export const ShopItemSchema = z.object({ itemId: z.string(), name: z.string(), kind: z.enum(['potion', 'ball']), buyPrice: z.number(), sellPrice: z.number(), unlockLevel: z.number(), unlocked: z.boolean(), owned: z.number() })
+// `kind` é string aberta de propósito: um tipo de item novo no servidor não pode quebrar a loja.
+// `kind` é string aberta de propósito: um tipo de item novo no servidor não pode quebrar a loja.
+export const ShopItemSchema = z.object({ itemId: z.string(), name: z.string(), kind: z.string(), buyPrice: z.number(), sellPrice: z.number(), unlockLevel: z.number(), unlocked: z.boolean(), owned: z.number() })
 export const ShopSchema = z.object({ level: z.number(), gold: z.number(), items: z.array(ShopItemSchema) })
 export const TradeSchema = z.object({ gold: z.number(), item: z.object({ itemId: z.string(), quantity: z.number() }) })
 export const SessionInfoDtoSchema = z.object({ huntId: z.string(), sessionId: z.string(), startedAt: z.string() })
@@ -22,7 +24,6 @@ export const StartHuntSchema = z.object({ session: SessionInfoDtoSchema })
 export const ActiveHuntSchema = z.object({ session: SessionDtoSchema.nullable() })
 export const StarterResponseSchema = z.object({ pokemon: PokemonDtoSchema })
 export const SettingsResponseSchema = z.object({ settings: SettingsSchema })
-export const StopResponseSchema = z.object({ trainer: TrainerSchema })
 
 export type Me = z.infer<typeof MeSchema>
 export type Trainer = z.infer<typeof TrainerSchema>

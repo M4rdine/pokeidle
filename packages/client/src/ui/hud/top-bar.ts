@@ -19,7 +19,7 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
   const tick = el('span', { class: 'muted', 'data-tick': '' }, '0')
   const conn = el('span', { class: 'conn', 'data-conn': 'closed' }, CONN_TEXT['closed']!)
   const dex = el('span', { class: 'muted', 'data-dex': '' })
-  const stop = intentButton('Parar', () => ctx.sendIntent?.({ t: 'hunt.stop' }), ctx)
+  const stop = intentButton('Parar', () => ctx.sendIntent?.({ t: 'hunt.stop' }))
   const leave = el('button', { type: 'button' }, 'Sair')
   leave.addEventListener('click', () => {
     leave.setAttribute('disabled', '')
@@ -33,14 +33,19 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
   root.append(el('header', { class: 'top-bar panel' },
     name, level, xpBar, nextUnlock, el('span', {}, 'ouro:'), gold, dex, el('span', {}, 'tick:'), tick, conn, ...shortcuts, stop, leave))
 
-  const offMe = ctx.session.subscribe((s) => s.me, (me) => {
+  // O XP do treinador sobe durante a hunt: o espelho manda, o /me só serve enquanto não há hunt.
+  const renderProgress = (): void => {
+    const me = ctx.session.get().me
     if (!me) return
     name.textContent = me.trainer.name
-    const progress = trainerProgress(ctx.registry, me.trainer.xp)
+    const xp = ctx.hunt.get().state?.trainer.xp ?? me.trainer.xp
+    const progress = trainerProgress(ctx.registry, xp)
     level.textContent = `nível ${progress.level}`
     xpBar.setAttribute('value', String(pct(progress.xpInto, progress.xpSpan)))
     nextUnlock.textContent = progress.next ? `próximo: ${progress.next.what} no nível ${progress.next.level}` : 'tudo destravado'
-  })
+  }
+  const offMe = ctx.session.subscribe((s) => s.me, renderProgress)
+  const offXp = ctx.hunt.subscribe((v) => v.state?.trainer.xp ?? null, renderProgress)
   const offGold = ctx.hunt.subscribe((v) => v.state?.trainer.gold ?? null, (value) => {
     if (value !== null) gold.textContent = String(value)
   })
@@ -69,5 +74,5 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
     conn.setAttribute('data-conn', key)
     conn.textContent = key === 'catching-up' ? 'recuperando tempo' : CONN_TEXT[status] ?? status
   })
-  return () => { offMe(); offGold(); offTick(); offDex(); offConn(); offPhase() }
+  return () => { offMe(); offXp(); offGold(); offTick(); offDex(); offConn(); offPhase() }
 }

@@ -58,7 +58,17 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   })
 
   await app.register(helmet, {
-    contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], imgSrc: ["'self'", 'data:', 'blob:'] } },
+    // `styleSrc`/`styleSrcAttr` explícitos: os padrões do helmet liberam 'unsafe-inline', e o
+    // cliente depende de a política proibir atributo `style` (ele aplica estilo pela API do DOM).
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'blob:'],
+        styleSrc: ["'self'"],
+        styleSrcAttr: ["'none'"],
+        frameAncestors: ["'none'"],
+      },
+    },
     frameguard: { action: 'deny' },
     referrerPolicy: { policy: 'same-origin' },
     hsts: config.COOKIE_SECURE ? { maxAge: 15552000 } : false,

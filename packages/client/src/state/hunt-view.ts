@@ -74,7 +74,12 @@ export function applyEvent(view: HuntView, e: Event, registry: Registry): HuntVi
     case 'captured': return capture(view, e, registry)
     case 'captureFailed': return addItem(view, e.ball, -1)
     case 'pokemonFainted': return mapTeam(view, e.pokemonId, (p) => ({ ...p, hp: 0 }))
-    case 'switched': return withDerived(withPlayer(view, { activeIndex: Math.max(0, s.player.team.findIndex((p) => p.id === e.pokemonId)), cooldowns: {} }), { cooldownUntil: {} })
+    case 'switched': {
+      const index = s.player.team.findIndex((p) => p.id === e.pokemonId)
+      // Id desconhecido (espelho fora de sincronia): mantém o ativo até o próximo snapshot corrigir.
+      if (index < 0) return view
+      return withDerived(withPlayer(view, { activeIndex: index, cooldowns: {} }), { cooldownUntil: {} })
+    }
     case 'levelUp': return mapTeam(view, e.pokemonId, (p) => rescale({ ...p, level: e.level }, hpAt(baseHp(registry, p.speciesName), e.level)))
     case 'evolved': return mapTeam(view, e.pokemonId, (p) => rescale({ ...p, speciesName: e.to }, hpAt(baseHp(registry, e.to), p.level)))
     case 'itemUsed': return addItem(mapTeam(view, e.pokemonId, (p) => ({ ...p, hp: e.hp })), e.itemId, -1)

@@ -50,7 +50,9 @@ export function createGameLoop(ctx: AppContext, deps: GameLoopDeps): GameLoop {
     if (message.t === 'hunt.tick') return applyTick(message)
     if (message.t === 'error') { ctx.toasts.show(message.message, 'error'); return }
     ctx.hunt.set(applyServerMessage(ctx.hunt.get(), message, ctx.registry))
-    if (message.t === 'hunt.stopped' || message.t === 'hunt.idle') void ctx.go()
+    // Parada pedida pelo jogador volta à lista; parada involuntária (time caído, erro) mantém a
+    // tela do jogo para a sobreposição explicar o motivo — quem sai dali são os botões dela.
+    if (message.t === 'hunt.idle' || (message.t === 'hunt.stopped' && message.reason === 'intent')) void ctx.go()
   }
 
   const socket = createHuntSocket({

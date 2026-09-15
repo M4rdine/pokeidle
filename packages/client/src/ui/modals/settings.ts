@@ -21,7 +21,11 @@ export function openSettings(ctx: AppContext): Modal {
     el('label', { for: 'set-dupes' }, 'Capturar duplicatas'),
     el('input', { id: 'set-dupes', name: 'set-dupes', type: 'checkbox', ...(current?.capture.allowDuplicates && { checked: true }) }))
 
-  const valueOf = (node: HTMLElement): number => Number(node.querySelector<HTMLInputElement>('input')!.value)
+  /** Campo vazio ou fracionário vira um inteiro válido aqui: o servidor recusaria com 400. */
+  const valueOf = (node: HTMLElement): number => {
+    const raw = Number(node.querySelector<HTMLInputElement>('input')!.value)
+    return Math.min(100, Math.max(0, Math.round(Number.isFinite(raw) ? raw : 0)))
+  }
   const save = el('button', { class: 'primary', type: 'button' }, 'Salvar')
   save.addEventListener('click', () => {
     error.textContent = ''

@@ -28,10 +28,11 @@ const root = document.querySelector<HTMLElement>('#app')
 if (!root) throw new Error('#app não existe no index.html')
 const toasts = createToasts(document.body)
 let unmount: (() => void) | null = null
-let ctx: AppContext
+let ctx: AppContext | undefined
 
 /** Refaz `GET /me` e, com inicial escolhido, a lista de hunts: é o que decide a tela. */
 async function refreshMe(): Promise<void> {
+  if (!ctx) return
   try {
     const me = await ctx.http.get('/me', MeSchema)
     const hunts = me.trainer.hasStarter ? (await ctx.http.get('/hunts', HuntsSchema)).hunts : []
@@ -44,6 +45,7 @@ async function refreshMe(): Promise<void> {
 }
 
 function render(): void {
+  if (!ctx) return
   unmount?.()
   unmount = null
   const screen = ctx.session.get().screen
@@ -55,7 +57,9 @@ function render(): void {
 }
 
 async function boot(): Promise<void> {
-  const http = createHttp({ fetch: (input, init) => fetch(input, init), onUnauthorized: () => {} })
+  // 401 em qualquer chamada (sessão expirada no meio do jogo) devolve o jogador à tela de entrar.
+  const onUnauthorized = (): void => { ctx?.session.set(withMe(ctx.session.get(), null)) }
+  const http = createHttp({ fetch: (input, init) => fetch(input, init), onUnauthorized })
   const atlas = await loadAtlas().catch(() => {
     toasts.show('Atlas não encontrado: rode pnpm assets build', 'error')
     return null
@@ -78,10 +82,16 @@ async function boot(): Promise<void> {
     random: Math.random,
   })
   const modals: Record<ModalName, (context: AppContext) => unknown> = { bag: openBag, team: openTeam, settings: openSettings, pokedex: openPokedex, shop: openShop }
-  ctx = { ...ctx, loop, sendIntent: loop.send, openModal: (name: ModalName) => { modals[name](ctx) } }
+  ctx = { ...ctx, loop, sendIntent: loop.send, openModal: (name: ModalName) => { if (ctx) modals[name](ctx) } }
   loop.onEvent(createTipShower(ctx))
-  ctx.session.subscribe((s) => s.me !== null, (logged) => { if (logged) loop.start(); else loop.stop() })
-  ctx.session.subscribe((s) => s.screen, () => render())
+  const app = ctx
+  app.session.subscribe((s) => s.me !== null, (logged) => {
+    if (logged) { loop.start(); return }
+    loop.stop()
+    app.hunt.set(emptyHuntView()) // sair não pode deixar o espelho da conta anterior na tela
+    app.log.set([])
+  })
+  app.session.subscribe((s) => s.screen, () => render())
   await refreshMe()
 }
 

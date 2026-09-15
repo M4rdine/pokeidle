@@ -30,7 +30,10 @@ export function mountMoves(root: HTMLElement, ctx: AppContext): () => void {
       if (!node) continue
       const total = cooldownTicks(move)
       const left = Math.max(0, (derived.cooldownUntil[move.name] ?? 0) - tick)
-      node.setAttribute('data-cd', String(total > 0 ? Math.min(1, left / total) : 0))
+      const fraction = total > 0 ? Math.min(1, left / total) : 0
+      node.setAttribute('data-cd', String(fraction))
+      // A barra encolhe junto com o cooldown (o CSS lê --cd); `data-cd` fica para os testes.
+      ;(node as HTMLElement).style.setProperty('--cd', String(fraction))
     }
   }
   const offActive = ctx.hunt.subscribe(activePokemon, render)

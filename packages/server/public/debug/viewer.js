@@ -33,6 +33,7 @@ function applySnapshot(msg) {
 
 function applyEvent(e) {
   const p = state.player
+  if (!p) return // hunt.tick pode chegar antes de qualquer hunt.snapshot (ex.: reconectar durante um catch-up)
   switch (e.type) {
     case 'moved': p.position = e.to; break
     case 'spawned': state.wilds.set(e.wildId, { id: e.wildId, speciesName: e.speciesName, level: e.level, position: e.position, hp: null, hpMax: null }); break

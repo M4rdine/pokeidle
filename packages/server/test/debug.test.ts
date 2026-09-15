@@ -21,11 +21,16 @@ afterAll(async () => { await on.close(); await off.close(); await t.close() })
 
 describe('DEBUG_VIEWER desligado', () => {
   it('nenhuma rota /debug existe', async () => {
-    for (const url of ['/debug/', '/debug/viewer.js', '/debug/map/route-1', '/debug/atlas/tiles.json']) expect((await api(off).get(url)).statusCode, url).toBe(404)
+    for (const url of ['/debug', '/debug/', '/debug/viewer.js', '/debug/map/route-1', '/debug/atlas/tiles.json']) expect((await api(off).get(url)).statusCode, url).toBe(404)
   })
 })
 
 describe('DEBUG_VIEWER ligado', () => {
+  it('GET /debug (sem barra) redireciona 302 para /debug/', async () => {
+    const r = await api(on).get('/debug')
+    expect(r.statusCode).toBe(302)
+    expect(r.headers['location']).toBe('/debug/')
+  })
   it('serve a página, o script e o css com os tipos certos e o CSP do helmet', async () => {
     const html = await api(on).get('/debug/')
     expect(html.statusCode).toBe(200)

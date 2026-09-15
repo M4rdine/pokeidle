@@ -8,13 +8,11 @@ import { chooseStarter, StarterSchema } from '../../account/starter.js'
 import { listTeam, setTeamOrder, TeamOrderSchema } from '../../account/team.js'
 import { authOf, requireAuth } from '../../auth/plugin.js'
 import type { PokemonRow } from '../../db/schema.js'
-import { applySettings, type RealtimeDeps } from '../../realtime/actions.js'
+import { applySettings, toRealtimeDeps } from '../../realtime/actions.js'
 import { parseBody } from '../validate.js'
 import type { RouteDeps } from './auth.js'
 
 const teamDto = (t: { team: PokemonRow[]; box: PokemonRow[] }) => ({ team: t.team.map(pokemonDto), box: t.box.map(pokemonDto) })
-
-const rt = (d: RouteDeps): RealtimeDeps => ({ db: d.db, registry: d.registry, now: d.now, scheduler: d.realtime.scheduler, sockets: d.realtime.sockets })
 
 export const trainerRoutes: FastifyPluginAsync<RouteDeps> = async (app, deps) => {
   const { db, now, registry } = deps
@@ -37,7 +35,7 @@ export const trainerRoutes: FastifyPluginAsync<RouteDeps> = async (app, deps) =>
 
   app.patch('/trainer/settings', guard, async (request) => {
     const patch = parseBody(SettingsPatchSchema, request.body)
-    const row = await applySettings(rt(deps), authOf(request).trainer.id, patch)
+    const row = await applySettings(toRealtimeDeps(deps), authOf(request).trainer.id, patch)
     return { settings: settingsDto(row) }
   })
 

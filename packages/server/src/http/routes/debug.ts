@@ -24,6 +24,7 @@ export const debugRoutes: FastifyPluginAsync<RouteDeps> = async (app, { registry
     if (!body) return reply.status(404).send(errorBody('not-found', 'arquivo não encontrado'))
     return reply.type(PAGE_FILES[name]!).send(body)
   }
+  app.get('/debug', async (_request, reply) => reply.redirect('/debug/', 302))
   app.get('/debug/', servePage('index.html'))
   app.get('/debug/viewer.js', servePage('viewer.js'))
   app.get('/debug/viewer.css', servePage('viewer.css'))

@@ -88,10 +88,10 @@ async function dispatch(conn: Conn, msg: ClientMessage): Promise<void> {
 }
 
 /**
- * Ping periódico com verificação de pong. O prazo (`pongTimeoutMs`) é medido a partir do
- * primeiro ping sem resposta — não da cadência do próprio ping — então não é resetado enquanto
- * ainda aguardamos aquele pong; cada tick só reenvia um novo ping quando o anterior já foi
- * respondido.
+ * Ping periódico com verificação de pong: o ping é reenviado a cada `pingMs`, respondido ou
+ * não. O prazo (`pongTimeoutMs`) é que não é renovado a cada envio — é medido a partir do
+ * primeiro ping sem resposta, não da cadência do ping em si; só reseta quando o pong daquele
+ * ping chega.
  */
 function attachHeartbeat(conn: Conn): () => void {
   const { socket, opts } = conn
@@ -163,7 +163,7 @@ function handleConnection(conn: Conn): void {
   let stopHeartbeat = (): void => {}
   let stopRecheck = (): void => {}
   socket.on('close', () => { stopHeartbeat(); stopRecheck(); rt.sockets.remove(socket) })
-  socket.on('error', () => socket.close())
+  socket.on('error', (err) => { conn.log.error({ err, trainerId }, 'erro no socket'); state.closing = true; socket.close() })
 
   rt.sockets.add({ socket, trainerId, tokenHash: hashToken(conn.token) })
   const runner = rt.scheduler.get(trainerId)

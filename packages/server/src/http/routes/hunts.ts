@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { trainerDto } from '../../account/dto.js'
 import { trainerExtra } from '../../account/me.js'
 import { authOf, requireAuth } from '../../auth/plugin.js'
-import { activeView, startAndAttach, stopViaScheduler, type RealtimeDeps, type SessionView } from '../../realtime/actions.js'
+import { activeView, startAndAttach, stopViaScheduler, toRealtimeDeps, type SessionView } from '../../realtime/actions.js'
 import { parseBody } from '../validate.js'
 import type { RouteDeps } from './auth.js'
 
@@ -18,8 +18,6 @@ const sessionDto = (a: SessionView) => ({ huntId: a.huntId, sessionId: a.session
 
 const HuntParams = z.object({ id: z.string().min(1).max(64) }).strict()
 
-const rt = (d: RouteDeps): RealtimeDeps => ({ db: d.db, registry: d.registry, now: d.now, scheduler: d.realtime.scheduler, sockets: d.realtime.sockets })
-
 export const huntRoutes: FastifyPluginAsync<RouteDeps> = async (app, deps) => {
   const { db, registry } = deps
   const guard = { preHandler: requireAuth }
@@ -28,17 +26,17 @@ export const huntRoutes: FastifyPluginAsync<RouteDeps> = async (app, deps) => {
 
   app.post('/hunts/:id/start', guard, async (request, reply) => {
     const { id } = parseBody(HuntParams, request.params)
-    const session = await startAndAttach(rt(deps), authOf(request).trainer.id, id)
+    const session = await startAndAttach(toRealtimeDeps(deps), authOf(request).trainer.id, id)
     return reply.status(201).send({ session })
   })
 
   app.post('/hunts/stop', guard, async (request) => {
-    const trainer = await stopViaScheduler(rt(deps), authOf(request).trainer.id)
+    const trainer = await stopViaScheduler(toRealtimeDeps(deps), authOf(request).trainer.id)
     return { trainer: trainerDto(trainer, await trainerExtra(db, trainer.id)) }
   })
 
   app.get('/hunts/active', guard, async (request) => {
-    const view = await activeView(rt(deps), authOf(request).trainer.id)
+    const view = await activeView(toRealtimeDeps(deps), authOf(request).trainer.id)
     return { session: view ? sessionDto(view) : null }
   })
 }

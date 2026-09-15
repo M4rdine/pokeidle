@@ -13,6 +13,7 @@ const deps = () => ({ db: t.db, registry: t.registry, now: () => t.clock.now, sc
 beforeAll(async () => { t = await testApp() })
 afterAll(async () => { await t.close() })
 beforeEach(async () => {
+  await t.scheduler.idle() // drena qualquer cadeia de persistência em voo do teste anterior antes do truncate
   await truncateAll(t.db); t.clock.now = T0
   ;({ cookie, trainerId } = await registerAndLogin(t.app))
   await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })

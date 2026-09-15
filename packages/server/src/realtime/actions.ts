@@ -6,11 +6,20 @@ import type { HuntState, Intent, IntentResult } from '../engine/types.js'
 import { loadActive } from '../hunt-store/snapshot.js'
 import { startHunt } from '../hunt-store/start.js'
 import { stopHunt } from '../hunt-store/stop.js'
+import type { RouteDeps } from '../http/routes/auth.js'
 import type { Scheduler } from './scheduler.js'
 import type { SocketRegistry } from './sockets.js'
 
 export interface RealtimeDeps { readonly db: Db; readonly registry: Registry; readonly now: () => Date; readonly scheduler: Scheduler; readonly sockets: SocketRegistry }
 export interface SessionView { readonly huntId: string; readonly sessionId: string; readonly startedAt: Date; readonly state: HuntState }
+
+/** Cada rota HTTP tinha sua própria cópia de `rt = (d: RouteDeps): RealtimeDeps => ({...})`
+ * (hunts.ts, trainer.ts); centraliza aqui. `import type` não gera dependência em tempo de
+ * execução — só de tipos — então não fecha um ciclo real com `http/app.ts` (que importa
+ * `wsRoutes`, que importa este módulo). */
+export function toRealtimeDeps(deps: RouteDeps): RealtimeDeps {
+  return { db: deps.db, registry: deps.registry, now: deps.now, scheduler: deps.realtime.scheduler, sockets: deps.realtime.sockets }
+}
 
 type UpdateSettingsPatch = Extract<Intent, { type: 'updateSettings' }>['patch']
 
@@ -45,6 +54,10 @@ export async function stopViaScheduler(d: RealtimeDeps, trainerId: string): Prom
 
 export async function applySettings(d: RealtimeDeps, trainerId: string, patch: SettingsPatch): Promise<TrainerRow> {
   const row = await updateSettings(d.db, trainerId, patch, d.now())
+  // O banco (`updateSettings` acima) sempre grava o valor novo, mesmo se o runner estiver em
+  // catch-up: `applyIntent` devolve `error: 'catching-up'` nesse caso (de propósito descartado
+  // aqui — nada a fazer com ele) e a hunt em memória segue com as configurações antigas até o
+  // catch-up terminar (próximo snapshot/attach já nasce com o valor novo do banco).
   if (d.scheduler.get(trainerId)) d.scheduler.applyIntent(trainerId, { type: 'updateSettings', patch: toIntentPatch(patch) })
   return row
 }

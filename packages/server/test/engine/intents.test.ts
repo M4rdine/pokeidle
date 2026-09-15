@@ -35,5 +35,7 @@ describe('applyIntent', () => {
     expect(r).toMatchObject({ state: { settings: { returnHpPercent: 50, capture: { ballTier: 'great', maxWildHpPercent: 30, allowDuplicates: false } } }, events: [] })
     expect(applyIntent(s, { type: 'updateSettings', patch: { returnHpPercent: 101 } }, deps)).toMatchObject({ error: { code: 'invalid-settings' } })
     expect(applyIntent(s, { type: 'updateSettings', patch: { capture: { maxWildHpPercent: -1 } } }, deps)).toMatchObject({ error: { code: 'invalid-settings' } })
+    expect(applyIntent(s, { type: 'updateSettings', patch: { potionHpPercent: 70 } }, deps)).toMatchObject({ state: { settings: { potionHpPercent: 70 } } })
+    expect(applyIntent(s, { type: 'updateSettings', patch: { potionHpPercent: 101 } }, deps)).toMatchObject({ error: { code: 'invalid-settings' } })
   })
 })

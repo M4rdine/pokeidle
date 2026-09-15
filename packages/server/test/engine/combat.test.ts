@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { attemptCapture, captureApplies, playerAttack, readyMoves, selectBall, wildAttack } from '../../src/engine/combat.js'
 import { makePokemon } from '../../src/engine/progression.js'
-import { baseState, miniDeps } from './fixtures/mini.js'
+import { baseState, charmander5, miniDeps } from './fixtures/mini.js'
 
 const fixed = (v: number) => ({ next: () => v, int: (min: number) => min, state: () => 0 })
 const fighting = (deps = miniDeps()) => { const s = baseState({}, deps); return { ...s, tick: 100, player: { ...s.player, mode: 'fighting' as const, targetWildId: 1, position: { x: 3, y: 0 } } } }
@@ -107,13 +107,17 @@ describe('captura', () => {
     expect(r.state.player.team).toHaveLength(1)
     expect(r.events).toEqual([{ type: 'captureFailed', tick: 100, wildId: 1, ball: 'poke-ball' }])
   })
-  it('time cheio: captura vai para a box', () => {
+  it('time cheio pelas vagas do nível: a captura vai para a box e o time fica intacto', () => {
     const deps = { ...miniDeps(), rng: fixed(0) }
     const s = fighting(deps)
-    const team = Array.from({ length: 6 }, (_, i) => ({ ...s.player.team[0]!, id: `p${i}` }))
+    const team = [charmander5(), { ...charmander5(), id: 'p2' }]
     const low = { ...s.wilds[0]!, hp: 4 }
-    const r = attemptCapture({ ...s, wilds: [low], player: { ...s.player, team } }, deps, low, deps.registry.items.get('poke-ball')!)
-    expect(r.state.player.team).toHaveLength(6)
+    const full = { ...s, wilds: [low], settings: { ...s.settings, teamSlots: 2 }, player: { ...s.player, team } }
+    const r = attemptCapture(full, deps, low, deps.registry.items.get('poke-ball')!)
+    expect(r.state.player.team).toHaveLength(2)
+    expect(r.state.box).toHaveLength(1)
+    expect(r.state.box[0]).toMatchObject({ speciesName: 'zubat', hp: 4 })
+    expect(r.state.wilds).toEqual([])
     expect(r.events[0]).toMatchObject({ type: 'captured', toBox: true })
   })
 })

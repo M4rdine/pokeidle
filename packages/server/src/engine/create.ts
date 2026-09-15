@@ -1,10 +1,12 @@
 import type { HuntMap } from '@pokeidle/shared'
-import { CAPTURE_MAX_WILD_HP_DEFAULT, RETURN_HP_PERCENT_DEFAULT } from './constants.js'
+import { CAPTURE_MAX_WILD_HP_DEFAULT, MAX_TEAM_SIZE, POTION_HP_PERCENT_DEFAULT, RETURN_HP_PERCENT_DEFAULT } from './constants.js'
 import { processRespawns } from './spawn.js'
 import type { EngineDeps, HuntSettings, HuntState, PokemonState } from './types.js'
 
 export const defaultSettings = (seen: readonly string[] = []): HuntSettings => ({
   returnHpPercent: RETURN_HP_PERCENT_DEFAULT,
+  potionHpPercent: POTION_HP_PERCENT_DEFAULT,
+  teamSlots: MAX_TEAM_SIZE,
   capture: { ballTier: 'best', maxWildHpPercent: CAPTURE_MAX_WILD_HP_DEFAULT, allowDuplicates: false },
   seen,
 })
@@ -20,9 +22,13 @@ export interface CreateInput {
 
 const clampPercent = (value: number): number => Math.min(100, Math.max(0, value))
 
+const clampTeamSlots = (value: number): number => Math.min(MAX_TEAM_SIZE, Math.max(1, Math.round(value)))
+
 const clampSettings = (settings: HuntSettings): HuntSettings => ({
   ...settings,
   returnHpPercent: clampPercent(settings.returnHpPercent),
+  potionHpPercent: clampPercent(settings.potionHpPercent),
+  teamSlots: clampTeamSlots(settings.teamSlots),
   capture: { ...settings.capture, maxWildHpPercent: clampPercent(settings.capture.maxWildHpPercent) },
 })
 
@@ -32,7 +38,7 @@ export function createHuntState(input: CreateInput, deps: EngineDeps): HuntState
   const initial: HuntState = {
     huntId: input.hunt.id, sessionId: input.sessionId, tick: 0,
     player: { team: input.team, activeIndex: 0, position: input.hunt.spawnPoint, path: [], mode: 'searching', targetWildId: null, healingUntilTick: null, cooldowns: {}, skippedWildIds: [] },
-    wilds: [], respawns, nextWildId: 1,
+    wilds: [], box: [], respawns, nextWildId: 1,
     trainer: input.trainer ?? { xp: 0, gold: 0 },
     inventory: input.inventory,
     settings: clampSettings(input.settings ?? defaultSettings()),

@@ -1,9 +1,16 @@
 import type { Item, Registry } from '@pokeidle/shared'
-import type { EngineError, HuntState, StepResult } from './types.js'
+import type { EngineError, HuntState, PokemonState, StepResult } from './types.js'
 
-export function weakestPotion(state: HuntState, registry: Registry): Item | null {
-  const potions = [...registry.items.values()].filter((i): i is Item & { kind: 'potion' } => i.kind === 'potion' && (state.inventory[i.id] ?? 0) > 0)
-  return potions.reduce<(Item & { kind: 'potion' }) | null>((best, i) => (best === null || i.healPercent < best.healPercent ? i : best), null)
+type Potion = Item & { kind: 'potion' }
+const healAmount = (p: Potion, hpMax: number): number => Math.ceil((hpMax * p.healPercent) / 100)
+
+/** A mais fraca que cobre o HP faltante; se nenhuma cobre, a mais forte; sem poção, null. */
+export function choosePotion(state: HuntState, registry: Registry, active: PokemonState): Potion | null {
+  const owned = [...registry.items.values()].filter((i): i is Potion => i.kind === 'potion' && (state.inventory[i.id] ?? 0) > 0)
+  if (owned.length === 0) return null
+  const missing = active.hpMax - active.hp
+  const sorted = [...owned].sort((a, b) => a.healPercent - b.healPercent)
+  return sorted.find((p) => healAmount(p, active.hpMax) >= missing) ?? sorted[sorted.length - 1]!
 }
 
 const fail = (code: string, message: string): { error: EngineError } => ({ error: { code, message } })

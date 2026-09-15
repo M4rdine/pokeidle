@@ -10,12 +10,14 @@ const PlayerStateSchema = z.object({
   healingUntilTick: z.number().int().nullable(), cooldowns: Cooldowns, skippedWildIds: z.array(z.number().int()),
 }).strict()
 const SettingsSchema = z.object({
-  returnHpPercent: z.number(), capture: z.object({ ballTier: z.enum(['poke', 'great', 'ultra', 'best']), maxWildHpPercent: z.number(), allowDuplicates: z.boolean() }).strict(), seen: z.array(z.string()),
+  returnHpPercent: z.number(), potionHpPercent: z.number().default(50), teamSlots: z.number().int().min(1).max(6).default(6),
+  capture: z.object({ ballTier: z.enum(['poke', 'great', 'ultra', 'best']), maxWildHpPercent: z.number(), allowDuplicates: z.boolean() }).strict(), seen: z.array(z.string()),
 }).strict()
 
 export const HuntStateSchema = z.object({
   huntId: z.string(), sessionId: z.string(), tick: z.number().int().min(0), player: PlayerStateSchema,
-  wilds: z.array(WildStateSchema), respawns: z.array(z.object({ spawnIndex: z.number().int(), atTick: z.number().int() }).strict()),
+  wilds: z.array(WildStateSchema), box: z.array(PokemonStateSchema).default([]),
+  respawns: z.array(z.object({ spawnIndex: z.number().int(), atTick: z.number().int() }).strict()),
   nextWildId: z.number().int(), trainer: z.object({ xp: z.number().int(), gold: z.number().int() }).strict(),
   inventory: z.record(z.string(), z.number().int()), settings: SettingsSchema,
 }).strict()

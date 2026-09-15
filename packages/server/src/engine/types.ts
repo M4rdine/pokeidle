@@ -9,7 +9,7 @@ export type Intent =
   | { type: 'stop' }
   | { type: 'useItem'; itemId: string }
   | { type: 'setActive'; pokemonId: string }
-  | { type: 'updateSettings'; patch: Partial<{ returnHpPercent: number; capture: Partial<CaptureSettings> }> }
+  | { type: 'updateSettings'; patch: Partial<{ returnHpPercent: number; potionHpPercent: number; capture: Partial<CaptureSettings> }> }
 
 export interface StepResult { readonly state: HuntState; readonly events: readonly Event[] }
 export interface EngineError { readonly code: string; readonly message: string }

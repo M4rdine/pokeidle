@@ -7,7 +7,7 @@ export const trainerLevel = (u: Unlocks, xp: number): number => levelFromXp(u.gr
 export const xpToNextLevel = (u: Unlocks, xp: number): number => xpForLevel(u.growthRate, trainerLevel(u, xp) + 1) - xp
 
 export const teamSlotsFor = (u: Unlocks, level: number): number =>
-  u.teamSlots.filter((s) => s.level <= level).reduce((best, s) => Math.max(best, s.slots), u.teamSlots[0]?.slots ?? 1)
+  u.teamSlots.filter((s) => s.level <= level).reduce((best, s) => Math.max(best, s.slots), 1)
 
 export const itemUnlockLevel = (u: Unlocks, itemId: string): number => u.items[itemId] ?? 0
 

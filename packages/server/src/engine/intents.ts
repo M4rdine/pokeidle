@@ -20,8 +20,21 @@ function setActive(state: HuntState, pokemonId: string): IntentResult {
 
 function updateSettings(state: HuntState, patch: Extract<Intent, { type: 'updateSettings' }>['patch']): IntentResult {
   const capture: CaptureSettings = { ...state.settings.capture, ...(patch.capture ?? {}) }
-  if (!inRange(patch.returnHpPercent) || !inRange(capture.maxWildHpPercent) || !TIERS.includes(capture.ballTier)) return fail('invalid-settings', 'percentuais devem estar em [0, 100] e ballTier em poke|great|ultra|best')
-  return { state: { ...state, settings: { ...state.settings, returnHpPercent: patch.returnHpPercent ?? state.settings.returnHpPercent, capture } }, events: [] }
+  if (!inRange(patch.returnHpPercent) || !inRange(patch.potionHpPercent) || !inRange(capture.maxWildHpPercent) || !TIERS.includes(capture.ballTier)) {
+    return fail('invalid-settings', 'percentuais devem estar em [0, 100] e ballTier em poke|great|ultra|best')
+  }
+  return {
+    state: {
+      ...state,
+      settings: {
+        ...state.settings,
+        returnHpPercent: patch.returnHpPercent ?? state.settings.returnHpPercent,
+        potionHpPercent: patch.potionHpPercent ?? state.settings.potionHpPercent,
+        capture,
+      },
+    },
+    events: [],
+  }
 }
 
 export function applyIntent(state: HuntState, intent: Intent, deps: EngineDeps): IntentResult {

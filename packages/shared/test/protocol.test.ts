@@ -6,13 +6,21 @@ const state: HuntState = {
   player: { team: [{ id: 'p1', speciesName: 'charmander', level: 5, xp: 135, hp: 20, hpMax: 20 }], activeIndex: 0, position: { x: 0, y: 0 }, path: [], mode: 'searching', targetWildId: null, healingUntilTick: null, cooldowns: {}, skippedWildIds: [] },
   wilds: [{ id: 1, spawnIndex: 0, speciesName: 'zubat', level: 3, hp: 16, hpMax: 16, position: { x: 3, y: 1 }, cooldowns: {}, captureTried: false }],
   respawns: [{ spawnIndex: 1, atTick: 10 }], nextWildId: 2, trainer: { xp: 0, gold: 0 }, inventory: { potion: 1 },
-  settings: { returnHpPercent: 30, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false }, seen: [] },
+  settings: { returnHpPercent: 30, potionHpPercent: 50, teamSlots: 6, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false }, seen: [] },
+  box: [],
 }
 
 describe('HuntStateSchema', () => {
   it('aceita um estado válido e rejeita campo extra', () => {
     expect(HuntStateSchema.parse(JSON.parse(JSON.stringify(state)))).toEqual(state)
     expect(() => HuntStateSchema.parse({ ...state, hack: 1 })).toThrow()
+  })
+  it('aplica padrões aos campos novos de snapshots antigos', () => {
+    const old = JSON.parse(JSON.stringify(state)) as Record<string, unknown>
+    const parsed = HuntStateSchema.parse(old)
+    expect(parsed.box).toEqual([])
+    expect(parsed.settings.potionHpPercent).toBe(50)
+    expect(parsed.settings.teamSlots).toBe(6)
   })
 })
 

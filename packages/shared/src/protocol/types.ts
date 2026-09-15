@@ -12,7 +12,10 @@ export interface WildState {
   readonly cooldowns: Readonly<Record<string, number>>; readonly captureTried: boolean
 }
 export interface CaptureSettings { readonly ballTier: BallTier; readonly maxWildHpPercent: number; readonly allowDuplicates: boolean }
-export interface HuntSettings { readonly returnHpPercent: number; readonly capture: CaptureSettings; readonly seen: readonly string[] }
+export interface HuntSettings {
+  readonly returnHpPercent: number; readonly potionHpPercent: number; readonly teamSlots: number
+  readonly capture: CaptureSettings; readonly seen: readonly string[]
+}
 export interface PlayerState {
   readonly team: readonly PokemonState[]; readonly activeIndex: number
   readonly position: Point; readonly path: readonly Point[]
@@ -25,6 +28,7 @@ export interface HuntState {
   readonly huntId: string; readonly sessionId: string; readonly tick: number
   readonly player: PlayerState
   readonly wilds: readonly WildState[]
+  readonly box: readonly PokemonState[]
   readonly respawns: readonly Respawn[]
   readonly nextWildId: number
   readonly trainer: { readonly xp: number; readonly gold: number }

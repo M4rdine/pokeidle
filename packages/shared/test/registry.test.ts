@@ -30,7 +30,8 @@ describe('buildRegistry', () => {
     raw.species[0]!.evolvesTo = { species: 'charizard', level: 36 }
     raw.loot[0]!.drops = [{ item: 'master-ball', chance: 1 }]
     raw.hunts[0]!.spawns[0]!.speciesName = 'mewtwo'
-    expect(() => buildRegistry(raw)).toThrow(/registro inconsistente:[\s\S]*fire-blast[\s\S]*charizard[\s\S]*master-ball[\s\S]*mewtwo/)
+    raw.unlocks = { ...raw.unlocks, items: { 'master-ball': 5 } }
+    expect(() => buildRegistry(raw)).toThrow(/registro inconsistente:[\s\S]*fire-blast[\s\S]*charizard[\s\S]*master-ball[\s\S]*mewtwo[\s\S]*master-ball/)
   })
   it('rejeita id ou nome de espécie duplicado', () => {
     const raw = minimal()

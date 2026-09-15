@@ -66,6 +66,18 @@ describe('cartão do ativo e golpes', () => {
     expect(hp.getAttribute('value')).toBe(String(view.state!.player.team[0]!.hp))
     expect(r.querySelector('[data-hp-text]')?.textContent).toContain('/')
   })
+  it('atualiza o HP no mesmo nó, sem remontar o cartão a cada tique', () => {
+    const hunt = createStore(view)
+    const r = root()
+    mountActivePokemon(r, ctxWith({ hunt }))
+    const bar = r.querySelector('[data-hp]')!
+    const title = r.querySelector('[data-name]')!
+    const team = view.state!.player.team
+    hunt.set({ ...view, state: { ...view.state!, player: { ...view.state!.player, team: [{ ...team[0]!, hp: 3 }] } } })
+    expect(r.querySelector('[data-hp]')).toBe(bar) // mesmo nó
+    expect(r.querySelector('[data-name]')).toBe(title)
+    expect(bar.getAttribute('value')).toBe('3')
+  })
   it('lista os golpes e mostra o cooldown restante em fração', () => {
     const ember = registry.moves.get('ember')!
     const hunt = createStore({ ...view, tick: 10, derived: { targetWildId: null, cooldownUntil: { ember: 10 + cooldownTicks(ember) } } })

@@ -21,12 +21,17 @@ describe('openModal', () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     expect(root.querySelector('.modal')).toBeNull()
 
-    openModal(root, 'A', el('p', {}, 'a'))
+    const closedA = vi.fn()
+    openModal(root, 'A', el('p', {}, 'a'), closedA)
     openModal(root, 'B', el('p', {}, 'b'))
+    expect(closedA).toHaveBeenCalledTimes(1) // o anterior é fechado de verdade, não só removido do DOM
     expect(root.querySelectorAll('.modal')).toHaveLength(1)
     expect(root.textContent).toContain('B')
     m.close() // fechar duas vezes não quebra nem fecha o modal atual
     expect(root.querySelectorAll('.modal')).toHaveLength(1)
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    expect(closedA).toHaveBeenCalledTimes(1) // o Esc não reabre o callback do modal já fechado
+    expect(root.querySelectorAll('.modal')).toHaveLength(0)
     root.remove()
   })
 })

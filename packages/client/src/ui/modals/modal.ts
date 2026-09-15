@@ -2,9 +2,12 @@ import { el } from '../dom.js'
 
 export interface Modal { close(): void }
 
-/** Um modal por vez: abrir fecha o anterior. Fecha no botão, no Esc e no clique fora. */
+/** O modal aberto no momento: abrir outro fecha este de verdade, soltando o ouvinte do Esc. */
+let current: Modal | null = null
+
+/** Um modal por vez. Fecha no botão, no Esc e no clique fora. */
 export function openModal(root: Element, title: string, content: HTMLElement, onClose?: () => void): Modal {
-  root.querySelector('.modal-backdrop')?.remove()
+  current?.close()
   const closeButton = el('button', { class: 'modal-close', type: 'button', 'aria-label': 'Fechar' }, '×')
   const dialog = el('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
     el('header', { class: 'modal-header' }, el('h2', {}, title), closeButton),
@@ -14,6 +17,7 @@ export function openModal(root: Element, title: string, content: HTMLElement, on
   const close = (): void => {
     if (!open) return
     open = false
+    if (current === modal) current = null
     document.removeEventListener('keydown', onKeydown)
     backdrop.remove()
     onClose?.()
@@ -24,5 +28,7 @@ export function openModal(root: Element, title: string, content: HTMLElement, on
   document.addEventListener('keydown', onKeydown)
   root.append(backdrop)
   closeButton.focus()
-  return { close }
+  const modal: Modal = { close }
+  current = modal
+  return modal
 }

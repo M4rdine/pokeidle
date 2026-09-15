@@ -1,0 +1,43 @@
+:root {
+  --bg: #0f0f14;
+  --panel: #1a1a22;
+  --border: #2e2e3a;
+  --text: #f0f0f5;
+  --muted: #8a8a9a;
+  --accent: #f8d030;
+  --danger: #e03030;
+  --ok: #50c878;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 32px;
+  --border-w: 2px;
+
+  --type-fire: #f08030;
+  --type-water: #6890f0;
+  --type-grass: #78c850;
+  --type-electric: #f8d030;
+  --type-normal: #a8a878;
+  --type-poison: #a040a0;
+  --type-ground: #e0c068;
+  --type-flying: #a890f0;
+  --type-psychic: #f85888;
+  --type-bug: #a8b820;
+  --type-rock: #b8a038;
+  --type-ghost: #705898;
+  --type-ice: #98d8d8;
+  --type-dragon: #7038f8;
+  --type-fighting: #c03028;
+  --type-dark: #705848;
+  --type-steel: #b8b8d0;
+  --type-fairy: #ee99ac;
+}
+
+body {
+  font-variant-numeric: tabular-nums;
+}
+
+canvas {
+  image-rendering: pixelated;
+}

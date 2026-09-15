@@ -8,3 +8,7 @@ coverage/
 .DS_Store
 .superpowers/
 tools/pokedata/.cache/
+packages/client/dist
+packages/client/coverage
+packages/client/test-results
+packages/client/playwright-report

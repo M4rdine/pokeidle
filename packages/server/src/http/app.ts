@@ -20,6 +20,7 @@ import { huntRoutes } from './routes/hunts.js'
 import { shopRoutes } from './routes/shop.js'
 import { trainerRoutes } from './routes/trainer.js'
 import { checkOrigin, REDACT_PATHS, sameOrigin } from './security.js'
+import { registerStatic } from './static.js'
 
 // O `ws` fecha a conexão com 1009 acima disto; o limite de negócio de verdade (4 KB, `error
 // validation` sem fechar a conexão) é aplicado dentro de `parseClientMessage`. Este é só uma
@@ -57,7 +58,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   })
 
   await app.register(helmet, {
-    contentSecurityPolicy: { directives: { defaultSrc: ["'self'"] } },
+    contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], imgSrc: ["'self'", 'data:', 'blob:'] } },
     frameguard: { action: 'deny' },
     referrerPolicy: { policy: 'same-origin' },
     hsts: config.COOKIE_SECURE ? { maxAge: 15552000 } : false,
@@ -113,6 +114,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   await app.register(shopRoutes, routeDeps)
   await app.register(huntRoutes, routeDeps)
   if (config.DEBUG_VIEWER) await app.register(debugRoutes, routeDeps)
+  await registerStatic(app, config)
   await app.register(wsRoutes, { ...routeDeps, ...(deps.wsOptions && { ws: deps.wsOptions }) })
   deps.extraRoutes?.(app)
   return app

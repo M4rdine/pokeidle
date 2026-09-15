@@ -3,12 +3,12 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { FastifyPluginAsync, FastifyReply } from 'fastify'
 import { z } from 'zod'
+import { ATLAS_FILES } from '../atlas-files.js'
 import { errorBody } from '../errors.js'
 import { parseBody } from '../validate.js'
 import type { RouteDeps } from './auth.js'
 
 const PUBLIC_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../public/debug')
-export const DEBUG_ALLOWED_ATLAS: Readonly<Record<string, string>> = { 'tiles.png': 'image/png', 'tiles.json': 'application/json', 'pokemon.png': 'image/png', 'pokemon.json': 'application/json' }
 const PAGE_FILES: Readonly<Record<string, string>> = { 'index.html': 'text/html; charset=utf-8', 'viewer.js': 'application/javascript; charset=utf-8', 'viewer.css': 'text/css; charset=utf-8' }
 const MapParams = z.object({ id: z.string().min(1).max(64) }).strict()
 const AtlasParams = z.object({ file: z.string().min(1).max(64) }).strict()
@@ -38,7 +38,7 @@ export const debugRoutes: FastifyPluginAsync<RouteDeps> = async (app, { registry
 
   app.get('/debug/atlas/:file', async (request, reply) => {
     const { file } = parseBody(AtlasParams, request.params)
-    const type = DEBUG_ALLOWED_ATLAS[file]
+    const type = ATLAS_FILES[file]
     if (!type) return reply.status(404).send(errorBody('not-found', 'arquivo não permitido'))
     const body = await fileOr404(path.join(config.ASSETS_DIR, file))
     if (!body) return reply.status(404).send(errorBody('not-found', 'atlas não encontrado; gere com pnpm assets build'))

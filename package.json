@@ -9,6 +9,10 @@
     "shared:test": "pnpm --filter @pokeidle/shared test",
     "server:test": "pnpm --filter @pokeidle/server test",
     "server:dev": "pnpm --filter @pokeidle/server dev",
+    "client:dev": "pnpm --filter @pokeidle/client dev",
+    "client:build": "pnpm --filter @pokeidle/client build",
+    "client:test": "pnpm --filter @pokeidle/client test",
+    "client:e2e": "pnpm --filter @pokeidle/client e2e",
     "db:up": "docker compose up -d"
   },
   "devDependencies": {

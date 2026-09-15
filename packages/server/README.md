@@ -115,6 +115,7 @@ nenhum nesse caso — persistir a captura cabe a quem consome o evento.
 | `POST /shop/buy` | sim | `validation`, `not-found`, `locked`, `insufficient-gold`, `hunt-active` |
 | `POST /shop/sell` | sim | `validation`, `not-found`, `hunt-active` |
 | `GET /hunts` | sim | — |
+| `GET /hunts/:id/map` | sim | `not-found` |
 | `POST /hunts/:id/start` | sim | `not-found`, `no-starter`, `hunt-active`, `validation` |
 | `POST /hunts/stop` | sim | `no-hunt` |
 | `GET /hunts/active` | sim | — |
@@ -296,6 +297,28 @@ uma segunda chamada não repete o trabalho.
 treinador aleatório, escolhe o inicial, inicia a Rota 1 e imprime os 20 primeiros
 `hunt.tick` recebidos pelo WebSocket — útil para checar visualmente handshake, ritmo
 dos ticks e o fechamento gracioso do servidor.
+
+## Cliente
+
+O Fastify serve o build do cliente (Vite, `@pokeidle/client`) direto de `/`, sem
+servidor HTTP separado. Ordem em produção: `pnpm client:build` (gera
+`packages/client/dist`) → `pnpm --filter @pokeidle/server start` → abra
+`http://localhost:3000/`. Sem a pasta `dist` (build ainda não rodou), `/` continua
+404 JSON como antes — nada quebra em dev sem o cliente compilado.
+
+Em dev, prefira `pnpm client:dev` (Vite em `localhost:5173`, com proxy para a API) e
+rode o servidor com `APP_ORIGIN=http://localhost:5173` (ver `.env.example`) — o
+Vite não serve o build de produção, então o `CLIENT_DIST` do Fastify fica sem uso
+nesse fluxo.
+
+`CLIENT_DIST` (padrão `<repo>/packages/client/dist`) pode ser sobrescrito. `index.html`
+é servido sem cache (`Cache-Control: no-cache`, sempre revalida); os chunks sob `/app/`
+(nomes com hash do Vite) usam `Cache-Control: public, max-age=31536000, immutable`.
+Qualquer caminho fora do build (`/nope.html`) cai no mesmo `setNotFoundHandler` JSON das
+outras rotas. `/assets/atlas/*` é público (allowlist fixa dos 4 arquivos do atlas —
+`tiles.png`/`.json`, `pokemon.png`/`.json` — igual à do `/debug/atlas/:file`; qualquer
+outro nome ou arquivo ausente é 404), servido independente de `CLIENT_DIST` existir. A
+CSP do Helmet libera `img-src 'self' data: blob:` para os sprites/atlas do cliente.
 
 ## Visualizador de depuração (`/debug`)
 

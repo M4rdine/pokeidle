@@ -6,6 +6,8 @@ const bool = z.enum(['true', 'false']).transform((v) => v === 'true')
 
 // `src/config.ts` → `packages/server/src` → três níveis acima é a raiz do repo.
 const DEFAULT_ASSETS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../assets/atlas')
+// `src/config.ts` → `packages/server/src` → dois níveis acima é `packages/`.
+const DEFAULT_CLIENT_DIST = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist')
 
 export type TrustProxy = boolean | number | string
 
@@ -41,6 +43,8 @@ export const ConfigSchema = z.object({
   DEBUG_VIEWER: bool.default('false'),
   /** Diretório com o atlas de assets (`tiles.png`/`.json`, `pokemon.png`/`.json`) gerado por `pnpm assets build`. */
   ASSETS_DIR: z.string().min(1).default(DEFAULT_ASSETS_DIR),
+  /** Build do cliente (Vite) servido em `/`. Sem a pasta, `/` continua 404 JSON como hoje. */
+  CLIENT_DIST: z.string().min(1).default(DEFAULT_CLIENT_DIST),
 })
 
 export type Config = z.infer<typeof ConfigSchema>

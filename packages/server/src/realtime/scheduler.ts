@@ -253,7 +253,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
   }
 
   return {
-    start: () => { if (timer) return; timer = setInterval(tick, TICK_MS) },
+    start: () => { if (timer) return; stopping = false; timer = setInterval(tick, TICK_MS) },
     stop: () => { stopping = true; if (timer) { clearInterval(timer); timer = null } },
     isStopping: () => stopping,
     tick,

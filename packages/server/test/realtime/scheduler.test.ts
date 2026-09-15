@@ -426,6 +426,12 @@ describe('contenção de erros e seams de teste', () => {
       scheduler.stop()
       expect(vi.getTimerCount()).toBe(0)
       expect(scheduler.isStopping()).toBe(true)
+      // I3: start() depois de um stop() precisa religar o scheduler de verdade — sem isto,
+      // `stopping` fica travado em `true` e qualquer catch-up subsequente aborta na hora
+      // (`shouldAbort: () => stopping`), mesmo com o timer rodando de novo.
+      scheduler.start()
+      expect(vi.getTimerCount()).toBe(1)
+      expect(scheduler.isStopping()).toBe(false)
     } finally {
       vi.useRealTimers()
     }

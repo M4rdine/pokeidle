@@ -22,13 +22,13 @@ beforeEach(async () => {
   t.clock.now = T0
 })
 
-async function trainerWithHunt(n: number, seed: number): Promise<string> {
-  const { cookie, trainerId } = await registerAndLogin(t.app, n)
-  await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
-  const charmander = t.registry.species.get('charmander')!
+async function trainerWithHunt(n: number, seed: number, app: TestApp = t): Promise<string> {
+  const { cookie, trainerId } = await registerAndLogin(app.app, n)
+  await api(app.app, cookie).post('/trainer/starter', { species: 'charmander' })
+  const charmander = app.registry.species.get('charmander')!
   const hpMax = hpAt(charmander.baseStats.hp, 12)
-  await t.db.update(pokemon).set({ level: 12, xp: xpForLevel(charmander.growthRate, 12), hp: hpMax, hpMax }).where(eq(pokemon.trainerId, trainerId))
-  await startHunt(t.db, loadRegistry(), trainerId, 'route-1', T0, { seed })
+  await app.db.update(pokemon).set({ level: 12, xp: xpForLevel(charmander.growthRate, 12), hp: hpMax, hpMax }).where(eq(pokemon.trainerId, trainerId))
+  await startHunt(app.db, loadRegistry(), trainerId, 'route-1', T0, { seed })
   return trainerId
 }
 
@@ -67,14 +67,22 @@ describe('recoverSessions', () => {
 
 describe('shutdown', () => {
   it('para o timer, flush com sync, fecha sockets; é idempotente', async () => {
-    const a = await trainerWithHunt(1, 4)
-    await t.scheduler.attach(a)
-    for (let i = 0; i < 30; i++) t.scheduler.tick()
-    let closed = 0
-    const shutdown = createShutdown({ app: { close: async () => {} }, scheduler: t.scheduler, sockets: t.sockets, close: async () => { closed++ }, logger: silentLogger })
-    await shutdown(); await shutdown()
-    expect(closed).toBe(1)
-    expect(t.scheduler.isStopping()).toBe(true)
-    expect((await loadActive(t.db, a))!.state.tick).toBe(30)
+    // App próprio (não o `t` compartilhado do arquivo): `createShutdown` chama
+    // `scheduler.stop()`, que deixa `stopping: true` — reutilizar o scheduler de `t` deixaria
+    // qualquer catch-up de um teste seguinte abortando na hora (shouldAbort: () => stopping).
+    const t2 = await testApp()
+    try {
+      const a = await trainerWithHunt(1, 4, t2)
+      await t2.scheduler.attach(a)
+      for (let i = 0; i < 30; i++) t2.scheduler.tick()
+      let closed = 0
+      const shutdown = createShutdown({ app: { close: async () => {} }, scheduler: t2.scheduler, sockets: t2.sockets, close: async () => { closed++ }, logger: silentLogger })
+      await shutdown(); await shutdown()
+      expect(closed).toBe(1)
+      expect(t2.scheduler.isStopping()).toBe(true)
+      expect((await loadActive(t2.db, a))!.state.tick).toBe(30)
+    } finally {
+      await t2.close()
+    }
   })
 })

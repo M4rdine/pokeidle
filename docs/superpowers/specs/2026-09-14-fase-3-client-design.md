@@ -203,3 +203,27 @@ do servidor como toast. Atalhos: `Esc` fecha modal, `+`/`-` zoom.
 Mobile e toque, animação de ataque por frames (não existe no atlas), ícones de itens, som,
 partículas, mais de uma hunt no mapa, chat, ranking, loja, box de Pokémon (captura com time
 cheio segue descartando), interpolação preditiva além do tween entre tiles, PWA/offline.
+
+## 10. Adendo do GDD (2026-09-14)
+
+O game design foi fechado em `docs/design/2026-09-14-pokeidle-gdd.md` depois desta spec. Ele
+divide a fase 3 em duas: **3a, regras e economia no servidor** (spec própria a escrever: dois
+limiares de HP e poções em três níveis, quem chega ataca primeiro, mochila de Pokémon via
+`state.box` no motor, nível do treinador com destraves, loja no Centro) e **3b, o cliente**
+(esta spec). O que muda aqui:
+
+- §4 `HuntView`: `potionHpPercent` nas settings; `box` no estado; nível do treinador derivado
+  de `trainer.xp` com `levelFromXp('medium-fast')` e o próximo destrave lido de
+  `shared/data/unlocks.json`.
+- §5 cena: números de dano coloridos por eficácia (`typeMultiplier` do `shared`), tremor de 2 px
+  no ativo ao receber golpe, brilho na captura, anel no level up, fade branco na evolução, "+XP"
+  flutuante; tudo conforme a tabela §4 do GDD.
+- §6 interface: barra superior ganha nível do treinador com barra de XP e "próximo: …";
+  contador "Pokédex da hunt: n/m"; modal **Loja** (comprar/vender com nível exigido, só fora de
+  hunt); modal **Time** mostra a mochila de Pokémon e as vagas destravadas; **Configurações**
+  ganha "usar poção abaixo de X %"; dicas de primeira vez (uma por evento do GDD §4, guardadas em
+  `localStorage`); toast "compre bolas" com ≤ 1 bola; a lista de hunts mostra hunts futuras
+  bloqueadas pelo nível.
+- §8 testes: `hunt-view` cobre `box`, `potionHpPercent` e o nível do treinador; `log` cobre as
+  linhas novas; a smoke E2E inclui abrir a loja e comprar uma Poção.
+- §9 fora do escopo: som continua fora; Rota 2 fica para conteúdo depois.

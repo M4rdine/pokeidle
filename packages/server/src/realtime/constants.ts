@@ -12,3 +12,6 @@ export const WS_SESSION_RECHECK_MS = 300_000
 export const WS_MAX_SOCKETS_PER_TRAINER = 8
 export const TICK_LAG_WARN_MS = 1000
 export const PERSIST_MAX_FAILURES = 3
+/** `hunt_log` tem 8 colunas escritas por linha; o Postgres tem um teto de 65 535 parâmetros
+ * por statement. 500 linhas × 8 = 4 000 params por lote, bem abaixo do limite. */
+export const LOG_INSERT_CHUNK = 500

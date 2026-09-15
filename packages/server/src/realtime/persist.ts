@@ -4,11 +4,22 @@ import { huntLog, huntSessions, pokemon, trainers, type TrainerRow } from '../db
 import { saveSnapshot } from '../hunt-store/snapshot.js'
 import { syncWithin } from '../hunt-store/sync.js'
 import { AppError } from '../http/errors.js'
+import { LOG_INSERT_CHUNK } from './constants.js'
 import type { LogEntry, PersistSnapshot } from './runner.js'
 
+const chunksOf = <T>(items: readonly T[], size: number): T[][] => {
+  const chunks: T[][] = []
+  for (let i = 0; i < items.length; i += size) chunks.push(items.slice(i, i + size))
+  return chunks
+}
+
+/** Insere em lotes de `LOG_INSERT_CHUNK` linhas, todos na mesma transação: um `pendingLog`
+ * grande (ex.: acumulado num catch-up longo) pode facilmente passar do teto de 65 535
+ * parâmetros por statement do Postgres numa única chamada `insert().values(...)`. */
 export async function insertLog(tx: Tx, trainerId: string, entries: readonly LogEntry[]): Promise<void> {
-  if (entries.length === 0) return
-  await tx.insert(huntLog).values(entries.map((e) => ({ trainerId, huntId: e.huntId, speciesName: e.speciesName, level: e.level, xpTrainer: e.xpTrainer, gold: e.gold, drops: e.drops, captured: e.captured })))
+  for (const chunk of chunksOf(entries, LOG_INSERT_CHUNK)) {
+    await tx.insert(huntLog).values(chunk.map((e) => ({ trainerId, huntId: e.huntId, speciesName: e.speciesName, level: e.level, xpTrainer: e.xpTrainer, gold: e.gold, drops: e.drops, captured: e.captured })))
+  }
 }
 
 /** Snapshot sempre; com `sync`, tabelas + hunt_log na mesma transação. */

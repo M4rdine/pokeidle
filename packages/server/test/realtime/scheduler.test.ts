@@ -9,6 +9,7 @@ import { simulate } from '../../src/engine/simulate.js'
 import { loadActive, startHunt } from '../../src/hunt-store/index.js'
 import { PERSIST_MAX_FAILURES, SNAPSHOT_EVERY_TICKS, SYNC_EVERY_TICKS } from '../../src/realtime/constants.js'
 import { finishRunner, flushRunner } from '../../src/realtime/persist.js'
+import type { LogEntry, PersistSnapshot } from '../../src/realtime/runner.js'
 import { createScheduler, type Scheduler } from '../../src/realtime/scheduler.js'
 import { createSocketRegistry, OPEN, type SocketLike } from '../../src/realtime/sockets.js'
 import { silentLogger } from '../helpers/app.js'
@@ -175,6 +176,23 @@ describe('attach single-flight e finish durante catch-up (C1)', () => {
     expect(await db.select().from(huntLog)).toEqual([])
     const [tr] = await db.select().from(trainers).where(eq(trainers.id, trainerId))
     expect(tr!.xp).toBe(0)
+  })
+})
+
+describe('insertLog em lotes (C2)', () => {
+  it('flushRunner com 9 000 entradas de log (72 000 parâmetros) insere as 9 000 linhas sem estourar o limite do Postgres', async () => {
+    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 12 })
+    const active = (await loadActive(db, trainerId))!
+    const entries: LogEntry[] = Array.from({ length: 9000 }, () => ({
+      huntId: active.huntId, speciesName: 'charmander', level: 12, xpTrainer: 1, gold: 1, drops: [], captured: false,
+    }))
+    const snap: PersistSnapshot = {
+      trainerId, huntId: active.huntId, state: active.state, rngState: active.rngState,
+      pendingLog: entries, lastSimulatedAt: T0,
+    }
+    await flushRunner(db, snap, T0, { sync: true })
+    const rows = await db.select().from(huntLog).where(eq(huntLog.trainerId, trainerId))
+    expect(rows.length).toBe(9000)
   })
 })
 

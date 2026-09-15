@@ -10,6 +10,8 @@ import type { Db } from '../db/client.js'
 import { CorruptSnapshotError } from '../hunt-store/state-schema.js'
 import type { Scheduler } from '../realtime/scheduler.js'
 import type { SocketRegistry } from '../realtime/sockets.js'
+import type { WsOptions } from '../realtime/ws.js'
+import { wsRoutes } from '../realtime/ws.js'
 import { AppError, errorBody } from './errors.js'
 import { authRoutes } from './routes/auth.js'
 import { huntRoutes } from './routes/hunts.js'
@@ -22,6 +24,7 @@ export interface AppDeps {
   readonly now?: () => Date
   readonly logger?: boolean
   readonly realtime: { readonly scheduler: Scheduler; readonly sockets: SocketRegistry }
+  readonly wsOptions?: Partial<WsOptions>
   /** @internal só para testes — a camada HTTP nunca deve passar isto. */
   readonly extraRoutes?: (app: FastifyInstance) => void
 }
@@ -85,6 +88,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   await app.register(authRoutes, routeDeps)
   await app.register(trainerRoutes, routeDeps)
   await app.register(huntRoutes, routeDeps)
+  await app.register(wsRoutes, { ...routeDeps, ...(deps.wsOptions && { ws: deps.wsOptions }) })
   deps.extraRoutes?.(app)
   return app
 }

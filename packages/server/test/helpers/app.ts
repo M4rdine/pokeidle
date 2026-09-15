@@ -5,6 +5,7 @@ import type { Db } from '../../src/db/client.js'
 import { buildApp } from '../../src/http/app.js'
 import { createScheduler, type Scheduler } from '../../src/realtime/scheduler.js'
 import { createSocketRegistry, type SocketRegistry } from '../../src/realtime/sockets.js'
+import type { WsOptions } from '../../src/realtime/ws.js'
 import { openTestDb, truncateAll } from './db.js'
 
 export const ORIGIN = 'http://localhost:3000'
@@ -21,14 +22,17 @@ export interface TestApp {
 const testConfig = (overrides: Readonly<Record<string, string>> = {}) =>
   loadConfig({ DATABASE_URL: 'postgres://x:x@localhost:1/x', APP_ORIGIN: ORIGIN, ARGON2_MEMORY_KIB: '4096', ARGON2_TIME_COST: '1', ...overrides })
 
-export async function testApp(): Promise<TestApp> {
+export async function testApp(opts?: { ws?: Partial<WsOptions> }): Promise<TestApp> {
   const { db, close } = await openTestDb()
   await truncateAll(db)
   const clock = { now: T0 }
   const registry = loadRegistry()
   const sockets = createSocketRegistry()
   const scheduler = createScheduler({ db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve() })
-  const app = await buildApp({ db, config: testConfig(), now: () => clock.now, logger: false, realtime: { scheduler, sockets } })
+  const app = await buildApp({
+    db, config: testConfig(), now: () => clock.now, logger: false, realtime: { scheduler, sockets },
+    ...(opts?.ws && { wsOptions: opts.ws }),
+  })
   return {
     app, db, clock, registry, scheduler, sockets,
     close: async () => { await scheduler.stop(); await app.close(); await close() },

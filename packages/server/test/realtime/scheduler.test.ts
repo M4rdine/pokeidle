@@ -196,6 +196,36 @@ describe('insertLog em lotes (C2)', () => {
   })
 })
 
+describe('sync que falha devolve o pendingLog (C3)', () => {
+  it('um sync que falha devolve as entradas ao runner; o próximo sync bem-sucedido grava tudo sem perda nem duplicata', async () => {
+    let syncCalls = 0
+    const flakyFlush: typeof flushRunner = async (db2, snap, now, opts) => {
+      if (opts.sync) {
+        syncCalls++
+        if (syncCalls === 1) throw new Error('db temporariamente indisponível')
+      }
+      return flushRunner(db2, snap, now, opts)
+    }
+    const s2 = createScheduler({
+      db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
+      persistence: { flush: flakyFlush, finish: finishRunner },
+    })
+    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 13 })
+    await s2.attach(trainerId)
+    for (let i = 0; i < SYNC_EVERY_TICKS; i++) { clock.now = new Date(clock.now.getTime() + TICK_MS); s2.tick() }
+    await s2.idle() // drena o sync que falha (a 1ª chamada de flakyFlush)
+    expect(syncCalls).toBe(1)
+    const runnerAfterFailure = s2.get(trainerId)!
+    expect(runnerAfterFailure.pendingLog.length).toBeGreaterThan(0) // as entradas não foram perdidas
+    const pendingBefore = runnerAfterFailure.pendingLog.length
+    expect(await db.select().from(huntLog)).toEqual([]) // nada foi gravado ainda
+    await s2.flushAll() // novo sync, agora com sucesso
+    expect(syncCalls).toBe(2)
+    const logRows = await db.select().from(huntLog).where(eq(huntLog.trainerId, trainerId))
+    expect(logRows.length).toBe(pendingBefore) // sem perda nem duplicata
+  })
+})
+
 describe('intents e finish', () => {
   it('applyIntent troca o estado e manda hunt.tick; sem runner devolve erro', async () => {
     expect(scheduler.applyIntent(trainerId, { type: 'stop' })).toMatchObject({ error: { code: 'no-hunt' } })

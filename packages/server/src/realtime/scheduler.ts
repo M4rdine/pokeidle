@@ -85,7 +85,20 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
     const snap = toPersistSnapshot(runner)
     void enqueue(runner.trainerId, async () => {
       deps.hooks?.onPersistStart?.(sync ? 'sync' : 'save', runner.trainerId)
-      await flush(deps.db, snap, deps.now(), { sync })
+      try {
+        await flush(deps.db, snap, deps.now(), { sync })
+      } catch (error) {
+        // Um sync já limpou `pendingLog` no runner em memória (via `markSaved`) antes mesmo
+        // do flush rodar; se ele falhar, essas entradas (derrotas/capturas) seriam perdidas
+        // pra sempre sem isto. A ordem original é preservada; o próximo sync tenta de novo
+        // com tudo junto. Um `save` (sem sync) nunca mexe em `pendingLog`, então devolver
+        // `snap.pendingLog` aqui duplicaria o que o runner atual já tem.
+        if (sync) {
+          const cur = runners.get(runner.trainerId)
+          if (cur) runners.set(runner.trainerId, { ...cur, pendingLog: [...snap.pendingLog, ...cur.pendingLog] })
+        }
+        throw error
+      }
       const current = runners.get(runner.trainerId)
       if (current && current.persistFailures > 0) runners.set(runner.trainerId, { ...current, persistFailures: 0 })
     })

@@ -1,5 +1,6 @@
 import { writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import type { PixiSpritesheet } from './atlas.js'
 import type { Catalog, CatalogItem, CatalogOutfit } from './catalog.js'
 import { directionName, loadCatalog } from './extract.js'
 
@@ -38,6 +39,18 @@ export function renderContactSheet(catalog: Catalog, opts: ContactSheetOptions):
 <input placeholder="filtrar por id" autofocus>
 <h2>Outfits (${outfits.length})</h2><section>${outfits.map(outfitFigure).join('')}</section>
 <h2>Itens (${items.length})</h2><section>${items.map(itemFigure).join('')}</section>
+<script>${SCRIPT}</script>`
+}
+
+/** Folha de aprovação do tileset: cada peça recortada do atlas, com o nome embaixo. */
+export function renderTilesetSheet(sheet: PixiSpritesheet): string {
+  const cells = Object.entries(sheet.frames).map(([name, f]) => {
+    const y = f.frame.y === 0 ? '0px' : `-${f.frame.y}px`
+    return `<figure data-id="${name}"><span style="width:${f.frame.w}px;height:${f.frame.h}px;display:block;image-rendering:pixelated;background-image:url(${sheet.meta.image});background-position:-${f.frame.x}px ${y}"></span><figcaption>${name}</figcaption></figure>`
+  })
+  return `<!doctype html><meta charset="utf-8"><title>Tileset do Pokeidle</title><style>${STYLE}</style>
+<input placeholder="filtrar por nome" autofocus>
+<h2>Tiles (${cells.length})</h2><section>${cells.join('')}</section>
 <script>${SCRIPT}</script>`
 }
 

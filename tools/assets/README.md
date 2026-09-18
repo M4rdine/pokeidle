@@ -9,19 +9,25 @@ originais **não** ficam no repositório: aponte os comandos para a sua cópia l
 ```bash
 pnpm assets inspect <spr> <dat> [--version 860|854]
 pnpm assets extract <spr> <dat> [--out assets/extracted] [--version 860|854]
-pnpm assets contact-sheet [--extracted assets/extracted] [--all-outfits] [--all-items]
+pnpm assets contact-sheet [--extracted assets/extracted] [--all-outfits] [--all-items] [--tileset assets/atlas]
 pnpm assets build [--extracted assets/extracted] [--manifest tools/assets/manifest.json] [--out assets/atlas]
 pnpm assets map-import tools/assets/maps/route-1.tmj --id rota-1 --name "Rota 1" [--tileset assets/atlas/tiles.tsj] [--manifest tools/assets/manifest.json] [--out packages/shared/data/hunts]
+pnpm assets map-preview packages/shared/data/hunts/rota-1.json [--atlas assets/atlas] [--out preview.png] [--blocking]
 ```
 
 - `inspect` resume assinaturas, contagens e avisos sem escrever nada.
 - `extract` escreve todos os PNGs e o `catalog.json`.
-- `contact-sheet` gera o `index.html` usado para descobrir ids de outfit e item.
+- `contact-sheet` gera o `index.html` usado para descobrir ids de outfit e item; com
+  `--tileset <dir>`, desenha `tileset.html` a partir do `tiles.json` do `build` (a folha de
+  aprovação da curadoria do tileset, uma célula por tile recortado do atlas) em vez do dump
+  extraído.
 - `build` valida o manifest contra o catálogo e gera os atlases.
 - `map-import` converte um mapa exportado do Tiled e grava em `packages/shared/data/hunts`
   por padrão; sem `--manifest`, confere os nomes de espécie dos spawns contra
   `loadRegistry().species` do `@pokeidle/shared` (com `--manifest`, usa os nomes do
   manifest em vez do registro).
+- `map-preview` desenha uma hunt já convertida em PNG a partir do atlas gerado pelo `build`,
+  sobrepondo `detail` ao `ground`; com `--blocking`, tinge de vermelho os tiles bloqueados.
 
 Os `.tmj` de origem do Tiled (commitados, não gerados) ficam em `tools/assets/maps/` — só o
 `HuntMap` JSON convertido vai para `packages/shared/data/hunts`.
@@ -77,6 +83,39 @@ Nomes de frame no `pokemon.json`:
 No `tiles.json` cada frame tem a chave igual ao `name` do tile no manifest. No `tiles.tsj`
 o id local de cada tile é a posição no manifest e o nome vai na propriedade `name`
 (`{ "name": "name", "type": "string", "value": "grass" }`).
+
+## Desenhar um mapa
+
+Fluxo completo de autoria, do atlas até a prévia:
+
+1. `pnpm assets build` — gera `assets/atlas/tiles.png`, `tiles.json` e `tiles.tsj` (o
+   tileset do Tiled, com os wangsets dos `terrains` do manifest).
+2. Opcional: `pnpm assets contact-sheet --tileset assets/atlas` e abra o `tileset.html`
+   gerado para aprovar o corte de cada tile antes de desenhar o mapa.
+3. Abra `assets/atlas/tiles.tsj` no Tiled.
+4. Pinte com o pincel de terreno (Terrain Brush) — ele usa os cantos (`corners`) de cada
+   entrada de `terrains` no manifest para escolher a peça certa automaticamente.
+5. Salve o mapa como JSON (`.tmj`), seguindo o contrato de autoria abaixo.
+6. `pnpm assets map-import <mapa.tmj> --id <id> --name "<nome>"` converte para `HuntMap` e
+   grava em `packages/shared/data/hunts`.
+7. `pnpm assets map-preview packages/shared/data/hunts/<id>.json` desenha o resultado em
+   PNG para conferência visual; use `--blocking` para ver os tiles bloqueados em vermelho.
+
+`map-import` recusa o mapa — listando todos os problemas de uma vez — quando:
+
+- o ponto de partida (`spawnPoint`) cai num tile bloqueado;
+- o Centro Pokémon (`pokecenter`) cai num tile bloqueado;
+- o Centro Pokémon está a menos de um tile da borda do mapa;
+- algum `spawn` não tem nenhum tile livre dentro do seu raio.
+
+### Fatiar tiles grandes
+
+Um item do Tibia maior que 1×1 (a cela do tileset é sempre 1 tile de 32px) precisa da
+chave `slice` na entrada de `tiles` do manifest, com `cols`/`rows` batendo com o tamanho do
+item (`validateManifest` recusa o manifest se não bater). Cada peça fatiada vira um tile
+próprio, nomeado `<nome>-x<col>-y<row>` na ordem de leitura (esquerda pra direita, cima pra
+baixo) — por exemplo, um `pokecenter` 2×2 vira `pokecenter-x0-y0`, `pokecenter-x1-y0`,
+`pokecenter-x0-y1` e `pokecenter-x1-y1`, cada um pintável como um tile normal no Tiled.
 
 ## Contrato de autoria no Tiled
 

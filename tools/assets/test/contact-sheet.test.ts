@@ -2,8 +2,9 @@ import { mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { packGrid } from '../src/atlas.js'
 import type { Catalog } from '../src/catalog.js'
-import { renderContactSheet, writeContactSheet } from '../src/contact-sheet.js'
+import { renderContactSheet, renderTilesetSheet, writeContactSheet } from '../src/contact-sheet.js'
 
 const catalog: Catalog = {
   version: 860,
@@ -34,6 +35,22 @@ describe('renderContactSheet', () => {
     const html = renderContactSheet(catalog, { onlyMultiTileOutfits: false, groundItemsOnly: false })
     expect(html).toContain('outfits/11/south_0.png')
     expect(html).toContain('items/101_0_0.png')
+  })
+})
+
+describe('renderTilesetSheet', () => {
+  it('desenha uma célula por tile do atlas, com o nome', () => {
+    const packed = packGrid([
+      { name: 'grass', image: { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(60) } },
+      { name: 'pokecenter-x0-y0', image: { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(90) } },
+    ], 'tiles.png')
+    const html = renderTilesetSheet(packed.sheet)
+    expect(html).toContain('grass')
+    expect(html).toContain('pokecenter-x0-y0')
+    expect(html.match(/<figure/g)).toHaveLength(2)
+    // cada célula recorta o atlas pela posição do frame
+    expect(html).toContain('background-position:-32px 0px')
+    expect(html).toContain('url(tiles.png)')
   })
 })
 

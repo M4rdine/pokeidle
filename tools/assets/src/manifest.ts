@@ -33,6 +33,7 @@ const TileSchema = z.object({
 
 const TerrainTileSchema = z.object({
   tile: nameSchema,
+  // ordem: superior-direito, inferior-direito, inferior-esquerdo, superior-esquerdo
   corners: z.tuple([z.string(), z.string(), z.string(), z.string()]),
 }).strict()
 

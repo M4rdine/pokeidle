@@ -10,7 +10,8 @@ import { loadManifest } from './manifest.js'
 import { loadTilesAtlas, renderMapPreview } from './map-preview.js'
 import { parseSpr } from './spr.js'
 import { encodePng } from './png.js'
-import { writeContactSheet } from './contact-sheet.js'
+import type { PixiSpritesheet } from './atlas.js'
+import { renderTilesetSheet, writeContactSheet } from './contact-sheet.js'
 import { importTiledMap, parseTiledTileset, type ImportOptions } from './tiled-import.js'
 
 const out = (line: string): void => void process.stdout.write(`${line}\n`)
@@ -85,7 +86,15 @@ program
   .option('--extracted <dir>', 'pasta com PNGs extraídos e catalog.json', 'assets/extracted')
   .option('--all-outfits', 'incluir outfits 1x1', false)
   .option('--all-items', 'incluir itens que não são chão', false)
-  .action(async (opts: { extracted: string; allOutfits: boolean; allItems: boolean }) => {
+  .option('--tileset <dir>', 'desenha o atlas gerado em vez do dump extraído')
+  .action(async (opts: { extracted: string; allOutfits: boolean; allItems: boolean; tileset?: string }) => {
+    if (opts.tileset !== undefined) {
+      const sheet = JSON.parse(await readFile(join(opts.tileset, 'tiles.json'), 'utf8')) as PixiSpritesheet
+      const target = join(opts.tileset, 'tileset.html')
+      await writeFile(target, renderTilesetSheet(sheet))
+      out(`folha do tileset em ${target} (${Object.keys(sheet.frames).length} tiles)`)
+      return
+    }
     const path = await writeContactSheet(opts.extracted, { onlyMultiTileOutfits: !opts.allOutfits, groundItemsOnly: !opts.allItems })
     out(`abra no navegador: ${path}`)
   })

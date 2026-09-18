@@ -45,4 +45,19 @@ describe('renderMapPreview', () => {
     const broken = { ...map, layers: { ...map.layers, ground: ['grass', 'sumiu'] } }
     expect(() => renderMapPreview(broken as HuntMap, atlas)).toThrow(/sumiu/)
   })
+  it('pixel transparente do detalhe deixa o chão aparecer embaixo', () => {
+    const halfTransparent: RgbaImage = { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(120) }
+    for (let y = 0; y < 32; y++) {
+      for (let x = 0; x < 16; x++) halfTransparent.data[(y * 32 + x) * 4 + 3] = 0
+    }
+    const punchedFrames: AtlasFrame[] = [{ name: 'grass', image: solid(60) }, { name: 'tree', image: halfTransparent }]
+    const punchedPacked = packGrid(punchedFrames, 'tiles.png')
+    const punchedAtlas = { sheet: punchedPacked.sheet, image: punchedPacked.image }
+    const punchedMap: HuntMap = { ...map, layers: { ...map.layers, detail: [null, 'tree'] } }
+
+    const preview = renderMapPreview(punchedMap, punchedAtlas)
+
+    expect(pixelAt(preview, 37, 5)).toEqual([60, 60, 60]) // pixel transparente do detalhe: chão continua visível
+    expect(pixelAt(preview, 50, 5)).toEqual([120, 120, 120]) // pixel opaco do detalhe: cobre o chão normalmente
+  })
 })

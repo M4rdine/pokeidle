@@ -445,6 +445,46 @@
         "cols": 2,
         "rows": 2
       }
+    },
+    {
+      "name": "cave-wall",
+      "itemId": 9061,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "cave-rock",
+      "itemId": 2164,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "fence",
+      "itemId": 2751,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "fence-corner",
+      "itemId": 2752,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "door",
+      "itemId": 2962,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
     }
   ],
   "transitions": [

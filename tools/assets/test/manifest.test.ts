@@ -158,6 +158,27 @@ describe('terrenos', () => {
   })
 })
 
+describe('transições', () => {
+  it('aceita uma transição entre dois tiles existentes', () => {
+    const manifest = parseManifest({
+      version: 1,
+      species: [],
+      tiles: [{ name: 'grass', itemId: 100 }, { name: 'dirt', itemId: 100, patternX: 1 }],
+      transitions: [{ name: 'grama-terra', from: 'grass', to: 'dirt' }],
+    })
+    expect(validateManifest(manifest, catalog)).toEqual([])
+  })
+  it('recusa transição citando tile inexistente', () => {
+    const manifest = parseManifest({
+      version: 1,
+      species: [],
+      tiles: [{ name: 'grass', itemId: 100 }],
+      transitions: [{ name: 'grama-terra', from: 'grass', to: 'sumiu' }],
+    })
+    expect(validateManifest(manifest, catalog).join('\n')).toMatch(/transição grama-terra: tile "sumiu" não existe/)
+  })
+})
+
 describe('loadManifest', () => {
   it('rejeita JSON malformado nomeando o arquivo', async () => {
     const tempDir = await mkdtemp(join(tmpdir(), 'manifest-'))

@@ -122,6 +122,26 @@ describe('buildAtlases', () => {
     expect(tileset.tilecount).toBe(5)
   })
 
+  it('uma transição gera as catorze peças mistas e o terreno correspondente', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }, { name: 'dirt', itemId: 100, patternX: 0 }],
+      transitions: [{ name: 'grama-terra', from: 'grass', to: 'dirt' }],
+    }))
+    const outDir = join(dir, 'atlas')
+    await buildAtlases({ extractedDir, manifestPath, outDir })
+    const sheet = JSON.parse(await readFile(join(outDir, 'tiles.json'), 'utf8')) as { frames: Record<string, unknown> }
+    const names = Object.keys(sheet.frames)
+    expect(names).toContain('grama-terra-abba')
+    expect(names.filter((n) => n.startsWith('grama-terra-'))).toHaveLength(14) // 16 menos as duas puras
+    const tileset = JSON.parse(await readFile(join(outDir, 'tiles.tsj'), 'utf8')) as { wangsets?: { name: string; wangtiles: unknown[] }[] }
+    const wangset = tileset.wangsets?.find((w) => w.name === 'grama-terra')
+    expect(wangset?.wangtiles).toHaveLength(16) // as catorze mistas mais as duas puras
+  })
+
   it('falha listando problemas de validação', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'pokeidle-atlas-'))
     const extractedDir = join(dir, 'extracted')

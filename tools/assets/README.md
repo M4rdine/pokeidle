@@ -95,6 +95,10 @@ Fluxo completo de autoria, do atlas até a prévia:
 3. Abra `assets/atlas/tiles.tsj` no Tiled.
 4. Pinte com o pincel de terreno (Terrain Brush) — ele usa os cantos (`corners`) de cada
    entrada de `terrains` no manifest para escolher a peça certa automaticamente.
+   Declarar uma entrada em `transitions` (com `from`/`to` apontando para dois tiles de chão já
+   existentes) gera as catorze peças de borda por composição dos dois tiles e já deixa o
+   terreno correspondente pronto — o autor do mapa não precisa recortar nem escolher a peça de
+   borda na mão, só pintar com o pincel de terreno normalmente.
 5. Salve o mapa como JSON (`.tmj`), seguindo o contrato de autoria abaixo.
 6. `pnpm assets map-import <mapa.tmj> --id <id> --name "<nome>"` converte para `HuntMap` e
    grava em `packages/shared/data/hunts`.

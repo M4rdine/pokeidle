@@ -2,11 +2,12 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { packGrid, toTiledTileset, type AtlasFrame } from './atlas.js'
 import type { Catalog, CatalogOutfit } from './catalog.js'
-import { DIRECTION_NAMES } from './compose.js'
+import { DIRECTION_NAMES, type RgbaImage } from './compose.js'
 import { itemFramePath, loadCatalog, outfitFramePath, type Logger } from './extract.js'
-import { expandedTileNames, loadManifest, validateManifest, type Manifest, type SpeciesEntry, type TileEntry } from './manifest.js'
+import { expandedTileNames, loadManifest, validateManifest, type Manifest, type SpeciesEntry, type TileEntry, type TransitionEntry } from './manifest.js'
 import { decodePng, encodePng } from './png.js'
 import { sliceImage } from './tile-slice.js'
+import { transitionTerrain, transitionTiles } from './transition.js'
 
 export interface BuildOptions {
   readonly extractedDir: string
@@ -57,6 +58,21 @@ async function tileFrames(extractedDir: string, tiles: readonly TileEntry[]): Pr
   return frames
 }
 
+function findTileImage(frames: readonly AtlasFrame[], transitionName: string, tileName: string): RgbaImage {
+  const frame = frames.find((f) => f.name === tileName)
+  if (!frame) throw new Error(`transição ${transitionName}: tile "${tileName}" não está no atlas`)
+  return frame.image
+}
+
+/** As catorze peças mistas de cada transição, compostas a partir dos frames de tiles já decodificados. */
+function transitionFrames(frames: readonly AtlasFrame[], transitions: readonly TransitionEntry[]): AtlasFrame[] {
+  return transitions.flatMap((entry) => {
+    const from = findTileImage(frames, entry.name, entry.from)
+    const to = findTileImage(frames, entry.name, entry.to)
+    return transitionTiles(entry, { from, to })
+  })
+}
+
 async function writeAtlas(outDir: string, baseName: string, frames: readonly AtlasFrame[]): Promise<ReturnType<typeof packGrid>> {
   const packed = packGrid(frames, `${baseName}.png`)
   await writeFile(join(outDir, `${baseName}.png`), encodePng(packed.image))
@@ -76,12 +92,15 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
   await writeAtlas(opts.outDir, 'pokemon', pokemon)
   log(`pokemon.png: ${pokemon.length} frames de ${manifest.species.length} espécies`)
 
-  const tiles = await tileFrames(opts.extractedDir, manifest.tiles)
+  const baseTiles = await tileFrames(opts.extractedDir, manifest.tiles)
+  const transitions = manifest.transitions ?? []
+  const tiles = [...baseTiles, ...transitionFrames(baseTiles, transitions)]
   const packedTiles = await writeAtlas(opts.outDir, 'tiles', tiles)
   const tileOrder = tiles.map((f) => f.name)
+  const terrains = [...(manifest.terrains ?? []), ...transitions.map(transitionTerrain)]
   await writeFile(
     join(opts.outDir, 'tiles.tsj'),
-    JSON.stringify(toTiledTileset(packedTiles.sheet, 'tibia-tiles', tileOrder, manifest.terrains ?? []), null, 2),
+    JSON.stringify(toTiledTileset(packedTiles.sheet, 'tibia-tiles', tileOrder, terrains), null, 2),
   )
   log(`tiles.png: ${tiles.length} tiles; tiles.tsj pronto para o Tiled`)
 

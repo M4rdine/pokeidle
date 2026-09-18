@@ -37,6 +37,16 @@ export interface PixiSpritesheet {
   }
 }
 
+export interface TiledWangColor { name: string; color: string; probability: number; tile: number }
+export interface TiledWangTile { tileid: number; wangid: number[] }
+export interface TiledWangset { name: string; type: 'corner'; tile: -1; colors: TiledWangColor[]; wangtiles: TiledWangTile[] }
+
+export interface TerrainInput {
+  readonly name: string
+  readonly colors: readonly string[]
+  readonly tiles: readonly { readonly tile: string; readonly corners: readonly [string, string, string, string] }[]
+}
+
 export interface TiledTileset {
   type: 'tileset'
   version: string
@@ -51,6 +61,7 @@ export interface TiledTileset {
   margin: number
   spacing: number
   tiles: Array<{ id: number; properties: Array<{ name: 'name'; type: 'string'; value: string }> }>
+  wangsets?: TiledWangset[]
 }
 
 function blitInto(src: RgbaImage, dst: Uint8Array, dstWidth: number, ox: number, oy: number): void {
@@ -111,10 +122,44 @@ export function packGrid(frames: readonly AtlasFrame[], imageName: string, paddi
   }
 }
 
-export function toTiledTileset(sheet: PixiSpritesheet, name: string, order: readonly string[]): TiledTileset {
+/** Cores de exibição no Tiled; só precisam ser distintas entre si. */
+const WANG_COLORS = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8000', '#8000ff', '#808080', '#804000', '#008080', '#800000', '#008000', '#000080', '#c0c0c0']
+
+function toWangset(terrain: TerrainInput, tileId: (name: string) => number): TiledWangset {
+  const colorIndex = new Map(terrain.colors.map((name, i) => [name, i + 1]))
+  return {
+    name: terrain.name,
+    type: 'corner',
+    tile: -1,
+    colors: terrain.colors.map((name, i) => ({ name, color: WANG_COLORS[i % WANG_COLORS.length]!, probability: 1, tile: -1 })),
+    wangtiles: terrain.tiles.map((entry) => {
+      const corner = (name: string): number => {
+        const index = colorIndex.get(name)
+        if (index === undefined) throw new Error(`terreno ${terrain.name}: cor "${name}" não está em colors`)
+        return index
+      }
+      const [topRight, bottomRight, bottomLeft, topLeft] = entry.corners
+      // Num conjunto "corner" o Tiled só lê os índices ímpares; os pares ficam em 0.
+      return { tileid: tileId(entry.tile), wangid: [0, corner(topRight), 0, corner(bottomRight), 0, corner(bottomLeft), 0, corner(topLeft)] }
+    }),
+  }
+}
+
+export function toTiledTileset(
+  sheet: PixiSpritesheet,
+  name: string,
+  order: readonly string[],
+  terrains: readonly TerrainInput[] = [],
+): TiledTileset {
   const frameNames = Object.keys(sheet.frames)
   const mismatch = order.length !== frameNames.length || order.some((n) => sheet.frames[n] === undefined)
   if (mismatch) throw new Error('ordem de frames não corresponde ao spritesheet')
+  const idByName = new Map(order.map((tileName, id) => [tileName, id]))
+  const tileId = (tileName: string): number => {
+    const id = idByName.get(tileName)
+    if (id === undefined) throw new Error(`terreno cita tile "${tileName}", que não está no tileset`)
+    return id
+  }
   return {
     type: 'tileset',
     version: '1.10',
@@ -129,5 +174,6 @@ export function toTiledTileset(sheet: PixiSpritesheet, name: string, order: read
     margin: 0,
     spacing: sheet.meta.padding,
     tiles: order.map((value, id) => ({ id, properties: [{ name: 'name', type: 'string', value }] })),
+    ...(terrains.length > 0 && { wangsets: terrains.map((t) => toWangset(t, tileId)) }),
   }
 }

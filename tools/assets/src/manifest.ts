@@ -31,15 +31,28 @@ const TileSchema = z.object({
   slice: SliceSchema.optional(),
 })
 
+const TerrainTileSchema = z.object({
+  tile: nameSchema,
+  corners: z.tuple([z.string(), z.string(), z.string(), z.string()]),
+}).strict()
+
+const TerrainSchema = z.object({
+  name: nameSchema,
+  colors: z.array(z.string().min(1)).min(1).max(15), // o Tiled aceita até 15 cores por conjunto
+  tiles: z.array(TerrainTileSchema).min(1),
+}).strict()
+
 export const ManifestSchema = z.object({
   version: z.literal(1),
   species: z.array(SpeciesSchema),
   tiles: z.array(TileSchema),
+  terrains: z.array(TerrainSchema).optional(),
 })
 
 export type Manifest = z.infer<typeof ManifestSchema>
 export type SpeciesEntry = Manifest['species'][number]
 export type TileEntry = Manifest['tiles'][number]
+export type TerrainEntry = NonNullable<Manifest['terrains']>[number]
 
 export function parseManifest(json: unknown): Manifest {
   return parseOrThrow(ManifestSchema, json, 'manifest')
@@ -94,12 +107,26 @@ function validateTile(t: TileEntry, catalog: Catalog): string[] {
   return problems
 }
 
+function validateTerrain(t: TerrainEntry, tileNames: ReadonlySet<string>): string[] {
+  const problems: string[] = []
+  const colors = new Set(t.colors)
+  for (const entry of t.tiles) {
+    if (!tileNames.has(entry.tile)) problems.push(`terreno ${t.name}: tile "${entry.tile}" não existe na lista de tiles`)
+    for (const color of entry.corners) {
+      if (!colors.has(color)) problems.push(`terreno ${t.name}: cor "${color}" não está em colors`)
+    }
+  }
+  return problems
+}
+
 export function validateManifest(m: Manifest, catalog: Catalog): string[] {
+  const tileNames = new Set(m.tiles.flatMap(expandedTileNames))
   return [
     ...duplicates(m.species.map((s) => s.name)).map((n) => `nome de espécie duplicado: ${n}`),
     ...duplicates(m.species.map((s) => s.id)).map((id) => `id de espécie duplicado: ${id}`),
     ...duplicates(m.tiles.flatMap(expandedTileNames)).map((n) => `nome de tile duplicado: ${n}`),
     ...m.species.flatMap((s) => validateSpecies(s, catalog)),
     ...m.tiles.flatMap((t) => validateTile(t, catalog)),
+    ...(m.terrains ?? []).flatMap((t) => validateTerrain(t, tileNames)),
   ]
 }

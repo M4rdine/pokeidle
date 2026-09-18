@@ -48,6 +48,7 @@ const TiledTilesetSchema = z.object({
   margin: z.number().int().min(0),
   spacing: z.number().int().min(0),
   tiles: z.array(z.object({ id: z.number().int().min(0), properties: z.array(TilesetPropertySchema) })),
+  wangsets: z.array(z.unknown()).optional(),
 })
 
 type TiledObject = z.infer<typeof TiledObjectSchema>
@@ -58,7 +59,10 @@ export interface ImportOptions {
 }
 
 export function parseTiledTileset(json: unknown): TiledTileset {
-  return parseOrThrow(TiledTilesetSchema, json, 'tileset', 'dica: use o tiles.tsj gerado pelo comando build')
+  const parsed = parseOrThrow(TiledTilesetSchema, json, 'tileset', 'dica: use o tiles.tsj gerado pelo comando build')
+  // wangsets só precisa ser aceito, não usado: descartamos para não carregar um tipo `unknown[]` adiante.
+  const { wangsets: _wangsets, ...tileset } = parsed
+  return tileset
 }
 
 const GID_FLAG_MASK = 0x1fff_ffff // remove bits de flip/rotação do Tiled

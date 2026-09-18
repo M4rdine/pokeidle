@@ -79,7 +79,10 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
   const tiles = await tileFrames(opts.extractedDir, manifest.tiles)
   const packedTiles = await writeAtlas(opts.outDir, 'tiles', tiles)
   const tileOrder = tiles.map((f) => f.name)
-  await writeFile(join(opts.outDir, 'tiles.tsj'), JSON.stringify(toTiledTileset(packedTiles.sheet, 'tibia-tiles', tileOrder), null, 2))
+  await writeFile(
+    join(opts.outDir, 'tiles.tsj'),
+    JSON.stringify(toTiledTileset(packedTiles.sheet, 'tibia-tiles', tileOrder, manifest.terrains ?? []), null, 2),
+  )
   log(`tiles.png: ${tiles.length} tiles; tiles.tsj pronto para o Tiled`)
 
   return { pokemonFrames: pokemon.length, tileFrames: tiles.length }

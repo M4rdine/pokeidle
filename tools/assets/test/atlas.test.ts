@@ -10,6 +10,10 @@ function px(img: RgbaImage, x: number, y: number): number {
   return img.data[(y * img.width + x) * 4]!
 }
 
+function solidFrame(name: string, value: number): AtlasFrame {
+  return { name, image: { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(value) } }
+}
+
 describe('packGrid', () => {
   const frames: AtlasFrame[] = [
     { name: 'a/walk_south_0', image: solid(2, 2, 10) },
@@ -92,5 +96,37 @@ describe('toTiledTileset', () => {
     const { sheet } = packGrid([{ name: 'grass', image: solid(32, 32, 1) }], 'tiles.png', 0)
     expect(() => toTiledTileset(sheet, 'x', [])).toThrow(/ordem de frames/)
     expect(() => toTiledTileset(sheet, 'x', ['water'])).toThrow(/ordem de frames/)
+  })
+
+  it('escreve os terrenos como wangsets no formato do Tiled', () => {
+    const frames = [solidFrame('grass', 1), solidFrame('dirt', 2), solidFrame('grass-dirt-ne', 3)]
+    const packed = packGrid(frames, 'tiles.png')
+    const order = frames.map((f) => f.name)
+    const tileset = toTiledTileset(packed.sheet, 'tibia-tiles', order, [{
+      name: 'grama-terra',
+      colors: ['grama', 'terra'],
+      tiles: [
+        { tile: 'grass', corners: ['grama', 'grama', 'grama', 'grama'] },
+        { tile: 'dirt', corners: ['terra', 'terra', 'terra', 'terra'] },
+        { tile: 'grass-dirt-ne', corners: ['terra', 'grama', 'grama', 'grama'] },
+      ],
+    }])
+    const wangset = tileset.wangsets?.[0]
+    expect(wangset).toMatchObject({ name: 'grama-terra', type: 'corner', tile: -1 })
+    expect(wangset?.colors.map((c) => c.name)).toEqual(['grama', 'terra'])
+    // wangid: [topo, topo-direita, direita, baixo-direita, baixo, baixo-esquerda, esquerda, topo-esquerda]
+    expect(wangset?.wangtiles).toEqual([
+      { tileid: 0, wangid: [0, 1, 0, 1, 0, 1, 0, 1] },
+      { tileid: 1, wangid: [0, 2, 0, 2, 0, 2, 0, 2] },
+      { tileid: 2, wangid: [0, 2, 0, 1, 0, 1, 0, 1] },
+    ])
+  })
+
+  it('recusa terreno citando tile fora do tileset', () => {
+    const frames = [solidFrame('grass', 1)]
+    const packed = packGrid(frames, 'tiles.png')
+    expect(() => toTiledTileset(packed.sheet, 'tibia-tiles', ['grass'], [{
+      name: 'x', colors: ['grama'], tiles: [{ tile: 'sumiu', corners: ['grama', 'grama', 'grama', 'grama'] }],
+    }])).toThrow(/sumiu/)
   })
 })

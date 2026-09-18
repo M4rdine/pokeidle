@@ -117,6 +117,47 @@ describe('tiles fatiados', () => {
   })
 })
 
+describe('terrenos', () => {
+  const terrainManifest = (over: Record<string, unknown> = {}) => ({
+    version: 1,
+    species: [],
+    tiles: [{ name: 'grass', itemId: 100 }, { name: 'dirt', itemId: 100, patternX: 1 }],
+    terrains: [{
+      name: 'grama-terra',
+      colors: ['grama', 'terra'],
+      tiles: [
+        { tile: 'grass', corners: ['grama', 'grama', 'grama', 'grama'] },
+        { tile: 'dirt', corners: ['terra', 'terra', 'terra', 'terra'] },
+      ],
+    }],
+    ...over,
+  })
+  it('aceita um terreno coerente', () => {
+    const manifest = parseManifest(terrainManifest())
+    expect(manifest.terrains?.[0]?.tiles).toHaveLength(2)
+    expect(validateManifest(manifest, catalog)).toEqual([])
+  })
+  it('recusa terreno citando tile inexistente ou cor fora da lista', () => {
+    const unknownTile = parseManifest(terrainManifest({
+      terrains: [{ name: 'grama-terra', colors: ['grama'], tiles: [{ tile: 'nao-existe', corners: ['grama', 'grama', 'grama', 'grama'] }] }],
+    }))
+    expect(validateManifest(unknownTile, catalog).join('\n')).toMatch(/terreno grama-terra: tile "nao-existe" não existe/)
+    const unknownColor = parseManifest(terrainManifest({
+      terrains: [{ name: 'grama-terra', colors: ['grama'], tiles: [{ tile: 'grass', corners: ['grama', 'agua', 'grama', 'grama'] }] }],
+    }))
+    expect(validateManifest(unknownColor, catalog).join('\n')).toMatch(/terreno grama-terra: cor "agua" não está em colors/)
+  })
+  it('um tile fatiado também pode entrar num terreno', () => {
+    const manifest = parseManifest({
+      version: 1,
+      species: [],
+      tiles: [{ name: 'casa', itemId: 101, slice: { cols: 2, rows: 2 } }],
+      terrains: [{ name: 'parede', colors: ['muro'], tiles: [{ tile: 'casa-x0-y0', corners: ['muro', 'muro', 'muro', 'muro'] }] }],
+    })
+    expect(validateManifest(manifest, catalog)).toEqual([])
+  })
+})
+
 describe('loadManifest', () => {
   it('rejeita JSON malformado nomeando o arquivo', async () => {
     const tempDir = await mkdtemp(join(tmpdir(), 'manifest-'))

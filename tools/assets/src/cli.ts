@@ -1,13 +1,15 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { Command } from 'commander'
-import { loadRegistry } from '@pokeidle/shared'
+import { loadRegistry, parseHuntMap } from '@pokeidle/shared'
 import { buildAtlases } from './build-atlases.js'
 import { parseDat, type DatVersion } from './dat.js'
 import { extractAll } from './extract.js'
 import { readJson } from './json-file.js'
 import { loadManifest } from './manifest.js'
+import { loadTilesAtlas, renderMapPreview } from './map-preview.js'
 import { parseSpr } from './spr.js'
+import { encodePng } from './png.js'
 import { writeContactSheet } from './contact-sheet.js'
 import { importTiledMap, parseTiledTileset, type ImportOptions } from './tiled-import.js'
 
@@ -104,6 +106,20 @@ program
     const target = join(opts.out, `${map.id}.json`)
     await writeFile(target, JSON.stringify(map, null, 2))
     out(`hunt gravada em ${target} (${map.width}x${map.height}, ${map.spawns.length} spawns)`)
+  })
+
+program
+  .command('map-preview')
+  .argument('<mapa>', 'hunt em JSON (packages/shared/data/hunts/route-1.json)')
+  .option('--atlas <dir>', 'pasta do atlas gerado pelo build', 'assets/atlas')
+  .option('--out <file>', 'arquivo PNG de saída', 'preview.png')
+  .option('--blocking', 'pinta de vermelho os tiles bloqueados', false)
+  .action(async (mapPath: string, opts: { atlas: string; out: string; blocking: boolean }) => {
+    const map = parseHuntMap(await readJson(mapPath))
+    const atlas = await loadTilesAtlas(opts.atlas)
+    const image = renderMapPreview(map, atlas, { blocking: opts.blocking })
+    await writeFile(opts.out, encodePng(image))
+    out(`prévia em ${opts.out} (${image.width}x${image.height})`)
   })
 
 export { program, readJson }

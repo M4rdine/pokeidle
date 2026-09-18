@@ -1,8 +1,10 @@
-import { mkdtemp, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { parseVersion, program, readJson } from '../src/cli.js'
+import { packGrid } from '../src/atlas.js'
+import { decodePng, encodePng } from '../src/png.js'
 import { buildDat, groundItemSpec, outfitSpec } from './fixtures/dat-fixture.js'
 import { buildSpr, solidSprite } from './fixtures/spr-fixture.js'
 
@@ -205,5 +207,25 @@ describe('program', () => {
   it('map-import usa packages/shared/data/hunts como pasta de saída padrão', () => {
     const mapImport = program.commands.find((c) => c.name() === 'map-import')
     expect(mapImport?.options.find((o) => o.long === '--out')?.defaultValue).toBe('packages/shared/data/hunts')
+  })
+
+  it('map-preview grava o PNG do mapa', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-preview-'))
+    const atlasDir = join(dir, 'atlas')
+    await mkdir(atlasDir, { recursive: true })
+    const packed = packGrid([{ name: 'grass', image: { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(60) } }], 'tiles.png')
+    await writeFile(join(atlasDir, 'tiles.png'), encodePng(packed.image))
+    await writeFile(join(atlasDir, 'tiles.json'), JSON.stringify(packed.sheet))
+    const mapPath = join(dir, 'mapa.json')
+    await writeFile(mapPath, JSON.stringify({
+      id: 'teste', name: 'Teste', width: 1, height: 1, tileSize: 32,
+      layers: { ground: ['grass'], detail: [null], blocking: [false] },
+      spawnPoint: { x: 0, y: 0 }, pokecenter: { x: 0, y: 0 },
+      spawns: [{ speciesName: 'zubat', minLevel: 2, maxLevel: 3, x: 0, y: 0, radius: 0, count: 1, respawnSeconds: 10 }],
+    }))
+    const out = join(dir, 'preview.png')
+    await program.parseAsync(['node', 'cli', 'map-preview', mapPath, '--atlas', atlasDir, '--out', out])
+    const written = decodePng(await readFile(out))
+    expect([written.width, written.height]).toEqual([32, 32])
   })
 })

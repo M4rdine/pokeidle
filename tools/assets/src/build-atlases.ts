@@ -4,8 +4,9 @@ import { packGrid, toTiledTileset, type AtlasFrame } from './atlas.js'
 import type { Catalog, CatalogOutfit } from './catalog.js'
 import { DIRECTION_NAMES } from './compose.js'
 import { itemFramePath, loadCatalog, outfitFramePath, type Logger } from './extract.js'
-import { loadManifest, validateManifest, type Manifest, type SpeciesEntry, type TileEntry } from './manifest.js'
+import { expandedTileNames, loadManifest, validateManifest, type Manifest, type SpeciesEntry, type TileEntry } from './manifest.js'
 import { decodePng, encodePng } from './png.js'
+import { sliceImage } from './tile-slice.js'
 
 export interface BuildOptions {
   readonly extractedDir: string
@@ -47,7 +48,11 @@ async function pokemonFrames(extractedDir: string, manifest: Manifest, catalog: 
 async function tileFrames(extractedDir: string, tiles: readonly TileEntry[]): Promise<AtlasFrame[]> {
   const frames: AtlasFrame[] = []
   for (const t of tiles) {
-    frames.push(await readFrame(t.name, itemFramePath(extractedDir, t.itemId, t.patternX, t.patternY)))
+    const image = decodePng(await readFile(itemFramePath(extractedDir, t.itemId, t.patternX, t.patternY)))
+    const pieces = sliceImage(image, t.slice?.cols ?? 1, t.slice?.rows ?? 1)
+    const names = expandedTileNames(t)
+    // `expandedTileNames` e `sliceImage` percorrem na mesma ordem de leitura.
+    pieces.forEach((piece, i) => frames.push({ name: names[i]!, image: piece }))
   }
   return frames
 }

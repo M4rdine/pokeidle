@@ -16,7 +16,10 @@ const catalog: Catalog = {
     { id: 10, width: 2, height: 2, directions: 4, phases: 2, layers: 1, displacement: { x: 8, y: 8 } },
     { id: 11, width: 2, height: 2, directions: 4, phases: 1, layers: 1, displacement: { x: 8, y: 8 } },
   ],
-  items: [{ id: 100, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false }],
+  items: [
+    { id: 100, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false },
+    { id: 101, width: 2, height: 2, patternX: 1, patternY: 1, phases: 1, isGround: false, isBlocking: true },
+  ],
 }
 
 async function writePng(path: string, w: number, h: number, v: number): Promise<void> {
@@ -34,6 +37,7 @@ async function setupFixtures(): Promise<{ dir: string; extractedDir: string }> {
     await writePng(outfitFramePath(extractedDir, 11, d, 0), 64, 64, 150)
   }
   await writePng(itemFramePath(extractedDir, 100, 0, 0), 32, 32, 90)
+  await writePng(itemFramePath(extractedDir, 101, 0, 0), 64, 64, 90)
   return { dir, extractedDir }
 }
 
@@ -90,6 +94,32 @@ describe('buildAtlases', () => {
     expect(pokemon.frames['bulbasaur/attack_south_0']).toBeDefined()
     expect(pokemon.frames['bulbasaur/attack_west_0']).toBeDefined()
     expect(pokemon.animations['bulbasaur/attack_south']).toEqual(['bulbasaur/attack_south_0'])
+  })
+
+  it('item grande vira uma peça por tile, cada uma 32×32', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    await writeFile(
+      manifestPath,
+      JSON.stringify({
+        version: 1,
+        species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+        tiles: [
+          { name: 'grass', itemId: 100 },
+          { name: 'pokecenter', itemId: 101, slice: { cols: 2, rows: 2 } },
+        ],
+      }),
+    )
+    const outDir = join(dir, 'atlas')
+    const result = await buildAtlases({ extractedDir, manifestPath, outDir })
+    expect(result.tileFrames).toBe(5)
+    const sheet = JSON.parse(await readFile(join(outDir, 'tiles.json'), 'utf8')) as {
+      frames: Record<string, { frame: { w: number; h: number } }>
+    }
+    expect(Object.keys(sheet.frames)).toEqual(['grass', 'pokecenter-x0-y0', 'pokecenter-x1-y0', 'pokecenter-x0-y1', 'pokecenter-x1-y1'])
+    expect(Object.values(sheet.frames).every((f) => f.frame.w === 32 && f.frame.h === 32)).toBe(true)
+    const tileset = JSON.parse(await readFile(join(outDir, 'tiles.tsj'), 'utf8')) as { tilecount: number }
+    expect(tileset.tilecount).toBe(5)
   })
 
   it('falha listando problemas de validação', async () => {

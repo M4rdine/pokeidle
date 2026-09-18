@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { parseOrThrow } from '@pokeidle/shared'
 import type { Catalog } from './catalog.js'
 import { readJson } from './json-file.js'
+import { sliceName } from './tile-slice.js'
 
 const KEBAB = /^[a-z0-9-]+$/
 const ONLY_DIGITS = /^\d+$/
@@ -20,11 +21,14 @@ const SpeciesSchema = z.object({
   attackOutfitId: z.number().int().positive().optional(),
 })
 
+const SliceSchema = z.object({ cols: z.number().int().min(1).max(8), rows: z.number().int().min(1).max(8) }).strict()
+
 const TileSchema = z.object({
   name: nameSchema,
   itemId: z.number().int().min(100),
   patternX: z.number().int().min(0).default(0),
   patternY: z.number().int().min(0).default(0),
+  slice: SliceSchema.optional(),
 })
 
 export const ManifestSchema = z.object({
@@ -50,6 +54,13 @@ export async function loadManifest(path: string): Promise<Manifest> {
   }
 }
 
+/** Um tile simples vira um nome; um tile fatiado vira um nome por peça, na ordem de leitura. */
+export function expandedTileNames(tile: TileEntry): string[] {
+  if (!tile.slice) return [tile.name]
+  const { cols, rows } = tile.slice
+  return Array.from({ length: cols * rows }, (_unused, i) => sliceName(tile.name, i % cols, Math.floor(i / cols)))
+}
+
 function duplicates<T>(values: readonly T[]): T[] {
   const seen = new Set<T>()
   const dups = new Set<T>()
@@ -73,8 +84,10 @@ function validateTile(t: TileEntry, catalog: Catalog): string[] {
   const item = catalog.items.find((i) => i.id === t.itemId)
   if (!item) return [`tile ${t.name}: item ${t.itemId} não existe no catálogo`]
   const problems: string[] = []
-  if (item.width !== TILE_SIZE_IN_TILES || item.height !== TILE_SIZE_IN_TILES) {
-    problems.push(`tile ${t.name}: item ${t.itemId} é ${item.width}x${item.height}, tiles devem ser 1x1`)
+  const big = item.width !== TILE_SIZE_IN_TILES || item.height !== TILE_SIZE_IN_TILES
+  if (big && !t.slice) problems.push(`tile ${t.name}: item ${t.itemId} é ${item.width}x${item.height}; use "slice" para cortá-lo em peças de um tile`)
+  if (t.slice && (t.slice.cols !== item.width || t.slice.rows !== item.height)) {
+    problems.push(`tile ${t.name}: slice ${t.slice.cols}x${t.slice.rows} não bate com o item ${t.itemId}, que é ${item.width}x${item.height}`)
   }
   if (t.patternX >= item.patternX) problems.push(`tile ${t.name}: patternX ${t.patternX} fora da faixa 0..${item.patternX - 1}`)
   if (t.patternY >= item.patternY) problems.push(`tile ${t.name}: patternY ${t.patternY} fora da faixa 0..${item.patternY - 1}`)
@@ -85,7 +98,7 @@ export function validateManifest(m: Manifest, catalog: Catalog): string[] {
   return [
     ...duplicates(m.species.map((s) => s.name)).map((n) => `nome de espécie duplicado: ${n}`),
     ...duplicates(m.species.map((s) => s.id)).map((id) => `id de espécie duplicado: ${id}`),
-    ...duplicates(m.tiles.map((t) => t.name)).map((n) => `nome de tile duplicado: ${n}`),
+    ...duplicates(m.tiles.flatMap(expandedTileNames)).map((n) => `nome de tile duplicado: ${n}`),
     ...m.species.flatMap((s) => validateSpecies(s, catalog)),
     ...m.tiles.flatMap((t) => validateTile(t, catalog)),
   ]

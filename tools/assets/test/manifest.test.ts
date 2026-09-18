@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { describe, expect, it } from 'vitest'
 import type { Catalog } from '../src/catalog.js'
-import { loadManifest, parseManifest, validateManifest } from '../src/manifest.js'
+import { expandedTileNames, loadManifest, parseManifest, validateManifest } from '../src/manifest.js'
 
 const catalog: Catalog = {
   version: 860,
@@ -68,9 +68,9 @@ describe('validateManifest', () => {
     expect(problems[2]).toMatch(/t.*item 555/)
   })
 
-  it('aponta item que não é 1x1, porque o tileset usa células de 32px', () => {
+  it('aponta item grande sem slice, porque o tileset usa células de 32px', () => {
     const m = parseManifest({ version: 1, species: [], tiles: [{ name: 'big', itemId: 101 }] })
-    expect(validateManifest(m, catalog)).toEqual(['tile big: item 101 é 2x2, tiles devem ser 1x1'])
+    expect(validateManifest(m, catalog)).toEqual(['tile big: item 101 é 2x2; use "slice" para cortá-lo em peças de um tile'])
   })
 
   it('aponta nomes e ids duplicados e pattern fora da faixa', () => {
@@ -86,6 +86,34 @@ describe('validateManifest', () => {
     expect(problems.some((p) => /nome de espécie duplicado.*dup/.test(p))).toBe(true)
     expect(problems.some((p) => /id de espécie duplicado.*1/.test(p))).toBe(true)
     expect(problems.some((p) => /grass.*patternX 2/.test(p))).toBe(true)
+  })
+})
+
+describe('tiles fatiados', () => {
+  it('aceita slice compatível com o catálogo e expande os nomes', () => {
+    const manifest = parseManifest({ version: 1, species: [], tiles: [{ name: 'pokecenter', itemId: 101, slice: { cols: 2, rows: 2 } }] })
+    const tile = manifest.tiles[0]!
+    expect(tile.slice).toEqual({ cols: 2, rows: 2 })
+    expect(expandedTileNames(tile)).toEqual(['pokecenter-x0-y0', 'pokecenter-x1-y0', 'pokecenter-x0-y1', 'pokecenter-x1-y1'])
+    expect(validateManifest(manifest, catalog)).toEqual([])
+  })
+  it('tile simples continua com um nome só', () => {
+    const manifest = parseManifest({ version: 1, species: [], tiles: [{ name: 'grass', itemId: 100 }] })
+    expect(expandedTileNames(manifest.tiles[0]!)).toEqual(['grass'])
+  })
+  it('recusa slice que não bate com o item e item grande sem slice', () => {
+    const wrongSlice = parseManifest({ version: 1, species: [], tiles: [{ name: 'pokecenter', itemId: 101, slice: { cols: 3, rows: 2 } }] })
+    expect(validateManifest(wrongSlice, catalog).join('\n')).toMatch(/pokecenter.*3x2.*101.*2x2/)
+    const missingSlice = parseManifest({ version: 1, species: [], tiles: [{ name: 'pokecenter', itemId: 101 }] })
+    expect(validateManifest(missingSlice, catalog).join('\n')).toMatch(/pokecenter.*use "slice"/)
+  })
+  it('nome duplicado depois da expansão é recusado', () => {
+    const clash = parseManifest({
+      version: 1,
+      species: [],
+      tiles: [{ name: 'casa', itemId: 101, slice: { cols: 2, rows: 2 } }, { name: 'casa-x0-y0', itemId: 100 }],
+    })
+    expect(validateManifest(clash, catalog).join('\n')).toMatch(/nome de tile duplicado: casa-x0-y0/)
   })
 })
 

@@ -22,31 +22,33 @@ const tileset: TiledTileset = {
   ],
 }
 
-// mapa 2x2: chão todo grass, montanha no canto inferior direito, bloqueio nesse tile
+// mapa 3x3: chão todo grass, montanha no canto superior direito, bloqueio no canto
+// inferior direito. Ponto de partida no canto (0,0), Centro Pokémon no meio (1,1) —
+// longe o bastante da borda para passar nas validações novas do importador.
 const tiled = {
   type: 'map',
   orientation: 'orthogonal',
-  width: 2,
-  height: 2,
+  width: 3,
+  height: 3,
   tilewidth: 32,
   tileheight: 32,
   tilesets: [{ firstgid: 1, source: 'tiles.tsj' }],
   layers: [
-    { type: 'tilelayer', name: 'ground', width: 2, height: 2, data: [1, 1, 1, 1] },
-    { type: 'tilelayer', name: 'detail', width: 2, height: 2, data: [0, 0, 0, 2] },
-    { type: 'tilelayer', name: 'blocking', width: 2, height: 2, data: [0, 0, 0, 1] },
+    { type: 'tilelayer', name: 'ground', width: 3, height: 3, data: [1, 1, 1, 1, 1, 1, 1, 1, 1] },
+    { type: 'tilelayer', name: 'detail', width: 3, height: 3, data: [0, 0, 2, 0, 0, 0, 0, 0, 0] },
+    { type: 'tilelayer', name: 'blocking', width: 3, height: 3, data: [0, 0, 0, 0, 0, 0, 0, 0, 1] },
     {
       type: 'objectgroup',
       name: 'objects',
       objects: [
         { id: 1, class: 'spawnPoint', x: 0, y: 0, width: 32, height: 32 },
-        { id: 2, class: 'pokecenter', x: 32, y: 0, width: 32, height: 32 },
+        { id: 2, class: 'pokecenter', x: 32, y: 32, width: 32, height: 32 },
         {
           id: 3,
           class: 'spawn',
-          x: 0,
-          y: 32,
-          width: 64,
+          x: 32,
+          y: 64,
+          width: 32,
           height: 32,
           properties: [
             { name: 'species', type: 'string', value: 'rattata' },
@@ -65,17 +67,17 @@ describe('importTiledMap', () => {
   const map = importTiledMap(tiled, tileset, { id: 'route-1', name: 'Rota 1' })
 
   it('converte camadas de tile em nomes e bloqueio em booleanos', () => {
-    expect(map).toMatchObject({ id: 'route-1', name: 'Rota 1', width: 2, height: 2, tileSize: 32 })
-    expect(map.layers.ground).toEqual(['grass', 'grass', 'grass', 'grass'])
-    expect(map.layers.detail).toEqual([null, null, null, 'mountain'])
-    expect(map.layers.blocking).toEqual([false, false, false, true])
+    expect(map).toMatchObject({ id: 'route-1', name: 'Rota 1', width: 3, height: 3, tileSize: 32 })
+    expect(map.layers.ground).toEqual(['grass', 'grass', 'grass', 'grass', 'grass', 'grass', 'grass', 'grass', 'grass'])
+    expect(map.layers.detail).toEqual([null, null, 'mountain', null, null, null, null, null, null])
+    expect(map.layers.blocking).toEqual([false, false, false, false, false, false, false, false, true])
   })
 
   it('converte objetos em posições de tile e spawns', () => {
     expect(map.spawnPoint).toEqual({ x: 0, y: 0 })
-    expect(map.pokecenter).toEqual({ x: 1, y: 0 })
+    expect(map.pokecenter).toEqual({ x: 1, y: 1 })
     expect(map.spawns).toEqual([
-      { speciesName: 'rattata', minLevel: 2, maxLevel: 5, x: 1, y: 1, radius: 1, count: 3, respawnSeconds: 20 },
+      { speciesName: 'rattata', minLevel: 2, maxLevel: 5, x: 1, y: 2, radius: 1, count: 3, respawnSeconds: 20 },
     ])
   })
 
@@ -89,7 +91,7 @@ describe('importTiledMap', () => {
   })
 
   it('falha em gid sem nome no tileset', () => {
-    const bad = { ...tiled, layers: [{ ...tiled.layers[0]!, data: [1, 1, 1, 9] }, ...tiled.layers.slice(1)] }
+    const bad = { ...tiled, layers: [{ ...tiled.layers[0]!, data: [1, 1, 1, 1, 1, 1, 1, 1, 9] }, ...tiled.layers.slice(1)] }
     expect(() => importTiledMap(bad, tileset, { id: 'x', name: 'x' })).toThrow(/gid 9/)
   })
 
@@ -124,7 +126,7 @@ describe('importTiledMap', () => {
           name: 'objects',
           objects: [
             { id: 1, class: 'spawnPoint', x: 0, y: 0, width: 32, height: 32 },
-            { id: 2, class: 'pokecenter', x: 32, y: 0, width: 32, height: 32 },
+            { id: 2, class: 'pokecenter', x: 32, y: 32, width: 32, height: 32 },
             {
               id: 3,
               class: 'spawn',
@@ -158,6 +160,114 @@ describe('importTiledMap', () => {
   })
 })
 
+interface TileCoord {
+  readonly x: number
+  readonly y: number
+}
+
+interface SpawnCoord extends TileCoord {
+  readonly radius: number
+}
+
+interface TiledMapOptions {
+  readonly width?: number
+  readonly height?: number
+  readonly blockingAt?: readonly TileCoord[]
+  readonly blockingAll?: boolean
+  readonly spawnPoint?: TileCoord
+  readonly pokecenter?: TileCoord
+  readonly spawnAt?: SpawnCoord
+}
+
+/** Monta um mapa Tiled falso (largura/altura configuráveis, padrão 4x4) para os testes de validação. */
+function tiledMapWith(options: TiledMapOptions): unknown {
+  const width = options.width ?? 4
+  const height = options.height ?? 4
+  const spawnPoint = options.spawnPoint ?? { x: 0, y: 0 }
+  const pokecenter = options.pokecenter ?? { x: 2, y: 2 }
+  const spawnAt = options.spawnAt ?? { x: 1, y: 1, radius: 1 }
+  const blockedKeys = new Set((options.blockingAt ?? []).map((p) => `${p.x},${p.y}`))
+
+  const groundData = new Array<number>(width * height).fill(1)
+  const detailData = new Array<number>(width * height).fill(0)
+  const blockingData = Array.from({ length: width * height }, (_, i) => {
+    if (options.blockingAll === true) return 1
+    const x = i % width
+    const y = Math.floor(i / width)
+    return blockedKeys.has(`${x},${y}`) ? 1 : 0
+  })
+
+  // objeto centrado exatamente no tile (x, y), com tamanho que produz o `radius` desejado
+  // (ver fórmula em toSpawn: radius = ceil(max(width, height) / 2 / TILE_SIZE)).
+  const spawnSize = spawnAt.radius * 2 * 32
+  const spawnObjectX = spawnAt.x * 32 + 16 - spawnSize / 2
+  const spawnObjectY = spawnAt.y * 32 + 16 - spawnSize / 2
+
+  return {
+    type: 'map',
+    orientation: 'orthogonal',
+    width,
+    height,
+    tilewidth: 32,
+    tileheight: 32,
+    tilesets: [{ firstgid: 1, source: 'tiles.tsj' }],
+    layers: [
+      { type: 'tilelayer', name: 'ground', width, height, data: groundData },
+      { type: 'tilelayer', name: 'detail', width, height, data: detailData },
+      { type: 'tilelayer', name: 'blocking', width, height, data: blockingData },
+      {
+        type: 'objectgroup',
+        name: 'objects',
+        objects: [
+          { id: 1, class: 'spawnPoint', x: spawnPoint.x * 32, y: spawnPoint.y * 32, width: 32, height: 32 },
+          { id: 2, class: 'pokecenter', x: pokecenter.x * 32, y: pokecenter.y * 32, width: 32, height: 32 },
+          {
+            id: 3,
+            class: 'spawn',
+            x: spawnObjectX,
+            y: spawnObjectY,
+            width: spawnSize,
+            height: spawnSize,
+            properties: [
+              { name: 'species', type: 'string', value: 'rattata' },
+              { name: 'minLevel', type: 'int', value: 2 },
+              { name: 'maxLevel', type: 'int', value: 5 },
+              { name: 'count', type: 'int', value: 3 },
+              { name: 'respawnSeconds', type: 'int', value: 20 },
+            ],
+          },
+        ],
+      },
+    ],
+  }
+}
+
+describe('validações do mapa', () => {
+  const meta = { id: 'route-1', name: 'Rota 1' }
+
+  it('recusa ponto de partida e Centro em tile bloqueado, e lista os dois de uma vez', () => {
+    const map = tiledMapWith({ blockingAt: [{ x: 0, y: 0 }, { x: 1, y: 1 }], spawnPoint: { x: 0, y: 0 }, pokecenter: { x: 1, y: 1 } })
+    expect(() => importTiledMap(map, tileset, meta)).toThrow(/ponto de partida[\s\S]*Centro Pokémon/)
+  })
+
+  it('recusa spawn sem nenhum tile livre no raio', () => {
+    const map = tiledMapWith({ blockingAll: true, spawnPoint: { x: 0, y: 0 }, pokecenter: { x: 1, y: 0 }, spawnAt: { x: 2, y: 0, radius: 0 } })
+    expect(() => importTiledMap(map, tileset, meta)).toThrow(/spawn.*sem tile livre/)
+  })
+
+  it('recusa Centro colado na borda do mapa', () => {
+    const map = tiledMapWith({ pokecenter: { x: 0, y: 0 } })
+    expect(() => importTiledMap(map, tileset, meta)).toThrow(/Centro Pokémon.*borda/)
+  })
+
+  it('aceita um mapa correto e devolve as camadas', () => {
+    const map = tiledMapWith({})
+    const hunt = importTiledMap(map, tileset, meta)
+    expect(hunt.layers.ground).toHaveLength(hunt.width * hunt.height)
+    expect(hunt.spawns.length).toBeGreaterThan(0)
+  })
+})
+
 describe('parseTiledTileset', () => {
   it('aceita o tiles.tsj gerado pelo build', () => {
     expect(parseTiledTileset(JSON.parse(JSON.stringify(tileset)))).toEqual(tileset)
@@ -176,8 +286,8 @@ describe('parseHuntMap', () => {
   })
 
   it('rejeita spawn fora do mapa', () => {
-    const outside = { ...map, spawns: [{ ...map.spawns[0]!, x: 2 }] }
-    expect(() => parseHuntMap(outside)).toThrow(/spawns\.0: fora do mapa \(2x2\)/)
+    const outside = { ...map, spawns: [{ ...map.spawns[0]!, x: 3 }] }
+    expect(() => parseHuntMap(outside)).toThrow(/spawns\.0: fora do mapa \(3x3\)/)
   })
 
   it('rejeita spawnPoint e pokecenter fora do mapa', () => {

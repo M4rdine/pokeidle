@@ -25,21 +25,22 @@ const tileset = {
 const tiledMap = {
   type: 'map',
   orientation: 'orthogonal',
-  width: 2,
-  height: 1,
+  width: 3,
+  height: 3,
   tilewidth: 32,
   tileheight: 32,
   tilesets: [{ firstgid: 1, source: 'tiles.tsj' }],
   layers: [
-    { type: 'tilelayer', name: 'ground', data: [1, 1] },
-    { type: 'tilelayer', name: 'detail', data: [0, 0] },
-    { type: 'tilelayer', name: 'blocking', data: [0, 0] },
+    { type: 'tilelayer', name: 'ground', data: [1, 1, 1, 1, 1, 1, 1, 1, 1] },
+    { type: 'tilelayer', name: 'detail', data: [0, 0, 0, 0, 0, 0, 0, 0, 0] },
+    { type: 'tilelayer', name: 'blocking', data: [0, 0, 0, 0, 0, 0, 0, 0, 0] },
     {
       type: 'objectgroup',
       name: 'objects',
       objects: [
         { id: 1, class: 'spawnPoint', x: 0, y: 0, width: 32, height: 32 },
-        { id: 2, class: 'pokecenter', x: 32, y: 0, width: 32, height: 32 },
+        // Centro a pelo menos 1 tile de cada borda (mapa 3x3 → único tile possível é o centro).
+        { id: 2, class: 'pokecenter', x: 32, y: 32, width: 32, height: 32 },
         {
           id: 3, class: 'spawn', x: 0, y: 0, width: 32, height: 32,
           properties: [
@@ -138,7 +139,7 @@ describe('program', () => {
     // schemas.HuntMapSchema exige spawns.length >= 1 (uma hunt sem nenhum spawn não faz
     // sentido no jogo); o fixture base já traz um spawn de charmander pra continuar válido.
     expect(written).toMatchObject({
-      id: 'rota-1', name: 'Rota 1', width: 2, height: 1,
+      id: 'rota-1', name: 'Rota 1', width: 3, height: 3,
       spawns: [{ speciesName: 'charmander', minLevel: 2, maxLevel: 5, count: 1, respawnSeconds: 10 }],
     })
     expect(stdout.lines()).toMatch(/hunt gravada em/)

@@ -140,6 +140,48 @@ function checkSpecies(spawns: readonly HuntSpawn[], objectIds: readonly number[]
   }
 }
 
+type Point = { x: number; y: number }
+
+const MIN_DISTANCE_FROM_EDGE = 1
+
+function blockedAt(blocking: readonly boolean[], width: number, x: number, y: number): boolean {
+  return blocking[y * width + x] ?? true
+}
+
+/** Um tile livre em qualquer lugar do quadrado de lado `2 * radius + 1` centrado no spawn. */
+function hasFreeTile(blocking: readonly boolean[], width: number, height: number, spawn: HuntSpawn): boolean {
+  for (let y = spawn.y - spawn.radius; y <= spawn.y + spawn.radius; y++) {
+    for (let x = spawn.x - spawn.radius; x <= spawn.x + spawn.radius; x++) {
+      if (x >= 0 && y >= 0 && x < width && y < height && !blockedAt(blocking, width, x, y)) return true
+    }
+  }
+  return false
+}
+
+function checkMap(
+  map: { width: number; height: number },
+  blocking: readonly boolean[],
+  points: { spawnPoint: Point; pokecenter: Point },
+  spawns: readonly HuntSpawn[],
+): string[] {
+  const problems: string[] = []
+  if (blockedAt(blocking, map.width, points.spawnPoint.x, points.spawnPoint.y)) {
+    problems.push(`ponto de partida em (${points.spawnPoint.x}, ${points.spawnPoint.y}) está num tile bloqueado`)
+  }
+  if (blockedAt(blocking, map.width, points.pokecenter.x, points.pokecenter.y)) {
+    problems.push(`Centro Pokémon em (${points.pokecenter.x}, ${points.pokecenter.y}) está num tile bloqueado`)
+  }
+  const { x, y } = points.pokecenter
+  const nearEdge = x < MIN_DISTANCE_FROM_EDGE || y < MIN_DISTANCE_FROM_EDGE || x >= map.width - MIN_DISTANCE_FROM_EDGE || y >= map.height - MIN_DISTANCE_FROM_EDGE
+  if (nearEdge) problems.push(`Centro Pokémon em (${x}, ${y}) está na borda do mapa; deixe ao menos um tile de folga`)
+  for (const spawn of spawns) {
+    if (!hasFreeTile(blocking, map.width, map.height, spawn)) {
+      problems.push(`spawn de ${spawn.speciesName} em (${spawn.x}, ${spawn.y}) está sem tile livre no raio ${spawn.radius}`)
+    }
+  }
+  return problems
+}
+
 export function importTiledMap(
   tiledJson: unknown,
   tileset: TiledTileset,
@@ -157,6 +199,11 @@ export function importTiledMap(
   const spawnObjects = all.filter((o) => objectClass(o) === 'spawn')
   const spawns = spawnObjects.map(toSpawn)
   if (options?.knownSpecies !== undefined) checkSpecies(spawns, spawnObjects.map((o) => o.id), options.knownSpecies)
+  const blocking = tileLayer(map, 'blocking').map((gid) => gid !== 0)
+  const spawnPoint = centerTile(singleObject(all, 'spawnPoint'))
+  const pokecenter = centerTile(singleObject(all, 'pokecenter'))
+  const problems = checkMap(map, blocking, { spawnPoint, pokecenter }, spawns)
+  if (problems.length > 0) throw new Error(`mapa inválido:\n- ${problems.join('\n- ')}`)
   return parseHuntMap({
     id: meta.id,
     name: meta.name,
@@ -166,10 +213,10 @@ export function importTiledMap(
     layers: {
       ground: toNames(tileLayer(map, 'ground')),
       detail: toNames(tileLayer(map, 'detail')),
-      blocking: tileLayer(map, 'blocking').map((gid) => gid !== 0),
+      blocking,
     },
-    spawnPoint: centerTile(singleObject(all, 'spawnPoint')),
-    pokecenter: centerTile(singleObject(all, 'pokecenter')),
+    spawnPoint,
+    pokecenter,
     spawns,
   })
 }

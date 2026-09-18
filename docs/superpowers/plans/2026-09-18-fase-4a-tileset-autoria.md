@@ -955,3 +955,261 @@ Explicar onde está o arquivo para abrir no Tiled (`assets/atlas/tiles.tsj`), qu
 - Nomes cruzados conferidos: `sliceImage`/`sliceName` (Task 1 → 2), `expandedTileNames` (Task 1 → 2 e 3), `TerrainInput`/`toTiledTileset` (Task 3), `renderMapPreview`/`loadTilesAtlas` (Task 5), `renderTilesetSheet` (Task 6 → 7).
 - Pacote correto em todos os comandos: `@pokeidle/assets-tools`.
 - Fora do escopo, repetido de propósito: água animada e camada acima do jogador são fase 4b; esta fase não toca cliente, servidor nem `HuntMap`.
+
+---
+
+### Task 8: Peças de transição geradas (acrescentada durante a execução)
+
+Motivo: a curadoria descobriu que o dump não traz conjuntos de borda em oito peças. As transições dele são anéis fechados dentro de um tile, feitos para o editor do Tibia, e não servem ao pincel de terreno do Tiled, que quer a cor de cada canto. Em vez de caçar no dump algo que não existe, o gerador passa a compor as peças a partir de dois tiles de chão.
+
+**Files:**
+- Create: `tools/assets/src/transition.ts`, `tools/assets/test/transition.test.ts`
+- Modify: `tools/assets/src/manifest.ts`, `tools/assets/src/build-atlases.ts`, `tools/assets/src/atlas.ts`, `tools/assets/test/manifest.test.ts`, `tools/assets/test/build-atlases.test.ts`, `tools/assets/README.md`
+
+**Interfaces:**
+- Consumes: `RgbaImage` (`compose.ts`), `TerrainInput`/`toTiledTileset` (Task 3), `expandedTileNames` (Task 1).
+- Produces: `CORNER_CODES: readonly string[]` (as 16 combinações de quatro letras `a`/`b`, na ordem superior-direito, inferior-direito, inferior-esquerdo, superior-esquerdo); `transitionMask(code: string, seed: number): Uint8Array` (32×32, 0 ou 255, puro e determinístico); `composeTransition(base: RgbaImage, over: RgbaImage, mask: Uint8Array): RgbaImage`; `transitionTiles(entry, images): { name: string; image: RgbaImage }[]`; `transitionTerrain(entry): TerrainInput`; `Manifest.transitions?: { name: string; from: string; to: string; softness?: number }[]`.
+
+O nome de cada peça é `<name>-<code>`, por exemplo `grama-terra-abba`. As duas peças puras (`aaaa` e `bbbb`) reaproveitam os tiles originais em vez de gerar cópia: o terreno aponta para `from` e `to` nesses dois casos.
+
+- [ ] **Step 1: Teste da máscara e da composição**
+
+`tools/assets/test/transition.test.ts`:
+```ts
+import { describe, expect, it } from 'vitest'
+import type { RgbaImage } from '../src/compose.js'
+import { composeTransition, CORNER_CODES, transitionMask } from '../src/transition.js'
+
+const solid = (value: number): RgbaImage => ({ width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(value) })
+const at = (mask: Uint8Array, x: number, y: number): number => mask[y * 32 + x]!
+
+describe('CORNER_CODES', () => {
+  it('cobre as dezesseis combinações de quatro cantos', () => {
+    expect(CORNER_CODES).toHaveLength(16)
+    expect(new Set(CORNER_CODES).size).toBe(16)
+    expect(CORNER_CODES).toContain('aaaa')
+    expect(CORNER_CODES).toContain('bbbb')
+    expect(CORNER_CODES.every((c) => /^[ab]{4}$/.test(c))).toBe(true)
+  })
+})
+
+describe('transitionMask', () => {
+  it('aaaa é toda transparente e bbbb é toda opaca', () => {
+    expect([...transitionMask('aaaa', 1)].every((v) => v === 0)).toBe(true)
+    expect([...transitionMask('bbbb', 1)].every((v) => v === 255)).toBe(true)
+  })
+  it('um canto b cobre o seu quadrante e não o oposto', () => {
+    // ordem: superior-direito, inferior-direito, inferior-esquerdo, superior-esquerdo
+    const topRight = transitionMask('baaa', 7)
+    expect(at(topRight, 28, 3)).toBe(255)
+    expect(at(topRight, 3, 28)).toBe(0)
+    const bottomLeft = transitionMask('aaba', 7)
+    expect(at(bottomLeft, 3, 28)).toBe(255)
+    expect(at(bottomLeft, 28, 3)).toBe(0)
+  })
+  it('é determinística: mesma semente, mesma máscara; sementes diferentes mudam a borda', () => {
+    expect([...transitionMask('abab', 3)]).toEqual([...transitionMask('abab', 3)])
+    expect([...transitionMask('abab', 3)]).not.toEqual([...transitionMask('abab', 4)])
+  })
+  it('a borda não é uma linha reta: existe pixel de cada lado da diagonal do quadrante', () => {
+    const mask = transitionMask('baaa', 11)
+    const edge = [...Array(32).keys()].flatMap((y) => [...Array(32).keys()].map((x) => ({ x, y, v: at(mask, x, y) })))
+    const mixedRows = new Set(edge.filter((p) => p.v === 255).map((p) => p.y))
+    expect(mixedRows.size).toBeGreaterThan(8) // o recorte acompanha a altura, não um corte único
+  })
+})
+
+describe('composeTransition', () => {
+  it('usa o tile de baixo onde a máscara é 0 e o de cima onde é 255', () => {
+    const mask = transitionMask('baaa', 5)
+    const out = composeTransition(solid(40), solid(200), mask)
+    expect([out.width, out.height]).toEqual([32, 32])
+    const pixel = (x: number, y: number): number => out.data[(y * 32 + x) * 4]!
+    expect(pixel(28, 3)).toBe(200)
+    expect(pixel(3, 28)).toBe(40)
+  })
+  it('não altera as imagens de entrada', () => {
+    const base = solid(40)
+    const over = solid(200)
+    const copy = new Uint8Array(base.data)
+    composeTransition(base, over, transitionMask('abab', 2))
+    expect([...base.data]).toEqual([...copy])
+    expect(over.data.every((v) => v === 200)).toBe(true)
+  })
+})
+```
+
+- [ ] **Step 2: Teste do manifesto e do build**
+
+Em `tools/assets/test/manifest.test.ts`:
+```ts
+describe('transições', () => {
+  it('aceita uma transição entre dois tiles existentes', () => {
+    const manifest = parseManifest({
+      version: 1,
+      species: [],
+      tiles: [{ name: 'grass', itemId: 100 }, { name: 'dirt', itemId: 100, patternX: 1 }],
+      transitions: [{ name: 'grama-terra', from: 'grass', to: 'dirt' }],
+    })
+    expect(validateManifest(manifest, catalog)).toEqual([])
+  })
+  it('recusa transição citando tile inexistente', () => {
+    const manifest = parseManifest({
+      version: 1,
+      species: [],
+      tiles: [{ name: 'grass', itemId: 100 }],
+      transitions: [{ name: 'grama-terra', from: 'grass', to: 'sumiu' }],
+    })
+    expect(validateManifest(manifest, catalog).join('\n')).toMatch(/transição grama-terra: tile "sumiu" não existe/)
+  })
+})
+```
+Em `tools/assets/test/build-atlases.test.ts`, um caso que usa o `setupFixtures()` existente:
+```ts
+it('uma transição gera as catorze peças mistas e o terreno correspondente', async () => {
+  const { dir, extractedDir } = await setupFixtures()
+  const manifestPath = join(dir, 'manifest.json')
+  await writeFile(manifestPath, JSON.stringify({
+    version: 1,
+    species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+    tiles: [{ name: 'grass', itemId: 100 }, { name: 'dirt', itemId: 100, patternX: 0 }],
+    transitions: [{ name: 'grama-terra', from: 'grass', to: 'dirt' }],
+  }))
+  const outDir = join(dir, 'atlas')
+  await buildAtlases({ extractedDir, manifestPath, outDir })
+  const sheet = JSON.parse(await readFile(join(outDir, 'tiles.json'), 'utf8')) as { frames: Record<string, unknown> }
+  const names = Object.keys(sheet.frames)
+  expect(names).toContain('grama-terra-abba')
+  expect(names.filter((n) => n.startsWith('grama-terra-'))).toHaveLength(14) // 16 menos as duas puras
+  const tileset = JSON.parse(await readFile(join(outDir, 'tiles.tsj'), 'utf8')) as { wangsets?: { name: string; wangtiles: unknown[] }[] }
+  const wangset = tileset.wangsets?.find((w) => w.name === 'grama-terra')
+  expect(wangset?.wangtiles).toHaveLength(16) // as catorze mistas mais as duas puras
+})
+```
+
+- [ ] **Step 3: Rodar e ver falhar**
+
+Run: `pnpm --filter @pokeidle/assets-tools test -- transition manifest build-atlases`
+
+- [ ] **Step 4: Implementar a máscara e a composição**
+
+`tools/assets/src/transition.ts`:
+```ts
+import type { RgbaImage } from './compose.js'
+
+const SIZE = 32
+const HALF = SIZE / 2
+const BYTES_PER_RGBA = 4
+const DEFAULT_SOFTNESS = 5
+
+/** Ordem dos cantos, igual à do Tiled num conjunto "corner". */
+const CORNER_ORDER = ['topRight', 'bottomRight', 'bottomLeft', 'topLeft'] as const
+
+export const CORNER_CODES: readonly string[] = Array.from({ length: 16 }, (_unused, i) =>
+  CORNER_ORDER.map((_c, bit) => ((i >> bit) & 1 ? 'b' : 'a')).join(''))
+
+/** PRNG determinístico (xorshift de 32 bits): mesma semente, mesmo ruído. */
+function noise(seed: number): () => number {
+  let state = (seed | 0) || 1
+  return () => {
+    state ^= state << 13
+    state ^= state >>> 17
+    state ^= state << 5
+    return ((state >>> 0) % 1000) / 1000
+  }
+}
+
+const cornerOf = (x: number, y: number): (typeof CORNER_ORDER)[number] =>
+  y < HALF ? (x < HALF ? 'topLeft' : 'topRight') : x < HALF ? 'bottomLeft' : 'bottomRight'
+
+/**
+ * Máscara do tile de cima: 255 onde o material `b` aparece. A borda entre quadrantes vizinhos
+ * ganha ruído determinístico, para o recorte não virar uma diagonal perfeita.
+ */
+export function transitionMask(code: string, seed: number, softness = DEFAULT_SOFTNESS): Uint8Array {
+  const isB = Object.fromEntries(CORNER_ORDER.map((corner, i) => [corner, code[i] === 'b'])) as Record<string, boolean>
+  const rand = noise(seed + code.length * 7919 + code.charCodeAt(0))
+  const mask = new Uint8Array(SIZE * SIZE)
+  for (let y = 0; y < SIZE; y++) {
+    for (let x = 0; x < SIZE; x++) {
+      const here = isB[cornerOf(x, y)] === true
+      const dx = Math.abs((x % HALF) - (x < HALF ? HALF - 1 : 0))
+      const dy = Math.abs((y % HALF) - (y < HALF ? HALF - 1 : 0))
+      const nearEdge = Math.min(dx, dy) < softness
+      const jitter = nearEdge && rand() < 0.35
+      mask[y * SIZE + x] = (jitter ? !here : here) ? 255 : 0
+    }
+  }
+  return mask
+}
+
+/** Desenha `over` sobre `base` onde a máscara manda; devolve imagem nova, sem tocar nas entradas. */
+export function composeTransition(base: RgbaImage, over: RgbaImage, mask: Uint8Array): RgbaImage {
+  const data = new Uint8Array(base.data)
+  for (let i = 0; i < mask.length; i++) {
+    if (mask[i] !== 255) continue
+    const at = i * BYTES_PER_RGBA
+    data.set(over.data.subarray(at, at + BYTES_PER_RGBA), at)
+  }
+  return { width: base.width, height: base.height, data }
+}
+```
+Atenção ao `jitter`: ele só pode inverter o pixel quando o vizinho do outro lado da borda tem material diferente; se os dois quadrantes vizinhos forem iguais, inverter cria sujeira no meio de uma área sólida. Garanta isso comparando com o quadrante espelhado antes de inverter, e escreva um teste que prove: em `bbbb` e `aaaa` a máscara continua uniforme mesmo com ruído (o teste do Step 1 já cobre).
+
+- [ ] **Step 5: Implementar manifesto, geração e terreno**
+
+`manifest.ts`:
+```ts
+const TransitionSchema = z.object({
+  name: nameSchema,
+  from: nameSchema,
+  to: nameSchema,
+  softness: z.number().int().min(1).max(12).optional(),
+}).strict()
+```
+`ManifestSchema` ganha `transitions: z.array(TransitionSchema).optional()`, e `validateManifest` acrescenta, para cada transição, `tile "<x>" não existe na lista de tiles` quando `from` ou `to` não estiver em `expandedTileNames`, com o prefixo `transição <name>: `.
+
+`transition.ts` ganha as duas funções que o build usa:
+```ts
+export interface TransitionEntry { readonly name: string; readonly from: string; readonly to: string; readonly softness?: number }
+
+/** As catorze peças mistas; as puras reaproveitam os tiles originais. */
+export function transitionTiles(entry: TransitionEntry, images: { from: RgbaImage; to: RgbaImage }): { name: string; image: RgbaImage }[] {
+  return CORNER_CODES.filter((code) => code !== 'aaaa' && code !== 'bbbb').map((code, i) => ({
+    name: `${entry.name}-${code}`,
+    image: composeTransition(images.from, images.to, transitionMask(code, i + 1, entry.softness)),
+  }))
+}
+
+/** Terreno de duas cores apontando cada código de canto para a peça correspondente. */
+export function transitionTerrain(entry: TransitionEntry): TerrainInput {
+  const colors = [entry.from, entry.to]
+  const tileFor = (code: string): string => (code === 'aaaa' ? entry.from : code === 'bbbb' ? entry.to : `${entry.name}-${code}`)
+  return {
+    name: entry.name,
+    colors,
+    tiles: CORNER_CODES.map((code) => ({
+      tile: tileFor(code),
+      corners: [0, 1, 2, 3].map((i) => (code[i] === 'b' ? entry.to : entry.from)) as [string, string, string, string],
+    })),
+  }
+}
+```
+(importe `TerrainInput` de `./atlas.js`.)
+
+`build-atlases.ts`: depois de montar os frames de tiles, gera as peças de cada transição a partir dos frames já decodificados (busque por nome no array), acrescenta ao final da lista, e passa `[...(manifest.terrains ?? []), ...(manifest.transitions ?? []).map(transitionTerrain)]` para `toTiledTileset`. Se `from` ou `to` não estiver entre os frames, lance `transição <name>: tile "<x>" não está no atlas`.
+
+- [ ] **Step 6: README**
+
+Na seção "Desenhar um mapa", explique: declarar `transitions` no manifesto gera as peças de borda e já deixa o terreno pronto no Tiled; o autor do mapa pinta com o pincel de terreno e não precisa escolher peça de borda na mão.
+
+- [ ] **Step 7: Rodar**
+
+Run: `pnpm --filter @pokeidle/assets-tools test` e `pnpm --filter @pokeidle/assets-tools typecheck`.
+
+- [ ] **Step 8: Commit**
+
+```bash
+git add tools/assets/src tools/assets/test tools/assets/README.md
+git commit -m "feat(assets): peças de transição geradas a partir de dois tiles, com terreno pronto"
+```

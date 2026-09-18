@@ -11,8 +11,8 @@ pnpm assets inspect <spr> <dat> [--version 860|854]
 pnpm assets extract <spr> <dat> [--out assets/extracted] [--version 860|854]
 pnpm assets contact-sheet [--extracted assets/extracted] [--all-outfits] [--all-items] [--tileset assets/atlas]
 pnpm assets build [--extracted assets/extracted] [--manifest tools/assets/manifest.json] [--out assets/atlas]
-pnpm assets map-import tools/assets/maps/route-1.tmj --id rota-1 --name "Rota 1" [--tileset assets/atlas/tiles.tsj] [--manifest tools/assets/manifest.json] [--out packages/shared/data/hunts]
-pnpm assets map-preview packages/shared/data/hunts/rota-1.json [--atlas assets/atlas] [--out preview.png] [--blocking]
+pnpm assets map-import tools/assets/maps/route-1.tmj --id route-1 --name "Rota 1" [--tileset assets/atlas/tiles.tsj] [--manifest tools/assets/manifest.json] [--out packages/shared/data/hunts]
+pnpm assets map-preview packages/shared/data/hunts/route-1.json [--atlas assets/atlas] [--out preview.png] [--blocking]
 ```
 
 - `inspect` resume assinaturas, contagens e avisos sem escrever nada.
@@ -52,7 +52,21 @@ Curadoria manual — veja `manifest.example.json`. Campos:
 {
   "version": 1,
   "species": [{ "id": 1, "name": "bulbasaur", "outfitId": 128, "attackOutfitId": 129 }],
-  "tiles": [{ "name": "grass", "itemId": 4526, "patternX": 0, "patternY": 0 }]
+  "tiles": [
+    { "name": "grass", "itemId": 4526, "patternX": 0, "patternY": 0 },
+    { "name": "pokecenter", "itemId": 4530, "slice": { "cols": 2, "rows": 2 } }
+  ],
+  "terrains": [
+    {
+      "name": "grama-terra",
+      "colors": ["grama", "terra"],
+      "tiles": [
+        { "tile": "grass", "corners": ["grama", "grama", "grama", "grama"] },
+        { "tile": "dirt", "corners": ["terra", "terra", "terra", "terra"] }
+      ]
+    }
+  ],
+  "transitions": [{ "name": "grama-terra", "from": "grass", "to": "dirt", "softness": 5 }]
 }
 ```
 
@@ -60,10 +74,21 @@ Regras validadas (`parseManifest` + `validateManifest`):
 
 - `name` em kebab-case ascii (`^[a-z0-9-]+$`) e **nunca só dígitos** — um nome numérico
   seria reordenado pelas chaves de objeto do JS e quebraria os ids locais do tileset.
-- nomes e ids de espécie únicos; nomes de tile únicos.
+- nomes e ids de espécie únicos; nomes de tile únicos (incluindo os nomes que as peças
+  mistas de `transitions` geram, ver abaixo).
 - `outfitId` e `attackOutfitId` (opcional) precisam existir no catálogo e ter 4 direções.
-- `itemId` precisa existir, ser **1x1** (a célula do tileset é de 32px) e o par
-  `patternX`/`patternY` precisa caber na faixa do item.
+- `itemId` precisa existir e o par `patternX`/`patternY` precisa caber na faixa do item; um
+  item maior que **1x1** (a célula do tileset é de 32px) precisa da chave `slice` batendo com
+  o tamanho do item — veja "Fatiar tiles grandes" abaixo.
+- `terrains` (opcional): cada entrada tem `name`, `colors` (as cores do pincel de terreno no
+  Tiled) e `tiles` — cada `tiles[].tile` referencia um nome de tile já declarado, e
+  `tiles[].corners` são as quatro cores dos cantos, nessa ordem: **superior-direito,
+  inferior-direito, inferior-esquerdo, superior-esquerdo**. Toda cor citada em `corners`
+  precisa estar em `colors`.
+- `transitions` (opcional): cada entrada tem `name`, `from` e `to` (dois nomes de tile já
+  declarados, diferentes entre si) e `softness` opcional (1 a 12; controla o ruído da borda
+  gerada — quanto maior, mais irregular). Gera as catorze peças mistas e o terreno
+  correspondente automaticamente — veja o passo 4 de "Desenhar um mapa" abaixo.
 - chaves extras no topo são ignoradas (é assim que o `_leiame` do exemplo sobrevive).
 
 ## Saída de `assets/atlas`
@@ -110,7 +135,11 @@ Fluxo completo de autoria, do atlas até a prévia:
 - o ponto de partida (`spawnPoint`) cai num tile bloqueado;
 - o Centro Pokémon (`pokecenter`) cai num tile bloqueado;
 - o Centro Pokémon está a menos de um tile da borda do mapa;
-- algum `spawn` não tem nenhum tile livre dentro do seu raio.
+- o Centro Pokémon (ou algum de seus quatro vizinhos ortogonais) não é alcançável a pé a
+  partir do ponto de partida — mesmo que o próprio tile esteja livre, um Centro murado
+  quebraria a hunt no jogo (o motor busca caminho com A* e desiste com `no-route`);
+- algum `spawn` não tem nenhum tile livre dentro do seu raio, ou tem um tile livre mas
+  inalcançável a pé (um bolsão fechado nunca seria alcançado pelos selvagens).
 
 ### Fatiar tiles grandes
 
@@ -169,5 +198,5 @@ pnpm --filter @pokeidle/assets-tools typecheck
 ```
 
 Módulos de `src/` são puros, exceto `extract.ts`, `build-atlases.ts`, o writer de
-`contact-sheet.ts`, `json-file.ts`, `cli.ts` e `main.ts` (o único com efeito colateral
-na importação).
+`contact-sheet.ts`, `json-file.ts`, `cli.ts`, `main.ts` (o único com efeito colateral
+na importação) e `map-preview.ts` (`loadTilesAtlas` lê o atlas do disco).

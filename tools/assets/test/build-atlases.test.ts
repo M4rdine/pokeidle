@@ -19,6 +19,7 @@ const catalog: Catalog = {
   items: [
     { id: 100, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false },
     { id: 101, width: 2, height: 2, patternX: 1, patternY: 1, phases: 1, isGround: false, isBlocking: true },
+    { id: 102, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false },
   ],
 }
 
@@ -125,21 +126,42 @@ describe('buildAtlases', () => {
   it('uma transição gera as catorze peças mistas e o terreno correspondente', async () => {
     const { dir, extractedDir } = await setupFixtures()
     const manifestPath = join(dir, 'manifest.json')
+    // grass (item 100) e dirt (item 102) são PNGs de cores distintas: só assim a peça composta
+    // "baaa" prova que ela de fato mistura os dois materiais, em vez de colar a mesma imagem
+    // duas vezes (o que passaria mesmo se composeTransition ignorasse um dos dois tiles).
+    const GRASS_COLOR = 90
+    const DIRT_COLOR = 210
+    await writePng(itemFramePath(extractedDir, 102, 0, 0), 32, 32, DIRT_COLOR)
     await writeFile(manifestPath, JSON.stringify({
       version: 1,
       species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
-      tiles: [{ name: 'grass', itemId: 100 }, { name: 'dirt', itemId: 100, patternX: 0 }],
+      tiles: [{ name: 'grass', itemId: 100 }, { name: 'dirt', itemId: 102 }],
       transitions: [{ name: 'grama-terra', from: 'grass', to: 'dirt' }],
     }))
     const outDir = join(dir, 'atlas')
     await buildAtlases({ extractedDir, manifestPath, outDir })
-    const sheet = JSON.parse(await readFile(join(outDir, 'tiles.json'), 'utf8')) as { frames: Record<string, unknown> }
+    const sheet = JSON.parse(await readFile(join(outDir, 'tiles.json'), 'utf8')) as {
+      frames: Record<string, { frame: { x: number; y: number; w: number; h: number } }>
+    }
     const names = Object.keys(sheet.frames)
     expect(names).toContain('grama-terra-abba')
     expect(names.filter((n) => n.startsWith('grama-terra-'))).toHaveLength(14) // 16 menos as duas puras
     const tileset = JSON.parse(await readFile(join(outDir, 'tiles.tsj'), 'utf8')) as { wangsets?: { name: string; wangtiles: unknown[] }[] }
     const wangset = tileset.wangsets?.find((w) => w.name === 'grama-terra')
     expect(wangset?.wangtiles).toHaveLength(16) // as catorze mistas mais as duas puras
+
+    // "baaa": só o quadrante superior-direito é o material "b" (dirt); os outros três são "a" (grass).
+    // Pontos bem no interior de cada quadrante (longe das bordas com ruído) provam a mistura peça a peça.
+    const bordersPiece = sheet.frames['grama-terra-baaa']!.frame
+    const tiles = decodePng(await readFile(join(outDir, 'tiles.png')))
+    const pixelAt = (dx: number, dy: number): number => {
+      const i = ((bordersPiece.y + dy) * tiles.width + bordersPiece.x + dx) * 4
+      return tiles.data[i]!
+    }
+    expect(pixelAt(28, 3)).toBe(DIRT_COLOR) // superior-direito ("b")
+    expect(pixelAt(28, 28)).toBe(GRASS_COLOR) // inferior-direito ("a")
+    expect(pixelAt(3, 28)).toBe(GRASS_COLOR) // inferior-esquerdo ("a")
+    expect(pixelAt(3, 3)).toBe(GRASS_COLOR) // superior-esquerdo ("a")
   })
 
   it('falha listando problemas de validação', async () => {

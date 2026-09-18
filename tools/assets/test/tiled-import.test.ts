@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { parseHuntMap } from '@pokeidle/shared'
-import type { TiledTileset } from '../src/atlas.js'
+import { packGrid, toTiledTileset, type TerrainInput, type TiledTileset } from '../src/atlas.js'
 import { importTiledMap, parseTiledTileset } from '../src/tiled-import.js'
 
 const tileset: TiledTileset = {
@@ -260,11 +260,47 @@ describe('validações do mapa', () => {
     expect(() => importTiledMap(map, tileset, meta)).toThrow(/Centro Pokémon.*borda/)
   })
 
+  it('trata Centro fora dos limites do mapa como bloqueado, sem vazar dados da próxima linha', () => {
+    // pokecenter na coluna 3 de um mapa 3x3 (colunas válidas 0..2): sem o limite de x em
+    // blockedAt, `y*width+x` cairia na linha seguinte (aqui livre) e o Centro passaria como
+    // "não bloqueado" por acidente, em vez de ser recusado por estar fora do grid.
+    const map = tiledMapWith({ width: 3, height: 3, spawnPoint: { x: 0, y: 0 }, pokecenter: { x: 3, y: 1 } })
+    expect(() => importTiledMap(map, tileset, meta)).toThrow(/Centro Pokémon em \(3, 1\) está num tile bloqueado/)
+  })
+
   it('aceita um mapa correto e devolve as camadas', () => {
     const map = tiledMapWith({})
     const hunt = importTiledMap(map, tileset, meta)
     expect(hunt.layers.ground).toHaveLength(hunt.width * hunt.height)
     expect(hunt.spawns.length).toBeGreaterThan(0)
+  })
+
+  it('recusa Centro Pokémon murado, mesmo com o próprio tile livre (inalcançável por A*)', () => {
+    // o tile do Centro (2,2) fica livre, mas os quatro vizinhos ortogonais estão bloqueados:
+    // nenhum caminho ortogonal alcança o Centro nem chega adjacente a ele.
+    const map = tiledMapWith({
+      width: 5,
+      height: 5,
+      spawnPoint: { x: 0, y: 0 },
+      pokecenter: { x: 2, y: 2 },
+      blockingAt: [{ x: 1, y: 2 }, { x: 3, y: 2 }, { x: 2, y: 1 }, { x: 2, y: 3 }],
+      spawnAt: { x: 0, y: 1, radius: 1 },
+    })
+    expect(() => importTiledMap(map, tileset, meta)).toThrow(/Centro Pokémon em \(2, 2\) não é alcançável a partir do ponto de partida/)
+  })
+
+  it('recusa spawn num bolsão fechado, mesmo com tile livre dentro do raio', () => {
+    // (4,4) é o canto do mapa: bloquear os dois únicos vizinhos ortogonais dentro dos limites
+    // isola essa tile completamente, mesmo que ela continue livre.
+    const map = tiledMapWith({
+      width: 5,
+      height: 5,
+      spawnPoint: { x: 0, y: 0 },
+      pokecenter: { x: 2, y: 2 },
+      blockingAt: [{ x: 3, y: 4 }, { x: 4, y: 3 }],
+      spawnAt: { x: 4, y: 4, radius: 0 },
+    })
+    expect(() => importTiledMap(map, tileset, meta)).toThrow(/spawn de rattata em \(4, 4\) não tem tile livre alcançável no raio 0/)
   })
 })
 
@@ -275,6 +311,38 @@ describe('parseTiledTileset', () => {
 
   it('rejeita objeto que não é um tileset do Tiled', () => {
     expect(() => parseTiledTileset({ type: 'map', tiles: [] })).toThrow(/tileset inválido/)
+  })
+
+  it('faz a ida e volta com o tileset gerado por toTiledTileset, com terreno, preservando os tiles', () => {
+    const packed = packGrid([
+      { name: 'grass', image: { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(10) } },
+      { name: 'dirt', image: { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(20) } },
+    ], 'tiles.png')
+    const terrain: TerrainInput = {
+      name: 'grama-terra',
+      colors: ['grama', 'terra'],
+      tiles: [
+        { tile: 'grass', corners: ['grama', 'grama', 'grama', 'grama'] },
+        { tile: 'dirt', corners: ['terra', 'terra', 'terra', 'terra'] },
+      ],
+    }
+    const generated = toTiledTileset(packed.sheet, 'tibia-tiles', ['grass', 'dirt'], [terrain])
+
+    // simula a volta pelo disco: o JSON escrito pelo build vira um `unknown` lido de volta pelo importador.
+    const roundTripped = parseTiledTileset(JSON.parse(JSON.stringify(generated)))
+
+    expect(roundTripped.tiles).toEqual(generated.tiles)
+    expect(roundTripped.tilecount).toBe(2)
+  })
+
+  it('descarta wangsets presentes sem erro', () => {
+    const withWangsets = {
+      ...tileset,
+      wangsets: [{ name: 'grama-terra', type: 'corner', tile: -1, colors: [], wangtiles: [] }],
+    }
+    const parsed = parseTiledTileset(withWangsets)
+    expect(parsed).not.toHaveProperty('wangsets')
+    expect(parsed.tiles).toEqual(tileset.tiles)
   })
 })
 

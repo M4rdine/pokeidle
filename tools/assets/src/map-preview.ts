@@ -18,6 +18,11 @@ export async function loadTilesAtlas(dir: string): Promise<TilesAtlas> {
 function blitTile(target: RgbaImage, atlas: TilesAtlas, name: string, destX: number, destY: number): void {
   const frame = atlas.sheet.frames[name]?.frame
   if (!frame) throw new Error(`tile "${name}" não está no atlas`)
+  if (destX + frame.w > target.width || destY + frame.h > target.height) {
+    throw new Error(
+      `blitTile: tile "${name}" (${frame.w}x${frame.h}) não cabe no destino em (${destX}, ${destY}) de ${target.width}x${target.height}`,
+    )
+  }
   for (let y = 0; y < frame.h; y++) {
     for (let x = 0; x < frame.w; x++) {
       const from = ((frame.y + y) * atlas.image.width + frame.x + x) * BYTES_PER_RGBA

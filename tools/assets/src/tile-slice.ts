@@ -7,7 +7,9 @@ export const sliceName = (base: string, col: number, row: number): string => `${
 
 /** Corta a imagem em `cols × rows` peças iguais, na ordem de leitura. */
 export function sliceImage(image: RgbaImage, cols: number, rows: number): RgbaImage[] {
-  if (cols === 1 && rows === 1) return [image]
+  // devolve uma cópia mesmo no caso trivial, para o contrato ficar uniforme com os outros caminhos
+  // (que sempre alocam buffers novos) e ninguém acabar mutando a imagem original sem querer.
+  if (cols === 1 && rows === 1) return [{ width: image.width, height: image.height, data: new Uint8Array(image.data) }]
   if (image.width % cols !== 0 || image.height % rows !== 0) {
     throw new Error(`corte ${cols}x${rows} não divide a imagem ${image.width}x${image.height}`)
   }

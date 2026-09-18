@@ -144,7 +144,16 @@ type Point = { x: number; y: number }
 
 const MIN_DISTANCE_FROM_EDGE = 1
 
-function blockedAt(blocking: readonly boolean[], width: number, x: number, y: number): boolean {
+/** Deslocamentos ortogonais: o mesmo movimento que o A* do motor usa para caminhar no grid. */
+const ORTHOGONAL_OFFSETS: readonly Point[] = [
+  { x: 1, y: 0 },
+  { x: -1, y: 0 },
+  { x: 0, y: 1 },
+  { x: 0, y: -1 },
+]
+
+function blockedAt(blocking: readonly boolean[], width: number, height: number, x: number, y: number): boolean {
+  if (x < 0 || y < 0 || x >= width || y >= height) return true
   return blocking[y * width + x] ?? true
 }
 
@@ -152,7 +161,43 @@ function blockedAt(blocking: readonly boolean[], width: number, x: number, y: nu
 function hasFreeTile(blocking: readonly boolean[], width: number, height: number, spawn: HuntSpawn): boolean {
   for (let y = spawn.y - spawn.radius; y <= spawn.y + spawn.radius; y++) {
     for (let x = spawn.x - spawn.radius; x <= spawn.x + spawn.radius; x++) {
-      if (x >= 0 && y >= 0 && x < width && y < height && !blockedAt(blocking, width, x, y)) return true
+      if (!blockedAt(blocking, width, height, x, y)) return true
+    }
+  }
+  return false
+}
+
+/** BFS a partir de `start` sobre tiles não bloqueados (só movimento ortogonal, como o A* do motor). */
+function reachableTiles(blocking: readonly boolean[], width: number, height: number, start: Point): Set<number> {
+  if (blockedAt(blocking, width, height, start.x, start.y)) return new Set()
+  const visited = new Set<number>([start.y * width + start.x])
+  const queue: Point[] = [start]
+  let head = 0
+  while (head < queue.length) {
+    const current = queue[head++]!
+    for (const offset of ORTHOGONAL_OFFSETS) {
+      const next = { x: current.x + offset.x, y: current.y + offset.y }
+      if (blockedAt(blocking, width, height, next.x, next.y)) continue
+      const index = next.y * width + next.x
+      if (visited.has(index)) continue
+      visited.add(index)
+      queue.push(next)
+    }
+  }
+  return visited
+}
+
+/** O motor considera o Centro alcançado quando chega nele ou em qualquer vizinho ortogonal. */
+function isPokecenterReachable(reachable: ReadonlySet<number>, width: number, height: number, pokecenter: Point): boolean {
+  const candidates = [pokecenter, ...ORTHOGONAL_OFFSETS.map((o) => ({ x: pokecenter.x + o.x, y: pokecenter.y + o.y }))]
+  return candidates.some((p) => p.x >= 0 && p.y >= 0 && p.x < width && p.y < height && reachable.has(p.y * width + p.x))
+}
+
+/** Algum tile alcançável dentro do quadrado de lado `2 * radius + 1` centrado no spawn. */
+function hasReachableTile(reachable: ReadonlySet<number>, width: number, height: number, spawn: HuntSpawn): boolean {
+  for (let y = spawn.y - spawn.radius; y <= spawn.y + spawn.radius; y++) {
+    for (let x = spawn.x - spawn.radius; x <= spawn.x + spawn.radius; x++) {
+      if (x >= 0 && y >= 0 && x < width && y < height && reachable.has(y * width + x)) return true
     }
   }
   return false
@@ -165,18 +210,26 @@ function checkMap(
   spawns: readonly HuntSpawn[],
 ): string[] {
   const problems: string[] = []
-  if (blockedAt(blocking, map.width, points.spawnPoint.x, points.spawnPoint.y)) {
+  if (blockedAt(blocking, map.width, map.height, points.spawnPoint.x, points.spawnPoint.y)) {
     problems.push(`ponto de partida em (${points.spawnPoint.x}, ${points.spawnPoint.y}) está num tile bloqueado`)
   }
-  if (blockedAt(blocking, map.width, points.pokecenter.x, points.pokecenter.y)) {
+  if (blockedAt(blocking, map.width, map.height, points.pokecenter.x, points.pokecenter.y)) {
     problems.push(`Centro Pokémon em (${points.pokecenter.x}, ${points.pokecenter.y}) está num tile bloqueado`)
   }
   const { x, y } = points.pokecenter
   const nearEdge = x < MIN_DISTANCE_FROM_EDGE || y < MIN_DISTANCE_FROM_EDGE || x >= map.width - MIN_DISTANCE_FROM_EDGE || y >= map.height - MIN_DISTANCE_FROM_EDGE
   if (nearEdge) problems.push(`Centro Pokémon em (${x}, ${y}) está na borda do mapa; deixe ao menos um tile de folga`)
+
+  const reachable = reachableTiles(blocking, map.width, map.height, points.spawnPoint)
+  if (!isPokecenterReachable(reachable, map.width, map.height, points.pokecenter)) {
+    problems.push(`Centro Pokémon em (${x}, ${y}) não é alcançável a partir do ponto de partida`)
+  }
+
   for (const spawn of spawns) {
     if (!hasFreeTile(blocking, map.width, map.height, spawn)) {
       problems.push(`spawn de ${spawn.speciesName} em (${spawn.x}, ${spawn.y}) está sem tile livre no raio ${spawn.radius}`)
+    } else if (!hasReachableTile(reachable, map.width, map.height, spawn)) {
+      problems.push(`spawn de ${spawn.speciesName} em (${spawn.x}, ${spawn.y}) não tem tile livre alcançável no raio ${spawn.radius}`)
     }
   }
   return problems

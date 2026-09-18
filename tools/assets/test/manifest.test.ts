@@ -198,6 +198,19 @@ describe('transições', () => {
     })
     expect(validateManifest(manifest, catalog).join('\n')).toMatch(/transição grama-grama: from e to são o mesmo tile/)
   })
+  it('recusa tile cujo nome colide com uma peça mista gerada pela transição', () => {
+    const manifest = parseManifest({
+      version: 1,
+      species: [],
+      tiles: [
+        { name: 'grass', itemId: 100 },
+        { name: 'dirt', itemId: 100, patternX: 1 },
+        { name: 'grama-terra-baaa', itemId: 100, patternX: 1 }, // colide com a peça mista "baaa" gerada pela transição
+      ],
+      transitions: [{ name: 'grama-terra', from: 'grass', to: 'dirt' }],
+    })
+    expect(validateManifest(manifest, catalog).join('\n')).toMatch(/nome de tile duplicado: grama-terra-baaa/)
+  })
 })
 
 describe('loadManifest', () => {

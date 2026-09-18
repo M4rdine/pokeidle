@@ -79,6 +79,12 @@ export function transitionMask(code: string, seed: number, softness = DEFAULT_SO
 
 /** Desenha `over` sobre `base` onde a máscara manda; devolve imagem nova, sem tocar nas entradas. */
 export function composeTransition(base: RgbaImage, over: RgbaImage, mask: Uint8Array): RgbaImage {
+  if (base.width !== over.width || base.height !== over.height) {
+    throw new Error(`composeTransition: tiles de tamanhos diferentes (${base.width}x${base.height} vs ${over.width}x${over.height})`)
+  }
+  if (mask.length !== base.width * base.height) {
+    throw new Error(`composeTransition: máscara com ${mask.length} pixels não bate com o tile ${base.width}x${base.height}`)
+  }
   const data = new Uint8Array(base.data)
   for (let i = 0; i < mask.length; i++) {
     if (mask[i] !== 255) continue

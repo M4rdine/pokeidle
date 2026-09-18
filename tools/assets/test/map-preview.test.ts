@@ -5,6 +5,7 @@ import type { RgbaImage } from '../src/compose.js'
 import { renderMapPreview } from '../src/map-preview.js'
 
 const solid = (value: number): RgbaImage => ({ width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(value) })
+const solidSized = (size: number, value: number): RgbaImage => ({ width: size, height: size, data: new Uint8Array(size * size * 4).fill(value) })
 const frames: AtlasFrame[] = [
   { name: 'grass', image: solid(60) },
   { name: 'tree', image: solid(120) },
@@ -44,6 +45,20 @@ describe('renderMapPreview', () => {
   it('tile que não está no atlas vira erro com o nome dele', () => {
     const broken = { ...map, layers: { ...map.layers, ground: ['grass', 'sumiu'] } }
     expect(() => renderMapPreview(broken as HuntMap, atlas)).toThrow(/sumiu/)
+  })
+  it('tile maior que o espaço de destino vira erro claro em vez de estourar o buffer', () => {
+    // um frame de atlas maior que o tileSize do mapa (40×40 numa grade de 32px) não cabe na
+    // célula de destino: sem a checagem, blitTile escreveria fora do buffer do target.
+    const oversizedFrames: AtlasFrame[] = [{ name: 'grass', image: solidSized(40, 40) }]
+    const oversizedPacked = packGrid(oversizedFrames, 'tiles.png')
+    const oversizedAtlas = { sheet: oversizedPacked.sheet, image: oversizedPacked.image }
+    const tinyMap: HuntMap = {
+      id: 'tiny', name: 'Tiny', width: 1, height: 1, tileSize: 32,
+      layers: { ground: ['grass'], detail: [null], blocking: [false] },
+      spawnPoint: { x: 0, y: 0 }, pokecenter: { x: 0, y: 0 },
+      spawns: [{ speciesName: 'zubat', minLevel: 1, maxLevel: 1, x: 0, y: 0, radius: 0, count: 1, respawnSeconds: 10 }],
+    }
+    expect(() => renderMapPreview(tinyMap, oversizedAtlas)).toThrow(/tile "grass" \(40x40\) não cabe no destino/)
   })
   it('pixel transparente do detalhe deixa o chão aparecer embaixo', () => {
     const halfTransparent: RgbaImage = { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(120) }

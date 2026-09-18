@@ -86,4 +86,15 @@ describe('composeTransition', () => {
     expect([...base.data]).toEqual([...copy])
     expect(over.data.every((v) => v === 200)).toBe(true)
   })
+  it('recusa tiles de tamanhos diferentes', () => {
+    const base = solid(40)
+    const over: RgbaImage = { width: 16, height: 16, data: new Uint8Array(16 * 16 * 4).fill(200) }
+    expect(() => composeTransition(base, over, transitionMask('baaa', 1))).toThrow(/tamanhos diferentes/)
+  })
+  it('recusa máscara de tamanho incompatível com o tile', () => {
+    const base = solid(40)
+    const over = solid(200)
+    const wrongMask = new Uint8Array(10)
+    expect(() => composeTransition(base, over, wrongMask)).toThrow(/máscara com 10 pixels/)
+  })
 })

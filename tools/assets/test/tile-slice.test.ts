@@ -30,9 +30,12 @@ describe('sliceImage', () => {
     expect(pieces.map((p) => [p.width, p.height])).toEqual([[32, 32], [32, 32], [32, 32], [32, 32]])
     expect(pieces.map(firstPixel)).toEqual([10, 20, 30, 40])
   })
-  it('1×1 devolve a imagem inteira', () => {
+  it('1×1 devolve a imagem inteira, mas como uma cópia nova (contrato igual aos outros cortes)', () => {
     const img = quadrants()
-    expect(sliceImage(img, 1, 1)).toEqual([img])
+    const [piece] = sliceImage(img, 1, 1)
+    expect(piece).toEqual(img)
+    expect(piece).not.toBe(img)
+    expect(piece?.data).not.toBe(img.data)
   })
   it('recusa corte que não divide a imagem', () => {
     expect(() => sliceImage(quadrants(), 3, 2)).toThrow(/não divide/)

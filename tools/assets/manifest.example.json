@@ -13,6 +13,18 @@
     { "name": "dirt", "itemId": 0 },
     { "name": "stone-floor", "itemId": 0 },
     { "name": "mountain", "itemId": 0 },
-    { "name": "water", "itemId": 0 }
-  ]
+    { "name": "water", "itemId": 0 },
+    { "name": "pokecenter", "itemId": 0, "slice": { "cols": 2, "rows": 2 } }
+  ],
+  "terrains": [
+    {
+      "name": "grama-terra",
+      "colors": ["grama", "terra"],
+      "tiles": [
+        { "tile": "grass", "corners": ["grama", "grama", "grama", "grama"] },
+        { "tile": "dirt", "corners": ["terra", "terra", "terra", "terra"] }
+      ]
+    }
+  ],
+  "transitions": [{ "name": "grama-terra", "from": "grass", "to": "dirt", "softness": 5 }]
 }

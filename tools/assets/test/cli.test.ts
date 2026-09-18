@@ -113,6 +113,25 @@ describe('program', () => {
     expect(stdout.lines()).toMatch(/outfits multi-tile: 1/)
   })
 
+  it('contact-sheet --tileset desenha tileset.html a partir do tiles.json do build', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-contact-'))
+    const packed = packGrid([
+      { name: 'grass', image: { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(60) } },
+      { name: 'dirt', image: { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(90) } },
+    ], 'tiles.png')
+    await writeFile(join(dir, 'tiles.json'), JSON.stringify(packed.sheet))
+
+    const stdout = captureStdout()
+    await program.parseAsync(['node', 'cli', 'contact-sheet', '--tileset', dir])
+
+    const target = join(dir, 'tileset.html')
+    const html = await readFile(target, 'utf8')
+    expect(html).toContain('grass')
+    expect(html).toContain('dirt')
+    expect(html.match(/<figure/g)).toHaveLength(2)
+    expect(stdout.lines()).toMatch(/folha do tileset em .*tileset\.html \(2 tiles\)/)
+  })
+
   it('map-import grava a hunt na pasta de saída', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'pokeidle-cli-'))
     const tiledPath = join(dir, 'route.tmj')

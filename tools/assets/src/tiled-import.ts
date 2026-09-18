@@ -203,36 +203,69 @@ function hasReachableTile(reachable: ReadonlySet<number>, width: number, height:
   return false
 }
 
+function outsideMap(width: number, height: number, p: Point): boolean {
+  return p.x < 0 || p.y < 0 || p.x >= width || p.y >= height
+}
+
+/** Ponto obrigatório do mapa: estar fora do grid e estar num tile bloqueado são causas distintas. */
+function checkPoint(
+  map: { width: number; height: number },
+  blocking: readonly boolean[],
+  point: Point,
+  label: string,
+): { problems: string[]; usable: boolean } {
+  const where = `${label} em (${point.x}, ${point.y})`
+  if (outsideMap(map.width, map.height, point)) {
+    return { problems: [`${where} está fora do mapa ${map.width}x${map.height}`], usable: false }
+  }
+  if (blockedAt(blocking, map.width, map.height, point.x, point.y)) {
+    return { problems: [`${where} está num tile bloqueado`], usable: false }
+  }
+  return { problems: [], usable: true }
+}
+
+/** Sem conjunto alcançável (ponto de partida inválido), só a folga de tile livre é checada. */
+function checkSpawns(
+  map: { width: number; height: number },
+  blocking: readonly boolean[],
+  spawns: readonly HuntSpawn[],
+  reachable: ReadonlySet<number> | undefined,
+): string[] {
+  const problems: string[] = []
+  for (const spawn of spawns) {
+    const where = `spawn de ${spawn.speciesName} em (${spawn.x}, ${spawn.y})`
+    if (!hasFreeTile(blocking, map.width, map.height, spawn)) {
+      problems.push(`${where} está sem tile livre no raio ${spawn.radius}`)
+    } else if (reachable && !hasReachableTile(reachable, map.width, map.height, spawn)) {
+      problems.push(`${where} não tem tile livre alcançável no raio ${spawn.radius}`)
+    }
+  }
+  return problems
+}
+
 function checkMap(
   map: { width: number; height: number },
   blocking: readonly boolean[],
   points: { spawnPoint: Point; pokecenter: Point },
   spawns: readonly HuntSpawn[],
 ): string[] {
-  const problems: string[] = []
-  if (blockedAt(blocking, map.width, map.height, points.spawnPoint.x, points.spawnPoint.y)) {
-    problems.push(`ponto de partida em (${points.spawnPoint.x}, ${points.spawnPoint.y}) está num tile bloqueado`)
-  }
-  if (blockedAt(blocking, map.width, map.height, points.pokecenter.x, points.pokecenter.y)) {
-    problems.push(`Centro Pokémon em (${points.pokecenter.x}, ${points.pokecenter.y}) está num tile bloqueado`)
-  }
-  const { x, y } = points.pokecenter
-  const nearEdge = x < MIN_DISTANCE_FROM_EDGE || y < MIN_DISTANCE_FROM_EDGE || x >= map.width - MIN_DISTANCE_FROM_EDGE || y >= map.height - MIN_DISTANCE_FROM_EDGE
-  if (nearEdge) problems.push(`Centro Pokémon em (${x}, ${y}) está na borda do mapa; deixe ao menos um tile de folga`)
+  const start = checkPoint(map, blocking, points.spawnPoint, 'ponto de partida')
+  const center = checkPoint(map, blocking, points.pokecenter, 'Centro Pokémon')
+  const problems = [...start.problems, ...center.problems]
 
-  const reachable = reachableTiles(blocking, map.width, map.height, points.spawnPoint)
-  if (!isPokecenterReachable(reachable, map.width, map.height, points.pokecenter)) {
+  const { x, y } = points.pokecenter
+  if (!outsideMap(map.width, map.height, points.pokecenter)) {
+    const nearEdge = x < MIN_DISTANCE_FROM_EDGE || y < MIN_DISTANCE_FROM_EDGE || x >= map.width - MIN_DISTANCE_FROM_EDGE || y >= map.height - MIN_DISTANCE_FROM_EDGE
+    if (nearEdge) problems.push(`Centro Pokémon em (${x}, ${y}) está na borda do mapa; deixe ao menos um tile de folga`)
+  }
+
+  // Sem ponto de partida utilizável não há de onde caminhar: as checagens derivadas
+  // repetiriam a mesma causa uma vez por spawn, escondendo o erro de verdade.
+  const reachable = start.usable ? reachableTiles(blocking, map.width, map.height, points.spawnPoint) : undefined
+  if (reachable && center.usable && !isPokecenterReachable(reachable, map.width, map.height, points.pokecenter)) {
     problems.push(`Centro Pokémon em (${x}, ${y}) não é alcançável a partir do ponto de partida`)
   }
-
-  for (const spawn of spawns) {
-    if (!hasFreeTile(blocking, map.width, map.height, spawn)) {
-      problems.push(`spawn de ${spawn.speciesName} em (${spawn.x}, ${spawn.y}) está sem tile livre no raio ${spawn.radius}`)
-    } else if (!hasReachableTile(reachable, map.width, map.height, spawn)) {
-      problems.push(`spawn de ${spawn.speciesName} em (${spawn.x}, ${spawn.y}) não tem tile livre alcançável no raio ${spawn.radius}`)
-    }
-  }
-  return problems
+  return [...problems, ...checkSpawns(map, blocking, spawns, reachable)]
 }
 
 export function importTiledMap(

@@ -3,7 +3,7 @@ import { parseOrThrow } from '@pokeidle/shared'
 import type { Catalog } from './catalog.js'
 import { readJson } from './json-file.js'
 import { sliceName } from './tile-slice.js'
-import { CORNER_CODES } from './transition.js'
+import { transitionTileNames } from './transition.js'
 
 const KEBAB = /^[a-z0-9-]+$/
 const ONLY_DIGITS = /^\d+$/
@@ -85,13 +85,6 @@ export function expandedTileNames(tile: TileEntry): string[] {
   return Array.from({ length: cols * rows }, (_unused, i) => sliceName(tile.name, i % cols, Math.floor(i / cols)))
 }
 
-const MIXED_CORNER_CODES = CORNER_CODES.filter((code) => code !== 'aaaa' && code !== 'bbbb')
-
-/** Os nomes das catorze peças mistas que `transitionTiles` gera para uma transição, sem gerar imagem. */
-function generatedTransitionNames(t: TransitionEntry): string[] {
-  return MIXED_CORNER_CODES.map((code) => `${t.name}-${code}`)
-}
-
 function duplicates<T>(values: readonly T[]): T[] {
   const seen = new Set<T>()
   const dups = new Set<T>()
@@ -137,6 +130,14 @@ function validateTerrain(t: TerrainEntry, tileNames: ReadonlySet<string>): strin
   return problems
 }
 
+/** Terrenos declarados e transições viram wangsets no mesmo tiles.tsj: os nomes não podem colidir. */
+function duplicateTerrainNames(m: Manifest): string[] {
+  const declared = (m.terrains ?? []).map((t) => t.name)
+  const fromTransitions = new Set((m.transitions ?? []).map((t) => t.name))
+  const colliding = new Set([...duplicates(declared), ...declared.filter((n) => fromTransitions.has(n))])
+  return [...colliding].map((n) => `nome de terreno duplicado: ${n}`)
+}
+
 function validateTransition(t: TransitionEntry, tileNames: ReadonlySet<string>): string[] {
   const problems: string[] = []
   if (!tileNames.has(t.from)) problems.push(`transição ${t.name}: tile "${t.from}" não existe na lista de tiles`)
@@ -147,13 +148,14 @@ function validateTransition(t: TransitionEntry, tileNames: ReadonlySet<string>):
 
 export function validateManifest(m: Manifest, catalog: Catalog): string[] {
   const tileNames = new Set(m.tiles.flatMap(expandedTileNames))
-  const generatedNames = (m.transitions ?? []).flatMap(generatedTransitionNames)
+  const generatedNames = (m.transitions ?? []).flatMap(transitionTileNames)
   return [
     ...duplicates(m.species.map((s) => s.name)).map((n) => `nome de espécie duplicado: ${n}`),
     ...duplicates(m.species.map((s) => s.id)).map((id) => `id de espécie duplicado: ${id}`),
     ...duplicates([...m.tiles.flatMap(expandedTileNames), ...generatedNames]).map((n) => `nome de tile duplicado: ${n}`),
     ...m.species.flatMap((s) => validateSpecies(s, catalog)),
     ...m.tiles.flatMap((t) => validateTile(t, catalog)),
+    ...duplicateTerrainNames(m),
     ...(m.terrains ?? []).flatMap((t) => validateTerrain(t, tileNames)),
     ...duplicates((m.transitions ?? []).map((t) => t.name)).map((n) => `nome de transição duplicado: ${n}`),
     ...(m.transitions ?? []).flatMap((t) => validateTransition(t, tileNames)),

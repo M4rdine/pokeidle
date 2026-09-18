@@ -28,6 +28,9 @@ async function writePng(path: string, w: number, h: number, v: number): Promise<
   await writeFile(path, encodePng({ width: w, height: h, data: new Uint8Array(w * h * 4).fill(v) }))
 }
 
+/** Cor do PNG do item 100, usada tanto na fixture quanto nas asserções de quadrante. */
+const GRASS_COLOR = 90
+
 async function setupFixtures(): Promise<{ dir: string; extractedDir: string }> {
   const dir = await mkdtemp(join(tmpdir(), 'pokeidle-atlas-'))
   const extractedDir = join(dir, 'extracted')
@@ -37,7 +40,7 @@ async function setupFixtures(): Promise<{ dir: string; extractedDir: string }> {
     for (const phase of [0, 1]) await writePng(outfitFramePath(extractedDir, 10, d, phase), 64, 64, 200)
     await writePng(outfitFramePath(extractedDir, 11, d, 0), 64, 64, 150)
   }
-  await writePng(itemFramePath(extractedDir, 100, 0, 0), 32, 32, 90)
+  await writePng(itemFramePath(extractedDir, 100, 0, 0), 32, 32, GRASS_COLOR)
   await writePng(itemFramePath(extractedDir, 101, 0, 0), 64, 64, 90)
   return { dir, extractedDir }
 }
@@ -129,7 +132,6 @@ describe('buildAtlases', () => {
     // grass (item 100) e dirt (item 102) são PNGs de cores distintas: só assim a peça composta
     // "baaa" prova que ela de fato mistura os dois materiais, em vez de colar a mesma imagem
     // duas vezes (o que passaria mesmo se composeTransition ignorasse um dos dois tiles).
-    const GRASS_COLOR = 90
     const DIRT_COLOR = 210
     await writePng(itemFramePath(extractedDir, 102, 0, 0), 32, 32, DIRT_COLOR)
     await writeFile(manifestPath, JSON.stringify({

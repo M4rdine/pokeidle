@@ -242,6 +242,16 @@ function tiledMapWith(options: TiledMapOptions): unknown {
   }
 }
 
+/** A mensagem de erro inteira, para asserções sobre o que NÃO deve aparecer nela. */
+function messageOf(run: () => unknown): string {
+  try {
+    run()
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error)
+  }
+  throw new Error('esperava que a importação falhasse, mas ela passou')
+}
+
 describe('validações do mapa', () => {
   const meta = { id: 'route-1', name: 'Rota 1' }
 
@@ -260,12 +270,37 @@ describe('validações do mapa', () => {
     expect(() => importTiledMap(map, tileset, meta)).toThrow(/Centro Pokémon.*borda/)
   })
 
-  it('trata Centro fora dos limites do mapa como bloqueado, sem vazar dados da próxima linha', () => {
+  it('recusa Centro fora dos limites do mapa dizendo que está fora, sem vazar dados da próxima linha', () => {
     // pokecenter na coluna 3 de um mapa 3x3 (colunas válidas 0..2): sem o limite de x em
     // blockedAt, `y*width+x` cairia na linha seguinte (aqui livre) e o Centro passaria como
-    // "não bloqueado" por acidente, em vez de ser recusado por estar fora do grid.
+    // "não bloqueado" por acidente. E mandar o autor destravar um tile que não existe não
+    // ajuda: a mensagem precisa dizer que a posição está fora do grid.
     const map = tiledMapWith({ width: 3, height: 3, spawnPoint: { x: 0, y: 0 }, pokecenter: { x: 3, y: 1 } })
-    expect(() => importTiledMap(map, tileset, meta)).toThrow(/Centro Pokémon em \(3, 1\) está num tile bloqueado/)
+    expect(() => importTiledMap(map, tileset, meta)).toThrow(/Centro Pokémon em \(3, 1\) está fora do mapa 3x3/)
+    expect(() => importTiledMap(map, tileset, meta)).not.toThrow(/tile bloqueado/)
+  })
+
+  it('não repete a borda nem a alcançabilidade quando o Centro já está fora do mapa', () => {
+    const map = tiledMapWith({ width: 3, height: 3, spawnPoint: { x: 0, y: 0 }, pokecenter: { x: 3, y: 1 } })
+    const message = messageOf(() => importTiledMap(map, tileset, meta))
+    expect(message).not.toMatch(/borda do mapa/)
+    expect(message).not.toMatch(/não é alcançável/)
+  })
+
+  it('com o ponto de partida bloqueado, aponta só a causa, sem a cascata de inalcançáveis', () => {
+    // o ponto de partida bloqueado zera o conjunto alcançável, então toda checagem derivada
+    // acusaria falha: o Centro e um erro por spawn. O autor precisa ver uma causa, não sete.
+    const map = tiledMapWith({
+      width: 5,
+      height: 5,
+      spawnPoint: { x: 0, y: 0 },
+      pokecenter: { x: 2, y: 2 },
+      blockingAt: [{ x: 0, y: 0 }],
+      spawnAt: { x: 3, y: 3, radius: 1 },
+    })
+    const message = messageOf(() => importTiledMap(map, tileset, meta))
+    expect(message).toMatch(/ponto de partida em \(0, 0\) está num tile bloqueado/)
+    expect(message).not.toMatch(/alcançável/)
   })
 
   it('aceita um mapa correto e devolve as camadas', () => {

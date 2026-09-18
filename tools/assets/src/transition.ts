@@ -101,9 +101,17 @@ export interface TransitionEntry {
   readonly softness?: number | undefined
 }
 
+/** Os códigos das peças mistas; as puras (aaaa/bbbb) reaproveitam os tiles originais. */
+const MIXED_CORNER_CODES = CORNER_CODES.filter((code) => code !== 'aaaa' && code !== 'bbbb')
+
+/** Os nomes que `transitionTiles` gera, na mesma ordem, sem compor imagem nenhuma. */
+export function transitionTileNames(entry: { readonly name: string }): string[] {
+  return MIXED_CORNER_CODES.map((code) => `${entry.name}-${code}`)
+}
+
 /** As catorze peças mistas; as puras (aaaa/bbbb) reaproveitam os tiles originais. */
 export function transitionTiles(entry: TransitionEntry, images: { from: RgbaImage; to: RgbaImage }): { name: string; image: RgbaImage }[] {
-  return CORNER_CODES.filter((code) => code !== 'aaaa' && code !== 'bbbb').map((code, i) => ({
+  return MIXED_CORNER_CODES.map((code, i) => ({
     name: `${entry.name}-${code}`,
     image: composeTransition(images.from, images.to, transitionMask(code, i + 1, entry.softness)),
   }))

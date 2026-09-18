@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { RgbaImage } from '../src/compose.js'
-import { composeTransition, CORNER_CODES, transitionMask } from '../src/transition.js'
+import { composeTransition, CORNER_CODES, transitionMask, transitionTileNames, transitionTiles } from '../src/transition.js'
 
 const solid = (value: number): RgbaImage => ({ width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(value) })
 const at = (mask: Uint8Array, x: number, y: number): number => mask[y * 32 + x]!
@@ -96,5 +96,24 @@ describe('composeTransition', () => {
     const over = solid(200)
     const wrongMask = new Uint8Array(10)
     expect(() => composeTransition(base, over, wrongMask)).toThrow(/máscara com 10 pixels/)
+  })
+})
+
+describe('transitionTileNames', () => {
+  const entry = { name: 'grama-terra', from: 'grass', to: 'dirt' }
+
+  it('devolve exatamente os nomes que transitionTiles gera, na mesma ordem', () => {
+    // a validação de colisão no manifesto usa esta lista sem gerar imagem nenhuma; se ela
+    // divergir do gerador, uma colisão de nome volta a passar despercebida.
+    const image: RgbaImage = { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(90) }
+    const generated = transitionTiles(entry, { from: image, to: image }).map((t) => t.name)
+    expect(transitionTileNames(entry)).toEqual(generated)
+  })
+
+  it('cobre as catorze peças mistas, sem as puras', () => {
+    const names = transitionTileNames(entry)
+    expect(names).toHaveLength(CORNER_CODES.length - 2)
+    expect(names).not.toContain('grama-terra-aaaa')
+    expect(names).not.toContain('grama-terra-bbbb')
   })
 })

@@ -132,14 +132,18 @@ Fluxo completo de autoria, do atlas até a prévia:
 
 `map-import` recusa o mapa — listando todos os problemas de uma vez — quando:
 
-- o ponto de partida (`spawnPoint`) cai num tile bloqueado;
-- o Centro Pokémon (`pokecenter`) cai num tile bloqueado;
+- o ponto de partida (`spawnPoint`) cai fora do mapa ou num tile bloqueado;
+- o Centro Pokémon (`pokecenter`) cai fora do mapa ou num tile bloqueado;
 - o Centro Pokémon está a menos de um tile da borda do mapa;
 - o Centro Pokémon (ou algum de seus quatro vizinhos ortogonais) não é alcançável a pé a
   partir do ponto de partida — mesmo que o próprio tile esteja livre, um Centro murado
   quebraria a hunt no jogo (o motor busca caminho com A* e desiste com `no-route`);
 - algum `spawn` não tem nenhum tile livre dentro do seu raio, ou tem um tile livre mas
   inalcançável a pé (um bolsão fechado nunca seria alcançado pelos selvagens).
+
+As checagens de alcançabilidade só rodam quando o ponto de partida é válido: com ele fora do
+mapa ou bloqueado, a mensagem aponta essa causa uma vez, em vez de acusar como inalcançável
+o Centro e cada um dos spawns.
 
 ### Fatiar tiles grandes
 

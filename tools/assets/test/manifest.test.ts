@@ -189,6 +189,28 @@ describe('transições', () => {
     })
     expect(validateManifest(manifest, catalog).join('\n')).toMatch(/nome de transição duplicado: grama-terra/)
   })
+  it('recusa terreno declarado com o mesmo nome de uma transição, que viraria dois pincéis homônimos', () => {
+    // terrenos declarados e transições viram wangsets no mesmo tiles.tsj: dois com o mesmo
+    // nome deixam o Tiled com dois pincéis indistinguíveis na paleta.
+    const manifest = parseManifest({
+      version: 1,
+      species: [],
+      tiles: [{ name: 'grass', itemId: 100 }, { name: 'dirt', itemId: 100, patternX: 1 }],
+      terrains: [{ name: 'grama-terra', colors: ['grass', 'dirt'], tiles: [{ tile: 'grass', corners: ['grass', 'grass', 'grass', 'grass'] }] }],
+      transitions: [{ name: 'grama-terra', from: 'grass', to: 'dirt' }],
+    })
+    expect(validateManifest(manifest, catalog).join('\n')).toMatch(/nome de terreno duplicado: grama-terra/)
+  })
+  it('recusa dois terrenos declarados com o mesmo nome', () => {
+    const terrain = { colors: ['grass'], tiles: [{ tile: 'grass', corners: ['grass', 'grass', 'grass', 'grass'] }] }
+    const manifest = parseManifest({
+      version: 1,
+      species: [],
+      tiles: [{ name: 'grass', itemId: 100 }],
+      terrains: [{ name: 'so-grama', ...terrain }, { name: 'so-grama', ...terrain }],
+    })
+    expect(validateManifest(manifest, catalog).join('\n')).toMatch(/nome de terreno duplicado: so-grama/)
+  })
   it('recusa transição com from e to iguais, que deixaria o terreno com a mesma cor duas vezes', () => {
     const manifest = parseManifest({
       version: 1,

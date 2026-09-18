@@ -177,6 +177,27 @@ describe('transições', () => {
     })
     expect(validateManifest(manifest, catalog).join('\n')).toMatch(/transição grama-terra: tile "sumiu" não existe/)
   })
+  it('recusa duas transições com o mesmo nome, que colidiriam no atlas', () => {
+    const manifest = parseManifest({
+      version: 1,
+      species: [],
+      tiles: [{ name: 'grass', itemId: 100 }, { name: 'dirt', itemId: 100, patternX: 1 }],
+      transitions: [
+        { name: 'grama-terra', from: 'grass', to: 'dirt' },
+        { name: 'grama-terra', from: 'dirt', to: 'grass' },
+      ],
+    })
+    expect(validateManifest(manifest, catalog).join('\n')).toMatch(/nome de transição duplicado: grama-terra/)
+  })
+  it('recusa transição com from e to iguais, que deixaria o terreno com a mesma cor duas vezes', () => {
+    const manifest = parseManifest({
+      version: 1,
+      species: [],
+      tiles: [{ name: 'grass', itemId: 100 }],
+      transitions: [{ name: 'grama-grama', from: 'grass', to: 'grass' }],
+    })
+    expect(validateManifest(manifest, catalog).join('\n')).toMatch(/transição grama-grama: from e to são o mesmo tile/)
+  })
 })
 
 describe('loadManifest', () => {

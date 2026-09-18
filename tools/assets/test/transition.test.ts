@@ -39,15 +39,32 @@ describe('transitionMask', () => {
     const mixedRows = new Set(edge.filter((p) => p.v === 255).map((p) => p.y))
     expect(mixedRows.size).toBeGreaterThan(8) // o recorte acompanha a altura, não um corte único
   })
-  it('quadrantes opostos iguais continuam uniformes mesmo com ruído (abab)', () => {
-    // ordem: topRight, bottomRight, bottomLeft, topLeft -> abab: topRight=a, bottomRight=b, bottomLeft=a, topLeft=b
-    // topLeft (b) e bottomRight (b) são opostos e iguais; topRight (a) e bottomLeft (a) são opostos e iguais.
-    for (let seed = 1; seed <= 20; seed++) {
-      const mask = transitionMask('abab', seed)
-      // canto superior-esquerdo (b) deve ficar inteiramente 255 perto do seu centro mesmo com ruído na borda
-      expect(at(mask, 0, 0)).toBe(255)
-      // canto superior-direito (a) deve ficar inteiramente 0 perto do seu centro
-      expect(at(mask, 31, 0)).toBe(0)
+  it('a divisa vertical entre dois quadrantes do mesmo material não recebe ruído (baaa)', () => {
+    // ordem: topRight, bottomRight, bottomLeft, topLeft -> baaa: só topRight é 'b'.
+    // bottomLeft e bottomRight são os dois 'a' que dividem a fronteira vertical x=15/16, longe da
+    // divisa horizontal (y >= 21): um teste que só olhasse pontos distantes de toda divisa, como
+    // (0,0), passaria mesmo numa implementação que ignora o vizinho do outro lado da borda — aqui
+    // varremos exatamente a fronteira entre dois quadrantes iguais para provar que ela fica limpa.
+    for (let seed = 1; seed <= 30; seed++) {
+      const mask = transitionMask('baaa', seed)
+      for (let y = 21; y <= 31; y++) {
+        for (const x of [15, 16]) {
+          expect(at(mask, x, y)).toBe(0)
+        }
+      }
+    }
+  })
+  it('a divisa horizontal entre dois quadrantes do mesmo material não recebe ruído (aaba, espelhado)', () => {
+    // ordem: topRight, bottomRight, bottomLeft, topLeft -> aaba: só bottomLeft é 'b'.
+    // topRight e bottomRight são os dois 'a' que dividem a fronteira horizontal y=15/16, longe da
+    // divisa vertical (x >= 21).
+    for (let seed = 1; seed <= 30; seed++) {
+      const mask = transitionMask('aaba', seed)
+      for (let x = 21; x <= 31; x++) {
+        for (const y of [15, 16]) {
+          expect(at(mask, x, y)).toBe(0)
+        }
+      }
     }
   })
 })

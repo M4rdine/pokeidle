@@ -133,6 +133,7 @@ function validateTransition(t: TransitionEntry, tileNames: ReadonlySet<string>):
   const problems: string[] = []
   if (!tileNames.has(t.from)) problems.push(`transição ${t.name}: tile "${t.from}" não existe na lista de tiles`)
   if (!tileNames.has(t.to)) problems.push(`transição ${t.name}: tile "${t.to}" não existe na lista de tiles`)
+  if (t.from === t.to) problems.push(`transição ${t.name}: from e to são o mesmo tile`)
   return problems
 }
 
@@ -145,6 +146,7 @@ export function validateManifest(m: Manifest, catalog: Catalog): string[] {
     ...m.species.flatMap((s) => validateSpecies(s, catalog)),
     ...m.tiles.flatMap((t) => validateTile(t, catalog)),
     ...(m.terrains ?? []).flatMap((t) => validateTerrain(t, tileNames)),
+    ...duplicates((m.transitions ?? []).map((t) => t.name)).map((n) => `nome de transição duplicado: ${n}`),
     ...(m.transitions ?? []).flatMap((t) => validateTransition(t, tileNames)),
   ]
 }

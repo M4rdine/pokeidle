@@ -2,55 +2,471 @@
   "_leiame": "ids do dump OTPokemon 2019 (assets/raw/otp2019, extraído em assets/extracted-otp2019); build com --extracted assets/extracted-otp2019. O manifest do pack Pokeretro ficou em manifest.pokeretro.json.",
   "version": 1,
   "species": [
-    { "id": 1, "name": "bulbasaur", "outfitId": 25 },
-    { "id": 2, "name": "ivysaur", "outfitId": 24 },
-    { "id": 3, "name": "venusaur", "outfitId": 22 },
-    { "id": 4, "name": "charmander", "outfitId": 29 },
-    { "id": 5, "name": "charmeleon", "outfitId": 23 },
-    { "id": 6, "name": "charizard", "outfitId": 67 },
-    { "id": 7, "name": "squirtle", "outfitId": 2 },
-    { "id": 8, "name": "wartortle", "outfitId": 71 },
-    { "id": 9, "name": "blastoise", "outfitId": 55 },
-    { "id": 12, "name": "butterfree", "outfitId": 40 },
-    { "id": 15, "name": "beedrill", "outfitId": 45 },
-    { "id": 18, "name": "pidgeot", "outfitId": 80 },
-    { "id": 24, "name": "arbok", "outfitId": 39 },
-    { "id": 25, "name": "pikachu", "outfitId": 59 },
-    { "id": 26, "name": "raichu", "outfitId": 50 },
-    { "id": 34, "name": "nidoking", "outfitId": 35 },
-    { "id": 37, "name": "vulpix", "outfitId": 62 },
-    { "id": 39, "name": "jigglypuff", "outfitId": 63 },
-    { "id": 40, "name": "wigglytuff", "outfitId": 64 },
-    { "id": 41, "name": "zubat", "outfitId": 36 },
-    { "id": 42, "name": "golbat", "outfitId": 10 },
-    { "id": 50, "name": "diglett", "outfitId": 82 },
-    { "id": 51, "name": "dugtrio", "outfitId": 83 },
-    { "id": 58, "name": "growlithe", "outfitId": 30 },
-    { "id": 59, "name": "arcanine", "outfitId": 12 },
-    { "id": 69, "name": "bellsprout", "outfitId": 31 },
-    { "id": 84, "name": "doduo", "outfitId": 26 },
-    { "id": 88, "name": "grimer", "outfitId": 8 },
-    { "id": 89, "name": "muk", "outfitId": 47 },
-    { "id": 92, "name": "gastly", "outfitId": 48 },
-    { "id": 93, "name": "haunter", "outfitId": 65 },
-    { "id": 103, "name": "exeggutor", "outfitId": 46 },
-    { "id": 112, "name": "rhydon", "outfitId": 77 },
-    { "id": 116, "name": "horsea", "outfitId": 57 },
-    { "id": 120, "name": "staryu", "outfitId": 42 },
-    { "id": 123, "name": "scyther", "outfitId": 15 },
-    { "id": 126, "name": "magmar", "outfitId": 76 },
-    { "id": 141, "name": "kabutops", "outfitId": 13 },
-    { "id": 143, "name": "snorlax", "outfitId": 51 },
-    { "id": 147, "name": "dratini", "outfitId": 33 },
-    { "id": 150, "name": "mewtwo", "outfitId": 34 },
-    { "id": 151, "name": "mew", "outfitId": 9 }
+    {
+      "id": 1,
+      "name": "bulbasaur",
+      "outfitId": 25
+    },
+    {
+      "id": 2,
+      "name": "ivysaur",
+      "outfitId": 24
+    },
+    {
+      "id": 3,
+      "name": "venusaur",
+      "outfitId": 22
+    },
+    {
+      "id": 4,
+      "name": "charmander",
+      "outfitId": 29
+    },
+    {
+      "id": 5,
+      "name": "charmeleon",
+      "outfitId": 23
+    },
+    {
+      "id": 6,
+      "name": "charizard",
+      "outfitId": 67
+    },
+    {
+      "id": 7,
+      "name": "squirtle",
+      "outfitId": 2
+    },
+    {
+      "id": 8,
+      "name": "wartortle",
+      "outfitId": 71
+    },
+    {
+      "id": 9,
+      "name": "blastoise",
+      "outfitId": 55
+    },
+    {
+      "id": 12,
+      "name": "butterfree",
+      "outfitId": 40
+    },
+    {
+      "id": 15,
+      "name": "beedrill",
+      "outfitId": 45
+    },
+    {
+      "id": 18,
+      "name": "pidgeot",
+      "outfitId": 80
+    },
+    {
+      "id": 24,
+      "name": "arbok",
+      "outfitId": 39
+    },
+    {
+      "id": 25,
+      "name": "pikachu",
+      "outfitId": 59
+    },
+    {
+      "id": 26,
+      "name": "raichu",
+      "outfitId": 50
+    },
+    {
+      "id": 34,
+      "name": "nidoking",
+      "outfitId": 35
+    },
+    {
+      "id": 37,
+      "name": "vulpix",
+      "outfitId": 62
+    },
+    {
+      "id": 39,
+      "name": "jigglypuff",
+      "outfitId": 63
+    },
+    {
+      "id": 40,
+      "name": "wigglytuff",
+      "outfitId": 64
+    },
+    {
+      "id": 41,
+      "name": "zubat",
+      "outfitId": 36
+    },
+    {
+      "id": 42,
+      "name": "golbat",
+      "outfitId": 10
+    },
+    {
+      "id": 50,
+      "name": "diglett",
+      "outfitId": 82
+    },
+    {
+      "id": 51,
+      "name": "dugtrio",
+      "outfitId": 83
+    },
+    {
+      "id": 58,
+      "name": "growlithe",
+      "outfitId": 30
+    },
+    {
+      "id": 59,
+      "name": "arcanine",
+      "outfitId": 12
+    },
+    {
+      "id": 69,
+      "name": "bellsprout",
+      "outfitId": 31
+    },
+    {
+      "id": 84,
+      "name": "doduo",
+      "outfitId": 26
+    },
+    {
+      "id": 88,
+      "name": "grimer",
+      "outfitId": 8
+    },
+    {
+      "id": 89,
+      "name": "muk",
+      "outfitId": 47
+    },
+    {
+      "id": 92,
+      "name": "gastly",
+      "outfitId": 48
+    },
+    {
+      "id": 93,
+      "name": "haunter",
+      "outfitId": 65
+    },
+    {
+      "id": 103,
+      "name": "exeggutor",
+      "outfitId": 46
+    },
+    {
+      "id": 112,
+      "name": "rhydon",
+      "outfitId": 77
+    },
+    {
+      "id": 116,
+      "name": "horsea",
+      "outfitId": 57
+    },
+    {
+      "id": 120,
+      "name": "staryu",
+      "outfitId": 42
+    },
+    {
+      "id": 123,
+      "name": "scyther",
+      "outfitId": 15
+    },
+    {
+      "id": 126,
+      "name": "magmar",
+      "outfitId": 76
+    },
+    {
+      "id": 141,
+      "name": "kabutops",
+      "outfitId": 13
+    },
+    {
+      "id": 143,
+      "name": "snorlax",
+      "outfitId": 51
+    },
+    {
+      "id": 147,
+      "name": "dratini",
+      "outfitId": 33
+    },
+    {
+      "id": 150,
+      "name": "mewtwo",
+      "outfitId": 34
+    },
+    {
+      "id": 151,
+      "name": "mew",
+      "outfitId": 9
+    }
   ],
   "tiles": [
-    { "name": "grass", "itemId": 106 },
-    { "name": "dirt", "itemId": 351 },
-    { "name": "stone-floor", "itemId": 509 },
-    { "name": "mountain", "itemId": 410 },
-    { "name": "water", "itemId": 632 },
-    { "name": "sand", "itemId": 931 }
+    {
+      "name": "grass",
+      "itemId": 106,
+      "patternX": 0
+    },
+    {
+      "name": "grass-b",
+      "itemId": 106,
+      "patternX": 1
+    },
+    {
+      "name": "grass-c",
+      "itemId": 106,
+      "patternX": 2
+    },
+    {
+      "name": "grass-d",
+      "itemId": 106,
+      "patternX": 3
+    },
+    {
+      "name": "dirt",
+      "itemId": 351
+    },
+    {
+      "name": "dirt-b",
+      "itemId": 352
+    },
+    {
+      "name": "dirt-c",
+      "itemId": 353
+    },
+    {
+      "name": "sand",
+      "itemId": 606
+    },
+    {
+      "name": "sand-b",
+      "itemId": 607
+    },
+    {
+      "name": "beach",
+      "itemId": 923
+    },
+    {
+      "name": "beach-b",
+      "itemId": 924
+    },
+    {
+      "name": "stone-floor",
+      "itemId": 430
+    },
+    {
+      "name": "stone-floor-b",
+      "itemId": 431
+    },
+    {
+      "name": "stone-slab",
+      "itemId": 429
+    },
+    {
+      "name": "mountain",
+      "itemId": 410
+    },
+    {
+      "name": "water",
+      "itemId": 632
+    },
+    {
+      "name": "cave-floor",
+      "itemId": 500
+    },
+    {
+      "name": "cave-floor-b",
+      "itemId": 501
+    },
+    {
+      "name": "tree-oak",
+      "itemId": 3611,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "tree-round",
+      "itemId": 3614,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "tree-broad",
+      "itemId": 3617,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "tree-pine",
+      "itemId": 3621,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "bush",
+      "itemId": 3626,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "bush-flower",
+      "itemId": 3753,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "grass-tuft",
+      "itemId": 5091,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "palm",
+      "itemId": 3640,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pebbles",
+      "itemId": 3912
+    },
+    {
+      "name": "stones",
+      "itemId": 3913
+    },
+    {
+      "name": "twigs",
+      "itemId": 3698
+    },
+    {
+      "name": "flowers-pink",
+      "itemId": 3876
+    },
+    {
+      "name": "flowers-white",
+      "itemId": 3680
+    },
+    {
+      "name": "planks",
+      "itemId": 3946
+    },
+    {
+      "name": "branch",
+      "itemId": 3718
+    },
+    {
+      "name": "wall-stone",
+      "itemId": 1546,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "wall-stone-side",
+      "itemId": 1555,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "wall-stone-corner",
+      "itemId": 1550,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "wall-stone-corner-b",
+      "itemId": 1568,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "roof-red",
+      "itemId": 1624,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "roof-red-b",
+      "itemId": 1625,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "roof-red-corner",
+      "itemId": 1626,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "roof-red-corner-b",
+      "itemId": 1627,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    }
+  ],
+  "transitions": [
+    {
+      "name": "grama-terra",
+      "from": "grass",
+      "to": "dirt"
+    },
+    {
+      "name": "grama-areia",
+      "from": "grass",
+      "to": "sand"
+    },
+    {
+      "name": "grama-agua",
+      "from": "grass",
+      "to": "water"
+    },
+    {
+      "name": "terra-pedra",
+      "from": "dirt",
+      "to": "stone-floor"
+    }
   ]
 }

@@ -1,4 +1,6 @@
 /* HUD da tela de jogo: preenchido na etapa da tela do jogo. */
+/* Ocupa a janela inteira e não rola: a cena é o centro e cada painel rola por dentro. */
+.screen.game-grid { max-width: none; margin: 0; padding: var(--space-2); }
 .game-grid {
   display: grid;
   grid-template-columns: 280px 1fr 200px;
@@ -9,9 +11,13 @@
   padding: var(--space-2);
 }
 .grid-top { grid-area: top; } .grid-left { grid-area: left; display: flex; flex-direction: column; gap: var(--space-2); }
-.grid-center { grid-area: center; position: relative; overflow: hidden; background: #000; }
-.grid-right { grid-area: right; } .grid-bottom { grid-area: bottom; min-height: 0; }
-.top-bar { display: flex; gap: var(--space-3); align-items: center; padding: var(--space-2) var(--space-3); flex-wrap: wrap; }
+.grid-center { grid-area: center; position: relative; overflow: hidden; background: #000; min-width: 0; min-height: 0; }
+.grid-right { grid-area: right; min-height: 0; overflow-y: auto; } .grid-bottom { grid-area: bottom; min-height: 0; }
+.top-bar { display: flex; gap: var(--space-2) var(--space-3); align-items: center; padding: var(--space-2) var(--space-3); flex-wrap: wrap; }
+.top-bar .xp-bar { width: 120px; }
+.top-bar button[data-open] { margin-left: 0; }
+/* Os botões de sair da hunt ficam na ponta direita, longe dos atalhos. */
+.top-bar .intent { margin-left: auto; }
 .conn[data-conn="open"] { color: var(--ok); } .conn[data-conn="reconnecting"], .conn[data-conn="connecting"] { color: var(--accent); }
 .conn[data-conn="closed"] { color: var(--danger); } .conn[data-conn="catching-up"] { color: var(--accent); }
 .active-card { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); }

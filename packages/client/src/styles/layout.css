@@ -10,7 +10,8 @@ canvas { image-rendering: pixelated; }
 .panel { background: var(--panel); border: var(--border-w) solid var(--border); border-radius: 0; }
 .muted { color: var(--muted); }
 .screen { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
-.screen-auth, .screen-game { max-width: 420px; margin: var(--space-4) auto; }
+/* Só as telas de formulário são estreitas: a do jogo ocupa a janela inteira (grade em hud.css). */
+.screen-auth { max-width: 420px; margin: var(--space-4) auto; }
 h1, h2 { margin: 0; font-size: 1.2rem; letter-spacing: 0.02em; }
 button { font: inherit; color: var(--text); background: var(--panel); border: var(--border-w) solid var(--border); padding: var(--space-2) var(--space-3); cursor: pointer; }
 button:hover:not([disabled]) { border-color: var(--accent); }

@@ -31,7 +31,7 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
     el('button', { type: 'button', 'data-open': modal, onclick: () => ctx.openModal?.(modal) }, MODAL_LABELS[modal]))
 
   root.append(el('header', { class: 'top-bar panel' },
-    name, level, xpBar, nextUnlock, el('span', {}, 'ouro:'), gold, dex, el('span', {}, 'tick:'), tick, conn, ...shortcuts, stop, leave))
+    name, level, xpBar, nextUnlock, el('span', {}, 'ouro:'), gold, dex, el('span', { class: 'muted' }, 'tick'), tick, conn, ...shortcuts, stop, leave))
 
   // O XP do treinador sobe durante a hunt: o espelho manda, o /me só serve enquanto não há hunt.
   const renderProgress = (): void => {

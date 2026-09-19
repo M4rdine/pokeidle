@@ -96,6 +96,22 @@ describe('parseOrThrow e HuntMap', () => {
   }
   const validSpawn = { speciesName: 'zubat', minLevel: 3, maxLevel: 5, x: 0, y: 0, radius: 0, count: 1, respawnSeconds: 10 }
 
+  const mapWithSpawn = { ...validMap, spawns: [validSpawn] }
+
+  it('aceita mapa sem camada de copa, que é o formato de hoje', () => {
+    expect(parseHuntMap(mapWithSpawn).layers.canopy).toBeUndefined()
+  })
+
+  it('aceita a camada de copa e a devolve', () => {
+    const map = { ...mapWithSpawn, layers: { ...mapWithSpawn.layers, canopy: ['tree-oak-x0-y0', null] } }
+    expect(parseHuntMap(map).layers.canopy).toEqual(['tree-oak-x0-y0', null])
+  })
+
+  it('rejeita camada de copa com tamanho errado', () => {
+    const map = { ...mapWithSpawn, layers: { ...mapWithSpawn.layers, canopy: ['tree-oak-x0-y0'] } }
+    expect(() => parseHuntMap(map)).toThrow(/width\*height/)
+  })
+
   it('rejeita spawn com minLevel > maxLevel', () => {
     const map = { ...validMap, spawns: [{ ...validSpawn, minLevel: 5, maxLevel: 3 }] }
     expect(() => parseHuntMap(map)).toThrow(/minLevel/)

@@ -28,6 +28,8 @@ export const HuntMapSchema = z
       ground: z.array(z.string().nullable()),
       detail: z.array(z.string().nullable()),
       blocking: z.array(z.boolean()),
+      // Desenhada depois dos personagens. Opcional: é o que mantém válidos os mapas já importados.
+      canopy: z.array(z.string().nullable()).optional(),
     }),
     spawnPoint: PointSchema,
     pokecenter: PointSchema,
@@ -36,6 +38,8 @@ export const HuntMapSchema = z
   .superRefine((m, ctx) => {
     const expected = m.width * m.height
     for (const [name, layer] of Object.entries(m.layers)) {
+      // `canopy` é opcional: quando o mapa não a traz, não há tamanho a conferir.
+      if (layer === undefined) continue
       if (layer.length !== expected) {
         ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['layers', name], message: `tem ${layer.length} tiles, esperado width*height = ${expected}` })
       }

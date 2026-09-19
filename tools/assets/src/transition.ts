@@ -1,4 +1,5 @@
 import type { TerrainInput } from './atlas.js'
+import { phaseFrameName, phaseFrameNames } from './tile-animation.js'
 import type { RgbaImage } from './compose.js'
 
 const SIZE = 32
@@ -109,12 +110,34 @@ export function transitionTileNames(entry: { readonly name: string }): string[] 
   return MIXED_CORNER_CODES.map((code) => `${entry.name}-${code}`)
 }
 
-/** As catorze peças mistas; as puras (aaaa/bbbb) reaproveitam os tiles originais. */
-export function transitionTiles(entry: TransitionEntry, images: { from: RgbaImage; to: RgbaImage }): { name: string; image: RgbaImage }[] {
-  return MIXED_CORNER_CODES.map((code, i) => ({
-    name: `${entry.name}-${code}`,
-    image: composeTransition(images.from, images.to, transitionMask(code, i + 1, entry.softness)),
-  }))
+/** As catorze peças mistas, uma por fase; as puras (aaaa/bbbb) reaproveitam os tiles originais. */
+export function transitionTiles(
+  entry: TransitionEntry,
+  images: { from: readonly RgbaImage[]; to: readonly RgbaImage[] },
+): { name: string; image: RgbaImage }[] {
+  if (images.from.length === 0 || images.to.length === 0) {
+    throw new Error(`transição ${entry.name}: lado sem imagem nenhuma`)
+  }
+  const phases = Math.max(images.from.length, images.to.length)
+  return MIXED_CORNER_CODES.flatMap((code, i) => {
+    // A máscara depende só do código e da semente: fica igual em todas as fases desta peça,
+    // senão o ruído da borda mudaria a cada quadro e a junção cintilaria.
+    const mask = transitionMask(code, i + 1, entry.softness)
+    return Array.from({ length: phases }, (_unused, phase) => ({
+      name: phaseFrameName(`${entry.name}-${code}`, phase),
+      image: composeTransition(
+        images.from[phase % images.from.length]!,
+        images.to[phase % images.to.length]!,
+        mask,
+      ),
+    }))
+  })
+}
+
+/** Os quadros de cada peça mista, para o atlas declarar a animação. Vazio quando não há o que animar. */
+export function transitionAnimations(entry: TransitionEntry, phases: number): Record<string, string[]> {
+  if (phases < 2) return {}
+  return Object.fromEntries(transitionTileNames(entry).map((name) => [name, phaseFrameNames(name, phases)]))
 }
 
 /** Terreno de duas cores apontando cada código de canto para a peça correspondente. */

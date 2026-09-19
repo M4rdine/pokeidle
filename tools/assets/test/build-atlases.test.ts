@@ -229,4 +229,29 @@ describe('buildAtlases', () => {
     )
   })
 
+  it('transição com um lado animado sai com os quadros do lado animado', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    await writePng(itemFramePath(extractedDir, 103, 0, 0), 32, 32, 10)
+    await writePng(itemFramePath(extractedDir, 103, 0, 0, 1), 32, 32, 20)
+    await writePng(itemFramePath(extractedDir, 103, 0, 0, 2), 32, 32, 30)
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }, { name: 'water', itemId: 103 }],
+      transitions: [{ name: 'grama-agua', from: 'grass', to: 'water' }],
+    }))
+
+    await buildAtlases({ extractedDir, manifestPath, outDir: dir }, () => {})
+
+    const sheet = JSON.parse(await readFile(join(dir, 'tiles.json'), 'utf8'))
+    expect(sheet.frames['grama-agua-baaa_2']).toBeDefined()
+    expect(sheet.animations['grama-agua-baaa']).toEqual(['grama-agua-baaa', 'grama-agua-baaa_1', 'grama-agua-baaa_2'])
+
+    const tileset = JSON.parse(await readFile(join(dir, 'tiles.tsj'), 'utf8'))
+    const names = tileset.tiles.map((t: { properties: { value: string }[] }) => t.properties[0]!.value)
+    expect(names).toContain('grama-agua-baaa')
+    expect(names).not.toContain('grama-agua-baaa_1')
+  })
+
 })

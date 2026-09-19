@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { RgbaImage } from '../src/compose.js'
-import { composeTransition, CORNER_CODES, transitionMask, transitionTileNames, transitionTiles } from '../src/transition.js'
+import { composeTransition, CORNER_CODES, transitionAnimations, transitionMask, transitionTileNames, transitionTiles } from '../src/transition.js'
 
 const solid = (value: number): RgbaImage => ({ width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(value) })
 const at = (mask: Uint8Array, x: number, y: number): number => mask[y * 32 + x]!
@@ -106,7 +106,7 @@ describe('transitionTileNames', () => {
     // a validação de colisão no manifesto usa esta lista sem gerar imagem nenhuma; se ela
     // divergir do gerador, uma colisão de nome volta a passar despercebida.
     const image: RgbaImage = { width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(90) }
-    const generated = transitionTiles(entry, { from: image, to: image }).map((t) => t.name)
+    const generated = transitionTiles(entry, { from: [image], to: [image] }).map((t) => t.name)
     expect(transitionTileNames(entry)).toEqual(generated)
   })
 
@@ -115,5 +115,54 @@ describe('transitionTileNames', () => {
     expect(names).toHaveLength(CORNER_CODES.length - 2)
     expect(names).not.toContain('grama-terra-aaaa')
     expect(names).not.toContain('grama-terra-bbbb')
+  })
+})
+
+describe('transitionTiles com fases', () => {
+  const entry = { name: 'grama-agua', from: 'grass', to: 'water' }
+  const solidOf = (v: number): RgbaImage => ({ width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(v) })
+
+  it('sai com a contagem de quadros do lado longo e faz o lado curto repetir', () => {
+    const from = [solidOf(10)]
+    const to = [solidOf(100), solidOf(110), solidOf(120)]
+    const tiles = transitionTiles(entry, { from, to })
+    // 14 peças mistas x 3 fases
+    expect(tiles).toHaveLength(42)
+    const names = tiles.map((t) => t.name)
+    expect(names).toContain('grama-agua-baaa')
+    expect(names).toContain('grama-agua-baaa_1')
+    expect(names).toContain('grama-agua-baaa_2')
+    expect(names).not.toContain('grama-agua-baaa_3')
+  })
+
+  it('usa a mesma máscara em todas as fases da mesma peça, senão a borda cintila', () => {
+    const from = [solidOf(10), solidOf(10)]
+    const to = [solidOf(200), solidOf(201)]
+    const tiles = transitionTiles(entry, { from, to })
+    const phase0 = tiles.find((t) => t.name === 'grama-agua-baaa')!
+    const phase1 = tiles.find((t) => t.name === 'grama-agua-baaa_1')!
+    // posições cujo pixel veio de `from`: se a máscara mudasse entre as fases, o conjunto mudaria
+    const fromPixels = (image: RgbaImage): number[] =>
+      [...image.data].map((v, i) => (i % 4 === 0 && v === 10 ? i : -1)).filter((i) => i >= 0)
+    expect(fromPixels(phase1.image)).toEqual(fromPixels(phase0.image))
+    expect(fromPixels(phase0.image).length).toBeGreaterThan(0)
+  })
+
+  it('recusa lado sem nenhuma imagem', () => {
+    expect(() => transitionTiles(entry, { from: [], to: [solidOf(1)] })).toThrow(/sem imagem/)
+  })
+})
+
+describe('transitionAnimations', () => {
+  const entry = { name: 'grama-agua', from: 'grass', to: 'water' }
+
+  it('declara os quadros de cada peça mista quando há mais de uma fase', () => {
+    const anims = transitionAnimations(entry, 3)
+    expect(Object.keys(anims)).toHaveLength(14)
+    expect(anims['grama-agua-baaa']).toEqual(['grama-agua-baaa', 'grama-agua-baaa_1', 'grama-agua-baaa_2'])
+  })
+
+  it('não declara nada quando os dois lados são parados', () => {
+    expect(transitionAnimations(entry, 1)).toEqual({})
   })
 })

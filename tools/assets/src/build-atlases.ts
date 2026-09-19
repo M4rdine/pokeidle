@@ -8,7 +8,7 @@ import { expandedTileNames, loadManifest, validateManifest, type Manifest, type 
 import { decodePng, encodePng } from './png.js'
 import { isPhaseFrame, phaseFrameName, phaseFrameNames } from './tile-animation.js'
 import { sliceImage } from './tile-slice.js'
-import { transitionTerrain, transitionTiles } from './transition.js'
+import { transitionAnimations, transitionTerrain, transitionTiles } from './transition.js'
 
 export interface BuildOptions {
   readonly extractedDir: string
@@ -89,13 +89,35 @@ function findTileImage(frames: readonly AtlasFrame[], transitionName: string, ti
   return frame.image
 }
 
-/** As catorze peças mistas de cada transição, compostas a partir dos frames de tiles já decodificados. */
-function transitionFrames(frames: readonly AtlasFrame[], transitions: readonly TransitionEntry[]): AtlasFrame[] {
-  return transitions.flatMap((entry) => {
-    const from = findTileImage(frames, entry.name, entry.from)
-    const to = findTileImage(frames, entry.name, entry.to)
-    return transitionTiles(entry, { from, to })
+/** Todas as fases de um tile, na ordem, para compor a transição quadro a quadro. */
+function tileImages(
+  frames: readonly AtlasFrame[],
+  transitionName: string,
+  tileName: string,
+  animations: Readonly<Record<string, readonly string[]>>,
+): RgbaImage[] {
+  const names = animations[tileName] ?? [tileName]
+  return names.map((name) => findTileImage(frames, transitionName, name))
+}
+
+/** As peças mistas de cada transição, com os quadros de fase, e a tabela de animação delas. */
+function transitionFrames(
+  frames: readonly AtlasFrame[],
+  transitions: readonly TransitionEntry[],
+  animations: Readonly<Record<string, readonly string[]>>,
+): { frames: AtlasFrame[]; animations: Record<string, string[]> } {
+  const built = transitions.map((entry) => {
+    const from = tileImages(frames, entry.name, entry.from, animations)
+    const to = tileImages(frames, entry.name, entry.to, animations)
+    return {
+      tiles: transitionTiles(entry, { from, to }),
+      anims: transitionAnimations(entry, Math.max(from.length, to.length)),
+    }
   })
+  return {
+    frames: built.flatMap((b) => b.tiles),
+    animations: Object.assign({}, ...built.map((b) => b.anims)) as Record<string, string[]>,
+  }
 }
 
 async function writeAtlas(
@@ -124,8 +146,10 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
 
   const base = await tileFrames(opts.extractedDir, manifest.tiles, catalog)
   const transitions = manifest.transitions ?? []
-  const tiles = [...base.frames, ...transitionFrames(base.frames, transitions)]
-  const packedTiles = await writeAtlas(opts.outDir, 'tiles', tiles, base.animations)
+  const mixed = transitionFrames(base.frames, transitions, base.animations)
+  const tiles = [...base.frames, ...mixed.frames]
+  const animations = { ...base.animations, ...mixed.animations }
+  const packedTiles = await writeAtlas(opts.outDir, 'tiles', tiles, animations)
   const tileOrder = tiles.filter((f) => !isPhaseFrame(f.name)).map((f) => f.name)
   const terrains = [...(manifest.terrains ?? []), ...transitions.map(transitionTerrain)]
   await writeFile(

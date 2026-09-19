@@ -20,6 +20,7 @@ const catalog: Catalog = {
     { id: 100, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false },
     { id: 101, width: 2, height: 2, patternX: 1, patternY: 1, phases: 1, isGround: false, isBlocking: true },
     { id: 102, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false },
+    { id: 103, width: 1, height: 1, patternX: 1, patternY: 1, phases: 3, isGround: true, isBlocking: false },
   ],
 }
 
@@ -189,4 +190,43 @@ describe('buildAtlases', () => {
     await writeFile(manifestPath, JSON.stringify({ version: 1, species: [], tiles: [{ name: 'grass', itemId: 100 }] }))
     await expect(buildAtlases({ extractedDir, manifestPath, outDir: join(dir, 'atlas') })).rejects.toThrow(/manifest sem espécies/)
   })
+  it('um tile animado gera um quadro por fase, declara a animação e fica com uma entrada só no tileset', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    // o item 103 tem 3 fases no catálogo do fixture; grava os três PNGs
+    await writePng(itemFramePath(extractedDir, 103, 0, 0), 32, 32, 10)
+    await writePng(itemFramePath(extractedDir, 103, 0, 0, 1), 32, 32, 20)
+    await writePng(itemFramePath(extractedDir, 103, 0, 0, 2), 32, 32, 30)
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }, { name: 'water', itemId: 103 }],
+    }))
+
+    await buildAtlases({ extractedDir, manifestPath, outDir: dir }, () => {})
+
+    const sheet = JSON.parse(await readFile(join(dir, 'tiles.json'), 'utf8'))
+    expect(Object.keys(sheet.frames).sort()).toEqual(['grass', 'water', 'water_1', 'water_2'])
+    expect(sheet.animations).toEqual({ water: ['water', 'water_1', 'water_2'] })
+
+    const tileset = JSON.parse(await readFile(join(dir, 'tiles.tsj'), 'utf8'))
+    expect(tileset.tiles.map((t: { properties: { value: string }[] }) => t.properties[0]!.value)).toEqual(['grass', 'water'])
+  })
+
+  it('avisa qual quadro de fase falta quando a extração é antiga', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    // só a fase 0 existe; o item 103 declara 3 fases no catálogo
+    await writePng(itemFramePath(extractedDir, 103, 0, 0), 32, 32, 10)
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'water', itemId: 103 }],
+    }))
+
+    await expect(buildAtlases({ extractedDir, manifestPath, outDir: dir }, () => {})).rejects.toThrow(
+      /tile water: falta o quadro da fase 1[\s\S]*pnpm assets extract/,
+    )
+  })
+
 })

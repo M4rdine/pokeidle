@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { packGrid, toTiledTileset, type AtlasFrame } from './atlas.js'
 import type { Catalog, CatalogOutfit } from './catalog.js'
@@ -6,6 +6,7 @@ import { DIRECTION_NAMES, type RgbaImage } from './compose.js'
 import { itemFramePath, loadCatalog, outfitFramePath, type Logger } from './extract.js'
 import { expandedTileNames, loadManifest, validateManifest, type Manifest, type SpeciesEntry, type TileEntry, type TransitionEntry } from './manifest.js'
 import { decodePng, encodePng } from './png.js'
+import { isPhaseFrame, phaseFrameName, phaseFrameNames } from './tile-animation.js'
 import { sliceImage } from './tile-slice.js'
 import { transitionTerrain, transitionTiles } from './transition.js'
 
@@ -46,16 +47,40 @@ async function pokemonFrames(extractedDir: string, manifest: Manifest, catalog: 
   return frames
 }
 
-async function tileFrames(extractedDir: string, tiles: readonly TileEntry[]): Promise<AtlasFrame[]> {
-  const frames: AtlasFrame[] = []
-  for (const t of tiles) {
-    const image = decodePng(await readFile(itemFramePath(extractedDir, t.itemId, t.patternX, t.patternY)))
-    const pieces = sliceImage(image, t.slice?.cols ?? 1, t.slice?.rows ?? 1)
-    const names = expandedTileNames(t)
-    // `expandedTileNames` e `sliceImage` percorrem na mesma ordem de leitura.
-    pieces.forEach((piece, i) => frames.push({ name: names[i]!, image: piece }))
+async function exists(path: string): Promise<boolean> {
+  try {
+    await access(path)
+    return true
+  } catch {
+    return false
   }
-  return frames
+}
+
+/** Frames de todos os tiles, um por fase, mais a tabela de animação dos que têm mais de uma fase. */
+async function tileFrames(
+  extractedDir: string,
+  tiles: readonly TileEntry[],
+  catalog: Catalog,
+): Promise<{ frames: AtlasFrame[]; animations: Record<string, string[]> }> {
+  const frames: AtlasFrame[] = []
+  const animations: Record<string, string[]> = {}
+  for (const t of tiles) {
+    const phases = catalog.items.find((i) => i.id === t.itemId)?.phases ?? 1
+    const names = expandedTileNames(t)
+    if (phases > 1) for (const name of names) animations[name] = phaseFrameNames(name, phases)
+    for (let phase = 0; phase < phases; phase++) {
+      const path = itemFramePath(extractedDir, t.itemId, t.patternX, t.patternY, phase)
+      if (!(await exists(path))) {
+        throw new Error(
+          `tile ${t.name}: falta o quadro da fase ${phase} em ${path}; rode "pnpm assets extract" de novo para gravar as fases`,
+        )
+      }
+      const pieces = sliceImage(decodePng(await readFile(path)), t.slice?.cols ?? 1, t.slice?.rows ?? 1)
+      // `expandedTileNames` e `sliceImage` percorrem na mesma ordem de leitura.
+      pieces.forEach((piece, i) => frames.push({ name: phaseFrameName(names[i]!, phase), image: piece }))
+    }
+  }
+  return { frames, animations }
 }
 
 function findTileImage(frames: readonly AtlasFrame[], transitionName: string, tileName: string): RgbaImage {
@@ -73,8 +98,13 @@ function transitionFrames(frames: readonly AtlasFrame[], transitions: readonly T
   })
 }
 
-async function writeAtlas(outDir: string, baseName: string, frames: readonly AtlasFrame[]): Promise<ReturnType<typeof packGrid>> {
-  const packed = packGrid(frames, `${baseName}.png`)
+async function writeAtlas(
+  outDir: string,
+  baseName: string,
+  frames: readonly AtlasFrame[],
+  animations?: Readonly<Record<string, readonly string[]>>,
+): Promise<ReturnType<typeof packGrid>> {
+  const packed = packGrid(frames, `${baseName}.png`, 0, animations)
   await writeFile(join(outDir, `${baseName}.png`), encodePng(packed.image))
   await writeFile(join(outDir, `${baseName}.json`), JSON.stringify(packed.sheet, null, 2))
   return packed
@@ -92,17 +122,17 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
   await writeAtlas(opts.outDir, 'pokemon', pokemon)
   log(`pokemon.png: ${pokemon.length} frames de ${manifest.species.length} espécies`)
 
-  const baseTiles = await tileFrames(opts.extractedDir, manifest.tiles)
+  const base = await tileFrames(opts.extractedDir, manifest.tiles, catalog)
   const transitions = manifest.transitions ?? []
-  const tiles = [...baseTiles, ...transitionFrames(baseTiles, transitions)]
-  const packedTiles = await writeAtlas(opts.outDir, 'tiles', tiles)
-  const tileOrder = tiles.map((f) => f.name)
+  const tiles = [...base.frames, ...transitionFrames(base.frames, transitions)]
+  const packedTiles = await writeAtlas(opts.outDir, 'tiles', tiles, base.animations)
+  const tileOrder = tiles.filter((f) => !isPhaseFrame(f.name)).map((f) => f.name)
   const terrains = [...(manifest.terrains ?? []), ...transitions.map(transitionTerrain)]
   await writeFile(
     join(opts.outDir, 'tiles.tsj'),
     JSON.stringify(toTiledTileset(packedTiles.sheet, 'tibia-tiles', tileOrder, terrains), null, 2),
   )
-  log(`tiles.png: ${tiles.length} tiles; tiles.tsj pronto para o Tiled`)
+  log(`tiles.png: ${tileOrder.length} tiles em ${tiles.length} quadros; tiles.tsj pronto para o Tiled`)
 
   return { pokemonFrames: pokemon.length, tileFrames: tiles.length }
 }

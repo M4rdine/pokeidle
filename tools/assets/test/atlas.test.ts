@@ -92,6 +92,39 @@ describe('toTiledTileset', () => {
     ])
   })
 
+  it('usa as animações passadas em vez de agrupar por sufixo', () => {
+    const { sheet } = packGrid(
+      [
+        { name: 'water', image: solid(32, 32, 1) },
+        { name: 'water_1', image: solid(32, 32, 2) },
+      ],
+      'tiles.png',
+      0,
+      { water: ['water', 'water_1'] },
+    )
+    expect(sheet.animations).toEqual({ water: ['water', 'water_1'] })
+  })
+
+  it('o tileset aceita uma ordem que cobre só parte dos frames', () => {
+    const { sheet } = packGrid(
+      [
+        { name: 'water', image: solid(32, 32, 1) },
+        { name: 'water_1', image: solid(32, 32, 2) },
+      ],
+      'tiles.png',
+      0,
+    )
+    const tileset = toTiledTileset(sheet, 'tibia-tiles', ['water'])
+    expect(tileset.tilecount).toBe(1)
+    expect(tileset.tiles).toEqual([{ id: 0, properties: [{ name: 'name', type: 'string', value: 'water' }] }])
+  })
+
+  it('o tileset recusa nome fora do spritesheet e nome repetido', () => {
+    const { sheet } = packGrid([{ name: 'grass', image: solid(32, 32, 1) }], 'tiles.png', 0)
+    expect(() => toTiledTileset(sheet, 'x', ['grass', 'sumiu'])).toThrow(/fora do spritesheet: sumiu/)
+    expect(() => toTiledTileset(sheet, 'x', ['grass', 'grass'])).toThrow(/nome repetido/)
+  })
+
   it('rejeita ordem com tamanho ou nomes diferentes do spritesheet', () => {
     const { sheet } = packGrid([{ name: 'grass', image: solid(32, 32, 1) }], 'tiles.png', 0)
     expect(() => toTiledTileset(sheet, 'x', [])).toThrow(/ordem de frames/)

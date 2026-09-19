@@ -86,7 +86,12 @@ function groupAnimations(names: readonly string[]): Record<string, string[]> {
   )
 }
 
-export function packGrid(frames: readonly AtlasFrame[], imageName: string, padding = 0): { image: RgbaImage; sheet: PixiSpritesheet } {
+export function packGrid(
+  frames: readonly AtlasFrame[],
+  imageName: string,
+  padding = 0,
+  animations?: Readonly<Record<string, readonly string[]>>,
+): { image: RgbaImage; sheet: PixiSpritesheet } {
   if (frames.length === 0) throw new Error('packGrid: nenhum frame para empacotar')
   const cellW = Math.max(...frames.map((f) => f.image.width))
   const cellH = Math.max(...frames.map((f) => f.image.height))
@@ -116,7 +121,9 @@ export function packGrid(frames: readonly AtlasFrame[], imageName: string, paddi
     image: { width, height, data },
     sheet: {
       frames: pixiFrames,
-      animations: groupAnimations(frames.map((f) => f.name)),
+      animations: animations
+        ? Object.fromEntries(Object.entries(animations).map(([key, names]) => [key, [...names]]))
+        : groupAnimations(frames.map((f) => f.name)),
       meta: { image: imageName, format: 'RGBA8888', size: { w: width, h: height }, scale: '1', columns, cell: { w: cellW, h: cellH }, padding },
     },
   }
@@ -151,9 +158,12 @@ export function toTiledTileset(
   order: readonly string[],
   terrains: readonly TerrainInput[] = [],
 ): TiledTileset {
-  const frameNames = Object.keys(sheet.frames)
-  const mismatch = order.length !== frameNames.length || order.some((n) => sheet.frames[n] === undefined)
-  if (mismatch) throw new Error('ordem de frames não corresponde ao spritesheet')
+  // A ordem pode cobrir só parte dos frames de propósito: os quadros de fase de um tile animado
+  // ficam no tiles.json e fora do tiles.tsj, para a paleta do Tiled não repetir a mesma peça.
+  if (order.length === 0) throw new Error('ordem de frames vazia: o tileset ficaria sem nenhum tile')
+  const unknown = order.filter((n) => sheet.frames[n] === undefined)
+  if (unknown.length > 0) throw new Error(`ordem de frames cita nomes fora do spritesheet: ${unknown.join(', ')}`)
+  if (new Set(order).size !== order.length) throw new Error('ordem de frames tem nome repetido')
   const idByName = new Map(order.map((tileName, id) => [tileName, id]))
   const tileId = (tileName: string): number => {
     const id = idByName.get(tileName)

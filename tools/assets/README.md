@@ -16,7 +16,18 @@ pnpm assets map-preview packages/shared/data/hunts/route-1.json [--atlas assets/
 ```
 
 - `inspect` resume assinaturas, contagens e avisos sem escrever nada.
-- `extract` escreve todos os PNGs e o `catalog.json`.
+- `extract` escreve todos os PNGs e o `catalog.json`. O `.spr` e o `.dat` **têm que ser do mesmo
+  pack**: os ids de sprite do `.dat` indexam aquele `.spr` específico e nada avisa quando o par
+  está trocado — o que sai são sprites coerentes, mas do item errado. O pack em uso é o OTPokemon
+  03/2019, e o comando correto é:
+
+  ```bash
+  pnpm assets extract assets/raw/otp2019/_extracted/otp.spr assets/raw/otp2019/_extracted/otp.dat \
+    --out assets/extracted-otp2019 --version 854 --extended
+  ```
+
+  O `assets/raw/Tibia.spr` da raiz é de **outro** pack e não serve para o `otp.dat`. Se o
+  `otp.spr` não estiver em disco, ele está em `assets/raw/otp2019/_extracted.zip`.
 - `contact-sheet` gera o `index.html` usado para descobrir ids de outfit e item; com
   `--tileset <dir>`, desenha `tileset.html` a partir do `tiles.json` do `build` (a folha de
   aprovação da curadoria do tileset, uma célula por tile recortado do atlas) em vez do dump

@@ -50,7 +50,10 @@ Peça fatiada anima peça a peça: um item 2×2 animado gera `<tile>-x0-y0`, `<t
 por diante, cada pedaço com a sua animação.
 
 **Tileset do Tiled.** A ordem escrita em `tiles.tsj` exclui os quadros de fase. A paleta mostra
-uma água, não seis, e o autor não consegue pintar a fase três por engano.
+uma água, não seis, e o autor não consegue pintar a fase três por engano. Como o importador
+resolve o número do tile pelo índice dentro dessa mesma lista, excluir as fases mantém os números
+estáveis e é o que impede um mapa já desenhado de passar a resolver nomes errados quando um tile
+ganhar fases.
 
 **Transições.** As peças geradas pela 4a passam a ser compostas fase a fase: a peça `<nome>-<código>`
 ganha os mesmos quadros que o lado animado tem. Quando `from` e `to` têm contagens diferentes, o

@@ -124,7 +124,9 @@ describe('buildAtlases', () => {
     expect(Object.keys(sheet.frames)).toEqual(['grass', 'pokecenter-x0-y0', 'pokecenter-x1-y0', 'pokecenter-x0-y1', 'pokecenter-x1-y1'])
     expect(Object.values(sheet.frames).every((f) => f.frame.w === 32 && f.frame.h === 32)).toBe(true)
     const tileset = JSON.parse(await readFile(join(outDir, 'tiles.tsj'), 'utf8')) as { tilecount: number }
-    expect(tileset.tilecount).toBe(5)
+    // 5 quadros numa grade de 3x2: a célula sobrando também conta, porque é assim que o Tiled
+    // numera um tileset de imagem, e é esse número que precisa bater com o que ele grava.
+    expect(tileset.tilecount).toBe(6)
   })
 
   it('uma transição gera as catorze peças mistas e o terreno correspondente', async () => {

@@ -161,9 +161,15 @@ o Centro e cada um dos spawns.
 
 Um item que o catálogo marca com mais de uma fase entra no `tiles.json` com um quadro por fase.
 A fase 0 fica com o nome simples do tile, as demais com `<tile>_<fase>`, e o `tiles.json` declara
-`animations[<tile>]` com a lista na ordem. O `tiles.tsj` do Tiled recebe só os nomes simples, para
-a paleta não repetir a mesma água uma vez por fase, e porque é a posição nessa lista que define o
-número do tile: incluir as fases mudaria os números de todo mapa já desenhado.
+`animations[<tile>]` com a lista na ordem. O `tiles.tsj` do Tiled recebe nome só nos
+quadros simples, para a paleta não repetir a mesma água uma vez por fase.
+
+O número de cada tile no `tiles.tsj` é a **célula dele na grade da imagem**, que é como o Tiled
+numera um tileset de imagem, e não a posição na lista de nomes. Por isso `tilecount` conta a grade
+inteira, células vazias do fim incluídas. Consequência prática: acrescentar ou tirar quadros do
+atlas renumera os tiles seguintes, e um `.tmj` desenhado antes passa a apontar para os tiles
+errados. Quando isso acontecer, regrave o `.tmj` a partir dos nomes do `.json` já importado, em
+vez de tentar corrigir gid na mão.
 
 As peças de transição acompanham: quando um dos lados é animado, a peça mista é composta fase a
 fase, com o lado parado repetindo. A máscara de ruído é a mesma em todas as fases da peça, senão

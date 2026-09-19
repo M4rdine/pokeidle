@@ -115,7 +115,9 @@ describe('toTiledTileset', () => {
       0,
     )
     const tileset = toTiledTileset(sheet, 'tibia-tiles', ['water'])
-    expect(tileset.tilecount).toBe(1)
+    // tilecount conta a grade inteira da imagem, como o Tiled faz; só `tiles` é que fica com os
+    // nomes do subconjunto, e o quadro de fase entra na grade sem nome nenhum.
+    expect(tileset.tilecount).toBe(2)
     expect(tileset.tiles).toEqual([{ id: 0, properties: [{ name: 'name', type: 'string', value: 'water' }] }])
   })
 
@@ -123,6 +125,38 @@ describe('toTiledTileset', () => {
     const { sheet } = packGrid([{ name: 'grass', image: solid(32, 32, 1) }], 'tiles.png', 0)
     expect(() => toTiledTileset(sheet, 'x', ['grass', 'sumiu'])).toThrow(/fora do spritesheet: sumiu/)
     expect(() => toTiledTileset(sheet, 'x', ['grass', 'grass'])).toThrow(/nome repetido/)
+  })
+
+  it('numera cada tile pela posição dele na grade da imagem, não pela posição na ordem', () => {
+    // o Tiled deriva o id de um tileset de imagem pela célula da grade, contando TODA célula,
+    // inclusive os quadros de fase que não entram na ordem. Numerar pela ordem gruda o nome no
+    // tile errado a partir do primeiro animado, e o mapa desenhado importa trocado.
+    const frames: AtlasFrame[] = [
+      { name: 'water', image: solid(32, 32, 1) },
+      { name: 'water_1', image: solid(32, 32, 2) },
+      { name: 'water_2', image: solid(32, 32, 3) },
+      { name: 'grass', image: solid(32, 32, 4) },
+    ]
+    const { sheet } = packGrid(frames, 'tiles.png', 0)
+    const tileset = toTiledTileset(sheet, 'tibia-tiles', ['water', 'grass'])
+    const idOf = (name: string): number =>
+      tileset.tiles.find((t) => t.properties[0]!.value === name)!.id
+    expect(idOf('water')).toBe(0)
+    expect(idOf('grass')).toBe(3)
+  })
+
+  it('o terreno aponta para o id de grade do tile, não para a posição na ordem', () => {
+    const frames: AtlasFrame[] = [
+      { name: 'water', image: solid(32, 32, 1) },
+      { name: 'water_1', image: solid(32, 32, 2) },
+      { name: 'water_2', image: solid(32, 32, 3) },
+      { name: 'grass', image: solid(32, 32, 4) },
+    ]
+    const { sheet } = packGrid(frames, 'tiles.png', 0)
+    const tileset = toTiledTileset(sheet, 'tibia-tiles', ['water', 'grass'], [
+      { name: 'praia', colors: ['water', 'grass'], tiles: [{ tile: 'grass', corners: ['grass', 'grass', 'grass', 'grass'] }] },
+    ])
+    expect(tileset.wangsets![0]!.wangtiles[0]!.tileid).toBe(3)
   })
 
   it('rejeita ordem com tamanho ou nomes diferentes do spritesheet', () => {

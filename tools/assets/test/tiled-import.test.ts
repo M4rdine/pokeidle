@@ -361,6 +361,85 @@ describe('parseTiledTileset', () => {
     expect(parseTiledTileset(JSON.parse(JSON.stringify(tileset)))).toEqual(tileset)
   })
 
+  it('com tile animado no meio, o gid pintado no Tiled resolve para o nome certo', () => {
+    // O Tiled numera um tileset de imagem pela célula da grade e conta TODA célula, inclusive os
+    // quadros de fase, que ficam fora da lista de nomes. Se o gerador numerasse pela posição na
+    // lista, 'grass' aqui receberia o id 1 em vez de 2, e todo tile depois do primeiro animado
+    // seria importado trocado — sem erro nenhum, só com o mapa errado.
+    const frame = (v: number) => ({ width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(v) })
+    const packed = packGrid([
+      { name: 'water', image: frame(10) },
+      { name: 'water_1', image: frame(20) },
+      { name: 'grass', image: frame(30) },
+    ], 'tiles.png')
+    const generated = parseTiledTileset(JSON.parse(JSON.stringify(toTiledTileset(packed.sheet, 'tibia-tiles', ['water', 'grass']))))
+    const names = generated.tiles.map((t) => ({ id: t.id, name: t.properties[0]!.value }))
+    expect(names).toEqual([{ id: 0, name: 'water' }, { id: 2, name: 'grass' }])
+
+    // mapa 1x1 com o gid da célula 2 (firstgid 1 + id 2): tem que virar 'grass'
+    const map = {
+      type: 'map',
+      orientation: 'orthogonal',
+      width: 1,
+      height: 1,
+      tilewidth: 32,
+      tileheight: 32,
+      tilesets: [{ firstgid: 1, source: 'tiles.tsj' }],
+      layers: [
+        { type: 'tilelayer', name: 'ground', width: 1, height: 1, data: [3] },
+        { type: 'tilelayer', name: 'detail', width: 1, height: 1, data: [0] },
+        { type: 'tilelayer', name: 'blocking', width: 1, height: 1, data: [0] },
+        {
+          type: 'objectgroup',
+          name: 'objects',
+          objects: [
+            { id: 1, class: 'spawnPoint', x: 0, y: 0, width: 32, height: 32 },
+            { id: 2, class: 'pokecenter', x: 0, y: 0, width: 32, height: 32 },
+            {
+              id: 3,
+              class: 'spawn',
+              x: 0,
+              y: 0,
+              width: 32,
+              height: 32,
+              properties: [
+                { name: 'species', type: 'string', value: 'rattata' },
+                { name: 'minLevel', type: 'int', value: 2 },
+                { name: 'maxLevel', type: 'int', value: 5 },
+                { name: 'count', type: 'int', value: 1 },
+                { name: 'respawnSeconds', type: 'int', value: 20 },
+              ],
+            },
+          ],
+        },
+      ],
+    }
+    // o mapa 1x1 não passa nas validações de borda; o que importa aqui é o nome resolvido
+    expect(() => importTiledMap(map, generated, { id: 'x', name: 'X' })).toThrow(/borda do mapa/)
+    const big = {
+      ...map,
+      width: 3,
+      height: 3,
+      layers: [
+        { type: 'tilelayer', name: 'ground', width: 3, height: 3, data: [3, 3, 3, 3, 3, 3, 3, 3, 3] },
+        { type: 'tilelayer', name: 'detail', width: 3, height: 3, data: [0, 0, 0, 0, 0, 0, 0, 0, 0] },
+        { type: 'tilelayer', name: 'blocking', width: 3, height: 3, data: [0, 0, 0, 0, 0, 0, 0, 0, 0] },
+        map.layers[3]!,
+      ],
+      // pokecenter no meio, longe da borda
+    }
+    const objects = (big.layers[3] as { objects: { id: number; class: string; x: number; y: number }[] }).objects
+    const centered = {
+      ...big,
+      layers: [
+        ...big.layers.slice(0, 3),
+        { type: 'objectgroup', name: 'objects', objects: objects.map((o) => (o.class === 'pokecenter' ? { ...o, x: 32, y: 32 } : o)) },
+      ],
+    }
+    const imported = importTiledMap(centered, generated, { id: 'x', name: 'X' })
+    expect(new Set(imported.layers.ground)).toEqual(new Set(['grass']))
+  })
+
   it('rejeita objeto que não é um tileset do Tiled', () => {
     expect(() => parseTiledTileset({ type: 'map', tiles: [] })).toThrow(/tileset inválido/)
   })

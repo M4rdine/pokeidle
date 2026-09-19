@@ -164,12 +164,21 @@ export function toTiledTileset(
   const unknown = order.filter((n) => sheet.frames[n] === undefined)
   if (unknown.length > 0) throw new Error(`ordem de frames cita nomes fora do spritesheet: ${unknown.join(', ')}`)
   if (new Set(order).size !== order.length) throw new Error('ordem de frames tem nome repetido')
-  const idByName = new Map(order.map((tileName, id) => [tileName, id]))
-  const tileId = (tileName: string): number => {
-    const id = idByName.get(tileName)
-    if (id === undefined) throw new Error(`terreno cita tile "${tileName}", que não está no tileset`)
-    return id
+  // O Tiled deriva o id de um tileset de imagem pela célula da grade, contando TODA célula da
+  // imagem — inclusive os quadros de fase, que ficam fora de `order`. Numerar pela posição em
+  // `order` grudaria o nome no tile errado a partir do primeiro animado.
+  const { columns, cell, padding } = sheet.meta
+  const gridId = (tileName: string): number => {
+    const frame = sheet.frames[tileName]?.frame
+    if (frame === undefined) throw new Error(`terreno cita tile "${tileName}", que não está no tileset`)
+    return (frame.y / (cell.h + padding)) * columns + frame.x / (cell.w + padding)
   }
+  const named = new Set(order)
+  const tileId = (tileName: string): number => {
+    if (!named.has(tileName)) throw new Error(`terreno cita tile "${tileName}", que não está no tileset`)
+    return gridId(tileName)
+  }
+  const rows = Math.ceil((sheet.meta.size.h + padding) / (cell.h + padding))
   return {
     type: 'tileset',
     version: '1.10',
@@ -179,11 +188,12 @@ export function toTiledTileset(
     imageheight: sheet.meta.size.h,
     tilewidth: sheet.meta.cell.w,
     tileheight: sheet.meta.cell.h,
-    tilecount: order.length,
+    // Igual ao que o Tiled calcula sozinho a partir da imagem: toda célula da grade conta.
+    tilecount: columns * rows,
     columns: sheet.meta.columns,
     margin: 0,
     spacing: sheet.meta.padding,
-    tiles: order.map((value, id) => ({ id, properties: [{ name: 'name', type: 'string', value }] })),
+    tiles: order.map((value) => ({ id: gridId(value), properties: [{ name: 'name' as const, type: 'string' as const, value } as const] })),
     ...(terrains.length > 0 && { wangsets: terrains.map((t) => toWangset(t, tileId)) }),
   }
 }

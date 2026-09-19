@@ -9,6 +9,7 @@ const solidSized = (size: number, value: number): RgbaImage => ({ width: size, h
 const frames: AtlasFrame[] = [
   { name: 'grass', image: solid(60) },
   { name: 'tree', image: solid(120) },
+  { name: 'stone', image: solid(200) },
 ]
 const atlas = (() => {
   const packed = packGrid(frames, 'tiles.png')
@@ -32,6 +33,14 @@ describe('renderMapPreview', () => {
     expect([preview.width, preview.height]).toEqual([64, 32])
     expect(pixelAt(preview, 5, 5)).toEqual([60, 60, 60]) // só chão
     expect(pixelAt(preview, 37, 5)).toEqual([120, 120, 120]) // detalhe cobre o chão
+  })
+  it('desenha a copa depois do detalhe', () => {
+    // o tile 1 já tem 'tree' no detail; pôr 'stone' na copa da mesma posição prova a ordem,
+    // porque só a camada desenhada por último pode vencer aquele pixel.
+    const withCanopy: HuntMap = { ...map, layers: { ...map.layers, canopy: [null, 'stone'] } }
+    const preview = renderMapPreview(withCanopy, atlas)
+    expect(pixelAt(preview, 37, 5)).toEqual([200, 200, 200])
+    expect(pixelAt(preview, 5, 5)).toEqual([60, 60, 60])
   })
   it('com blocking, tinge de vermelho só os tiles bloqueados', () => {
     const plain = renderMapPreview(map, atlas)

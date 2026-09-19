@@ -85,6 +85,23 @@ describe('importTiledMap', () => {
     expect(() => parseHuntMap(map)).not.toThrow()
   })
 
+  it('importa a camada de copa quando ela existe', () => {
+    const withCanopy = {
+      ...tiled,
+      layers: [
+        ...tiled.layers.slice(0, 3),
+        { type: 'tilelayer', name: 'canopy', width: 3, height: 3, data: [0, 0, 2, 0, 0, 0, 0, 0, 0] },
+        ...tiled.layers.slice(3),
+      ],
+    }
+    const imported = importTiledMap(withCanopy, tileset, { id: 'route-1', name: 'Rota 1' })
+    expect(imported.layers.canopy).toEqual([null, null, 'mountain', null, null, null, null, null, null])
+  })
+
+  it('omite a copa quando o arquivo não tem a camada', () => {
+    expect(map.layers.canopy).toBeUndefined()
+  })
+
   it('falha se faltar spawnPoint ou pokecenter', () => {
     const noObjects = { ...tiled, layers: tiled.layers.slice(0, 3) }
     expect(() => importTiledMap(noObjects, tileset, { id: 'x', name: 'x' })).toThrow(/spawnPoint/)

@@ -96,6 +96,12 @@ function tileLayer(map: TiledMap, name: string): number[] {
   return layer.data
 }
 
+/** Como `tileLayer`, mas devolve `undefined` em vez de lançar: serve às camadas opcionais. */
+function optionalTileLayer(map: TiledMap, name: string): number[] | undefined {
+  const layer = map.layers.find((l) => l.type === 'tilelayer' && l.name === name)
+  return layer && layer.type === 'tilelayer' ? layer.data : undefined
+}
+
 function objects(map: TiledMap): TiledObject[] {
   return map.layers.flatMap((l) => (l.type === 'objectgroup' ? l.objects : []))
 }
@@ -288,6 +294,7 @@ export function importTiledMap(
   const blocking = tileLayer(map, 'blocking').map((gid) => gid !== 0)
   const spawnPoint = centerTile(singleObject(all, 'spawnPoint'))
   const pokecenter = centerTile(singleObject(all, 'pokecenter'))
+  const canopy = optionalTileLayer(map, 'canopy')
   const problems = checkMap(map, blocking, { spawnPoint, pokecenter }, spawns)
   if (problems.length > 0) throw new Error(`mapa inválido:\n- ${problems.join('\n- ')}`)
   return parseHuntMap({
@@ -300,6 +307,7 @@ export function importTiledMap(
       ground: toNames(tileLayer(map, 'ground')),
       detail: toNames(tileLayer(map, 'detail')),
       blocking,
+      ...(canopy === undefined ? {} : { canopy: toNames(canopy) }),
     },
     spawnPoint,
     pokecenter,

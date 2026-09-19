@@ -45,7 +45,7 @@ function tintBlocking(target: RgbaImage, destX: number, destY: number, size: num
   }
 }
 
-/** Desenha `ground` e depois `detail`; com `blocking`, tinge de vermelho os tiles bloqueados. */
+/** Desenha `ground`, `detail` e `canopy` nessa ordem; com `blocking`, tinge de vermelho os bloqueados. */
 export function renderMapPreview(map: HuntMap, atlas: TilesAtlas, opts: { blocking?: boolean } = {}): RgbaImage {
   const size = map.tileSize
   const target: RgbaImage = {
@@ -53,7 +53,7 @@ export function renderMapPreview(map: HuntMap, atlas: TilesAtlas, opts: { blocki
     height: map.height * size,
     data: new Uint8Array(map.width * size * map.height * size * BYTES_PER_RGBA),
   }
-  for (const layer of [map.layers.ground, map.layers.detail]) {
+  for (const layer of [map.layers.ground, map.layers.detail, map.layers.canopy ?? []]) {
     layer.forEach((name, i) => {
       if (name !== null) blitTile(target, atlas, name, (i % map.width) * size, Math.floor(i / map.width) * size)
     })

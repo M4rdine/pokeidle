@@ -27,7 +27,8 @@ pnpm assets map-preview packages/shared/data/hunts/route-1.json [--atlas assets/
   `loadRegistry().species` do `@pokeidle/shared` (com `--manifest`, usa os nomes do
   manifest em vez do registro).
 - `map-preview` desenha uma hunt já convertida em PNG a partir do atlas gerado pelo `build`,
-  sobrepondo `detail` ao `ground`; com `--blocking`, tinge de vermelho os tiles bloqueados.
+  sobrepondo `detail` ao `ground` e `canopy` aos dois; com `--blocking`, tinge de vermelho os
+  tiles bloqueados.
 
 Os `.tmj` de origem do Tiled (commitados, não gerados) ficam em `tools/assets/maps/` — só o
 `HuntMap` JSON convertido vai para `packages/shared/data/hunts`.
@@ -145,6 +146,21 @@ As checagens de alcançabilidade só rodam quando o ponto de partida é válido:
 mapa ou bloqueado, a mensagem aponta essa causa uma vez, em vez de acusar como inalcançável
 o Centro e cada um dos spawns.
 
+### Tiles animados
+
+Um item que o catálogo marca com mais de uma fase entra no `tiles.json` com um quadro por fase.
+A fase 0 fica com o nome simples do tile, as demais com `<tile>_<fase>`, e o `tiles.json` declara
+`animations[<tile>]` com a lista na ordem. O `tiles.tsj` do Tiled recebe só os nomes simples, para
+a paleta não repetir a mesma água uma vez por fase, e porque é a posição nessa lista que define o
+número do tile: incluir as fases mudaria os números de todo mapa já desenhado.
+
+As peças de transição acompanham: quando um dos lados é animado, a peça mista é composta fase a
+fase, com o lado parado repetindo. A máscara de ruído é a mesma em todas as fases da peça, senão
+a junção cintilaria a cada quadro.
+
+O build falha com o caminho do arquivo que falta se a extração em disco for anterior a isto; é só
+rodar `pnpm assets extract` de novo.
+
 ### Fatiar tiles grandes
 
 Um item do Tibia maior que 1×1 (a cela do tileset é sempre 1 tile de 32px) precisa da
@@ -160,6 +176,9 @@ baixo) — por exemplo, um `pokecenter` 2×2 vira `pokecenter-x0-y0`, `pokecente
 - exatamente **um** tileset, o `tiles.tsj` gerado pelo `build`;
 - três camadas de tiles no nível raiz: `ground`, `detail` e `blocking`
   (qualquer gid diferente de 0 em `blocking` vira `true`);
+- uma quarta camada de tiles opcional, `canopy`, desenhada **depois** dos personagens: é o que
+  cobre o jogador quando ele passa por baixo. Serve para a metade de cima da árvore, varanda,
+  ponte e placa. Ela não bloqueia nada: o tronco continua marcado por você em `blocking`;
 - camadas dentro de grupos **não** são suportadas;
 - uma camada de objetos com as classes:
   - `spawnPoint` (exatamente 1) — posição inicial do jogador;

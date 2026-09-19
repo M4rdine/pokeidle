@@ -157,6 +157,17 @@ As checagens de alcançabilidade só rodam quando o ponto de partida é válido:
 mapa ou bloqueado, a mensagem aponta essa causa uma vez, em vez de acusar como inalcançável
 o Centro e cada um dos spawns.
 
+### Scripts auxiliares
+
+`tools/assets/scripts/` guarda dois utilitários fora do CLI, rodados com `npx tsx`:
+
+- `folha.ts <nome...>` desenha um PNG com os tiles pedidos ampliados, para conferir peça por peça
+  sem abrir o navegador (a variável `OUT` diz onde gravar e `COLS` quantos por linha).
+- `desenhar-rota1.ts` compõe a Rota 1 por código: lagoa com praia, caminho com transição de
+  terreno, grama variada, bosques com copa e props. Ele reescreve `maps/route-1.tmj`, que continua
+  sendo a fonte de autoria; o mapa do jogo sai do `map-import` como sempre. É um ponto de partida
+  para editar no Tiled, não um substituto do editor.
+
 ### Tiles animados
 
 Um item que o catálogo marca com mais de uma fase entra no `tiles.json` com um quadro por fase.

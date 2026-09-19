@@ -9,6 +9,7 @@ import { buildDat, groundItemSpec, outfitSpec } from './fixtures/dat-fixture.js'
 import { buildSpr, solidSprite } from './fixtures/spr-fixture.js'
 
 const RED: Rgb = [255, 0, 0]
+const GREEN: Rgb = [0, 255, 0]
 
 describe('extractAll', () => {
   it('escreve PNGs por outfit/direção/fase, por item, e o catalog.json', async () => {
@@ -47,6 +48,28 @@ describe('extractAll', () => {
     expect(written.version).toBe(860)
 
     await expect(loadCatalog(outDir)).resolves.toEqual(catalog)
+  })
+
+  it('grava um PNG por fase do item, com a fase 0 no caminho antigo', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-extract-fases-'))
+    const sprPath = join(dir, 'Tibia.spr')
+    const datPath = join(dir, 'Tibia.dat')
+    const outDir = join(dir, 'out')
+
+    // dois sprites de cores diferentes; o item 100 tem 3 fases e usa um sprite por fase
+    await writeFile(sprPath, buildSpr([solidSprite(RED), solidSprite(GREEN)]))
+    const animated = { ...groundItemSpec(1), phases: 3, spriteIds: [1, 2, 1] }
+    await writeFile(datPath, buildDat({ items: [animated], outfits: [] }))
+
+    const catalog = await extractAll({ sprPath, datPath, outDir, version: 860 })
+    expect(catalog.items[0]).toMatchObject({ id: 100, phases: 3 })
+
+    const phase0 = decodePng(await readFile(itemFramePath(outDir, 100, 0, 0)))
+    const phase1 = decodePng(await readFile(itemFramePath(outDir, 100, 0, 0, 1)))
+    const phase2 = decodePng(await readFile(itemFramePath(outDir, 100, 0, 0, 2)))
+    expect(Array.from(phase0.data.subarray(0, 4))).toEqual([255, 0, 0, 255])
+    expect(Array.from(phase1.data.subarray(0, 4))).toEqual([0, 255, 0, 255])
+    expect(Array.from(phase2.data.subarray(0, 4))).toEqual([255, 0, 0, 255])
   })
 
   it('loadCatalog rejeita catalog.json inválido', async () => {

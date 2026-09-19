@@ -26,8 +26,9 @@ export function outfitFramePath(outDir: string, id: number, direction: string, p
   return join(outDir, 'outfits', String(id), `${direction}_${phase}.png`)
 }
 
-export function itemFramePath(outDir: string, id: number, px: number, py: number): string {
-  return join(outDir, 'items', `${id}_${px}_${py}.png`)
+export function itemFramePath(outDir: string, id: number, px: number, py: number, phase = 0): string {
+  const suffix = phase === 0 ? '' : `_${phase}`
+  return join(outDir, 'items', `${id}_${px}_${py}${suffix}.png`)
 }
 
 async function writeOutfit(spr: SprFile, outfit: ThingType, outDir: string): Promise<void> {
@@ -43,8 +44,10 @@ async function writeOutfit(spr: SprFile, outfit: ThingType, outDir: string): Pro
 async function writeItem(spr: SprFile, item: ThingType, outDir: string): Promise<void> {
   for (let px = 0; px < item.patternX; px++) {
     for (let py = 0; py < item.patternY; py++) {
-      const img = composeFrame(spr, item, { patternX: px, patternY: py, phase: 0 })
-      await writeFile(itemFramePath(outDir, item.id, px, py), encodePng(img))
+      for (let phase = 0; phase < item.phases; phase++) {
+        const img = composeFrame(spr, item, { patternX: px, patternY: py, phase })
+        await writeFile(itemFramePath(outDir, item.id, px, py, phase), encodePng(img))
+      }
     }
   }
 }

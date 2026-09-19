@@ -2,7 +2,7 @@ import { randomBytes } from 'node:crypto'
 import net from 'node:net'
 import { hpAt, xpForLevel } from '@pokeidle/shared'
 import { eq } from 'drizzle-orm'
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { pokemon, sessions } from '../../src/db/schema.js'
 import { hashToken, resolveSession, TOUCH_INTERVAL_MS } from '../../src/auth/session.js'
 import { loadConfig } from '../../src/config.js'
@@ -53,6 +53,15 @@ let cookie: string
 let trainerId: string
 beforeAll(async () => { t = await testApp({ ws: { pingMs: 100, pongTimeoutMs: 150, sessionRecheckMs: 100 } }); base = await listen(t.app) })
 afterAll(async () => { await t.close() })
+// Socket aberto de um teste anterior continua fazendo o servidor anexar runner e persistir.
+// Se isso coincidir com o `truncate` do próximo teste, o Postgres acusa deadlock e o arquivo
+// falha sozinho, sem nada a ver com o que está sendo testado. Fechar tudo e esperar o
+// agendador ficar ocioso antes de truncar elimina a corrida.
+afterEach(async () => {
+  for (const c of opened) c.close()
+  opened = []
+  await t.scheduler.idle()
+})
 beforeEach(async () => {
   await truncateAll(t.db); t.clock.now = T0
   ;({ cookie, trainerId } = await registerAndLogin(t.app))
@@ -61,7 +70,13 @@ beforeEach(async () => {
   const hpMax = hpAt(charmander.baseStats.hp, 12)
   await t.db.update(pokemon).set({ level: 12, xp: xpForLevel(charmander.growthRate, 12), hp: hpMax, hpMax })
 })
-const open = async (c = cookie) => { const r = await connectWs(base, c); if (!('client' in r)) throw new Error(`rejeitado ${r.rejected}`); return r.client }
+let opened: Awaited<ReturnType<typeof open>>[] = []
+const open = async (c = cookie) => {
+  const r = await connectWs(base, c)
+  if (!('client' in r)) throw new Error(`rejeitado ${r.rejected}`)
+  opened = [...opened, r.client]
+  return r.client
+}
 const waitUntil = async (fn: () => boolean, timeoutMs = 1000): Promise<void> => {
   const start = Date.now()
   while (!fn()) {
@@ -240,9 +255,16 @@ describe('catch-up pelo socket (I4)', () => {
 describe('abuso', () => {
   it('rate limit: 2ª intenção em 200 ms → rate-limited; ping não conta', async () => {
     const c = await open(); await c.next()
-    c.send({ t: 'item.use', itemId: 'potion' }); await c.nextOf('error') // no-hunt
-    c.send({ t: 'ping' }); await c.nextOf('pong')
+    // As três mensagens saem no mesmo tick, sem esperar resposta entre elas: esperar o erro e o
+    // pong no meio fazia a segunda intenção sair depois dos 200 ms com a máquina carregada, e o
+    // teste falhava sozinho. O servidor responde na ordem em que recebe, então a leitura abaixo
+    // continua provando as três coisas: a 1ª intenção passa, o ping não consome a cota e a 2ª
+    // intenção dentro da janela é barrada.
     c.send({ t: 'item.use', itemId: 'potion' })
+    c.send({ t: 'ping' })
+    c.send({ t: 'item.use', itemId: 'potion' })
+    expect(await c.nextOf('error')).toMatchObject({ code: 'no-hunt' })
+    expect(await c.nextOf('pong')).toEqual({ t: 'pong' })
     expect(await c.nextOf('error')).toMatchObject({ code: 'rate-limited' })
     c.close()
   })

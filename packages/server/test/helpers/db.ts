@@ -16,6 +16,17 @@ export async function openTestDb(): Promise<{ db: Db; close: () => Promise<void>
   return { db, close }
 }
 
+/** Filhas antes das mães: apagar nesta ordem respeita as chaves estrangeiras sem cascade. */
+const TEST_TABLES = ['hunt_log', 'hunt_sessions', 'pokedex_entries', 'inventory', 'pokemon', 'trainers', 'sessions', 'users'] as const
+
+/**
+ * Limpa o banco de teste com DELETE, não com TRUNCATE. As tabelas aqui têm dezenas de linhas, e
+ * o TRUNCATE cria e sincroniza arquivos de relação novos a cada chamada: medido em disco
+ * virtualizado (Colima), um único TRUNCATE chegou a 30 s preso em DataFileImmediateSync com a
+ * máquina carregada, enfileirando os outros e estourando o tempo de testes que nada tinham a ver
+ * com isso. O DELETE não toca em arquivo novo e é barato nesse tamanho.
+ */
 export async function truncateAll(db: Db): Promise<void> {
-  await db.execute(sql`truncate table hunt_log, hunt_sessions, pokedex_entries, inventory, pokemon, trainers, sessions, users restart identity cascade`)
+  for (const table of TEST_TABLES) await db.execute(sql.raw(`delete from ${table}`))
+  await db.execute(sql.raw('alter sequence hunt_log_id_seq restart'))
 }

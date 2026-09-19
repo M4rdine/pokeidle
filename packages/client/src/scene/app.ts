@@ -4,14 +4,15 @@ import type { Event } from '@pokeidle/shared/protocol'
 // código do Pixi por implementações equivalentes sem `new Function`.
 import 'pixi.js/unsafe-eval'
 import { Application, Container } from 'pixi.js'
-import { TILE_SIZE } from '../config.js'
+import { TILE_ANIMATION_MS, TILE_SIZE } from '../config.js'
 import { activePokemon, type HuntView } from '../state/hunt-view.js'
 import type { AtlasData } from './atlas.js'
 import { cameraStep, type Camera } from './camera.js'
 import { createEffectRunner, fadeOut, floatingText, lunge, ring, shake } from './effects.js'
 import { createEntityLayer } from './entities.js'
 import { isDone, positionAt } from './interpolate.js'
-import { buildMapSprite } from './map-layer.js'
+import { animatedTileLayer, bakePlacements } from './map-layer.js'
+import { splitLayer } from './map-parts.js'
 import { type Entities } from './reconcile.js'
 import { loadSheets } from './sprites.js'
 
@@ -47,11 +48,25 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
 
   const sheets = await loadSheets(deps.atlas)
   const world = new Container()
-  const mapLayer = buildMapSprite(app.renderer, deps.map, sheets)
+  const worldSize = { w: deps.map.width * TILE_SIZE, h: deps.map.height * TILE_SIZE }
+  const anims = deps.atlas.tiles.animations
+  const ground = splitLayer(deps.map.layers.ground, deps.map.width, anims)
+  const detail = splitLayer(deps.map.layers.detail, deps.map.width, anims)
+  const canopy = splitLayer(deps.map.layers.canopy ?? [], deps.map.width, anims)
+  const mapLayer = bakePlacements(app.renderer, [...ground.baked, ...detail.baked], worldSize, sheets)
+  const animatedGround = animatedTileLayer([...ground.animated, ...detail.animated], sheets)
+  const canopyLayer = bakePlacements(app.renderer, canopy.baked, worldSize, sheets)
+  const animatedCanopy = animatedTileLayer(canopy.animated, sheets)
+  const animatedTiles = [...animatedGround.sprites, ...animatedCanopy.sprites]
   const entities = new Container()
   entities.sortableChildren = true
   const overlay = new Container()
-  world.addChild(mapLayer, entities, overlay)
+  // De baixo para cima: chão assado, chão animado, personagens, copa assada, copa animada e o
+  // overlay de barra de vida e rótulo, que fica acima de tudo para o jogador não sumir na mata.
+  if (mapLayer) world.addChild(mapLayer)
+  world.addChild(animatedGround.container, entities)
+  if (canopyLayer) world.addChild(canopyLayer)
+  world.addChild(animatedCanopy.container, overlay)
   app.stage.addChild(world)
 
   const effects = createEffectRunner(app.ticker)
@@ -74,10 +89,12 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
   let cam: Camera = { x: 0, y: 0 }
   let firstCameraTick = true
   let zoom: 1 | 2 = 1
-  const worldSize = { w: deps.map.width * TILE_SIZE, h: deps.map.height * TILE_SIZE }
 
   app.ticker.add(() => {
     const now = deps.now()
+    // Relógio único: todos os tiles animados trocam de quadro no mesmo instante.
+    const tileFrame = Math.floor(now / TILE_ANIMATION_MS)
+    for (const sprite of animatedTiles) sprite.gotoAndStop(tileFrame % sprite.totalFrames)
     for (const l of entityLayer.live.values()) {
       const p = positionAt(l.tween, now)
       l.sprite.root.x = px(p.x)
@@ -174,7 +191,8 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
       // A textura do mapa é gerada só para esta cena (nunca fica em cache do Assets): pode
       // destruir tudo. Os spritesheets destroem só as sub-texturas de frame (destroyBase=false)
       // — a imagem base do atlas fica em cache do Assets para a próxima cena reusar.
-      mapLayer.texture.destroy(true)
+      mapLayer?.texture.destroy(true)
+      canopyLayer?.texture.destroy(true)
       sheets.pokemon.destroy(false)
       sheets.tiles.destroy(false)
       app.destroy(true, { children: true })

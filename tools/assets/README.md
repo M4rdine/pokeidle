@@ -11,8 +11,8 @@ pnpm assets inspect <spr> <dat> [--version 860|854]
 pnpm assets extract <spr> <dat> [--out assets/extracted] [--version 860|854]
 pnpm assets contact-sheet [--extracted assets/extracted] [--all-outfits] [--all-items] [--tileset assets/atlas]
 pnpm assets build [--extracted assets/extracted] [--manifest tools/assets/manifest.json] [--out assets/atlas]
-pnpm assets map-import tools/assets/maps/route-1.tmj --id route-1 --name "Rota 1" [--tileset assets/atlas/tiles.tsj] [--manifest tools/assets/manifest.json] [--out packages/shared/data/hunts]
-pnpm assets map-preview packages/shared/data/hunts/route-1.json [--atlas assets/atlas] [--out preview.png] [--blocking]
+pnpm assets region-import tools/assets/maps/kanto.tmj [--tileset assets/atlas/tiles.tsj] [--manifest tools/assets/manifest.json] [--out packages/shared/data/hunts] [--regions packages/shared/data/regions.json]
+pnpm assets map-preview packages/shared/data/hunts/campo-inicial.json [--atlas assets/atlas] [--out preview.png] [--blocking]
 ```
 
 - `inspect` resume assinaturas, contagens e avisos sem escrever nada.
@@ -163,10 +163,12 @@ o Centro e cada um dos spawns.
 
 - `folha.ts <nome...>` desenha um PNG com os tiles pedidos ampliados, para conferir peça por peça
   sem abrir o navegador (a variável `OUT` diz onde gravar e `COLS` quantos por linha).
-- `desenhar-rota1.ts` compõe a Rota 1 por código: lagoa com praia, caminho com transição de
-  terreno, grama variada, bosques com copa e props. Ele reescreve `maps/route-1.tmj`, que continua
-  sendo a fonte de autoria; o mapa do jogo sai do `map-import` como sempre. É um ponto de partida
-  para editar no Tiled, não um substituto do editor.
+- `desenhar-kanto.ts` compõe a região inteira por código: oito áreas de bioma, cada uma pintada
+  com o pincel de canto do seu conjunto de terreno, com trilha de terra da partida até o Centro e
+  props por densidade. A composição é pura e fica em `src/kanto-draw.ts` (o elenco dos biomas em
+  `src/kanto-biomas.ts`); o script só lê o tileset e grava `maps/kanto.tmj`. Rode com
+  `pnpm mapa:kanto` na raiz ou `pnpm desenhar:kanto` aqui. É um ponto de partida para editar no
+  Tiled, não um substituto do editor — o mapa do jogo sai do `region-import` como sempre.
 
 ### Tiles animados
 
@@ -174,6 +176,11 @@ Um item que o catálogo marca com mais de uma fase entra no `tiles.json` com um 
 A fase 0 fica com o nome simples do tile, as demais com `<tile>_<fase>`, e o `tiles.json` declara
 `animations[<tile>]` com a lista na ordem. O `tiles.tsj` do Tiled recebe nome só nos
 quadros simples, para a paleta não repetir a mesma água uma vez por fase.
+
+Conjunto de terreno desenhado também anima: a entrada do manifesto aceita `animate: "from" | "to"`
+e, nesse caso, as repetições da peça pura daquele material viram fases (`<tile>_1`, `<tile>_2`) em
+vez de variações estáticas `-v2`/`-v3`. É assim que a água desenhada volta a pulsar. Repetição
+idêntica pixel a pixel é descartada, e cada peça pura leva no máximo três quadros extras.
 
 O número de cada tile no `tiles.tsj` é a **célula dele na grade da imagem**, que é como o Tiled
 numera um tileset de imagem, e não a posição na lista de nomes. Por isso `tilecount` conta a grade

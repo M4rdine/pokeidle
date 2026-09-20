@@ -89,6 +89,31 @@ async function writeWangSet(path: string): Promise<void> {
   await writeFile(path, encodePng(gridPng(cells, 4)))
 }
 
+/** Célula pura de B com uma listra numa linha só: o centro dos quadrantes continua sendo B. */
+function celulaComListra(linha: number): Uint8Array {
+  const d = cellBytes(B, B, B, B)
+  for (let x = 0; x < 32; x++) {
+    const i = (linha * 32 + x) * 4
+    d[i] = A; d[i + 1] = A; d[i + 2] = A
+  }
+  return d
+}
+
+/**
+ * As dezesseis combinações mais três repetições da peça pura B: duas com desenho próprio
+ * (variações de verdade) e uma cópia exata da primeira, que o build tem que descartar. A
+ * diferença é de desenho, não de tom, porque `harmonize` iguala tons de propósito.
+ */
+async function writeWangSetComRepetidos(path: string): Promise<void> {
+  const cells: Uint8Array[] = []
+  for (const tl of [A, B]) for (const tr of [A, B]) for (const bl of [A, B]) for (const br of [A, B]) {
+    cells.push(cellBytes(tl, tr, bl, br))
+  }
+  cells.push(celulaComListra(0), celulaComListra(15), celulaComListra(0))
+  await mkdir(dirname(path), { recursive: true })
+  await writeFile(path, encodePng(gridPng(cells, 4)))
+}
+
 /** Só duas combinações: o pincel ficaria com catorze buracos. */
 async function writeIncompleteSet(path: string): Promise<void> {
   await mkdir(dirname(path), { recursive: true })
@@ -329,6 +354,55 @@ describe('buildAtlases', () => {
     const pincel = tileset.wangsets.find((w) => w.name === 'campo-caminho')!
     expect(pincel.colors).toHaveLength(2)
     expect(pincel.wangtiles).toHaveLength(16)
+  })
+
+  it('peça pura repetida vira variação, e repetição idêntica é descartada', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    const terrenosDir = join(dir, 'terrenos')
+    await mkdir(terrenosDir, { recursive: true })
+    await writeWangSetComRepetidos(join(terrenosDir, 'campo-pedra.png'))
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }],
+      // swap porque as repetições fazem do segundo material a maioria da grade, e é o material
+      // majoritário que o leitor assume como fundo — a mesma inversão dos conjuntos reais.
+      terrainSets: [{ name: 'campo-pedra', from: 'campo', to: 'pedra', file: 'campo-pedra.png', swap: true }],
+    }))
+
+    await buildAtlases({ extractedDir, manifestPath, outDir: dir, terrainsDir: terrenosDir }, () => {})
+
+    const sheet = JSON.parse(await readFile(join(dir, 'tiles.json'), 'utf8')) as { frames: Record<string, unknown>; animations: Record<string, string[]> }
+    // Três repetições, duas distintas: só duas variações saem.
+    expect(Object.keys(sheet.frames).filter((n) => /^campo-pedra-bbbb-v\d$/.test(n))).toEqual(['campo-pedra-bbbb-v2', 'campo-pedra-bbbb-v3'])
+    expect(sheet.animations['campo-pedra-bbbb']).toBeUndefined()
+  })
+
+  it('conjunto marcado como animado transforma as repetições em fases, não em variações', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    const terrenosDir = join(dir, 'terrenos')
+    await mkdir(terrenosDir, { recursive: true })
+    await writeWangSetComRepetidos(join(terrenosDir, 'campo-agua.png'))
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }],
+      terrainSets: [{ name: 'campo-agua', from: 'campo', to: 'agua', file: 'campo-agua.png', swap: true, animate: 'to' }],
+    }))
+
+    await buildAtlases({ extractedDir, manifestPath, outDir: dir, terrainsDir: terrenosDir }, () => {})
+
+    const sheet = JSON.parse(await readFile(join(dir, 'tiles.json'), 'utf8')) as { frames: Record<string, unknown>; animations: Record<string, string[]> }
+    expect(sheet.animations['campo-agua-bbbb']).toEqual(['campo-agua-bbbb', 'campo-agua-bbbb_1', 'campo-agua-bbbb_2'])
+    expect(Object.keys(sheet.frames).filter((n) => n.startsWith('campo-agua-bbbb-v'))).toEqual([])
+
+    // Quadro de fase não entra no tileset do Tiled: quem pinta o mapa vê um tile só.
+    const tileset = JSON.parse(await readFile(join(dir, 'tiles.tsj'), 'utf8')) as { tiles: { properties: { value: string }[] }[] }
+    const nomes = tileset.tiles.map((t) => t.properties[0]!.value)
+    expect(nomes).toContain('campo-agua-bbbb')
+    expect(nomes).not.toContain('campo-agua-bbbb_1')
   })
 
   it('recusa conjunto de terreno incompleto, em vez de gerar pincel com buraco', async () => {

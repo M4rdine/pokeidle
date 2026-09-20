@@ -522,7 +522,8 @@
       "from": "campo",
       "to": "agua",
       "file": "campo-agua.png",
-      "swap": true
+      "swap": true,
+      "animate": "to"
     },
     {
       "name": "campo-areia",
@@ -536,7 +537,8 @@
       "from": "areia",
       "to": "agua",
       "file": "areia-agua.png",
-      "swap": true
+      "swap": true,
+      "animate": "to"
     },
     {
       "name": "pedra-caverna",

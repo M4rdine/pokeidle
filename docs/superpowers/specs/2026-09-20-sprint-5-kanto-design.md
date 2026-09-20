@@ -49,9 +49,11 @@ com material por bioma e pincel de canto de verdade:
 
 1. Campo de alturas por ruído decide o material de cada canto dentro da área.
 2. O tile sai do pincel do bioma, escolhendo a peça pelo código dos quatro cantos.
-3. Props entram por densidade de bioma, com árvore ocupando dois tiles, tronco bloqueando e copa
+3. Trilha de terra batida corta a área ligando o ponto de partida ao Centro Pokémon. Além de dar
+   direção ao olho, ela garante um corredor sem props entre os dois — prop só nasce em material
+   primário. Bioma de caverna não recebe trilha: lá o chão já é o caminho.
+4. Props entram por densidade de bioma, com árvore ocupando dois tiles, tronco bloqueando e copa
    na camada de cima.
-4. Caminho de terra liga as áreas, passando pelos Centros.
 
 O resultado é ponto de partida para o Tiled, não substituto: o arquivo continua sendo `.tmj` e o
 usuário pode abrir e ajustar qualquer área à mão.
@@ -71,5 +73,10 @@ O maior é a área ficar bonita e injogável: Centro cercado, spawn ilhado. Miti
 do importador já cobrem os dois casos e recusam a região inteira nomeando a área.
 
 O segundo é o mapa ficar monótono, porque ruído puro tende a manchas parecidas. Mitigação: cada
-bioma tem a própria mistura de materiais e a própria densidade de props, e o caminho de terra
-cruza o mapa dando direção.
+bioma tem a própria mistura de materiais e a própria densidade de props, as peças puras têm
+variações de desenho, e a trilha de terra cruza a área dando direção.
+
+O terceiro apareceu na revisão: trocar a água do dump pela água desenhada tirou a animação do
+lago, porque só o item do dump trazia fases. Mitigação implementada: a entrada do manifesto de um
+conjunto de terreno aceita `animate`, e as repetições da peça pura daquele material viram fases de
+animação — a água desenhada pulsa como a antiga.

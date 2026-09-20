@@ -1,4 +1,4 @@
-import { loadRegistry, type Registry } from '@pokeidle/shared'
+import { loadContentRegistry, type ContentRegistry } from '@pokeidle/shared'
 import type { ClientMessage } from '@pokeidle/shared/protocol'
 import type { Http } from './api/http.js'
 import type { GameLoop } from './game-loop.js'
@@ -13,7 +13,7 @@ export type ModalName = 'bag' | 'team' | 'settings' | 'pokedex' | 'shop'
 
 export interface AppContext {
   readonly http: Http
-  readonly registry: Registry
+  readonly registry: ContentRegistry
   readonly session: Store<SessionState>
   readonly hunt: Store<HuntView>
   readonly log: Store<readonly LogLine[]>
@@ -39,7 +39,7 @@ const memoryStorage = (): Pick<Storage, 'getItem' | 'setItem'> => {
 export function createContext(over: Partial<AppContext> = {}): AppContext {
   return {
     http: { get: noHttp, post: noHttp, put: noHttp, patch: noHttp },
-    registry: loadRegistry(),
+    registry: loadContentRegistry(),
     session: createStore(initialSession()),
     hunt: createStore(emptyHuntView()),
     log: createStore<readonly LogLine[]>([]),

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { TYPE_NAMES } from '../src/index.js'
-import { buildRegistry, loadRegistry } from '../src/registry.js'
+import { buildRegistry } from '../src/registry.js'
+import { loadRegistry } from '../src/registry-full.js'
 
 const minimal = () => ({
   species: [
@@ -12,7 +13,7 @@ const minimal = () => ({
   items: [{ id: 'potion', name: 'Poção', kind: 'potion', healPercent: 20, buyPrice: 100, sellPrice: 50 }],
   loot: [{ species: 'charmander', gold: [1, 2], drops: [{ item: 'potion', chance: 0.5 }] }],
   unlocks: { growthRate: 'medium-fast', teamSlots: [{ level: 1, slots: 3 }], items: {}, regions: {} },
-  regions: [{ id: 'kanto', name: 'Kanto', order: 1, minTrainerLevel: 1, width: 1, height: 2, areas: [{ id: 'r', name: 'R', bounds: { x: 0, y: 0, width: 1, height: 2 }, anchor: { x: 0, y: 1 }, species: ['charmander'], minLevel: 1, maxLevel: 3 }] }],
+  regions: [{ id: 'kanto', name: 'Kanto', order: 1, minTrainerLevel: 1, width: 1, height: 2, areas: [{ id: 'r', name: 'R', bounds: { x: 0, y: 0, width: 1, height: 2 }, anchor: { x: 0, y: 1 }, species: ['charmander'], minLevel: 1, maxLevel: 3, wildCount: 3, respawnSeconds: 20, minTrainerLevel: 1 }] }],
   hunts: [{ id: 'r', name: 'R', width: 1, height: 2, tileSize: 32, layers: { ground: ['grass', 'grass'], detail: [null, null], blocking: [false, false] }, spawnPoint: { x: 0, y: 0 }, pokecenter: { x: 0, y: 1 }, spawns: [{ speciesName: 'charmander', minLevel: 1, maxLevel: 3, x: 0, y: 0, radius: 0, count: 1, respawnSeconds: 10 }] }],
 })
 
@@ -32,7 +33,13 @@ describe('buildRegistry', () => {
     raw.loot[0]!.drops = [{ item: 'master-ball', chance: 1 }]
     raw.hunts[0]!.spawns[0]!.speciesName = 'mewtwo'
     raw.unlocks = { ...raw.unlocks, items: { 'master-ball': 5 } }
-    expect(() => buildRegistry(raw)).toThrow(/registro inconsistente:[\s\S]*fire-blast[\s\S]*charizard[\s\S]*master-ball[\s\S]*mewtwo[\s\S]*master-ball/)
+    // Todos os problemas de uma vez, não o primeiro: quem corrige o conteúdo quer a lista
+    // inteira. A ordem do relatório não faz parte do contrato.
+    const erro = (() => { try { buildRegistry(raw); return '' } catch (e) { return e instanceof Error ? e.message : String(e) } })()
+    expect(erro).toMatch(/^registro inconsistente:/)
+    for (const trecho of ['fire-blast', 'charizard', 'loot de charmander: item master-ball', 'unlocks: item master-ball', 'mewtwo']) {
+      expect(erro, trecho).toContain(trecho)
+    }
   })
   it('rejeita id ou nome de espécie duplicado', () => {
     const raw = minimal()

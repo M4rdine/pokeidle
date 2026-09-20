@@ -4,7 +4,7 @@ import { MODAL_LABELS } from '../../config.js'
 import { trainerProgress } from '../../state/progress.js'
 import { el, mount } from '../dom.js'
 
-/** Lista as hunts liberadas e, abaixo, as futuras com o nível que as destrava. */
+/** Lista as áreas do treinador: as liberadas com botão, as bloqueadas com o nível que as abre. */
 export function mountHunts(root: HTMLElement, ctx: AppContext): () => void {
   const { me, hunts } = ctx.session.get()
   const error = el('p', { class: 'form-error', role: 'alert' })
@@ -19,28 +19,24 @@ export function mountHunts(root: HTMLElement, ctx: AppContext): () => void {
         button.removeAttribute('disabled')
       })
   }
-  const available = hunts.map((hunt) => {
+  // Área bloqueada continua na lista, esmaecida e sem botão: saber o que vem depois faz parte do
+  // jogo, e é o servidor que decide o bloqueio — o cliente só desenha o que recebeu.
+  const cartao = (hunt: (typeof hunts)[number]) => {
+    const faixa = el('p', { class: 'hunt-levels' }, `níveis ${hunt.minLevel}–${hunt.maxLevel}`)
+    if (hunt.locked) {
+      return el('article', { class: 'hunt-card hunt-locked panel', 'data-hunt': hunt.id },
+        el('h2', {}, hunt.name),
+        faixa,
+        el('p', { class: 'hunt-gate' }, `abre no nível ${hunt.minTrainerLevel}`))
+    }
     const button = el('button', { class: 'primary', type: 'button' }, 'Iniciar')
     button.addEventListener('click', () => start(hunt.id, button))
-    return el('article', { class: 'hunt-card panel', 'data-hunt': hunt.id },
-      el('h2', {}, hunt.name),
-      el('p', { class: 'hunt-levels' }, `níveis ${hunt.minLevel}–${hunt.maxLevel}`),
-      button)
-  })
-  // Região bloqueada aparece como um cartão só, com o nível que a abre: as áreas dela ainda não
-  // vêm do servidor, então não há o que listar por dentro.
-  const known = new Set(hunts.map((h) => h.id))
-  const regionOf = new Map<string, string>()
-  for (const region of ctx.registry.regions.values()) {
-    for (const area of region.areas) regionOf.set(area.id, region.id)
+    return el('article', { class: 'hunt-card panel', 'data-hunt': hunt.id }, el('h2', {}, hunt.name), faixa, button)
   }
-  const visibleRegions = new Set([...known].map((id) => regionOf.get(id)).filter((r): r is string => r !== undefined))
-  const locked = Object.entries(ctx.registry.unlocks.regions)
-    .filter(([id]) => !visibleRegions.has(id))
-    .sort((a, b) => a[1] - b[1])
-    .map(([id, level]) => el('article', { class: 'hunt-card hunt-locked panel', 'data-hunt': id },
-      el('h2', {}, ctx.registry.regions.get(id)?.name ?? id),
-      el('p', { class: 'hunt-levels' }, `destrava no nível ${level}`)))
+  // Ordem de dificuldade: o que já dá para jogar primeiro, o resto na sequência em que abre.
+  const cartoes = [...hunts]
+    .sort((a, b) => Number(a.locked) - Number(b.locked) || a.minTrainerLevel - b.minTrainerLevel)
+    .map(cartao)
 
   const progress = me ? trainerProgress(ctx.registry, me.trainer.xp) : null
   const bar = el('header', { class: 'trainer-bar panel' },
@@ -56,7 +52,7 @@ export function mountHunts(root: HTMLElement, ctx: AppContext): () => void {
   mount(root, el('section', { class: 'screen screen-hunts' },
     bar,
     el('h1', {}, 'Hunts'),
-    el('div', { class: 'hunt-grid' }, ...available, ...locked),
+    el('div', { class: 'hunt-grid' }, ...cartoes),
     shortcuts,
     error))
   return () => { root.replaceChildren() }

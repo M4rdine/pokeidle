@@ -1,3 +1,4 @@
+import { findArea } from '@pokeidle/shared'
 import { z } from 'zod'
 import type { AppContext, ModalName } from '../../app-context.js'
 import { MODAL_LABELS } from '../../config.js'
@@ -55,10 +56,10 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
   async function loadEntries() { return (await ctx.http.get('/trainer/pokedex', PokedexSchema)).entries }
   const renderDex = (): void => {
     const huntId = ctx.hunt.get().session?.huntId
-    const map = huntId ? ctx.registry.hunts.get(huntId) : undefined
-    if (!map) { dex.textContent = ''; return }
-    const { n, m } = huntPokedexCount(ctx.hunt.get(), entries, map)
-    dex.textContent = `${map.name}: ${n}/${m}`
+    const area = huntId ? findArea(ctx.registry.regions, huntId)?.area : undefined
+    if (!area) { dex.textContent = ''; return }
+    const { n, m } = huntPokedexCount(ctx.hunt.get(), entries, area.species)
+    dex.textContent = `${area.name}: ${n}/${m}`
   }
   void loadEntries().then((loaded) => { entries = loaded; renderDex() }).catch(() => {})
   const offDex = ctx.hunt.subscribe((v) => v.state?.settings.seen, renderDex)

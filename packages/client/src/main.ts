@@ -2,7 +2,7 @@ import './styles/tokens.css'
 import './styles/layout.css'
 import './styles/hud.css'
 import './styles/modals.css'
-import { loadRegistry } from '@pokeidle/shared'
+import { loadContentRegistry } from '@pokeidle/shared'
 import { HuntsSchema, MeSchema } from './api/dto.js'
 import { ApiError, createHttp } from './api/http.js'
 import { createContext, type AppContext, type ModalName } from './app-context.js'
@@ -66,7 +66,7 @@ async function boot(): Promise<void> {
   })
   ctx = createContext({
     http,
-    registry: loadRegistry(),
+    registry: loadContentRegistry(),
     session: createStore(initialSession()),
     hunt: createStore(emptyHuntView()),
     toasts,

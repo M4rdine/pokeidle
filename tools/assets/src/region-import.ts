@@ -103,6 +103,14 @@ export function cropRegion(map: TiledMapLike, rect: Rect): TiledMapLike {
   return { ...map, width: rect.width, height: rect.height, layers }
 }
 
+/**
+ * Quanto abaixo do selvagem mais fraco o treinador ainda pode entrar. Uma folga fixa em vez de
+ * uma tabela: o portão existe para evitar que o nível 1 entre na caverna, não para microgerir.
+ */
+const FOLGA_DE_NIVEL = 2
+
+const nivelMinimoDeTreinador = (menorNivelDaArea: number): number => Math.max(1, menorNivelDaArea - FOLGA_DE_NIVEL)
+
 /** Metadados de uma área, no referencial da região, para o navegador de áreas do cliente. */
 export interface AreaMeta {
   readonly id: string
@@ -113,6 +121,12 @@ export interface AreaMeta {
   readonly species: readonly string[]
   readonly minLevel: number
   readonly maxLevel: number
+  /** Quantos selvagens a área mantém vivos ao mesmo tempo, somando todos os spawns. */
+  readonly wildCount: number
+  /** Tempo de renascimento do spawn mais lento: é ele que limita o ritmo da caçada. */
+  readonly respawnSeconds: number
+  /** Nível de treinador exigido para entrar, derivado da faixa de níveis da área. */
+  readonly minTrainerLevel: number
 }
 
 export interface RegionMeta {
@@ -250,6 +264,9 @@ export function importRegion(
       species: [...new Set(hunt.spawns.map((s) => s.speciesName))],
       minLevel: Math.min(...niveis),
       maxLevel: Math.max(...niveis),
+      wildCount: hunt.spawns.reduce((total, s) => total + s.count, 0),
+      respawnSeconds: Math.max(...hunt.spawns.map((s) => s.respawnSeconds)),
+      minTrainerLevel: nivelMinimoDeTreinador(Math.min(...niveis)),
     })
   }
 

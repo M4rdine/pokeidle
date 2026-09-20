@@ -1,4 +1,4 @@
-import { cooldownTicks, hpAt, STRUGGLE, xpForLevel, type Registry } from '@pokeidle/shared'
+import { cooldownTicks, hpAt, STRUGGLE, xpForLevel, type ContentRegistry } from '@pokeidle/shared'
 import type { Event, HuntState, PokemonState, ServerMessage, SessionInfo, StopReason, Summary, WildState } from '@pokeidle/shared/protocol'
 
 export type Phase = 'idle' | 'catching-up' | 'active' | 'stopped'
@@ -23,8 +23,8 @@ const mapWild = (view: HuntView, id: number, fn: (w: WildState) => WildState): H
 const removeWild = (view: HuntView, id: number): HuntView => withState(view, { ...view.state!, wilds: view.state!.wilds.filter((w) => w.id !== id) })
 const addItem = (view: HuntView, itemId: string, delta: number): HuntView => withState(view, { ...view.state!, inventory: { ...view.state!.inventory, [itemId]: (view.state!.inventory[itemId] ?? 0) + delta } })
 const clearTarget = (view: HuntView): HuntView => withDerived(withPlayer(view, { targetWildId: null }), { targetWildId: null })
-const baseHp = (registry: Registry, speciesName: string): number => registry.species.get(speciesName)?.baseStats.hp ?? 1
-const growthOf = (registry: Registry, speciesName: string) => registry.species.get(speciesName)?.growthRate ?? 'medium-fast'
+const baseHp = (registry: ContentRegistry, speciesName: string): number => registry.species.get(speciesName)?.baseStats.hp ?? 1
+const growthOf = (registry: ContentRegistry, speciesName: string) => registry.species.get(speciesName)?.growthRate ?? 'medium-fast'
 
 export function applySnapshot(view: HuntView, msg: Snapshot): HuntView {
   const s = msg.state
@@ -33,7 +33,7 @@ export function applySnapshot(view: HuntView, msg: Snapshot): HuntView {
 
 function rescale(p: PokemonState, hpMax: number): PokemonState { return { ...p, hpMax, hp: Math.max(0, Math.min(hpMax, p.hp + (hpMax - p.hpMax))) } }
 
-function capture(view: HuntView, e: Extract<Event, { type: 'captured' }>, registry: Registry): HuntView {
+function capture(view: HuntView, e: Extract<Event, { type: 'captured' }>, registry: ContentRegistry): HuntView {
   const s = view.state!
   const wild = s.wilds.find((w) => w.id === e.wildId)
   const hpMax = wild?.hpMax ?? hpAt(baseHp(registry, e.speciesName), e.level)
@@ -46,7 +46,7 @@ function capture(view: HuntView, e: Extract<Event, { type: 'captured' }>, regist
 }
 
 /** Uma linha por tipo de evento (spec §4). Puro: devolve um view novo. */
-export function applyEvent(view: HuntView, e: Event, registry: Registry): HuntView {
+export function applyEvent(view: HuntView, e: Event, registry: ContentRegistry): HuntView {
   if (!view.state) return view
   const s = view.state
   switch (e.type) {
@@ -91,7 +91,7 @@ export function applyEvent(view: HuntView, e: Event, registry: Registry): HuntVi
   }
 }
 
-export function applyServerMessage(view: HuntView, msg: ServerMessage, registry: Registry): HuntView {
+export function applyServerMessage(view: HuntView, msg: ServerMessage, registry: ContentRegistry): HuntView {
   switch (msg.t) {
     case 'hunt.snapshot': return applySnapshot(view, msg)
     case 'hunt.tick': {

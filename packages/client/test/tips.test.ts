@@ -1,4 +1,4 @@
-import { loadRegistry } from '@pokeidle/shared'
+import { loadContentRegistry } from '@pokeidle/shared'
 import type { ServerMessage } from '@pokeidle/shared/protocol'
 import { describe, expect, it, vi } from 'vitest'
 import { createContext } from '../src/app-context.js'
@@ -7,7 +7,7 @@ import { ballWarning, huntPokedexCount, tipFor } from '../src/state/tips.js'
 import { createTipShower } from '../src/ui/tips.js'
 import fixture from './fixtures/route1-300.json' with { type: 'json' }
 
-const registry = loadRegistry()
+const registry = loadContentRegistry()
 const snapshot = (fixture as unknown as { snapshot: Extract<ServerMessage, { t: 'hunt.snapshot' }> }).snapshot
 const view = applySnapshot(emptyHuntView(), snapshot)
 const wildId = snapshot.state.wilds[0]!.id
@@ -39,8 +39,8 @@ describe('dicas de primeira vez', () => {
   it('ballWarning e huntPokedexCount', () => {
     expect(ballWarning(view, registry)).toBe(false)
     expect(ballWarning({ ...view, state: { ...view.state!, inventory: { 'poke-ball': 1 } } }, registry)).toBe(true)
-    const map = registry.hunts.get('campo-inicial')!
-    const total = new Set(map.spawns.map((s) => s.speciesName)).size
-    expect(huntPokedexCount(view, [{ speciesName: 'zubat', seenAt: 'x', caughtAt: 'y' }], map)).toEqual({ n: map.spawns.some((s) => s.speciesName === 'zubat') ? 1 : 0, m: total })
+    const area = registry.regions.get('kanto')!.areas.find((a) => a.id === 'campo-inicial')!
+    const esperado = { n: area.species.includes('zubat') ? 1 : 0, m: area.species.length }
+    expect(huntPokedexCount(view, [{ speciesName: 'zubat', seenAt: 'x', caughtAt: 'y' }], area.species)).toEqual(esperado)
   })
 })

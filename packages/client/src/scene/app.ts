@@ -1,4 +1,4 @@
-import { typeMultiplier, type HuntMap, type Registry } from '@pokeidle/shared'
+import { typeMultiplier, type HuntMap, type ContentRegistry } from '@pokeidle/shared'
 import type { Event } from '@pokeidle/shared/protocol'
 // A CSP do servidor (default-src 'self') proíbe unsafe-eval; este módulo troca os geradores de
 // código do Pixi por implementações equivalentes sem `new Function`.
@@ -19,7 +19,7 @@ import { loadSheets } from './sprites.js'
 export interface SceneDeps {
   readonly atlas: AtlasData
   readonly map: HuntMap
-  readonly registry: Registry
+  readonly registry: ContentRegistry
   readonly now: () => number
   /** Só para teste/injeção; o padrão (aba em segundo plano) já é o que a Task 9 precisa. */
   readonly isHidden?: () => boolean

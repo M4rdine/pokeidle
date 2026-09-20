@@ -122,6 +122,17 @@ Charmander nível 10 na Rota 1, 10 minutos, regras deste documento: 170–210 de
 capturas, ~7 000 XP, ~1 500 ouro, nível 21–22 do Pokémon, 7–15 retornos ao Centro, 0–1 queda.
 Custo de CPU do servidor: 58 µs por tick por hunt (~850 hunts simultâneas em 25 % de um núcleo).
 
+**Medição de 2026-09-20, depois do sprint 5.** A Rota 1 deu lugar ao Campo Inicial, que tem cinco
+espécies e vinte selvagens — densidade subida de propósito para alcançar as 150 derrotas e as três
+capturas que este documento exige. O ouro veio junto e dobrou: **~3 200 em dez minutos** (medido
+em três seeds), contra os ~1 500 previstos aqui. Os preços da loja continuam como estão, o que na
+prática deixa a primeira sessão com o dobro do poder de compra planejado.
+
+Decisão em aberto para o dono do jogo, porque é balanceamento e não implementação: aceitar o
+número novo, dobrar os preços da loja, ou cortar o ouro por derrota pela metade. O teste
+`packages/server/test/balance.test.ts` trava a faixa medida hoje (2 500–4 000) para que o número
+não volte a mudar sem ninguém ver.
+
 ## 7. O que muda no código (entra como "fase 3a: regras e economia", antes do cliente)
 
 1. `items.json`: Poção 20 %/100, Super 50 %/400, Hiper 100 %/1 500; `sellPrice` = metade.

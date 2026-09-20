@@ -56,12 +56,18 @@ O motor passa a sortear com a chance ajustada. `rollLoot` ganha o parâmetro, e 
 `buildRegistry` ganha um bloco novo de checagens, no mesmo formato das que já existem (todos os
 problemas de uma vez, não o primeiro):
 
-- Todo item exigido por uma evolução é obtenível: cai de alguma espécie ou está à venda na loja.
-- Toda espécie do registro aparece em alguma área — senão ela é inalcançável e a Pokédex não fecha.
-- Toda tabela de loot fecha: a soma das chances de uma espécie não passa de 1, e nenhum item da
-  tabela é desconhecido (esta última já existe e fica).
-- Todo item vendido na loja tem preço maior que zero, e todo item que a loja compra tem preço de
-  venda menor que o de compra.
+- Todo item que o jogo exige é obtenível: cai de alguma espécie ou está à venda na loja. A
+  checagem nasceu mirando pedras de evolução, mas o nosso modelo de evolução ainda é só por nível
+  (evolução por item é da sprint 10); hoje ela vale sobre os itens que a tabela de destraves
+  exige, e cobre as pedras no dia em que elas existirem, sem precisar de código novo.
+- Nenhum drop tem chance zero: uma entrada que nunca cai é conteúdo morto se passando por
+  conteúdo. (A ideia original de somar as chances e exigir ≤ 1 estava errada: os drops são
+  sorteados de forma independente, então somar não significa nada.)
+- Todo item que a loja vende tem preço de venda menor que o de compra, senão existe um ciclo de
+  ouro infinito.
+- "Toda espécie aparece em alguma área" ficou de fora: com uma região só, quarenta das quarenta e
+  duas espécies estão legitimamente sem área. A checagem entra na sprint 8, junto com a segunda
+  região, que é quando ela passa a acusar algo de verdade.
 
 A checagem roda no boot do servidor e no teste do registro, que é onde ela precisa doer.
 
@@ -89,8 +95,9 @@ faixa de nível: é a informação que explica por que uma área difícil vale a
   entrada fora de faixa é recusada.
 - O motor: com a mesma seed, a área de degrau alto produz mais drops que a de degrau 1 em 3000
   ticks, e o ouro **não** muda — é a prova de que o multiplicador ficou onde deveria.
-- O registro: um item exigido por evolução que não cai em lugar nenhum derruba `buildRegistry`
-  com mensagem nomeando o item e a evolução; uma espécie sem área também.
+- O registro: um item exigido que não cai nem está à venda derruba `buildRegistry` nomeando o
+  item; preço de venda acima do de compra e drop com chance zero também; e o conteúdo real do
+  repositório passa em todas as checagens.
 - O analisador: a chance mostrada é a ajustada, não a base.
 
 ## 8. Riscos
@@ -100,6 +107,15 @@ drop, e o teste de balanceamento que já existe passa a medir também o ouro por
 regressão.
 
 O segundo é a validação nova recusar o jogo por conteúdo legítimo que ainda não foi importado —
-uma espécie sem área hoje é o caso normal, porque só Kanto existe. Mitigação: a checagem de
-"espécie sem área" nasce como aviso no boot e só vira erro quando a segunda região entrar, na
-sprint 8; as outras três nascem como erro.
+uma espécie sem área hoje é o caso normal, porque só Kanto existe. Mitigação: essa checagem ficou
+de fora e entra na sprint 8, com a segunda região; as outras nasceram como erro.
+
+## 9. O que a execução mostrou
+
+O teste de ouro não confirmou a previsão, contradisse: a área inicial rende **~3 200 de ouro em
+dez minutos**, o dobro dos ~1 500 que o GDD §6 registra. A causa não é a raridade (ela não toca
+ouro) e sim o sprint 5, que subiu a densidade da área inicial para cinco espécies e vinte
+selvagens a fim de alcançar as 150 derrotas exigidas pelo próprio GDD. O teste trava a faixa
+medida hoje, e a escolha entre aceitar o número, dobrar os preços da loja ou cortar o ouro por
+derrota está registrada no GDD §6 como decisão em aberto do dono do jogo — é balanceamento, não
+implementação.

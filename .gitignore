@@ -17,5 +17,7 @@ packages/client/playwright-report
 # no build local (ver docs/deploy.md).
 packages/server/public/atlas/
 
-# Capturas e rascunhos da revisão de design: material de trabalho, não entrega.
-.impeccable/
+# Capturas da revisão de design são material de trabalho; o design.json ao lado do DESIGN.md é
+# sistema e fica versionado.
+.impeccable/review/
+.impeccable/mocks/

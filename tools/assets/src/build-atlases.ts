@@ -159,6 +159,11 @@ async function terrainSetFrames(
       return { measured: m.measured, canonical: alvo }
     })
     for (const [code, image] of grid.pieces) frames.push({ name: `${set.name}-${code}`, image: harmonize(image, shifts) })
+    // Variações das peças puras: campo grande com um tile só fica chapado e denuncia repetição.
+    for (const code of ['aaaa', 'bbbb']) {
+      const extras = (grid.variants.get(code) ?? []).slice(1)
+      extras.forEach((image, i) => frames.push({ name: `${set.name}-${code}-v${i + 2}`, image: harmonize(image, shifts) }))
+    }
     terrains.push({
       name: set.name,
       colors: [set.from, set.to],

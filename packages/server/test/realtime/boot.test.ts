@@ -28,7 +28,7 @@ async function trainerWithHunt(n: number, seed: number, app: TestApp = t): Promi
   const charmander = app.registry.species.get('charmander')!
   const hpMax = hpAt(charmander.baseStats.hp, 12)
   await app.db.update(pokemon).set({ level: 12, xp: xpForLevel(charmander.growthRate, 12), hp: hpMax, hpMax }).where(eq(pokemon.trainerId, trainerId))
-  await startHunt(app.db, loadRegistry(), trainerId, 'route-1', T0, { seed })
+  await startHunt(app.db, loadRegistry(), trainerId, 'campo-inicial', T0, { seed })
   return trainerId
 }
 
@@ -42,7 +42,7 @@ describe('recoverSessions', () => {
     t.clock.now = new Date(T0.getTime() + 2 * 60 * 1000) // 600 ticks
     const res = await recoverSessions(t.scheduler, t.db, () => t.clock.now, silentLogger)
     expect(res).toEqual({ recovered: 2, failed: 1 })
-    const ref = simulate(beforeA.state, 600, { registry: loadRegistry(), hunt: loadRegistry().hunts.get('route-1')!, rng: createRng(beforeA.seed, beforeA.rngState) })
+    const ref = simulate(beforeA.state, 600, { registry: loadRegistry(), hunt: loadRegistry().hunts.get('campo-inicial')!, rng: createRng(beforeA.seed, beforeA.rngState) })
     expect(t.scheduler.get(a)!.state).toEqual(ref.state)
     expect(t.scheduler.get(b)).toBeDefined()
     expect(t.scheduler.get(c)).toBeUndefined()

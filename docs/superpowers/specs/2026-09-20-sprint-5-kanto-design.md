@@ -25,14 +25,19 @@ Região de 96×72 tiles, dividida em oito áreas de níveis crescentes, cada uma
 
 | Área | Bioma | Níveis | Espécies |
 |---|---|---|---|
-| campo-inicial | campo com bosque esparso | 2–6 | pidgey, rattata |
-| bosque-denso | floresta fechada | 5–10 | caterpie, weedle, oddish |
-| trilha-pedregosa | campo com afloramento | 8–14 | geodude, sandshrew |
-| margem-do-lago | campo, praia e água | 10–16 | poliwag, psyduck |
-| praia-longa | areia e água | 12–18 | krabby, shellder |
-| entrada-da-caverna | pedra e caverna | 15–22 | zubat, geodude |
-| caverna-funda | caverna fechada | 20–28 | golbat, onix |
-| pico-rochoso | pedra alta | 25–35 | machop, onix |
+| campo-inicial | campo com bosque esparso | 2–6 | zubat, bellsprout, diglett, gastly, vulpix |
+| bosque-denso | floresta fechada | 5–10 | bellsprout, butterfree |
+| trilha-pedregosa | campo com afloramento | 8–14 | diglett, growlithe |
+| margem-do-lago | campo, praia e água | 10–16 | horsea, staryu |
+| praia-longa | areia e água | 12–18 | squirtle, staryu |
+| entrada-da-caverna | pedra e caverna | 15–22 | zubat, gastly |
+| caverna-funda | caverna fechada | 20–28 | golbat, haunter |
+| pico-rochoso | pedra alta | 25–35 | rhydon, arcanine |
+
+O elenco saiu do que o registro tem hoje (pidgey, caterpie, geodude e companhia ainda não foram
+importados), e o campo-inicial ganhou cinco espécies de captura fácil em vez de duas: a régua de
+balanceamento exige um número mínimo de capturas em 3000 ticks, e espécie de evolução final tem
+taxa de captura baixa demais para o começo do jogo.
 
 Cada área tem ponto de partida, Centro Pokémon e spawns próprios, e é recortada num mapa jogável
 pelo importador que já existe.

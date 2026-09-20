@@ -21,7 +21,7 @@ afterAll(async () => { await on.close(); await off.close(); await t.close() })
 
 describe('DEBUG_VIEWER desligado', () => {
   it('nenhuma rota /debug existe', async () => {
-    for (const url of ['/debug', '/debug/', '/debug/viewer.js', '/debug/map/route-1', '/debug/atlas/tiles.json']) expect((await api(off).get(url)).statusCode, url).toBe(404)
+    for (const url of ['/debug', '/debug/', '/debug/viewer.js', '/debug/map/campo-inicial', '/debug/atlas/tiles.json']) expect((await api(off).get(url)).statusCode, url).toBe(404)
   })
 })
 
@@ -44,9 +44,9 @@ describe('DEBUG_VIEWER ligado', () => {
     expect(String((await api(on).get('/debug/viewer.css')).headers['content-type'])).toMatch(/text\/css/)
   })
   it('mapa do registro e 404 para desconhecido', async () => {
-    const r = await api(on).get('/debug/map/route-1')
+    const r = await api(on).get('/debug/map/campo-inicial')
     expect(r.statusCode).toBe(200)
-    expect(r.json()).toMatchObject({ id: 'route-1', width: 40, height: 30, tileSize: 32 })
+    expect(r.json()).toMatchObject({ id: 'campo-inicial', width: 24, height: 36, tileSize: 32 })
     expect((await api(on).get('/debug/map/nope')).statusCode).toBe(404)
   })
   it('atlas só da allowlist e só o que existe; sem path traversal', async () => {

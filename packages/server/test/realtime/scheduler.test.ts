@@ -28,7 +28,18 @@ let scheduler: Scheduler
 
 const fakeSocket = () => { const s = { sent: [] as string[], readyState: OPEN, send(d: string) { s.sent.push(d) }, close() { s.readyState = 3 } }; return s as SocketLike & { sent: string[] } }
 const msgs = (s: { sent: string[] }) => s.sent.map((x) => JSON.parse(x) as { t: string })
-const start = async (seed = 1) => { await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed }); await scheduler.attach(trainerId) }
+/**
+ * Deixa o time à beira de cair e desliga poção e retorno ao Centro. Sem isso o motor cura e o
+ * time nunca desmaia: o teste passaria ou falharia conforme a geometria do mapa, não conforme o
+ * comportamento em teste.
+ */
+const prepararQueda = async (): Promise<void> => {
+  await db.update(pokemon).set({ level: 1, hp: 1, hpMax: 12 })
+  await db.delete(inventory).where(eq(inventory.trainerId, trainerId))
+  await db.update(trainers).set({ returnHpPercent: 0, potionHpPercent: 0 }).where(eq(trainers.id, trainerId))
+}
+
+const start = async (seed = 1) => { await startHunt(db, registry, trainerId, 'campo-inicial', clock.now, { seed }); await scheduler.attach(trainerId) }
 
 beforeAll(async () => { ({ db, close } = await openTestDb()) })
 afterAll(async () => { await close() })
@@ -79,17 +90,17 @@ describe('attach / tick / persist', () => {
     await start(7)
     const before = (await loadActive(db, trainerId))!
     for (let i = 0; i < 400; i++) scheduler.tick()
-    const ref = simulate(before.state, 400, { registry, hunt: registry.hunts.get('route-1')!, rng: createRng(before.seed, before.rngState) })
+    const ref = simulate(before.state, 400, { registry, hunt: registry.hunts.get('campo-inicial')!, rng: createRng(before.seed, before.rngState) })
     expect(scheduler.get(trainerId)!.state).toEqual(ref.state)
     await scheduler.whenIdle(trainerId) // drena os saves/syncs enfileirados antes do truncate do próximo teste
   })
   it('attach com atraso faz catch-up em fatias, manda catchup/summary/snapshot e persiste com sync', async () => {
     const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
-    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 4 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { seed: 4 })
     const before = (await loadActive(db, trainerId))!
     clock.now = new Date(T0.getTime() + 10 * 60 * 1000) // 3000 ticks
     await scheduler.attach(trainerId)
-    const ref = simulate(before.state, 3000, { registry, hunt: registry.hunts.get('route-1')!, rng: createRng(before.seed, before.rngState) })
+    const ref = simulate(before.state, 3000, { registry, hunt: registry.hunts.get('campo-inicial')!, rng: createRng(before.seed, before.rngState) })
     expect(scheduler.get(trainerId)!.state).toEqual(ref.state)
     expect(scheduler.get(trainerId)!.catchingUp).toBe(false)
     const types = msgs(s).map((m) => m.t)
@@ -104,7 +115,7 @@ describe('attach / tick / persist', () => {
   })
   it('attach com sessão inexistente falha com no-hunt; attach de snapshot corrompido finaliza sem sync', async () => {
     await expect(scheduler.attach(trainerId)).rejects.toMatchObject({ code: 'no-hunt' })
-    await startHunt(db, registry, trainerId, 'route-1', T0)
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0)
     await db.update(huntSessions).set({ state: { lixo: 1 } }).where(eq(huntSessions.trainerId, trainerId))
     const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
     await scheduler.attach(trainerId)
@@ -117,10 +128,10 @@ describe('attach / tick / persist', () => {
 describe('attach single-flight e finish durante catch-up (C1)', () => {
   it('finish disparado durante o catch-up aguarda o catch-up terminar, finaliza com o estado atualizado e não deixa runner fantasma tickando', async () => {
     const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
-    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 8 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { seed: 8 })
     const before = (await loadActive(db, trainerId))!
     clock.now = new Date(T0.getTime() + 20 * 60 * 1000) // 6000 ticks de atraso
-    const ref = simulate(before.state, 6000, { registry, hunt: registry.hunts.get('route-1')!, rng: createRng(before.seed, before.rngState) })
+    const ref = simulate(before.state, 6000, { registry, hunt: registry.hunts.get('campo-inicial')!, rng: createRng(before.seed, before.rngState) })
     let finishPromise: Promise<TrainerRow | null> | null = null
     let calls = 0
     const s2: Scheduler = createScheduler({
@@ -145,7 +156,7 @@ describe('attach single-flight e finish durante catch-up (C1)', () => {
     expect(types.slice(stoppedIdx + 1)).toEqual([])
   })
   it('dois attach() concorrentes para o mesmo treinador devolvem a mesma promessa, criam um único runner e não duplicam hunt_log', async () => {
-    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 9 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { seed: 9 })
     clock.now = new Date(T0.getTime() + 10 * 60 * 1000) // 3000 ticks
     const p1 = scheduler.attach(trainerId)
     const p2 = scheduler.attach(trainerId)
@@ -167,7 +178,7 @@ describe('attach single-flight e finish durante catch-up (C1)', () => {
     expect(scheduler.get(trainerId)).toBe(before)
   })
   it('finishRunner com a sessão já apagada rejeita no-hunt e não escreve nada', async () => {
-    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 10 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { seed: 10 })
     const active = (await loadActive(db, trainerId))!
     await db.delete(huntSessions).where(eq(huntSessions.trainerId, trainerId))
     const snap = {
@@ -184,7 +195,7 @@ describe('attach single-flight e finish durante catch-up (C1)', () => {
 
 describe('insertLog em lotes (C2)', () => {
   it('flushRunner com 9 000 entradas de log (72 000 parâmetros) insere as 9 000 linhas sem estourar o limite do Postgres', async () => {
-    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 12 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { seed: 12 })
     const active = (await loadActive(db, trainerId))!
     const entries: LogEntry[] = Array.from({ length: 9000 }, () => ({
       huntId: active.huntId, speciesName: 'charmander', level: 12, xpTrainer: 1, gold: 1, drops: [], captured: false,
@@ -213,7 +224,7 @@ describe('sync que falha devolve o pendingLog (C3)', () => {
       db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
       persistence: { flush: flakyFlush, finish: finishRunner },
     })
-    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 13 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', clock.now, { seed: 13 })
     await s2.attach(trainerId)
     for (let i = 0; i < SYNC_EVERY_TICKS; i++) { clock.now = new Date(clock.now.getTime() + TICK_MS); s2.tick() }
     await s2.idle() // drena o sync que falha (a 1ª chamada de flakyFlush)
@@ -255,7 +266,7 @@ describe('intents e finish', () => {
   })
   it('team-fainted no tick finaliza com cura do time', async () => {
     const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
-    await db.update(pokemon).set({ level: 1, hp: 1, hpMax: 12 })
+    await prepararQueda()
     await start(11)
     let guard = 0
     while (scheduler.size() > 0 && guard++ < 3000) scheduler.tick()
@@ -278,7 +289,7 @@ describe('intents e finish', () => {
       db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
       hooks: { onPersistStart: (kind) => kinds.push(kind) },
     })
-    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 2 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', clock.now, { seed: 2 })
     await s2.attach(trainerId)
     for (let i = 0; i < SNAPSHOT_EVERY_TICKS; i++) s2.tick() // enfileira um save
     for (let i = 0; i < 20; i++) s2.tick()
@@ -292,7 +303,7 @@ describe('intents e finish', () => {
 describe('contenção de erros e seams de teste', () => {
   it('attach: erro no catch-up (motor) remove o runner, preserva a sessão e propaga o erro', async () => {
     const s2 = createScheduler({ db, registry: brokenRegistry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve() })
-    await startHunt(db, registry, trainerId, 'route-1', T0)
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0)
     clock.now = new Date(T0.getTime() + 10 * 60 * 1000) // 3000 ticks > MIN_CATCHUP_TICKS, entra no catch-up
     await expect(s2.attach(trainerId)).rejects.toMatchObject({ code: 'not-found' })
     expect(s2.size()).toBe(0)
@@ -300,7 +311,7 @@ describe('contenção de erros e seams de teste', () => {
   })
   it('attach: catch-up abortado por stop() persiste o tempo simulado (não o relógio) e remove o runner', async () => {
     const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
-    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 4 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { seed: 4 })
     clock.now = new Date(T0.getTime() + 20 * 60 * 1000) // 6000 ticks
     const abortingScheduler: Scheduler = createScheduler({
       db, registry, now: () => clock.now, sockets, logger: silentLogger,
@@ -323,7 +334,7 @@ describe('contenção de erros e seams de teste', () => {
       db, registry, now: () => clock.now, sockets, logger: silentLogger,
       yieldNow: async () => { if (!detached) { detached = true; s2.detach(trainerId) } },
     })
-    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 42 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', clock.now, { seed: 42 })
     clock.now = new Date(T0.getTime() + 10 * 60 * 1000) // 3000 ticks: várias fatias
     await s2.attach(trainerId)
     expect(s2.get(trainerId)).toBeUndefined()
@@ -337,7 +348,7 @@ describe('contenção de erros e seams de teste', () => {
   it('tick: erro no motor remove o runner, preserva a sessão e notifica o socket', async () => {
     const s2 = createScheduler({ db, registry: brokenRegistry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve() })
     const s = fakeSocket(); sockets.add({ socket: s, trainerId, tokenHash: 'tk' })
-    await startHunt(db, registry, trainerId, 'route-1', clock.now) // lastSimulatedAt === now: sem catch-up
+    await startHunt(db, registry, trainerId, 'campo-inicial', clock.now) // lastSimulatedAt === now: sem catch-up
     await s2.attach(trainerId) // sucesso: o caminho sem catch-up não chama engineDeps
     expect(s2.size()).toBe(1)
     s2.tick()
@@ -352,7 +363,7 @@ describe('contenção de erros e seams de teste', () => {
       db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
       persistence: { flush: flushRunner, finish: failingFinish },
     })
-    await startHunt(db, registry, trainerId, 'route-1', clock.now)
+    await startHunt(db, registry, trainerId, 'campo-inicial', clock.now)
     await s2.attach(trainerId)
     await expect(s2.finish(trainerId, 'intent')).rejects.toMatchObject({ code: 'internal' })
     expect(msgs(s).at(-1)).toEqual({ t: 'error', code: 'internal', message: 'erro interno' })
@@ -367,7 +378,7 @@ describe('contenção de erros e seams de teste', () => {
       db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
       persistence: { flush: failingFlush, finish: finishRunner },
     })
-    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 6 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', clock.now, { seed: 6 })
     await s2.attach(trainerId)
     for (let i = 0; i < PERSIST_MAX_FAILURES * SNAPSHOT_EVERY_TICKS; i++) { clock.now = new Date(clock.now.getTime() + TICK_MS); s2.tick() }
     await s2.idle() // drena os 3 saves que falham (o terceiro dispara o finish por persist-failed)
@@ -385,8 +396,8 @@ describe('contenção de erros e seams de teste', () => {
       db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
       persistence: { flush: flushRunner, finish: failingFinish },
     })
-    await db.update(pokemon).set({ level: 1, hp: 1, hpMax: 12 })
-    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 11 })
+    await prepararQueda()
+    await startHunt(db, registry, trainerId, 'campo-inicial', clock.now, { seed: 11 })
     await s2.attach(trainerId)
     let guard = 0
     while (s2.size() > 0 && guard++ < 3000) s2.tick()
@@ -405,8 +416,8 @@ describe('contenção de erros e seams de teste', () => {
       db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
       persistence: { flush: flushRunner, finish: failingFinish },
     })
-    await db.update(pokemon).set({ level: 1, hp: 1, hpMax: 12 })
-    await startHunt(db, registry, trainerId, 'route-1', T0, { seed: 11 })
+    await prepararQueda()
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { seed: 11 })
     clock.now = new Date(T0.getTime() + 10 * 60 * 1000) // 3000 ticks de atraso: o time desmaia dentro do catch-up
     await expect(s2.attach(trainerId)).rejects.toMatchObject({ code: 'internal' })
     expect(s2.size()).toBe(0)
@@ -419,7 +430,7 @@ describe('contenção de erros e seams de teste', () => {
       db, registry, now: () => clock.now, sockets, logger: silentLogger, yieldNow: () => Promise.resolve(),
       persistence: { flush: flushRunner, finish: failingFinish },
     })
-    await startHunt(db, registry, trainerId, 'route-1', clock.now, { seed: 5 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', clock.now, { seed: 5 })
     await s2.attach(trainerId)
     const result = s2.applyIntent(trainerId, { type: 'stop' })
     expect('error' in result).toBe(false)

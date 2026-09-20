@@ -73,7 +73,7 @@ describe('time', () => {
     await t.db.insert(pokemon).values({ id: 'y-w1', trainerId: other.trainerId, speciesName: 'zubat', level: 4, xp: 100, hp: 10, hpMax: 18, teamSlot: 0 })
     const alien = await api(t.app, cookie).put('/trainer/team', { slots: ['y-w1'] })
     expect(alien.statusCode).toBe(404)
-    await t.db.insert(huntSessions).values({ trainerId, huntId: 'route-1', sessionId: 's', state: {}, seed: 1, rngState: 1, startedAt: T0, lastSimulatedAt: T0 })
+    await t.db.insert(huntSessions).values({ trainerId, huntId: 'campo-inicial', sessionId: 's', state: {}, seed: 1, rngState: 1, startedAt: T0, lastSimulatedAt: T0 })
     const busy = await api(t.app, cookie).put('/trainer/team', { slots: ['x-w1'] })
     expect(busy.statusCode).toBe(409)
     expect(busy.json()).toMatchObject({ error: { code: 'hunt-active' } })

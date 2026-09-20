@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('registrar, inicial, Rota 1, derrota, mochila, parar e comprar na loja', async ({ page }) => {
+test('registrar, inicial, Campo Inicial, derrota, mochila, parar e comprar na loja', async ({ page }) => {
   const email = `smoke-${Date.now()}@test.dev`
   await page.goto('/')
 

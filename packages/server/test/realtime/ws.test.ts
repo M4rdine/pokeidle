@@ -180,10 +180,10 @@ describe('hunt pelo socket', () => {
   it('start por REST manda snapshot; ticks chegam; intents funcionam; stop manda hunt.stopped', async () => {
     const c = await open()
     await c.next() // idle
-    await api(t.app, cookie).post('/hunts/route-1/start')
+    await api(t.app, cookie).post('/hunts/campo-inicial/start')
     const snap = await c.nextOf('hunt.snapshot')
     expect(JSON.stringify(snap)).not.toMatch(/seed|rngState/)
-    expect(snap['session']).toMatchObject({ huntId: 'route-1', startedAt: T0.toISOString() })
+    expect(snap['session']).toMatchObject({ huntId: 'campo-inicial', startedAt: T0.toISOString() })
     expect(snap['serverTime']).toBe(T0.getTime())
     t.scheduler.tick(); t.scheduler.tick() // tick 0 só escolhe alvo (sem eventos); o 1 já anda ou luta
     const tick = await c.nextOf('hunt.tick')
@@ -209,7 +209,7 @@ describe('hunt pelo socket', () => {
   it('dois sockets do mesmo treinador recebem o mesmo tick', async () => {
     const a = await open(); const b = await open()
     await a.next(); await b.next()
-    await api(t.app, cookie).post('/hunts/route-1/start')
+    await api(t.app, cookie).post('/hunts/campo-inicial/start')
     await a.nextOf('hunt.snapshot'); await b.nextOf('hunt.snapshot')
     t.scheduler.tick(); t.scheduler.tick() // idem: só o 2º tick produz eventos
     expect(await a.nextOf('hunt.tick')).toEqual(await b.nextOf('hunt.tick'))
@@ -234,7 +234,7 @@ describe('catch-up pelo socket (I4)', () => {
     const app2 = await buildApp({ db: t.db, config: config2, now: () => clock2.now, logger: false, realtime: { scheduler: scheduler2, sockets: sockets2 } })
     const base2 = await listen(app2)
     try {
-      await startHunt(t.db, t.registry, trainerId, 'route-1', T0, { seed: 9 })
+      await startHunt(t.db, t.registry, trainerId, 'campo-inicial', T0, { seed: 9 })
       clock2.now = new Date(T0.getTime() + 10 * 60 * 1000) // 3000 ticks de atraso: várias fatias de CATCHUP_SLICE_TICKS
       void scheduler2.attach(trainerId) // não aguarda: o catch-up roda em segundo plano
       const r = await connectWs(base2, cookie)

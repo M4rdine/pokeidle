@@ -49,8 +49,12 @@ describe('loadRegistry (dados reais do repositório)', () => {
     expect(r.species.get('charizard')?.baseStats.hp).toBe(78)
     for (const s of r.species.values()) expect(s.learnset.length).toBeGreaterThanOrEqual(1)
   })
-  it('tem a Rota 1 e a tabela de tipos completa', () => {
-    expect(r.hunts.get('route-1')?.width).toBe(40)
+  it('tem Kanto com as oito áreas, cada uma com mapa próprio, e a tabela de tipos completa', () => {
+    const kanto = r.regions.get('kanto')!
+    expect(kanto.areas).toHaveLength(8)
+    expect(kanto.areas.map((a) => a.id)).toContain('campo-inicial')
+    // Toda área declarada precisa ter mapa: é o que o registro checa e o que quebra o jogo se faltar.
+    for (const area of kanto.areas) expect(r.hunts.get(area.id)?.width).toBe(24)
     expect(r.typeChart.fire.grass).toBe(2)
     expect(r.typeChart.electric.ground).toBe(0)
   })

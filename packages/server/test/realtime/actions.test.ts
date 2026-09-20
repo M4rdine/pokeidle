@@ -24,8 +24,8 @@ beforeEach(async () => {
 
 describe('actions', () => {
   it('startAndAttach cria sessão e runner; activeView lê do runner; stopViaScheduler finaliza', async () => {
-    const s = await startAndAttach(deps(), trainerId, 'route-1')
-    expect(s).toMatchObject({ huntId: 'route-1', sessionId: expect.stringMatching(/^[0-9a-f-]{36}$/), startedAt: T0 })
+    const s = await startAndAttach(deps(), trainerId, 'campo-inicial')
+    expect(s).toMatchObject({ huntId: 'campo-inicial', sessionId: expect.stringMatching(/^[0-9a-f-]{36}$/), startedAt: T0 })
     expect(t.scheduler.get(trainerId)).toBeDefined()
     t.scheduler.tick()
     const view = await activeView(deps(), trainerId)
@@ -38,7 +38,7 @@ describe('actions', () => {
     await expect(stopViaScheduler(deps(), trainerId)).rejects.toMatchObject({ code: 'no-hunt' })
   })
   it('stopViaScheduler cai no banco quando a sessão existe sem runner (órfã)', async () => {
-    await startAndAttach(deps(), trainerId, 'route-1')
+    await startAndAttach(deps(), trainerId, 'campo-inicial')
     t.scheduler.detach(trainerId)
     const trainer = await stopViaScheduler(deps(), trainerId)
     expect(trainer.id).toBe(trainerId)
@@ -47,14 +47,14 @@ describe('actions', () => {
   it('applySettings grava no banco e no runner quando há hunt', async () => {
     await applySettings(deps(), trainerId, { returnHpPercent: 45 })
     expect((await t.db.select().from(trainers).where(eq(trainers.id, trainerId)))[0]!.returnHpPercent).toBe(45)
-    await startAndAttach(deps(), trainerId, 'route-1')
+    await startAndAttach(deps(), trainerId, 'campo-inicial')
     await applySettings(deps(), trainerId, { capture: { ballTier: 'poke' } })
     expect(t.scheduler.get(trainerId)!.state.settings.capture.ballTier).toBe('poke')
     expect((await t.db.select().from(trainers).where(eq(trainers.id, trainerId)))[0]!.ballTier).toBe('poke')
   })
   it('useItem e setActive delegam ao motor com erros tipados', async () => {
     expect(useItem(deps(), trainerId, 'potion')).toMatchObject({ error: { code: 'no-hunt' } })
-    await startAndAttach(deps(), trainerId, 'route-1')
+    await startAndAttach(deps(), trainerId, 'campo-inicial')
     expect(useItem(deps(), trainerId, 'potion')).toMatchObject({ error: { code: 'full-hp' } })
     expect(setActive(deps(), trainerId, 'x')).toMatchObject({ error: { code: 'unknown-pokemon' } })
   })
@@ -62,7 +62,7 @@ describe('actions', () => {
 
 describe('REST sobre o scheduler', () => {
   it('start → runner; active vem do runner; stop finaliza; logout fecha sockets do token', async () => {
-    expect((await api(t.app, cookie).post('/hunts/route-1/start')).statusCode).toBe(201)
+    expect((await api(t.app, cookie).post('/hunts/campo-inicial/start')).statusCode).toBe(201)
     expect(t.scheduler.get(trainerId)).toBeDefined()
     t.scheduler.tick(); t.scheduler.tick()
     expect((await api(t.app, cookie).get('/hunts/active')).json()).toMatchObject({ session: { state: { tick: 2 } } })

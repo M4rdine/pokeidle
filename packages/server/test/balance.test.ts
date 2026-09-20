@@ -4,7 +4,7 @@ import { createHuntState, defaultSettings } from '../src/engine/create.js'
 import { simulate, summarizeEvents } from '../src/engine/simulate.js'
 
 const registry = loadRegistry()
-const hunt = registry.hunts.get('route-1')!
+const hunt = registry.hunts.get('campo-inicial')!
 const TICKS = 3000 // 10 minutos a 200 ms
 
 const charmander10 = () => {

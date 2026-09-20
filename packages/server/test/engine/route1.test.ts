@@ -9,7 +9,7 @@ import { step } from '../../src/engine/step.js'
 import type { EngineDeps, HuntState } from '../../src/engine/types.js'
 
 const registry = loadRegistry()
-const hunt = registry.hunts.get('route-1')!
+const hunt = registry.hunts.get('campo-inicial')!
 const deps = (seed: number): EngineDeps => ({ registry, hunt, rng: createRng(seed) })
 const start = (d: EngineDeps): HuntState => createHuntState({ hunt, sessionId: 'route1-test', team: [makePokemon(registry, 'p1', 'charmander', 12)], inventory: { potion: 3, 'poke-ball': 5 }, settings: defaultSettings() }, d)
 

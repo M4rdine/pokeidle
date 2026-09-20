@@ -7,7 +7,7 @@
  * mudar o arranjo da grade, que é fora do nosso controle.
  */
 import type { RgbaImage } from './compose.js'
-import { CORNER_CODES } from './transition.js'
+import { CORNER_CODES, composeTransition, transitionMask } from './transition.js'
 
 const CELL = 32
 const BYTES = 4
@@ -55,8 +55,8 @@ export interface WangGrid {
    * várias vezes na grade, e usar as repetidas como variação é o que evita campo chapado.
    */
   readonly variants: ReadonlyMap<string, readonly RgbaImage[]>
-  /** Códigos que o conjunto não cobriu; o pincel do Tiled fica capenga neles. */
-  readonly missing: readonly string[]
+  /** Códigos que o gerador não entregou e o build compôs a partir das duas peças puras. */
+  readonly synthesized: readonly string[]
   readonly fromColor: Rgb
   readonly toColor: Rgb
 }
@@ -123,5 +123,23 @@ export function readWangGrid(img: RgbaImage, materials: WangGridOptions): WangGr
       variants.set(code, [...(variants.get(code) ?? []), cell])
     }
   }
-  return { pieces, variants, missing: CORNER_CODES.filter((c) => !pieces.has(c)), fromColor, toColor }
+  // Passo 3: completa o que o gerador não entregou. Ele quase nunca devolve os códigos em
+  // xadrez (bbaa, baba, abab...), e recusar a folha inteira por causa de cinco peças jogava fora
+  // um conjunto bom. As que faltam saem das duas puras com a mesma máscara ruidosa das transições
+  // sintéticas, então a borda combina com o resto do conjunto em vez de virar diagonal perfeita.
+  // Passo 3: completa o que o gerador não entregou. Ele quase nunca devolve os códigos em xadrez
+  // (bbaa, baba, abab...), e recusar a folha inteira por causa de cinco peças jogava fora um
+  // conjunto bom. As que faltam saem das duas puras com a mesma máscara ruidosa das transições
+  // sintéticas, então a borda combina com o resto do conjunto em vez de virar diagonal perfeita.
+  // Quem decide se sintetizar demais é aceitável é quem conhece a procedência da folha; aqui só
+  // se lê e se completa. As duas puras existem: sem elas o passo 1 já teria recusado a folha.
+  const faltando = CORNER_CODES.filter((c) => !pieces.has(c))
+  const puraA = pieces.get('aaaa')!
+  const puraB = pieces.get('bbbb')!
+  for (const [i, code] of CORNER_CODES.entries()) {
+    if (pieces.has(code)) continue
+    pieces.set(code, composeTransition(puraA, puraB, transitionMask(code, i + 1)))
+  }
+
+  return { pieces, variants, synthesized: faltando, fromColor, toColor }
 }

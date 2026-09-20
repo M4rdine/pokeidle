@@ -1,4 +1,4 @@
-import { hpAt, levelFromXp, nextEvolution, rollLoot, xpForLevel, xpOnDefeat, type Registry, type Species } from '@pokeidle/shared'
+import { findArea, hpAt, levelFromXp, MIN_RARITY, nextEvolution, rollLoot, xpForLevel, xpOnDefeat, type Registry, type Species } from '@pokeidle/shared'
 import { TICKS_PER_SECOND } from './constants.js'
 import type { EngineDeps, Event, HuntState, PokemonState, StepResult, WildState } from './types.js'
 
@@ -64,7 +64,10 @@ export function applyDefeat(state: HuntState, deps: EngineDeps, wild: WildState)
   const active = state.player.team[state.player.activeIndex]
   if (!active) throw new Error('sem Pokémon ativo')
   const gained = gainXp(active, xp, deps.registry, state.tick)
-  const loot = rollLoot(species, deps.registry.loot, deps.rng)
+  // O degrau vem da área da região, não de um campo do mapa: é a região que define a escala de
+  // dificuldade, e o mapa é só o recorte dela.
+  const rarity = findArea(deps.registry.regions, deps.hunt.id)?.area.rarity ?? MIN_RARITY
+  const loot = rollLoot(species, deps.registry.loot, deps.rng, rarity)
   const removed = removeWild(state, deps, wild)
   const team = removed.player.team.map((p, i) => (i === state.player.activeIndex ? gained.pokemon : p))
   const defeated: Event = {

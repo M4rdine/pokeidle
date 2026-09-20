@@ -8,6 +8,7 @@ export * from './schemas/items.js'
 export * from './schemas/loot.js'
 export * from './schemas/hunt-map.js'
 export * from './schemas/unlocks.js'
+export * from './schemas/region.js'
 export {
   buildContentRegistry, buildRegistry, loadContentRegistry,
   type ContentRegistry, type RawContent, type RawRegistry, type Registry,

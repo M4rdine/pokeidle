@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { MAX_RARITY, MIN_RARITY } from '../loot.js'
 import { kebab } from './species.js'
 
 const PointSchema = z.object({ x: z.number().int().min(0), y: z.number().int().min(0) }).strict()
@@ -32,6 +33,11 @@ export const AreaSchema = z.object({
    * abaixo do selvagem mais fraco é só perder tempo e Pokémon.
    */
   minTrainerLevel: z.number().int().min(1),
+  /**
+   * Degrau de raridade: 1 na área mais fácil da região, 8 na mais difícil. Multiplica só a
+   * chance dos drops — é o que faz valer a pena voltar a uma área difícil.
+   */
+  rarity: z.number().int().min(MIN_RARITY).max(MAX_RARITY),
 }).strict().refine((a) => a.minLevel <= a.maxLevel, { message: 'minLevel maior que maxLevel' })
 
 export const RegionSchema = z.object({

@@ -52,92 +52,135 @@ uma frase de vinte palavras com três materiais deu manchas sobre água ruidosa.
 passam a ser gerados. Os sprites de Pokémon continuam vindo do dump, o que mantém o risco de
 licença nos personagens e é uma decisão consciente do usuário.
 
-**Custo:** dez centavos de dólar por conjunto de terreno. Um cenário completo com seis pares
-de terreno e vinte folhas de props fica em torno de três a cinco dólares. O gargalo é
-curadoria, não dinheiro.
+**Custo:** dez centavos de dólar por conjunto de terreno. Saldo em 2026-09-20: US$ 5,30, ou
+cinquenta e três conjuntos, o que cobre os seis biomas e as folhas de props com folga. O gargalo
+é curadoria, não dinheiro.
 
 **Pipeline:** gerar no Retro Diffusion, cortar para o nosso atlas, declarar wangset no
 manifesto, abrir no Tiled, desenhar. As ferramentas para isso já existem desde a fase 4a.
 
-## 4. Design de jogo: o que muda em três meses
+## 4. O modelo de conteúdo que falta
 
-O loop não muda. O que entra é profundidade que prova sistemas:
+A referência (pokeidle.io) não tem "mapas": tem **regiões** com portão de nível e, dentro de
+cada uma, **dezenas de áreas**. Kanto e Johto abrem no nível 1, Outland no 150, Hoenn no 500,
+Sinnoh no 1.000, Unova no 5.000, Kalos no 10.000, Alola no 25.000. Só Outland tem 58 áreas.
 
-1. **Rota 2 de verdade.** O destravamento por nível já existe em `unlocks.json` e nunca foi
-   exercitado porque só há uma rota. Rota 2 transforma código morto em sistema demonstrável.
-2. **Resumo de progresso offline.** O catch-up de 12 h é a parte mais interessante do motor e
-   hoje é invisível. Uma tela de "o que aconteceu enquanto você estava fora" mostra isso.
-3. **Pokédex com meta.** Já existem entradas de pokédex no banco. Falta objetivo e tela.
-4. **Histórico de caçada.** O `hunt_log` já grava tudo. Um gráfico de XP e ouro por hora
-   prova a telemetria e dá ao jogador uma razão para ajustar configurações.
-5. **Evolução visível.** O evento existe e o cliente já tem o flash. Falta a tela de antes e
-   depois, que é barata e memorável.
+Cada área carrega espécie, faixa de nível, drops próprios e regras: a tela mostra "Nessa região
+não existem espécies Shiny — área apenas para farm de itens lendários". O jogador escolhe onde
+caçar num mapa-múndi com marcadores, filtrando por tipo, faixa de nível, fraco contra, forte
+contra e já capturado.
 
-Fora de escopo nestes três meses: PvP, comércio entre jogadores, mais de duas rotas, som,
-monetização.
+Nosso modelo hoje é outro: uma hunt é um mapa de 40×30, e `unlocks.hunts` gateia por nível uma
+lista plana. Isso não escala para dezenas de áreas por região.
 
-## 5. Sprints
+**Proposta: região é o mapa, área é um recorte dele.**
 
-Doze sprints semanais. Cada um termina com algo que dá para ver ou medir.
+| Conceito | O que é | De onde vem |
+|---|---|---|
+| Região | Um mapa grande desenhado uma vez, com bioma próprio e nível mínimo | Tiled, como hoje, só que maior |
+| Área | Um retângulo dentro da região, com espécies, faixa de nível e respawn | Objeto no Tiled, como os spawns já são |
+| Drop | Tabela por espécie, com ouro e itens por chance | `loot.json`, que já existe |
+| Raridade | Variante da área que multiplica raros | Propriedade do objeto de área |
 
-### Bloco A — a primeira impressão (sprints 1 a 3)
+A decisão de engenharia que torna isso barato: **o importador recorta cada área num `HuntMap`
+próprio na hora do build**. O motor não muda nada, os 232 testes do servidor continuam valendo, e
+a região grande existe para duas coisas: autoria no Tiled e a imagem do navegador de áreas, que o
+nosso `map-preview` já sabe gerar em PNG.
 
-**Sprint 1: travar o estilo e gerar os terrenos base.**
-Gerar os seis pares de terreno (grama/terra, grama/areia, grama/água, terra/pedra,
-pedra/caverna, areia/água) com prompt curto. Cortar, nomear e entrar no manifesto. Entregar
-folha de aprovação e escolher com o usuário. Critério: seis wangsets novos no `tiles.tsj`.
+Com isso, desenhar uma região de vinte áreas custa um mapa, não vinte.
 
-**Sprint 2: props, vegetação e construção.**
-Árvores em três silhuetas, arbustos, flores, pedras, cerca, ponte e um Centro Pokémon montável.
-Critério: o tileset novo cobre tudo que a Rota 1 usa hoje, sem nenhuma peça do Tibia no cenário.
+## 5. Design de jogo: o que entra em três meses
 
-**Sprint 3: redesenhar a Rota 1 com o tileset novo.**
-Trocar o gerador por autoria no Tiled, agora com peças que combinam. Critério: prévia em PNG
-aprovada pelo usuário e jogo rodando com o mapa novo.
+1. **Regiões e áreas**, como descrito acima. É a espinha; tudo depois depende dela.
+2. **Navegador de áreas**: mapa da região com marcadores, filtro por tipo, faixa de nível, fraco
+   contra e já capturado, com contagem de "X de Y áreas".
+3. **Drops por área**: a tabela de loot já existe por espécie; falta multiplicador de raridade por
+   área e a leitura no cliente, com o log mostrando o que caiu.
+4. **Portão de nível por região**, que transforma `huntUnlockLevel` de código morto em sistema.
+5. **Resumo de progresso offline**, que é a parte mais interessante do motor e hoje é invisível.
+6. **Pokédex com meta** e **evolução visível**, ambas baratas e memoráveis.
 
-### Bloco B — o jogo existe para os outros (sprints 4 a 6)
+Fora de escopo nestes três meses, apesar de existirem na referência: PvP, ginásio, torneio,
+mercado entre jogadores, guilda, chat global, passe de batalha, VIP e gemas. São sistemas sociais
+e de monetização que não servem ao objetivo de portfólio e multiplicam o custo de operação.
 
-**Sprint 4: CI no GitHub Actions.**
-Testes, typecheck, cobertura e smoke rodando a cada push, com selo no README. Critério: PR
-que quebra teste fica vermelho.
+## 5b. Sobre as releases da referência
 
-**Sprint 5: deploy público.**
-Servidor e Postgres hospedados, domínio, HTTPS, migração automática no boot. Critério: link
-que qualquer pessoa abre e joga.
+O usuário vai enviar as notas de versão do jogo de referência para virarem specs. Regra de
+triagem, para o backlog não virar um depósito: cada release entra na fila classificada em
+**adotar**, **adaptar** ou **descartar**. Adotar é o que cabe no nosso escopo e no nosso modelo.
+Adaptar é o que precisa de outra forma aqui. Descartar é o que depende de PvP, monetização ou
+população grande. Nada entra no sprint sem passar por essa classificação.
 
-**Sprint 6: observabilidade.**
-Logs estruturados já existem; entram métricas de tick, de caçadas ativas e de erro, mais
-rastreamento de exceção. Critério: painel que responde "quantas caçadas rodando agora".
+## 6. Sprints
 
-### Bloco C — profundidade de sistema (sprints 7 a 9)
+Doze sprints semanais. Cada um termina com algo que dá para ver ou medir. A ordem mudou depois
+da referência: infraestrutura barata primeiro, porque destrava mostrar; o modelo de conteúdo logo
+em seguida, porque tudo depende dele; arte e mundo no meio; prova de engenharia no fim.
 
-**Sprint 7: Rota 2 e destravamento.**
-Mapa novo, spawns de nível mais alto, `huntUnlockLevel` finalmente chamado no servidor.
-Critério: jogador de nível baixo recebe recusa clara ao tentar entrar.
+### Bloco A — fundação (semanas 1 a 3)
 
-**Sprint 8: resumo offline e histórico.**
-Tela de retorno com o que aconteceu, e gráfico de XP e ouro por hora a partir do `hunt_log`.
-Critério: fechar a aba por uma hora e ver o relatório ao voltar.
+**Sprint 1: integração contínua e deploy público.**
+Testes, tipos, cobertura e smoke a cada push. Servidor e Postgres hospedados, domínio, HTTPS e
+migração no boot. Pronto quando existe um link que um estranho abre e joga, e um teste quebrado
+deixa o PR vermelho sozinho.
 
-**Sprint 9: Pokédex e evolução visível.**
-Tela de pokédex com progresso e tela de evolução com antes e depois.
-Critério: capturar uma espécie nova muda a pokédex na hora.
+**Sprint 2: modelo de conteúdo, região e área.**
+Schemas de região e área no shared, objeto de área no contrato do Tiled, importador recortando
+cada área num `HuntMap` próprio, registro e migração. A Rota 1 de hoje vira a primeira área de
+Kanto. Pronto quando o jogo roda com o modelo novo sem o motor mudar de comportamento.
 
-### Bloco D — prova de engenharia (sprints 10 a 12)
+**Sprint 3: terrenos base por bioma.**
+Seis pares de terreno gerados com prompt curto: campo, floresta, praia, caverna, montanha e
+cidade. Cortar, nomear, declarar wangset. Pronto quando os seis pincéis aparecem na paleta do
+Tiled e a folha de aprovação passa no seu olho.
 
-**Sprint 10: teste de carga.**
-Script que sobe N caçadas simultâneas e mede CPU, memória e atraso de tick, confirmando ou
-corrigindo os números do README. Critério: gráfico com o limite real medido.
+### Bloco B — o mundo (semanas 4 a 6)
 
-**Sprint 11: mobile e acessibilidade.**
-Layout responsivo, toque, navegação por teclado e contraste. Critério: jogar no celular sem
-rolagem horizontal.
+**Sprint 4: props, vegetação e construção.**
+Árvores em três silhuetas por bioma, arbustos, flores, pedras, cerca, ponte e um Centro Pokémon
+montável. Pronto quando nenhuma peça do Tibia resta no cenário.
+
+**Sprint 5: Kanto desenhada.**
+Uma região grande no Tiled, com doze áreas marcadas, espécies e faixas de nível coerentes com a
+progressão. Pronto quando as doze áreas importam limpas e a prévia em PNG da região fica boa o
+bastante para virar a imagem do navegador.
+
+**Sprint 6: navegador de áreas.**
+Mapa da região com marcadores, zoom e arraste, filtro por tipo, faixa de nível, fraco contra,
+forte contra e já capturado, com contagem de "X de Y áreas". Pronto quando dá para achar onde
+farmar um tipo específico sem sair da tela.
+
+### Bloco C — sistemas (semanas 7 a 9)
+
+**Sprint 7: drops por área.**
+Multiplicador de raridade por área, leitura no cliente e log mostrando o que caiu, no formato da
+referência. Pronto quando derrotar um selvagem lista itens e ouro na linha do log.
+
+**Sprint 8: segunda região e portão de nível.**
+Região nova com nível mínimo, e `huntUnlockLevel` finalmente chamado no servidor. Pronto quando
+um treinador de nível baixo recebe recusa clara ao tentar entrar.
+
+**Sprint 9: observabilidade.**
+Métricas de tick, de caçadas ativas e de erro, mais rastreamento de exceção. Pronto quando dá
+para responder "quantas caçadas rodam agora" olhando um painel.
+
+### Bloco D — prova de engenharia (semanas 10 a 12)
+
+**Sprint 10: resumo offline, histórico e pokédex.**
+Tela de retorno com o que aconteceu, gráfico de XP e ouro por hora vindo do `hunt_log`, e pokédex
+com progresso por região. Pronto quando fechar a aba por uma hora rende um relatório na volta.
+
+**Sprint 11: teste de carga, celular e acessibilidade.**
+Script que sobe N caçadas simultâneas e mede CPU, memória e atraso de tick. Layout responsivo,
+toque, teclado e contraste. Pronto quando o número de 850 caçadas é confirmado ou corrigido, e dá
+para jogar no celular sem rolagem lateral.
 
 **Sprint 12: documentação e apresentação.**
-Diagrama de arquitetura, decisões registradas, README que explica o que é interessante, vídeo
-curto de demonstração. Critério: alguém de fora entende o projeto em cinco minutos.
+Diagrama de arquitetura, decisões registradas, README honesto e vídeo curto de demonstração.
+Pronto quando alguém de fora entende o projeto em cinco minutos.
 
-## 6. Backlog fora dos sprints
+## 7. Backlog fora dos sprints
 
 Dívida registrada que entra quando sobrar espaço, em ordem de dor:
 
@@ -150,7 +193,7 @@ Dívida registrada que entra quando sobrar espaço, em ordem de dor:
 - A mochila de Pokémon nunca é podada.
 - Venda na loja não é limitada por nível, decisão documentada.
 
-## 7. Riscos
+## 8. Riscos
 
 O maior é a coerência da arte gerada. Cada lote sai de um sorteio diferente e o conjunto pode
 virar colcha de retalhos. Mitigação: travar o estilo no sprint 1, gerar sempre com o mesmo

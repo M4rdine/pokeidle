@@ -127,6 +127,23 @@ function transitionFrames(
   }
 }
 
+/** Os dois códigos de canto puros: 'aaaa' é o primeiro material do conjunto, 'bbbb' o segundo. */
+const PURE_CODES = ['aaaa', 'bbbb'] as const
+const PURE_CODE = { from: 'aaaa', to: 'bbbb' } as const
+/** Teto de quadros extras por peça pura: mais que isto só engorda o atlas. */
+const MAX_PURE_EXTRAS = 3
+
+/** Descarta imagens repetidas pixel a pixel, preservando a ordem da primeira aparição. */
+function distinctImages(images: readonly RgbaImage[]): RgbaImage[] {
+  const vistas = new Set<string>()
+  return images.filter((img) => {
+    const chave = `${img.width}x${img.height}:${Buffer.from(img.data).toString('base64')}`
+    if (vistas.has(chave)) return false
+    vistas.add(chave)
+    return true
+  })
+}
+
 /**
  * Conjuntos de terreno desenhados: cada PNG em grade vira dezesseis peças nomeadas e um pincel
  * completo. Um conjunto que não cobre os dezesseis códigos é recusado, porque o pincel ficaria
@@ -135,9 +152,10 @@ function transitionFrames(
 async function terrainSetFrames(
   dir: string,
   sets: readonly TerrainSetEntry[],
-): Promise<{ frames: AtlasFrame[]; terrains: TerrainInput[] }> {
+): Promise<{ frames: AtlasFrame[]; terrains: TerrainInput[]; animations: Record<string, string[]> }> {
   const frames: AtlasFrame[] = []
   const terrains: TerrainInput[] = []
+  const animations: Record<string, string[]> = {}
   // Primeira aparição de um material define a cor que todos os conjuntos passam a usar. Sem isto,
   // quatro conjuntos de campo trazem quatro verdes e a grama muda de cor na emenda entre áreas.
   const canonical = new Map<string, Rgb>()
@@ -159,10 +177,20 @@ async function terrainSetFrames(
       return { measured: m.measured, canonical: alvo }
     })
     for (const [code, image] of grid.pieces) frames.push({ name: `${set.name}-${code}`, image: harmonize(image, shifts) })
-    // Variações das peças puras: campo grande com um tile só fica chapado e denuncia repetição.
-    for (const code of ['aaaa', 'bbbb']) {
-      const extras = (grid.variants.get(code) ?? []).slice(1)
-      extras.forEach((image, i) => frames.push({ name: `${set.name}-${code}-v${i + 2}`, image: harmonize(image, shifts) }))
+    const codigoAnimado = set.animate === undefined ? null : PURE_CODE[set.animate]
+    for (const code of PURE_CODES) {
+      const base = `${set.name}-${code}`
+      // Repetição idêntica não é variação nem fase: no conjunto de caverna duas células puras
+      // saíram iguais pixel a pixel, e emiti-las dobrava o peso sem mudar nada na tela.
+      const extras = distinctImages((grid.variants.get(code) ?? []).slice(1)).slice(0, MAX_PURE_EXTRAS)
+      if (code === codigoAnimado) {
+        // Fases: o cliente alterna os quadros no mesmo relógio da água do dump.
+        extras.forEach((image, i) => frames.push({ name: phaseFrameName(base, i + 1), image: harmonize(image, shifts) }))
+        if (extras.length > 0) animations[base] = phaseFrameNames(base, extras.length + 1)
+        continue
+      }
+      // Variações: campo grande com um tile só fica chapado e denuncia repetição.
+      extras.forEach((image, i) => frames.push({ name: `${base}-v${i + 2}`, image: harmonize(image, shifts) }))
     }
     terrains.push({
       name: set.name,
@@ -173,7 +201,7 @@ async function terrainSetFrames(
       })),
     })
   }
-  return { frames, terrains }
+  return { frames, terrains, animations }
 }
 
 /**
@@ -234,7 +262,7 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
   )
   const props = await propFrames(opts.propsDir ?? join(opts.manifestPath, '..', 'props'), manifest.props ?? [])
   const tiles = [...base.frames, ...mixed.frames, ...desenhados.frames, ...props]
-  const animations = { ...base.animations, ...mixed.animations }
+  const animations = { ...base.animations, ...mixed.animations, ...desenhados.animations }
   const packedTiles = await writeAtlas(opts.outDir, 'tiles', tiles, animations)
   const tileOrder = tiles.filter((f) => !isPhaseFrame(f.name)).map((f) => f.name)
   const terrains = [...(manifest.terrains ?? []), ...transitions.map(transitionTerrain), ...desenhados.terrains]

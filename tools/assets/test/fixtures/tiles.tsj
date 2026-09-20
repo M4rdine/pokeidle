@@ -1943,26 +1943,6 @@
       ]
     },
     {
-      "id": 268,
-      "properties": [
-        {
-          "name": "name",
-          "type": "string",
-          "value": "campo-agua-bbbb-v2"
-        }
-      ]
-    },
-    {
-      "id": 269,
-      "properties": [
-        {
-          "name": "name",
-          "type": "string",
-          "value": "campo-agua-bbbb-v3"
-        }
-      ]
-    },
-    {
       "id": 270,
       "properties": [
         {
@@ -2343,26 +2323,6 @@
       ]
     },
     {
-      "id": 308,
-      "properties": [
-        {
-          "name": "name",
-          "type": "string",
-          "value": "areia-agua-bbbb-v2"
-        }
-      ]
-    },
-    {
-      "id": 309,
-      "properties": [
-        {
-          "name": "name",
-          "type": "string",
-          "value": "areia-agua-bbbb-v3"
-        }
-      ]
-    },
-    {
       "id": 310,
       "properties": [
         {
@@ -2558,7 +2518,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-caverna-bbbb-v3"
+          "value": "campo-pedra-bbbb"
         }
       ]
     },
@@ -2568,7 +2528,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-bbbb"
+          "value": "campo-pedra-babb"
         }
       ]
     },
@@ -2578,7 +2538,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-babb"
+          "value": "campo-pedra-baab"
         }
       ]
     },
@@ -2588,7 +2548,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-baab"
+          "value": "campo-pedra-bbab"
         }
       ]
     },
@@ -2598,7 +2558,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-bbab"
+          "value": "campo-pedra-aabb"
         }
       ]
     },
@@ -2608,7 +2568,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-aabb"
+          "value": "campo-pedra-aaaa"
         }
       ]
     },
@@ -2618,7 +2578,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-aaaa"
+          "value": "campo-pedra-bbaa"
         }
       ]
     },
@@ -2628,7 +2588,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-bbaa"
+          "value": "campo-pedra-abbb"
         }
       ]
     },
@@ -2638,7 +2598,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-abbb"
+          "value": "campo-pedra-abba"
         }
       ]
     },
@@ -2648,7 +2608,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-abba"
+          "value": "campo-pedra-bbba"
         }
       ]
     },
@@ -2658,7 +2618,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-bbba"
+          "value": "campo-pedra-abaa"
         }
       ]
     },
@@ -2668,7 +2628,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-abaa"
+          "value": "campo-pedra-aaba"
         }
       ]
     },
@@ -2678,7 +2638,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-aaba"
+          "value": "campo-pedra-abab"
         }
       ]
     },
@@ -2688,7 +2648,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-abab"
+          "value": "campo-pedra-baaa"
         }
       ]
     },
@@ -2698,7 +2658,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-baaa"
+          "value": "campo-pedra-aaab"
         }
       ]
     },
@@ -2708,7 +2668,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-aaab"
+          "value": "campo-pedra-baba"
         }
       ]
     },
@@ -2718,7 +2678,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-baba"
+          "value": "campo-pedra-aaaa-v2"
         }
       ]
     },
@@ -2728,7 +2688,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-aaaa-v2"
+          "value": "campo-pedra-aaaa-v3"
         }
       ]
     },
@@ -2738,7 +2698,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-aaaa-v3"
+          "value": "campo-pedra-bbbb-v2"
         }
       ]
     },
@@ -2748,7 +2708,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-bbbb-v2"
+          "value": "campo-pedra-bbbb-v3"
         }
       ]
     },
@@ -2758,7 +2718,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-pedra-bbbb-v3"
+          "value": "arvore-larga-1-x0-y0"
         }
       ]
     },
@@ -2768,7 +2728,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x0-y0"
+          "value": "arvore-larga-1-x1-y0"
         }
       ]
     },
@@ -2778,7 +2738,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x1-y0"
+          "value": "arvore-larga-1-x0-y1"
         }
       ]
     },
@@ -2788,7 +2748,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x0-y1"
+          "value": "arvore-larga-1-x1-y1"
         }
       ]
     },
@@ -2798,7 +2758,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x1-y1"
+          "value": "pinheiro-1-x0-y0"
         }
       ]
     },
@@ -2808,7 +2768,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x0-y0"
+          "value": "pinheiro-1-x1-y0"
         }
       ]
     },
@@ -2818,7 +2778,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x1-y0"
+          "value": "pinheiro-1-x0-y1"
         }
       ]
     },
@@ -2828,7 +2788,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x0-y1"
+          "value": "pinheiro-1-x1-y1"
         }
       ]
     },
@@ -2838,7 +2798,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x1-y1"
+          "value": "arvore-larga-2-x0-y0"
         }
       ]
     },
@@ -2848,7 +2808,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x0-y0"
+          "value": "arvore-larga-2-x1-y0"
         }
       ]
     },
@@ -2858,7 +2818,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x1-y0"
+          "value": "arvore-larga-2-x0-y1"
         }
       ]
     },
@@ -2868,7 +2828,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x0-y1"
+          "value": "arvore-larga-2-x1-y1"
         }
       ]
     },
@@ -2878,7 +2838,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x1-y1"
+          "value": "pinheiro-2-x0-y0"
         }
       ]
     },
@@ -2888,7 +2848,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x0-y0"
+          "value": "pinheiro-2-x1-y0"
         }
       ]
     },
@@ -2898,7 +2858,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x1-y0"
+          "value": "pinheiro-2-x0-y1"
         }
       ]
     },
@@ -2908,7 +2868,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x0-y1"
+          "value": "pinheiro-2-x1-y1"
         }
       ]
     },
@@ -2918,7 +2878,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x1-y1"
+          "value": "arvore-larga-3-x0-y0"
         }
       ]
     },
@@ -2928,7 +2888,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x0-y0"
+          "value": "arvore-larga-3-x1-y0"
         }
       ]
     },
@@ -2938,7 +2898,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x1-y0"
+          "value": "arvore-larga-3-x0-y1"
         }
       ]
     },
@@ -2948,7 +2908,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x0-y1"
+          "value": "arvore-larga-3-x1-y1"
         }
       ]
     },
@@ -2958,7 +2918,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x1-y1"
+          "value": "pinheiro-3-x0-y0"
         }
       ]
     },
@@ -2968,7 +2928,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x0-y0"
+          "value": "pinheiro-3-x1-y0"
         }
       ]
     },
@@ -2978,7 +2938,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x1-y0"
+          "value": "pinheiro-3-x0-y1"
         }
       ]
     },
@@ -2988,7 +2948,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x0-y1"
+          "value": "pinheiro-3-x1-y1"
         }
       ]
     },
@@ -2998,7 +2958,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x1-y1"
+          "value": "arvore-larga-4-x0-y0"
         }
       ]
     },
@@ -3008,7 +2968,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x0-y0"
+          "value": "arvore-larga-4-x1-y0"
         }
       ]
     },
@@ -3018,7 +2978,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x1-y0"
+          "value": "arvore-larga-4-x0-y1"
         }
       ]
     },
@@ -3028,7 +2988,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x0-y1"
+          "value": "arvore-larga-4-x1-y1"
         }
       ]
     },
@@ -3038,7 +2998,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x1-y1"
+          "value": "pinheiro-4-x0-y0"
         }
       ]
     },
@@ -3048,7 +3008,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x0-y0"
+          "value": "pinheiro-4-x1-y0"
         }
       ]
     },
@@ -3058,7 +3018,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x1-y0"
+          "value": "pinheiro-4-x0-y1"
         }
       ]
     },
@@ -3068,7 +3028,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x0-y1"
+          "value": "pinheiro-4-x1-y1"
         }
       ]
     },
@@ -3078,7 +3038,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x1-y1"
+          "value": "arbusto-1"
         }
       ]
     },
@@ -3088,7 +3048,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-1"
+          "value": "pedra-1"
         }
       ]
     },
@@ -3098,7 +3058,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-1"
+          "value": "flores-1"
         }
       ]
     },
@@ -3108,7 +3068,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "flores-1"
+          "value": "arbusto-2"
         }
       ]
     },
@@ -3118,7 +3078,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-2"
+          "value": "pedra-2"
         }
       ]
     },
@@ -3128,7 +3088,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-2"
+          "value": "flores-2"
         }
       ]
     },
@@ -3138,7 +3098,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "flores-2"
+          "value": "arbusto-3"
         }
       ]
     },
@@ -3148,7 +3108,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-3"
+          "value": "pedra-3"
         }
       ]
     },
@@ -3158,7 +3118,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-3"
+          "value": "flores-3"
         }
       ]
     },
@@ -3168,7 +3128,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "flores-3"
+          "value": "arbusto-4"
         }
       ]
     },
@@ -3178,22 +3138,12 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-4"
-        }
-      ]
-    },
-    {
-      "id": 392,
-      "properties": [
-        {
-          "name": "name",
-          "type": "string",
           "value": "pedra-4"
         }
       ]
     },
     {
-      "id": 393,
+      "id": 392,
       "properties": [
         {
           "name": "name",
@@ -5285,12 +5235,25 @@
       ],
       "wangtiles": [
         {
-          "tileid": 330,
+          "tileid": 329,
           "wangid": [
             0,
             2,
             0,
             2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 330,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
             0,
             2,
             0,
@@ -5305,7 +5268,7 @@
             0,
             1,
             0,
-            2,
+            1,
             0,
             2
           ]
@@ -5316,7 +5279,7 @@
             0,
             2,
             0,
-            1,
+            2,
             0,
             1,
             0,
@@ -5327,11 +5290,11 @@
           "tileid": 333,
           "wangid": [
             0,
-            2,
-            0,
-            2,
+            1,
             0,
             1,
+            0,
+            2,
             0,
             2
           ]
@@ -5344,18 +5307,18 @@
             0,
             1,
             0,
-            2,
+            1,
             0,
-            2
+            1
           ]
         },
         {
           "tileid": 335,
           "wangid": [
             0,
-            1,
+            2,
             0,
-            1,
+            2,
             0,
             1,
             0,
@@ -5366,13 +5329,13 @@
           "tileid": 336,
           "wangid": [
             0,
-            2,
-            0,
-            2,
-            0,
             1,
             0,
-            1
+            2,
+            0,
+            2,
+            0,
+            2
           ]
         },
         {
@@ -5385,14 +5348,14 @@
             0,
             2,
             0,
-            2
+            1
           ]
         },
         {
           "tileid": 338,
           "wangid": [
             0,
-            1,
+            2,
             0,
             2,
             0,
@@ -5405,11 +5368,11 @@
           "tileid": 339,
           "wangid": [
             0,
-            2,
+            1,
             0,
             2,
             0,
-            2,
+            1,
             0,
             1
           ]
@@ -5420,9 +5383,9 @@
             0,
             1,
             0,
-            2,
-            0,
             1,
+            0,
+            2,
             0,
             1
           ]
@@ -5433,30 +5396,17 @@
             0,
             1,
             0,
-            1,
-            0,
             2,
             0,
-            1
+            1,
+            0,
+            2
           ]
         },
         {
           "tileid": 342,
           "wangid": [
             0,
-            1,
-            0,
-            2,
-            0,
-            1,
-            0,
-            2
-          ]
-        },
-        {
-          "tileid": 343,
-          "wangid": [
-            0,
             2,
             0,
             1,
@@ -5467,7 +5417,7 @@
           ]
         },
         {
-          "tileid": 344,
+          "tileid": 343,
           "wangid": [
             0,
             1,
@@ -5480,7 +5430,7 @@
           ]
         },
         {
-          "tileid": 345,
+          "tileid": 344,
           "wangid": [
             0,
             2,

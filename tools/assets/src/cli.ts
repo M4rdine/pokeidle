@@ -145,7 +145,7 @@ program
 
 program
   .command('map-preview')
-  .argument('<mapa>', 'hunt em JSON (packages/shared/data/hunts/route-1.json)')
+  .argument('<mapa>', 'hunt em JSON (packages/shared/data/hunts/campo-inicial.json)')
   .option('--atlas <dir>', 'pasta do atlas gerado pelo build', 'assets/atlas')
   .option('--out <file>', 'arquivo PNG de saída', 'preview.png')
   .option('--blocking', 'pinta de vermelho os tiles bloqueados', false)

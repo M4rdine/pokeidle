@@ -65,6 +65,11 @@ const TerrainSetSchema = z.object({
   file: z.string().min(1),
   /** Liga quando o gerador inverteu qual material virou fundo. */
   swap: z.boolean().optional(),
+  /**
+   * Material que pulsa. As repetições da peça pura desse material viram fases de animação em
+   * vez de variações estáticas — é assim que a água desenhada volta a se mexer.
+   */
+  animate: z.enum(['from', 'to']).optional(),
 }).strict()
 
 /**

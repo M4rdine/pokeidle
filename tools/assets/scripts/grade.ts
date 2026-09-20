@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs'
-import { decodePng, encodePng, type RgbaImage } from '../src/png.js'
+import { decodePng, encodePng } from '../src/png.js'
+import type { RgbaImage } from '../src/compose.js'
 
 /** Desenha a grade do conjunto gerado com separadores, para mapear célula por célula. */
 const img = decodePng(readFileSync(process.argv[2]!))

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pokeidle — operação</title>
+  <link rel="stylesheet" href="/metrics/ui/painel.css" />
+</head>
+<body>
+  <header class="barra">
+    <strong>Pokeidle</strong>
+    <span class="muted">operação</span>
+    <span id="uptime" class="muted"></span>
+    <span id="estado" class="estado" data-estado="carregando">carregando</span>
+  </header>
+
+  <main>
+    <section class="cartoes" aria-label="Agora">
+      <article class="cartao"><strong id="huntsAtivas">—</strong><span>caçadas ativas</span></article>
+      <article class="cartao"><strong id="huntsCatchup">—</strong><span>em catch-up</span></article>
+      <article class="cartao"><strong id="conexoes">—</strong><span>sockets abertos</span></article>
+      <article class="cartao"><strong id="memoria">—</strong><span>memória residente</span></article>
+    </section>
+
+    <section aria-labelledby="tick-h">
+      <h2 id="tick-h">Tick</h2>
+      <p class="muted nota">O jogo simula cinco vezes por segundo. Duração acima de 200 ms significa que o laço não fecha no tempo.</p>
+      <table class="tabela">
+        <thead><tr><th scope="col">medida</th><th scope="col" class="num">p50</th><th scope="col" class="num">p95</th><th scope="col" class="num">p99</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">duração</th><td class="num" id="tickP50">—</td><td class="num" id="tickP95">—</td><td class="num" id="tickP99">—</td></tr>
+          <tr><th scope="row">atraso</th><td class="num" id="lagP50">—</td><td class="num" id="lagP95">—</td><td class="num" id="lagP99">—</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="persist-h">
+      <h2 id="persist-h">Persistência</h2>
+      <p class="muted nota">A única parte do tick que fala com o banco. Quando o tick atrasa, é aqui que se olha primeiro.</p>
+      <table class="tabela">
+        <thead><tr><th scope="col">tipo</th><th scope="col" class="num">gravações</th><th scope="col" class="num">p95</th><th scope="col" class="num">falhas</th></tr></thead>
+        <tbody id="persistCorpo"><tr><td colspan="4" class="muted">—</td></tr></tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="http-h">
+      <h2 id="http-h">HTTP e erros</h2>
+      <table class="tabela">
+        <thead><tr><th scope="col">rota</th><th scope="col" class="num">requisições</th><th scope="col" class="num">erros 5xx</th></tr></thead>
+        <tbody id="httpCorpo"><tr><td colspan="3" class="muted">—</td></tr></tbody>
+      </table>
+      <table class="tabela">
+        <thead><tr><th scope="col">erros por escopo</th><th scope="col" class="num">desde o boot</th></tr></thead>
+        <tbody id="errosCorpo"><tr><td colspan="2" class="muted">nenhum</td></tr></tbody>
+      </table>
+    </section>
+
+    <section aria-labelledby="hunts-h">
+      <h2 id="hunts-h">Caçadas encerradas</h2>
+      <table class="tabela">
+        <thead><tr><th scope="col">motivo</th><th scope="col" class="num">desde o boot</th></tr></thead>
+        <tbody id="fimCorpo"><tr><td colspan="2" class="muted">nenhuma</td></tr></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script type="module" src="/metrics/ui/painel.js"></script>
+</body>
+</html>

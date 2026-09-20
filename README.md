@@ -15,6 +15,8 @@ progresso continua com a aba fechada. A simulação inteira acontece no servidor
   58 µs por tick por treinador e cerca de 850 caçadas simultâneas a 25 % de CPU numa máquina.
 - **Progresso offline.** Quem volta depois de horas recebe a simulação recuperada em fatias, com
   teto de 12 horas.
+- **Observabilidade de verdade.** `/metrics` no formato Prometheus (tick, caçadas, persistência,
+  HTTP, erros) e um painel que lê o mesmo endpoint, os dois atrás de credencial.
 - **Pipeline de assets escrito do zero.** Leitura de sprites, atlas, fatiamento, tileset do Tiled
   com pincéis de terreno e prévia do mapa em PNG.
 

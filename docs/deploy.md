@@ -26,6 +26,27 @@ um `cp` manual, e bastava esquecê-lo uma vez para o jogo abrir com o mapa em br
 pedia tiles que a cópia servida não tinha. `packages/server/test/atlas-cobertura.test.ts` falha
 quando a cópia fica para trás.
 
+## Métricas
+
+`/metrics` responde no formato Prometheus e `/metrics/ui/` é um painel que lê esse mesmo
+endpoint — caçadas ativas, quantis de tick, persistência, HTTP e erros por escopo.
+
+Os dois passam pela mesma guarda, e não existe configuração que os deixe abertos:
+
+- Com `METRICS_TOKEN` no ambiente, exigem `Authorization: Bearer <token>` de qualquer origem,
+  inclusive local.
+- Sem o token, só respondem ao loopback — o caso do desenvolvimento.
+
+Em produção, defina o token junto dos outros segredos:
+
+```bash
+fly secrets set METRICS_TOKEN="$(openssl rand -hex 24)"
+curl -H "Authorization: Bearer <token>" https://<app>.fly.dev/metrics
+```
+
+Para histórico e alerta, aponte um Prometheus para essa URL; o endpoint não guarda série, e o
+painel mostra só o agora.
+
 ## Primeiro deploy
 
 1. Criar o banco no Neon e copiar a URL de conexão com `sslmode=require`.

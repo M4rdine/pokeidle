@@ -20,12 +20,10 @@ Pokédex, e onde cada área mostra o que rende antes de entrar.
 
 Fora do escopo: drops por área com multiplicador de raridade (sprint 7 — aqui o analisador usa a
 tabela de loot padrão que já existe); segunda região (sprint 8); mapa da região renderizado em
-PixiJS com zoom e arraste. Este sprint entrega o mapa como *minimapa estático por área* desenhado
-a partir do tile de terreno dominante; a tela grande com zoom fica para quando houver mais de uma
-região para navegar.
+PixiJS com zoom e arraste, que só se justifica quando houver mais de uma região para navegar.
 
 Critério de pronto: com o filtro "forte contra água" e "nível 10 a 20", a tela mostra só as áreas
-que servem, e o cartão de cada uma diz quanto XP por hora ela rende para o time atual.
+que servem, e cada uma diz quanto XP por hora rende para o time atual.
 
 ## 3. De onde vêm os dados
 
@@ -71,26 +69,34 @@ contra" derivados da tabela de tipos, e "só com espécie que falta na Pokédex"
 URL (`?tipo=fire&nivel=10-20`), para o estado ser compartilhável e sobreviver ao recarregar —
 é a regra de URL como estado das nossas próprias diretrizes de front-end.
 
-**Lista de áreas.** Um cartão por área, com contagem "X de Y áreas" no topo. O cartão traz nome,
-faixa de nível, as espécies com sprite, o minimapa e três números do analisador. Área de região
-bloqueada aparece esmaecida com o nível que a abre, nunca some — saber o que vem depois é parte
-do jogo.
+**Lista de áreas.** Uma linha por área, não um cartão, com contagem "X de Y áreas" ao lado do
+título. A linha traz nome, faixa de nível, as espécies com sprite e tipo, e três números do
+analisador, em colunas de largura fixa: a tarefa é comparar áreas, e comparar é ler a mesma
+coluna de cima a baixo, o que cartões lado a lado não permitem. Área bloqueada aparece esmaecida
+com o nível que a abre, nunca some — saber o que vem depois é parte do jogo.
 
-**Painel do analisador.** Ao focar um cartão (mouse ou teclado), o painel lateral abre com a
-tabela por espécie: nível, XP por derrota, ouro, chance de captura com a melhor bola do inventário
-e o confronto de tipo contra o time. No celular o painel vira uma gaveta abaixo do cartão.
+O minimapa por área saiu do escopo na execução: numa linha de altura fixa ele competiria com os
+sprites das espécies pelo mesmo espaço, e é a espécie, não o bioma, que responde à pergunta "onde
+farmo o que eu quero". O bioma volta quando houver o mapa da região navegável, na sprint em que
+existir uma segunda região para navegar.
 
-Acessibilidade não é apêndice: os cartões são uma lista navegável por teclado, o foco abre o
-painel, os filtros são `fieldset` com rótulo, e o confronto nunca é indicado só por cor — vem com
-o número do multiplicador.
+**Painel do analisador.** Ao abrir uma linha (clique ou teclado), o detalhe aparece como gaveta
+logo abaixo dela, com a tabela por espécie: nível, XP por derrota, ouro, tempo por derrota, chance
+de captura e o confronto de tipo contra o time. Gaveta na própria lista, e não painel lateral nem
+modal: comparar áreas exige abrir uma, olhar, fechar e abrir a vizinha sem perder o lugar.
+
+Acessibilidade não é apêndice: a ficha é uma lista de verdade, o corpo de cada linha é um botão
+nativo (com rótulo próprio, em vez do despejo de todas as colunas), "Caçar" fica fora dele porque
+botão dentro de botão não existe em HTML, os filtros são `fieldset` com legenda, e o confronto vem
+escrito ("arrasa", "vantagem", "não fere"), nunca só por cor.
 
 ## 5. Arquivos
 
 - `packages/shared/src/analyzer.ts` — estimativa pura (novo).
 - `packages/shared/test/analyzer.test.ts` — testes da estimativa (novo).
 - `packages/client/src/state/area-filters.ts` — filtro puro e leitura/escrita da URL (novo).
-- `packages/client/src/ui/screens/areas/` — a tela quebrada em `AreaList`, `AreaCard`,
-  `AreaFilters`, `AreaAnalyzer` e `minimap.ts`, nenhum acima de 200 linhas (novo).
+- `packages/client/src/ui/screens/areas/` — a tela quebrada em `index.ts`, `AreaRow`,
+  `AreaFilters`, `AreaAnalyzer` e `format.ts`, nenhum acima de 200 linhas (novo).
 - `packages/client/src/ui/screens/hunts.ts` — some; quem chama passa a montar a tela nova.
 - `packages/client/src/styles/areas.css` — estilo da tela (novo).
 
@@ -100,9 +106,10 @@ o número do multiplicador.
   estimativa é determinística (mesma entrada, mesma saída).
 - `area-filters.test.ts`: cada filtro isola o conjunto certo; filtros compõem; a ida e volta pela
   URL preserva o estado.
-- `areas.test.ts`: a contagem "X de Y" bate com o filtro; região bloqueada não tem botão; focar
-  um cartão abre o painel; o painel lista uma linha por espécie.
-- O smoke continua verde: ele clica no primeiro cartão não bloqueado, que continua existindo.
+- `areas.test.ts`: a contagem "X de Y" bate com o filtro; área bloqueada não tem botão de caçar;
+  abrir uma linha mostra a tabela por espécie e abrir de novo fecha; filtro sem resultado explica
+  o que fazer; sem o time carregado a ficha continua de pé, com travessão no lugar do número.
+- O smoke passa a clicar na primeira linha não bloqueada.
 
 ## 7. Riscos
 
@@ -111,5 +118,5 @@ nele. Mitigação: a estimativa é declarada como aproximação na própria inte
 os testes fixam a ordem de grandeza contra uma simulação real de 3000 ticks do motor, não contra
 um valor mágico.
 
-O segundo é a tela virar um painel de planilha e matar o clima do jogo. Mitigação: o cartão mostra
-três números e sprites; a tabela completa só aparece no painel, sob demanda.
+O segundo é a tela virar um painel de planilha e matar o clima do jogo. Mitigação: a linha mostra
+três números e os sprites das espécies; a tabela completa só abre sob demanda.

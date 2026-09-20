@@ -1,6 +1,7 @@
 import './styles/tokens.css'
 import './styles/layout.css'
 import './styles/hud.css'
+import './styles/areas.css'
 import './styles/modals.css'
 import { loadContentRegistry } from '@pokeidle/shared'
 import { HuntsSchema, MeSchema } from './api/dto.js'
@@ -14,7 +15,7 @@ import { createStore } from './state/store.js'
 import { el, mount } from './ui/dom.js'
 import { mountAuth } from './ui/screens/auth.js'
 import { mountGame } from './ui/screens/game.js'
-import { mountHunts } from './ui/screens/hunts.js'
+import { mountAreas } from './ui/screens/areas/index.js'
 import { mountStarter } from './ui/screens/starter.js'
 import { openBag } from './ui/modals/bag.js'
 import { openPokedex } from './ui/modals/pokedex.js'
@@ -51,7 +52,7 @@ function render(): void {
   const screen = ctx.session.get().screen
   if (screen === 'auth') unmount = mountAuth(root!, ctx)
   else if (screen === 'starter') unmount = mountStarter(root!, ctx)
-  else if (screen === 'hunts') unmount = mountHunts(root!, ctx)
+  else if (screen === 'hunts') unmount = mountAreas(root!, ctx)
   else if (screen === 'game') unmount = mountGame(root!, ctx)
   else mount(root!, el('p', { class: 'loading' }, 'Carregando…'))
 }

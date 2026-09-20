@@ -16,3 +16,6 @@ packages/client/playwright-report
 # redistribuir num repositório público é outra. Fica fora do git e entra na imagem
 # no build local (ver docs/deploy.md).
 packages/server/public/atlas/
+
+# Capturas e rascunhos da revisão de design: material de trabalho, não entrega.
+.impeccable/

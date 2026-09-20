@@ -1,0 +1,166 @@
+/*
+ * Navegador de áreas. Herda o mundo do jogo: fundo escuro, painel de borda reta de 2 px, acento
+ * amarelo, números tabulares. A composição é uma ficha de linhas, não uma grade de cartões — a
+ * tarefa é comparar áreas, e comparar é ler a mesma coluna de cima a baixo. Por isso as colunas
+ * têm largura fixa e idêntica em todas as linhas, em vez de se ajustarem ao conteúdo de cada uma.
+ */
+
+.screen-areas { max-width: 1100px; width: 100%; margin: 0 auto; }
+.area-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
+/* "nível 5" quebrando no meio deixa a barra com duas alturas no celular. */
+.trainer-bar > span { white-space: nowrap; }
+.area-head-right { display: flex; align-items: baseline; gap: var(--space-3); }
+.area-count { margin: 0; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* --- filtros --- */
+.area-filters {
+  display: grid;
+  grid-template-columns: minmax(23rem, 2fr) auto auto auto;
+  align-items: start; gap: var(--space-3);
+  padding: var(--space-3);
+}
+.filter-group { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); }
+.filter-group legend {
+  float: left; width: 100%; padding: 0 0 var(--space-1);
+  color: var(--muted); font-size: 0.8em; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.filter-types { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.filter-type {
+  padding: 0 var(--space-1); background: transparent;
+  border: 1px solid; border-radius: 0; cursor: pointer;
+  font-size: 0.8em; text-transform: lowercase;
+}
+.filter-type:hover { filter: brightness(1.35); }
+/* Cada tipo empresta a cor por uma variável: a borda e o ponto usam o tom, mas o rótulo
+   fica no texto claro do tema — `dark` e `ghost` são escuros demais para serem lidos. */
+.filter-type.type-normal { --t: var(--type-normal); }
+.filter-type.type-fire { --t: var(--type-fire); }
+.filter-type.type-water { --t: var(--type-water); }
+.filter-type.type-electric { --t: var(--type-electric); }
+.filter-type.type-grass { --t: var(--type-grass); }
+.filter-type.type-ice { --t: var(--type-ice); }
+.filter-type.type-fighting { --t: var(--type-fighting); }
+.filter-type.type-poison { --t: var(--type-poison); }
+.filter-type.type-ground { --t: var(--type-ground); }
+.filter-type.type-flying { --t: var(--type-flying); }
+.filter-type.type-psychic { --t: var(--type-psychic); }
+.filter-type.type-bug { --t: var(--type-bug); }
+.filter-type.type-rock { --t: var(--type-rock); }
+.filter-type.type-ghost { --t: var(--type-ghost); }
+.filter-type.type-dragon { --t: var(--type-dragon); }
+.filter-type.type-dark { --t: var(--type-dark); }
+.filter-type.type-steel { --t: var(--type-steel); }
+.filter-type.type-fairy { --t: var(--type-fairy); }
+.filter-type { color: var(--text); border-color: var(--t); display: inline-flex; align-items: center; gap: 0.35em; }
+.filter-type::before { content: ''; width: 0.55em; height: 0.55em; background: var(--t); }
+.filter-type[aria-pressed='true'] { background: var(--t); color: var(--bg); }
+.filter-type[aria-pressed='true']::before { background: var(--bg); }
+
+.filter-level-field { display: inline-flex; align-items: center; gap: var(--space-1); }
+.filter-level-field label { color: var(--muted); }
+.filter-level { width: 5ch; padding: var(--space-1) var(--space-2); text-align: center; }
+.filter-toggle { padding: var(--space-1) var(--space-2); }
+.filter-toggle[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); }
+/* Vive no cabeçalho, ao lado da contagem que ele muda. Dentro do painel de filtros ele abria
+   uma faixa morta sob os grupos curtos. */
+.filter-clear { padding: var(--space-1) var(--space-2); font-size: 0.9em; }
+
+/* --- ficha --- */
+.area-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.area-row {
+  display: grid; grid-template-columns: 1fr auto; align-items: stretch; gap: var(--space-3);
+  background: var(--panel); border: var(--border-w) solid var(--border);
+  padding-right: var(--space-3);
+  /* Só a borda muda no hover: a linha não se mexe, então a coluna não pisca ao passar o mouse. */
+  transition: border-color 120ms ease-out;
+}
+.area-row:hover { border-color: var(--accent); }
+.area-row-open { border-color: var(--accent); }
+.area-row-locked { opacity: 0.55; }
+.area-row-locked:hover { border-color: var(--border); }
+
+/* As larguras são fixas de propósito: é o alinhamento entre linhas que torna a ficha comparável. */
+.area-main {
+  display: grid;
+  grid-template-columns: minmax(9rem, 1fr) 4.5rem 10rem 4.5rem 4.5rem 7rem;
+  align-items: center; gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: none; border: 0; text-align: left; color: inherit; font: inherit; cursor: pointer;
+}
+.area-main:focus-visible { outline: var(--border-w) solid var(--accent); outline-offset: -2px; }
+.area-row-locked .area-main { cursor: pointer; }
+
+.area-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.area-title { font-size: 1rem; font-weight: 600; letter-spacing: 0.02em; }
+.area-missing { color: var(--accent); font-size: 0.8em; }
+.area-levels, .area-metric { display: flex; flex-direction: column; line-height: 1.15; }
+.area-levels strong, .area-metric strong { font-variant-numeric: tabular-nums; }
+.area-levels > span, .area-metric > span { font-size: 0.75em; letter-spacing: 0.04em; }
+/* As três métricas são células próprias do grid: ficam na mesma coluna em todas as linhas. */
+.area-metrics { display: contents; }
+
+.area-species { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.area-sprites { display: flex; align-items: center; gap: var(--space-1); min-height: 32px; }
+.area-more { font-size: 0.8em; }
+.area-types { display: flex; flex-wrap: wrap; gap: 2px; }
+.area-types .type { margin: 0; }
+/* Caixa de tamanho fixo: o frame do atlas tem 32 ou 64 px e o sprite é escalado para caber.
+   O filho é posicionado, não item de grid, senão o grid o encolhe para 32 px e corta o quadro. */
+.sprite-thumb { position: relative; display: inline-block; overflow: hidden; flex: none; }
+.sprite-thumb > span {
+  position: absolute; top: 50%; left: 50%;
+  background-repeat: no-repeat; transform-origin: center;
+  translate: -50% -50%;
+}
+
+.area-gate { align-self: center; color: var(--accent); font-size: 0.85em; white-space: nowrap; }
+.area-start { align-self: center; white-space: nowrap; }
+
+.matchup-good strong { color: var(--ok); }
+.matchup-bad strong { color: var(--danger); }
+.matchup-none strong { color: var(--muted); }
+
+/* --- analisador --- */
+.area-detail { margin-top: calc(var(--space-2) * -1); }
+.area-analyzer {
+  border: var(--border-w) solid var(--accent); border-top: 0;
+  background: var(--bg); padding: var(--space-3);
+  /* A abertura é o único movimento da tela: a gaveta nasce da própria linha, de cima para baixo. */
+  animation: analyzer-open 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes analyzer-open { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) {
+  .area-analyzer { animation: none; }
+  .area-row { transition: none; }
+}
+.analyzer-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.analyzer-table th, .analyzer-table td { padding: var(--space-1) var(--space-2); text-align: left; }
+.analyzer-table thead th {
+  color: var(--muted); font-weight: 400; font-size: 0.8em;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+.analyzer-table .num { text-align: right; }
+.analyzer-table tbody tr + tr th, .analyzer-table tbody tr + tr td { border-top: 1px solid var(--border); }
+.analyzer-table tbody th { font-weight: 400; }
+.especie-nome { display: inline-flex; align-items: center; gap: var(--space-1); margin-right: var(--space-1); }
+.analyzer-note { margin: var(--space-3) 0 0; font-size: 0.85em; }
+
+.area-empty { padding: var(--space-3); }
+.link { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; }
+
+@media (max-width: 960px) {
+  .area-filters { grid-template-columns: 1fr; }
+  .area-main {
+    grid-template-columns: 1fr auto auto;
+    grid-template-areas: 'nome faixa faixa' 'especies metrica-xp metrica-ouro' 'confronto confronto confronto';
+    gap: var(--space-2);
+  }
+  .area-name { grid-area: nome; }
+  .area-levels { grid-area: faixa; flex-direction: row; gap: var(--space-1); align-items: baseline; }
+  .area-species { grid-area: especies; }
+  .area-metric:nth-of-type(1) { grid-area: metrica-xp; }
+  .area-metric:nth-of-type(2) { grid-area: metrica-ouro; }
+  .area-metric:nth-of-type(3) { grid-area: confronto; flex-direction: row; gap: var(--space-1); align-items: baseline; }
+  .analyzer-table { display: block; overflow-x: auto; white-space: nowrap; }
+}

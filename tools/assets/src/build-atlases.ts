@@ -1,4 +1,4 @@
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { access, copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { packGrid, toTiledTileset, type AtlasFrame, type TerrainInput } from './atlas.js'
 import type { Catalog, CatalogOutfit } from './catalog.js'
@@ -17,6 +17,13 @@ export interface BuildOptions {
   readonly extractedDir: string
   readonly manifestPath: string
   readonly outDir: string
+  /**
+   * Para onde publicar a cópia que o servidor entrega ao navegador. O build escreve o atlas de
+   * trabalho em `outDir` (com o `.tsj` que o Tiled usa) e publica aqui os quatro arquivos da
+   * allowlist. Sem isso a cópia servida congela na última vez que alguém lembrou de copiar à
+   * mão, e o jogo desenha um mapa com metade dos tiles faltando.
+   */
+  readonly publishDir?: string | undefined
   /** Pasta dos conjuntos de terreno desenhados; padrão ao lado do manifesto. */
   readonly terrainsDir?: string
   /** Pasta dos props desenhados; padrão ao lado do manifesto. */
@@ -272,5 +279,24 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
   )
   log(`tiles.png: ${tileOrder.length} tiles em ${tiles.length} quadros; tiles.tsj pronto para o Tiled`)
 
+  const publicado = await publishAtlas(opts.outDir, opts.publishDir)
+  if (publicado !== null) log(`publicado para o servidor em ${publicado}`)
+
   return { pokemonFrames: pokemon.length, tileFrames: tiles.length }
+}
+
+/** Os quatro arquivos que o servidor entrega; o `.tsj` é ferramenta e fica de fora. */
+const PUBLICADOS = ['tiles.png', 'tiles.json', 'pokemon.png', 'pokemon.json'] as const
+
+/**
+ * Copia o atlas recém-gerado para a pasta que o servidor serve. Devolve o destino, ou null quando
+ * não há destino configurado.
+ */
+async function publishAtlas(outDir: string, publishDir: string | undefined): Promise<string | null> {
+  if (publishDir === undefined) return null
+  await mkdir(publishDir, { recursive: true })
+  for (const nome of PUBLICADOS) {
+    await copyFile(join(outDir, nome), join(publishDir, nome))
+  }
+  return publishDir
 }

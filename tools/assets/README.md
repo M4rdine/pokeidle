@@ -10,7 +10,7 @@ originais **não** ficam no repositório: aponte os comandos para a sua cópia l
 pnpm assets inspect <spr> <dat> [--version 860|854]
 pnpm assets extract <spr> <dat> [--out assets/extracted] [--version 860|854]
 pnpm assets contact-sheet [--extracted assets/extracted] [--all-outfits] [--all-items] [--tileset assets/atlas]
-pnpm assets build [--extracted assets/extracted] [--manifest tools/assets/manifest.json] [--out assets/atlas]
+pnpm assets build [--extracted assets/extracted] [--manifest tools/assets/manifest.json] [--out assets/atlas] [--publish packages/server/public/atlas]
 pnpm assets region-import tools/assets/maps/kanto.tmj [--tileset assets/atlas/tiles.tsj] [--manifest tools/assets/manifest.json] [--out packages/shared/data/hunts] [--regions packages/shared/data/regions.json]
 pnpm assets map-preview packages/shared/data/hunts/campo-inicial.json [--atlas assets/atlas] [--out preview.png] [--blocking]
 ```

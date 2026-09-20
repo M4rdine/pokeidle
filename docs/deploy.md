@@ -19,9 +19,12 @@ Para gerar o atlas na sua máquina antes do primeiro deploy:
 
 ```bash
 pnpm assets build --extracted assets/extracted-otp2019
-mkdir -p packages/server/public/atlas
-cp assets/atlas/{tiles,pokemon}.{png,json} packages/server/public/atlas/
 ```
+
+O build já publica os quatro arquivos servidos em `packages/server/public/atlas`. Antes isso era
+um `cp` manual, e bastava esquecê-lo uma vez para o jogo abrir com o mapa em branco — o navegador
+pedia tiles que a cópia servida não tinha. `packages/server/test/atlas-cobertura.test.ts` falha
+quando a cópia fica para trás.
 
 ## Primeiro deploy
 

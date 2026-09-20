@@ -78,10 +78,15 @@ program
   .option('--extracted <dir>', 'pasta com PNGs extraídos e catalog.json', 'assets/extracted')
   .option('--manifest <file>', 'manifest de curadoria', 'tools/assets/manifest.json')
   .option('--out <dir>', 'pasta de saída dos atlases', 'assets/atlas')
+  .option('--publish <dir>', 'cópia servida ao navegador; "nenhum" para não publicar', 'packages/server/public/atlas')
   .option('--terrains <dir>', 'conjuntos de terreno desenhados', 'tools/assets/terrenos')
   .option('--props <dir>', 'props desenhados', 'tools/assets/props')
-  .action(async (opts: { extracted: string; manifest: string; out: string; terrains: string; props: string }) => {
-    await buildAtlases({ extractedDir: opts.extracted, manifestPath: opts.manifest, outDir: opts.out, terrainsDir: opts.terrains, propsDir: opts.props }, out)
+  .action(async (opts: { extracted: string; manifest: string; out: string; publish: string; terrains: string; props: string }) => {
+    await buildAtlases({
+      extractedDir: opts.extracted, manifestPath: opts.manifest, outDir: opts.out,
+      publishDir: opts.publish === 'nenhum' ? undefined : opts.publish,
+      terrainsDir: opts.terrains, propsDir: opts.props,
+    }, out)
   })
 
 program

@@ -104,13 +104,22 @@ Fora de escopo nestes três meses, apesar de existirem na referência: PvP, gin�
 mercado entre jogadores, guilda, chat global, passe de batalha, VIP e gemas. São sistemas sociais
 e de monetização que não servem ao objetivo de portfólio e multiplicam o custo de operação.
 
-## 5b. Sobre as releases da referência
+## 5b. Releases da referência, já triadas
 
-O usuário vai enviar as notas de versão do jogo de referência para virarem specs. Regra de
-triagem, para o backlog não virar um depósito: cada release entra na fila classificada em
-**adotar**, **adaptar** ou **descartar**. Adotar é o que cabe no nosso escopo e no nosso modelo.
-Adaptar é o que precisa de outra forma aqui. Descartar é o que depende de PvP, monetização ou
-população grande. Nada entra no sprint sem passar por essa classificação.
+As notas de versão do jogo de referência, de 2026-08-07 a 2026-09-18, foram lidas e classificadas
+em **adotar**, **adaptar** ou **descartar**, em
+`docs/design/2026-09-20-triagem-releases-referencia.md`. O resultado: **24 sistemas adotados**,
+oito adaptados e seis famílias inteiras descartadas por dependerem de população, dinheiro real ou
+moderação.
+
+Os adotados couberam nos sprints que já existiam, porque quase todos são regra de jogo e não
+infraestrutura. Os mais afetados são o 6, que ganha o analisador de hunt; o 7, que vira o sprint
+de risco e economia; o 8, com degraus de dificuldade e shiny decidido no servidor; e o 10, que
+concentra nota, qualidade, refino, itens seguráveis, depot e evolução ramificada.
+
+A triagem também guarda os tropeços deles, que valem mais que as features: a pedra exigida por 34
+evoluções que nenhuma hunt dropava, a inflação de moeda depois do nível 100, a nota que punia
+evoluir e o shiny que os bots enxergavam durante a hunt.
 
 ## 6. Sprints
 

@@ -78,8 +78,9 @@ program
   .option('--extracted <dir>', 'pasta com PNGs extraídos e catalog.json', 'assets/extracted')
   .option('--manifest <file>', 'manifest de curadoria', 'tools/assets/manifest.json')
   .option('--out <dir>', 'pasta de saída dos atlases', 'assets/atlas')
-  .action(async (opts: { extracted: string; manifest: string; out: string }) => {
-    await buildAtlases({ extractedDir: opts.extracted, manifestPath: opts.manifest, outDir: opts.out }, out)
+  .option('--terrains <dir>', 'conjuntos de terreno desenhados', 'tools/assets/terrenos')
+  .action(async (opts: { extracted: string; manifest: string; out: string; terrains: string }) => {
+    await buildAtlases({ extractedDir: opts.extracted, manifestPath: opts.manifest, outDir: opts.out, terrainsDir: opts.terrains }, out)
   })
 
 program

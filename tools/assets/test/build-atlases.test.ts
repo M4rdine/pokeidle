@@ -46,6 +46,55 @@ async function setupFixtures(): Promise<{ dir: string; extractedDir: string }> {
   return { dir, extractedDir }
 }
 
+
+/** Pinta uma célula 32x32 com um material por quadrante (TL, TR, BL, BR). */
+function cellBytes(tl: number, tr: number, bl: number, br: number): Uint8Array {
+  const d = new Uint8Array(32 * 32 * 4)
+  for (let y = 0; y < 32; y++) {
+    for (let x = 0; x < 32; x++) {
+      const v = y < 16 ? (x < 16 ? tl : tr) : (x < 16 ? bl : br)
+      const i = (y * 32 + x) * 4
+      d[i] = v; d[i + 1] = v; d[i + 2] = v; d[i + 3] = 255
+    }
+  }
+  return d
+}
+
+function gridPng(cells: Uint8Array[], cols: number): { width: number; height: number; data: Uint8Array } {
+  const rows = Math.ceil(cells.length / cols)
+  const width = cols * 32
+  const height = rows * 32
+  const data = new Uint8Array(width * height * 4)
+  cells.forEach((c, i) => {
+    const ox = (i % cols) * 32
+    const oy = Math.floor(i / cols) * 32
+    for (let y = 0; y < 32; y++) {
+      const from = y * 32 * 4
+      data.set(c.subarray(from, from + 32 * 4), ((oy + y) * width + ox) * 4)
+    }
+  })
+  return { width, height, data }
+}
+
+const A = 40
+const B = 200
+
+/** Grade com as dezesseis combinações: cada célula recebe um código diferente. */
+async function writeWangSet(path: string): Promise<void> {
+  const cells: Uint8Array[] = []
+  for (const tl of [A, B]) for (const tr of [A, B]) for (const bl of [A, B]) for (const br of [A, B]) {
+    cells.push(cellBytes(tl, tr, bl, br))
+  }
+  await mkdir(dirname(path), { recursive: true })
+  await writeFile(path, encodePng(gridPng(cells, 4)))
+}
+
+/** Só duas combinações: o pincel ficaria com catorze buracos. */
+async function writeIncompleteSet(path: string): Promise<void> {
+  await mkdir(dirname(path), { recursive: true })
+  await writeFile(path, encodePng(gridPng([cellBytes(A, A, A, A), cellBytes(B, B, B, B)], 2)))
+}
+
 describe('buildAtlases', () => {
   it('gera pokemon e tiles com nomes de frame e animações', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'pokeidle-atlas-'))
@@ -254,6 +303,49 @@ describe('buildAtlases', () => {
     const names = tileset.tiles.map((t: { properties: { value: string }[] }) => t.properties[0]!.value)
     expect(names).toContain('grama-agua-baaa')
     expect(names).not.toContain('grama-agua-baaa_1')
+  })
+
+  it('conjunto de terreno desenhado vira dezesseis peças e um pincel completo', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    const terrenosDir = join(dir, 'terrenos')
+    await mkdir(terrenosDir, { recursive: true })
+    // Grade 2x2: duas células puras do material base, uma mista e uma pura do outro material.
+    await writeWangSet(join(terrenosDir, 'campo-caminho.png'))
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }],
+      terrainSets: [{ name: 'campo-caminho', from: 'campo', to: 'caminho', file: 'campo-caminho.png' }],
+    }))
+
+    await buildAtlases({ extractedDir, manifestPath, outDir: dir, terrainsDir: terrenosDir }, () => {})
+
+    const sheet = JSON.parse(await readFile(join(dir, 'tiles.json'), 'utf8')) as { frames: Record<string, unknown> }
+    const peças = Object.keys(sheet.frames).filter((n) => n.startsWith('campo-caminho-'))
+    expect(peças).toHaveLength(16)
+
+    const tileset = JSON.parse(await readFile(join(dir, 'tiles.tsj'), 'utf8')) as { wangsets: { name: string; colors: unknown[]; wangtiles: unknown[] }[] }
+    const pincel = tileset.wangsets.find((w) => w.name === 'campo-caminho')!
+    expect(pincel.colors).toHaveLength(2)
+    expect(pincel.wangtiles).toHaveLength(16)
+  })
+
+  it('recusa conjunto de terreno incompleto, em vez de gerar pincel com buraco', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    const terrenosDir = join(dir, 'terrenos')
+    await mkdir(terrenosDir, { recursive: true })
+    await writeIncompleteSet(join(terrenosDir, 'furado.png'))
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }],
+      terrainSets: [{ name: 'furado', from: 'a', to: 'b', file: 'furado.png' }],
+    }))
+
+    await expect(buildAtlases({ extractedDir, manifestPath, outDir: dir, terrainsDir: terrenosDir }, () => {}))
+      .rejects.toThrow(/furado[\s\S]*fald|furado[\s\S]*faltam/i)
   })
 
 })

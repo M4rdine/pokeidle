@@ -508,5 +508,49 @@
       "from": "dirt",
       "to": "stone-floor"
     }
+  ],
+  "terrainSets": [
+    {
+      "name": "campo-caminho",
+      "from": "campo",
+      "to": "caminho",
+      "file": "campo-caminho.png",
+      "swap": true
+    },
+    {
+      "name": "campo-agua",
+      "from": "campo",
+      "to": "agua",
+      "file": "campo-agua.png",
+      "swap": true
+    },
+    {
+      "name": "campo-areia",
+      "from": "campo",
+      "to": "areia",
+      "file": "campo-areia.png",
+      "swap": true
+    },
+    {
+      "name": "areia-agua",
+      "from": "areia",
+      "to": "agua",
+      "file": "areia-agua.png",
+      "swap": true
+    },
+    {
+      "name": "pedra-caverna",
+      "from": "pedra",
+      "to": "caverna",
+      "file": "pedra-caverna.png",
+      "swap": true
+    },
+    {
+      "name": "campo-pedra",
+      "from": "campo",
+      "to": "pedra",
+      "file": "campo-pedra.png",
+      "swap": true
+    }
   ]
 }

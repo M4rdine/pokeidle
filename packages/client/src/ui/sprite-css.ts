@@ -22,3 +22,26 @@ export function applySpriteStyle(node: HTMLElement, atlas: AtlasData, species: s
   node.classList.add('sprite')
   for (const [property, value] of Object.entries(style)) node.style.setProperty(property, value)
 }
+
+/**
+ * Miniatura de tamanho fixo. Os frames do atlas têm 32 ou 64 px conforme a espécie, e o estilo
+ * do sprite grava a largura do frame direto no elemento: sem uma caixa que recorte e escale, um
+ * Rhydon de 64 px invade a coluna vizinha da ficha de áreas.
+ */
+export function spriteThumb(atlas: AtlasData, species: string, size = 32): HTMLElement {
+  const box = document.createElement('span')
+  box.className = 'sprite-thumb'
+  box.style.setProperty('width', `${size}px`)
+  box.style.setProperty('height', `${size}px`)
+  const inner = document.createElement('span')
+  const style = spriteStyle(atlas, species)
+  if (!style) {
+    inner.classList.add('sprite-unknown')
+  } else {
+    for (const [property, value] of Object.entries(style)) inner.style.setProperty(property, value)
+    const largura = Number.parseInt(style['width'] ?? `${size}`, 10)
+    inner.style.setProperty('transform', `scale(${size / (largura || size)})`)
+  }
+  box.append(inner)
+  return box
+}

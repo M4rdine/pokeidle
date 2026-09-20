@@ -13,8 +13,8 @@ test('registrar, inicial, Campo Inicial, derrota, mochila, parar e comprar na lo
   await expect(page.getByText('Escolha seu inicial')).toBeVisible()
   await page.locator('.starter-card[data-species=charmander]').getByRole('button', { name: 'Escolher' }).click()
 
-  await expect(page.getByRole('heading', { name: 'Hunts' })).toBeVisible()
-  await page.locator('.hunt-card:not(.hunt-locked)').getByRole('button', { name: 'Iniciar' }).first().click()
+  await expect(page.getByRole('heading', { name: 'Onde caçar' })).toBeVisible()
+  await page.locator('.area-row:not(.area-row-locked)').getByRole('button', { name: 'Caçar' }).first().click()
 
   await expect(page.locator('#scene canvas')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('.log-line', { hasText: 'derrotado' }).first()).toBeVisible({ timeout: 120_000 })
@@ -31,7 +31,7 @@ test('registrar, inicial, Campo Inicial, derrota, mochila, parar e comprar na lo
   }).toPass({ timeout: 120_000 })
 
   await page.getByRole('button', { name: 'Parar' }).click()
-  await expect(page.getByRole('heading', { name: 'Hunts' })).toBeVisible({ timeout: 30_000 })
+  await expect(page.getByRole('heading', { name: 'Onde caçar' })).toBeVisible({ timeout: 30_000 })
 
   await page.getByRole('button', { name: 'Loja' }).click()
   const potion = page.locator('.shop-item[data-item=potion]')

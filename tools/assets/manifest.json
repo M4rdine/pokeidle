@@ -552,5 +552,107 @@
       "file": "campo-pedra.png",
       "swap": true
     }
+  ],
+  "props": [
+    {
+      "name": "arvore-larga-1",
+      "file": "arvore-larga-0.png",
+      "size": 64
+    },
+    {
+      "name": "pinheiro-1",
+      "file": "pinheiro-0.png",
+      "size": 64
+    },
+    {
+      "name": "arvore-larga-2",
+      "file": "arvore-larga-1.png",
+      "size": 64
+    },
+    {
+      "name": "pinheiro-2",
+      "file": "pinheiro-1.png",
+      "size": 64
+    },
+    {
+      "name": "arvore-larga-3",
+      "file": "arvore-larga-2.png",
+      "size": 64
+    },
+    {
+      "name": "pinheiro-3",
+      "file": "pinheiro-2.png",
+      "size": 64
+    },
+    {
+      "name": "arvore-larga-4",
+      "file": "arvore-larga-3.png",
+      "size": 64
+    },
+    {
+      "name": "pinheiro-4",
+      "file": "pinheiro-3.png",
+      "size": 64
+    },
+    {
+      "name": "arbusto-1",
+      "file": "arbusto-0.png",
+      "size": 32
+    },
+    {
+      "name": "pedra-1",
+      "file": "pedra-0.png",
+      "size": 32
+    },
+    {
+      "name": "flores-1",
+      "file": "flores-0.png",
+      "size": 32
+    },
+    {
+      "name": "arbusto-2",
+      "file": "arbusto-1.png",
+      "size": 32
+    },
+    {
+      "name": "pedra-2",
+      "file": "pedra-1.png",
+      "size": 32
+    },
+    {
+      "name": "flores-2",
+      "file": "flores-1.png",
+      "size": 32
+    },
+    {
+      "name": "arbusto-3",
+      "file": "arbusto-2.png",
+      "size": 32
+    },
+    {
+      "name": "pedra-3",
+      "file": "pedra-2.png",
+      "size": 32
+    },
+    {
+      "name": "flores-3",
+      "file": "flores-2.png",
+      "size": 32
+    },
+    {
+      "name": "arbusto-4",
+      "file": "arbusto-3.png",
+      "size": 32
+    },
+    {
+      "name": "pedra-4",
+      "file": "pedra-3.png",
+      "size": 32
+    },
+    {
+      "name": "flores-4",
+      "file": "flores-3.png",
+      "size": 32
+    }
   ]
 }

@@ -67,6 +67,19 @@ const TerrainSetSchema = z.object({
   swap: z.boolean().optional(),
 }).strict()
 
+/**
+ * Prop desenhado: um PNG com o objeto sobre fundo chapado. O build recorta o fundo, apara e
+ * centraliza na célula. Um prop de 64 vira quatro peças de 32, como os itens grandes do dump.
+ */
+const PropSchema = z.object({
+  name: nameSchema,
+  file: z.string().min(1),
+  /** Lado da célula em pixels: 32 ocupa um tile, 64 ocupa dois por dois. */
+  size: z.union([z.literal(32), z.literal(64)]),
+  /** Tolerância do recorte de fundo; sobe quando a peça tem sombra colada. */
+  tolerance: z.number().int().min(0).max(80).optional(),
+}).strict()
+
 export const ManifestSchema = z.object({
   version: z.literal(1),
   species: z.array(SpeciesSchema),
@@ -74,9 +87,11 @@ export const ManifestSchema = z.object({
   terrains: z.array(TerrainSchema).optional(),
   transitions: z.array(TransitionSchema).optional(),
   terrainSets: z.array(TerrainSetSchema).optional(),
+  props: z.array(PropSchema).optional(),
 })
 
 export type TerrainSetEntry = z.infer<typeof TerrainSetSchema>
+export type PropEntry = z.infer<typeof PropSchema>
 export type Manifest = z.infer<typeof ManifestSchema>
 export type SpeciesEntry = Manifest['species'][number]
 export type TileEntry = Manifest['tiles'][number]

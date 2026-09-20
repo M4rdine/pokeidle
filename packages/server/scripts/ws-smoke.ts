@@ -48,8 +48,8 @@ async function registerAndStart(): Promise<string> {
   await postJson('/trainer/starter', cookie, { species: 'charmander' })
   process.stdout.write('inicial escolhido: charmander\n')
 
-  await postJson('/hunts/route-1/start', cookie, {})
-  process.stdout.write('hunt iniciada: route-1\n')
+  await postJson('/hunts/campo-inicial/start', cookie, {})
+  process.stdout.write('hunt iniciada: campo-inicial\n')
 
   return cookie
 }

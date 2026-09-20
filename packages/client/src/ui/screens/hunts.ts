@@ -1,10 +1,8 @@
 import type { AppContext, ModalName } from '../../app-context.js'
 import { StartHuntSchema } from '../../api/dto.js'
-import { HUNT_NAMES, MODAL_LABELS } from '../../config.js'
+import { MODAL_LABELS } from '../../config.js'
 import { trainerProgress } from '../../state/progress.js'
 import { el, mount } from '../dom.js'
-
-const huntName = (id: string, fallback?: string): string => HUNT_NAMES[id] ?? fallback ?? id
 
 /** Lista as hunts liberadas e, abaixo, as futuras com o nível que as destrava. */
 export function mountHunts(root: HTMLElement, ctx: AppContext): () => void {
@@ -25,7 +23,7 @@ export function mountHunts(root: HTMLElement, ctx: AppContext): () => void {
     const button = el('button', { class: 'primary', type: 'button' }, 'Iniciar')
     button.addEventListener('click', () => start(hunt.id, button))
     return el('article', { class: 'hunt-card panel', 'data-hunt': hunt.id },
-      el('h2', {}, huntName(hunt.id, hunt.name)),
+      el('h2', {}, hunt.name),
       el('p', { class: 'hunt-levels' }, `níveis ${hunt.minLevel}–${hunt.maxLevel}`),
       button)
   })
@@ -41,7 +39,7 @@ export function mountHunts(root: HTMLElement, ctx: AppContext): () => void {
     .filter(([id]) => !visibleRegions.has(id))
     .sort((a, b) => a[1] - b[1])
     .map(([id, level]) => el('article', { class: 'hunt-card hunt-locked panel', 'data-hunt': id },
-      el('h2', {}, ctx.registry.regions.get(id)?.name ?? huntName(id)),
+      el('h2', {}, ctx.registry.regions.get(id)?.name ?? id),
       el('p', { class: 'hunt-levels' }, `destrava no nível ${level}`)))
 
   const progress = me ? trainerProgress(ctx.registry, me.trainer.xp) : null

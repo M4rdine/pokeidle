@@ -50,6 +50,11 @@ function cutCell(img: RgbaImage, cellX: number, cellY: number): RgbaImage {
 export interface WangGrid {
   /** Uma imagem de 32×32 por código de canto presente no conjunto. */
   readonly pieces: ReadonlyMap<string, RgbaImage>
+  /**
+   * Todas as células que produziram cada código, não só a primeira. As puras costumam aparecer
+   * várias vezes na grade, e usar as repetidas como variação é o que evita campo chapado.
+   */
+  readonly variants: ReadonlyMap<string, readonly RgbaImage[]>
   /** Códigos que o conjunto não cobriu; o pincel do Tiled fica capenga neles. */
   readonly missing: readonly string[]
   readonly fromColor: Rgb
@@ -104,6 +109,7 @@ export function readWangGrid(img: RgbaImage, materials: WangGridOptions): WangGr
   // Passo 2: o código de cada célula sai da classificação dos quadrantes.
   const classify = (c: Rgb): 'a' | 'b' => (dist2(c, fromColor) <= dist2(c, toColor) ? 'a' : 'b')
   const pieces = new Map<string, RgbaImage>()
+  const variants = new Map<string, RgbaImage[]>()
   for (let cy = 0; cy < rows; cy++) {
     for (let cx = 0; cx < cols; cx++) {
       const topLeft = classify(quadrantColor(img, cx, cy, false, false))
@@ -112,8 +118,10 @@ export function readWangGrid(img: RgbaImage, materials: WangGridOptions): WangGr
       const bottomRight = classify(quadrantColor(img, cx, cy, true, true))
       // Mesma ordem dos wangsets: superior-direito, inferior-direito, inferior-esquerdo, superior-esquerdo.
       const code = `${topRight}${bottomRight}${bottomLeft}${topLeft}`
-      if (!pieces.has(code)) pieces.set(code, cutCell(img, cx, cy))
+      const cell = cutCell(img, cx, cy)
+      if (!pieces.has(code)) pieces.set(code, cell)
+      variants.set(code, [...(variants.get(code) ?? []), cell])
     }
   }
-  return { pieces, missing: CORNER_CODES.filter((c) => !pieces.has(c)), fromColor, toColor }
+  return { pieces, variants, missing: CORNER_CODES.filter((c) => !pieces.has(c)), fromColor, toColor }
 }

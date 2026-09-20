@@ -92,4 +92,12 @@ describe('readWangGrid', () => {
     // a peça que era "só TR do material base" vira o complemento dela
     expect(trocado.pieces.get('baaa')).toBeDefined()
   })
+  it('guarda todas as células que produziram o mesmo código, como variação', () => {
+    const puroA = cell(A, A, A, A)
+    const imagem = grid([puroA, puroA, puroA, cell(B, B, B, B)], 2)
+    const r = readWangGrid(imagem, { from: 'grama', to: 'terra' })
+    expect(r.variants.get('aaaa')).toHaveLength(3)
+    expect(r.variants.get('bbbb')).toHaveLength(1)
+    expect(r.pieces.get('aaaa')).toBe(r.variants.get('aaaa')![0])
+  })
 })

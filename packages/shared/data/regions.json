@@ -4,31 +4,171 @@
     "name": "Kanto",
     "order": 1,
     "minTrainerLevel": 1,
-    "width": 40,
-    "height": 30,
+    "width": 96,
+    "height": 72,
     "areas": [
       {
-        "id": "route-1",
-        "name": "Rota 1",
+        "id": "campo-inicial",
+        "name": "Campo Inicial",
         "bounds": {
           "x": 0,
           "y": 0,
-          "width": 40,
-          "height": 30
+          "width": 24,
+          "height": 36
         },
         "anchor": {
-          "x": 20,
-          "y": 15
+          "x": 12,
+          "y": 18
         },
         "species": [
           "zubat",
           "bellsprout",
           "diglett",
-          "horsea",
-          "gastly"
+          "gastly",
+          "vulpix"
         ],
         "minLevel": 2,
-        "maxLevel": 12
+        "maxLevel": 6
+      },
+      {
+        "id": "bosque-denso",
+        "name": "Bosque Denso",
+        "bounds": {
+          "x": 24,
+          "y": 0,
+          "width": 24,
+          "height": 36
+        },
+        "anchor": {
+          "x": 36,
+          "y": 18
+        },
+        "species": [
+          "bellsprout",
+          "butterfree"
+        ],
+        "minLevel": 5,
+        "maxLevel": 10
+      },
+      {
+        "id": "trilha-pedregosa",
+        "name": "Trilha Pedregosa",
+        "bounds": {
+          "x": 48,
+          "y": 0,
+          "width": 24,
+          "height": 36
+        },
+        "anchor": {
+          "x": 60,
+          "y": 18
+        },
+        "species": [
+          "diglett",
+          "growlithe"
+        ],
+        "minLevel": 8,
+        "maxLevel": 14
+      },
+      {
+        "id": "margem-do-lago",
+        "name": "Margem do Lago",
+        "bounds": {
+          "x": 72,
+          "y": 0,
+          "width": 24,
+          "height": 36
+        },
+        "anchor": {
+          "x": 84,
+          "y": 18
+        },
+        "species": [
+          "horsea",
+          "staryu"
+        ],
+        "minLevel": 10,
+        "maxLevel": 16
+      },
+      {
+        "id": "praia-longa",
+        "name": "Praia Longa",
+        "bounds": {
+          "x": 0,
+          "y": 36,
+          "width": 24,
+          "height": 36
+        },
+        "anchor": {
+          "x": 12,
+          "y": 54
+        },
+        "species": [
+          "squirtle",
+          "staryu"
+        ],
+        "minLevel": 12,
+        "maxLevel": 18
+      },
+      {
+        "id": "entrada-da-caverna",
+        "name": "Entrada da Caverna",
+        "bounds": {
+          "x": 24,
+          "y": 36,
+          "width": 24,
+          "height": 36
+        },
+        "anchor": {
+          "x": 36,
+          "y": 54
+        },
+        "species": [
+          "zubat",
+          "gastly"
+        ],
+        "minLevel": 15,
+        "maxLevel": 22
+      },
+      {
+        "id": "caverna-funda",
+        "name": "Caverna Funda",
+        "bounds": {
+          "x": 48,
+          "y": 36,
+          "width": 24,
+          "height": 36
+        },
+        "anchor": {
+          "x": 60,
+          "y": 54
+        },
+        "species": [
+          "golbat",
+          "haunter"
+        ],
+        "minLevel": 20,
+        "maxLevel": 28
+      },
+      {
+        "id": "pico-rochoso",
+        "name": "Pico Rochoso",
+        "bounds": {
+          "x": 72,
+          "y": 36,
+          "width": 24,
+          "height": 36
+        },
+        "anchor": {
+          "x": 84,
+          "y": 54
+        },
+        "species": [
+          "rhydon",
+          "arcanine"
+        ],
+        "minLevel": 25,
+        "maxLevel": 35
       }
     ]
   }

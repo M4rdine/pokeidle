@@ -39,7 +39,7 @@ describe('dicas de primeira vez', () => {
   it('ballWarning e huntPokedexCount', () => {
     expect(ballWarning(view, registry)).toBe(false)
     expect(ballWarning({ ...view, state: { ...view.state!, inventory: { 'poke-ball': 1 } } }, registry)).toBe(true)
-    const map = registry.hunts.get('route-1')!
+    const map = registry.hunts.get('campo-inicial')!
     const total = new Set(map.spawns.map((s) => s.speciesName)).size
     expect(huntPokedexCount(view, [{ speciesName: 'zubat', seenAt: 'x', caughtAt: 'y' }], map)).toEqual({ n: map.spawns.some((s) => s.speciesName === 'zubat') ? 1 : 0, m: total })
   })

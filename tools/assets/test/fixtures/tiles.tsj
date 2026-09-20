@@ -3,12 +3,12 @@
   "version": "1.10",
   "name": "tibia-tiles",
   "image": "tiles.png",
-  "imagewidth": 512,
-  "imageheight": 480,
+  "imagewidth": 640,
+  "imageheight": 640,
   "tilewidth": 32,
   "tileheight": 32,
-  "tilecount": 240,
-  "columns": 16,
+  "tilecount": 400,
+  "columns": 20,
   "margin": 0,
   "spacing": 0,
   "tiles": [
@@ -1561,6 +1561,1646 @@
           "value": "terra-pedra-abbb"
         }
       ]
+    },
+    {
+      "id": 230,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-bbbb"
+        }
+      ]
+    },
+    {
+      "id": 231,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-babb"
+        }
+      ]
+    },
+    {
+      "id": 232,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-baab"
+        }
+      ]
+    },
+    {
+      "id": 233,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-bbab"
+        }
+      ]
+    },
+    {
+      "id": 234,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-aabb"
+        }
+      ]
+    },
+    {
+      "id": 235,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-aaaa"
+        }
+      ]
+    },
+    {
+      "id": 236,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-bbaa"
+        }
+      ]
+    },
+    {
+      "id": 237,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-abbb"
+        }
+      ]
+    },
+    {
+      "id": 238,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-abba"
+        }
+      ]
+    },
+    {
+      "id": 239,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-bbba"
+        }
+      ]
+    },
+    {
+      "id": 240,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-abaa"
+        }
+      ]
+    },
+    {
+      "id": 241,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-aaba"
+        }
+      ]
+    },
+    {
+      "id": 242,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-abab"
+        }
+      ]
+    },
+    {
+      "id": 243,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-baaa"
+        }
+      ]
+    },
+    {
+      "id": 244,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-aaab"
+        }
+      ]
+    },
+    {
+      "id": 245,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-baba"
+        }
+      ]
+    },
+    {
+      "id": 246,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-aaaa-v2"
+        }
+      ]
+    },
+    {
+      "id": 247,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-aaaa-v3"
+        }
+      ]
+    },
+    {
+      "id": 248,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-bbbb-v2"
+        }
+      ]
+    },
+    {
+      "id": 249,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-caminho-bbbb-v3"
+        }
+      ]
+    },
+    {
+      "id": 250,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-bbbb"
+        }
+      ]
+    },
+    {
+      "id": 251,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-babb"
+        }
+      ]
+    },
+    {
+      "id": 252,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-baab"
+        }
+      ]
+    },
+    {
+      "id": 253,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-bbab"
+        }
+      ]
+    },
+    {
+      "id": 254,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-aabb"
+        }
+      ]
+    },
+    {
+      "id": 255,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-aaaa"
+        }
+      ]
+    },
+    {
+      "id": 256,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-bbaa"
+        }
+      ]
+    },
+    {
+      "id": 257,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-abbb"
+        }
+      ]
+    },
+    {
+      "id": 258,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-abba"
+        }
+      ]
+    },
+    {
+      "id": 259,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-bbba"
+        }
+      ]
+    },
+    {
+      "id": 260,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-abaa"
+        }
+      ]
+    },
+    {
+      "id": 261,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-aaba"
+        }
+      ]
+    },
+    {
+      "id": 262,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-abab"
+        }
+      ]
+    },
+    {
+      "id": 263,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-baaa"
+        }
+      ]
+    },
+    {
+      "id": 264,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-aaab"
+        }
+      ]
+    },
+    {
+      "id": 265,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-baba"
+        }
+      ]
+    },
+    {
+      "id": 266,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-aaaa-v2"
+        }
+      ]
+    },
+    {
+      "id": 267,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-aaaa-v3"
+        }
+      ]
+    },
+    {
+      "id": 268,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-bbbb-v2"
+        }
+      ]
+    },
+    {
+      "id": 269,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-agua-bbbb-v3"
+        }
+      ]
+    },
+    {
+      "id": 270,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-bbbb"
+        }
+      ]
+    },
+    {
+      "id": 271,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-babb"
+        }
+      ]
+    },
+    {
+      "id": 272,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-baab"
+        }
+      ]
+    },
+    {
+      "id": 273,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-bbab"
+        }
+      ]
+    },
+    {
+      "id": 274,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-aabb"
+        }
+      ]
+    },
+    {
+      "id": 275,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-aaaa"
+        }
+      ]
+    },
+    {
+      "id": 276,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-bbaa"
+        }
+      ]
+    },
+    {
+      "id": 277,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-abbb"
+        }
+      ]
+    },
+    {
+      "id": 278,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-abba"
+        }
+      ]
+    },
+    {
+      "id": 279,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-bbba"
+        }
+      ]
+    },
+    {
+      "id": 280,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-abaa"
+        }
+      ]
+    },
+    {
+      "id": 281,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-aaba"
+        }
+      ]
+    },
+    {
+      "id": 282,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-abab"
+        }
+      ]
+    },
+    {
+      "id": 283,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-baaa"
+        }
+      ]
+    },
+    {
+      "id": 284,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-aaab"
+        }
+      ]
+    },
+    {
+      "id": 285,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-baba"
+        }
+      ]
+    },
+    {
+      "id": 286,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-aaaa-v2"
+        }
+      ]
+    },
+    {
+      "id": 287,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-aaaa-v3"
+        }
+      ]
+    },
+    {
+      "id": 288,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-bbbb-v2"
+        }
+      ]
+    },
+    {
+      "id": 289,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-areia-bbbb-v3"
+        }
+      ]
+    },
+    {
+      "id": 290,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-bbbb"
+        }
+      ]
+    },
+    {
+      "id": 291,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-babb"
+        }
+      ]
+    },
+    {
+      "id": 292,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-baab"
+        }
+      ]
+    },
+    {
+      "id": 293,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-bbab"
+        }
+      ]
+    },
+    {
+      "id": 294,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-aabb"
+        }
+      ]
+    },
+    {
+      "id": 295,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-aaaa"
+        }
+      ]
+    },
+    {
+      "id": 296,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-bbaa"
+        }
+      ]
+    },
+    {
+      "id": 297,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-abbb"
+        }
+      ]
+    },
+    {
+      "id": 298,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-abba"
+        }
+      ]
+    },
+    {
+      "id": 299,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-bbba"
+        }
+      ]
+    },
+    {
+      "id": 300,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-abaa"
+        }
+      ]
+    },
+    {
+      "id": 301,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-aaba"
+        }
+      ]
+    },
+    {
+      "id": 302,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-abab"
+        }
+      ]
+    },
+    {
+      "id": 303,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-baaa"
+        }
+      ]
+    },
+    {
+      "id": 304,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-aaab"
+        }
+      ]
+    },
+    {
+      "id": 305,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-baba"
+        }
+      ]
+    },
+    {
+      "id": 306,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-aaaa-v2"
+        }
+      ]
+    },
+    {
+      "id": 307,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-aaaa-v3"
+        }
+      ]
+    },
+    {
+      "id": 308,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-bbbb-v2"
+        }
+      ]
+    },
+    {
+      "id": 309,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "areia-agua-bbbb-v3"
+        }
+      ]
+    },
+    {
+      "id": 310,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-bbbb"
+        }
+      ]
+    },
+    {
+      "id": 311,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-babb"
+        }
+      ]
+    },
+    {
+      "id": 312,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-baab"
+        }
+      ]
+    },
+    {
+      "id": 313,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-bbab"
+        }
+      ]
+    },
+    {
+      "id": 314,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-aabb"
+        }
+      ]
+    },
+    {
+      "id": 315,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-aaaa"
+        }
+      ]
+    },
+    {
+      "id": 316,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-bbaa"
+        }
+      ]
+    },
+    {
+      "id": 317,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-abbb"
+        }
+      ]
+    },
+    {
+      "id": 318,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-abba"
+        }
+      ]
+    },
+    {
+      "id": 319,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-bbba"
+        }
+      ]
+    },
+    {
+      "id": 320,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-abaa"
+        }
+      ]
+    },
+    {
+      "id": 321,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-aaba"
+        }
+      ]
+    },
+    {
+      "id": 322,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-abab"
+        }
+      ]
+    },
+    {
+      "id": 323,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-baaa"
+        }
+      ]
+    },
+    {
+      "id": 324,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-aaab"
+        }
+      ]
+    },
+    {
+      "id": 325,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-baba"
+        }
+      ]
+    },
+    {
+      "id": 326,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-aaaa-v2"
+        }
+      ]
+    },
+    {
+      "id": 327,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-aaaa-v3"
+        }
+      ]
+    },
+    {
+      "id": 328,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-bbbb-v2"
+        }
+      ]
+    },
+    {
+      "id": 329,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-caverna-bbbb-v3"
+        }
+      ]
+    },
+    {
+      "id": 330,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-bbbb"
+        }
+      ]
+    },
+    {
+      "id": 331,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-babb"
+        }
+      ]
+    },
+    {
+      "id": 332,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-baab"
+        }
+      ]
+    },
+    {
+      "id": 333,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-bbab"
+        }
+      ]
+    },
+    {
+      "id": 334,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-aabb"
+        }
+      ]
+    },
+    {
+      "id": 335,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-aaaa"
+        }
+      ]
+    },
+    {
+      "id": 336,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-bbaa"
+        }
+      ]
+    },
+    {
+      "id": 337,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-abbb"
+        }
+      ]
+    },
+    {
+      "id": 338,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-abba"
+        }
+      ]
+    },
+    {
+      "id": 339,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-bbba"
+        }
+      ]
+    },
+    {
+      "id": 340,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-abaa"
+        }
+      ]
+    },
+    {
+      "id": 341,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-aaba"
+        }
+      ]
+    },
+    {
+      "id": 342,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-abab"
+        }
+      ]
+    },
+    {
+      "id": 343,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-baaa"
+        }
+      ]
+    },
+    {
+      "id": 344,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-aaab"
+        }
+      ]
+    },
+    {
+      "id": 345,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-baba"
+        }
+      ]
+    },
+    {
+      "id": 346,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-aaaa-v2"
+        }
+      ]
+    },
+    {
+      "id": 347,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-aaaa-v3"
+        }
+      ]
+    },
+    {
+      "id": 348,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-bbbb-v2"
+        }
+      ]
+    },
+    {
+      "id": 349,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "campo-pedra-bbbb-v3"
+        }
+      ]
+    },
+    {
+      "id": 350,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-1-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 351,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-1-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 352,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-1-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 353,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-1-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 354,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-1-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 355,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-1-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 356,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-1-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 357,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-1-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 358,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-2-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 359,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-2-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 360,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-2-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 361,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-2-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 362,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-2-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 363,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-2-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 364,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-2-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 365,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-2-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 366,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-3-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 367,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-3-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 368,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-3-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 369,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-3-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 370,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-3-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 371,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-3-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 372,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-3-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 373,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-3-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 374,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-4-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 375,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-4-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 376,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-4-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 377,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-4-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 378,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-4-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 379,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-4-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 380,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-4-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 381,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-4-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 382,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arbusto-1"
+        }
+      ]
+    },
+    {
+      "id": 383,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-1"
+        }
+      ]
+    },
+    {
+      "id": 384,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "flores-1"
+        }
+      ]
+    },
+    {
+      "id": 385,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arbusto-2"
+        }
+      ]
+    },
+    {
+      "id": 386,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-2"
+        }
+      ]
+    },
+    {
+      "id": 387,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "flores-2"
+        }
+      ]
+    },
+    {
+      "id": 388,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arbusto-3"
+        }
+      ]
+    },
+    {
+      "id": 389,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-3"
+        }
+      ]
+    },
+    {
+      "id": 390,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "flores-3"
+        }
+      ]
+    },
+    {
+      "id": 391,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arbusto-4"
+        }
+      ]
+    },
+    {
+      "id": 392,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-4"
+        }
+      ]
+    },
+    {
+      "id": 393,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "flores-4"
+        }
+      ]
     }
   ],
   "wangsets": [
@@ -2476,6 +4116,1380 @@
             2,
             0,
             2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "campo-caminho",
+      "type": "corner",
+      "tile": -1,
+      "colors": [
+        {
+          "name": "campo",
+          "color": "#ff0000",
+          "probability": 1,
+          "tile": -1
+        },
+        {
+          "name": "caminho",
+          "color": "#00ff00",
+          "probability": 1,
+          "tile": -1
+        }
+      ],
+      "wangtiles": [
+        {
+          "tileid": 230,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 231,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 232,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 233,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 234,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 235,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 236,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 237,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 238,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 239,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 240,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 241,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 242,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 243,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 244,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 245,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "campo-agua",
+      "type": "corner",
+      "tile": -1,
+      "colors": [
+        {
+          "name": "campo",
+          "color": "#ff0000",
+          "probability": 1,
+          "tile": -1
+        },
+        {
+          "name": "agua",
+          "color": "#00ff00",
+          "probability": 1,
+          "tile": -1
+        }
+      ],
+      "wangtiles": [
+        {
+          "tileid": 250,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 251,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 252,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 253,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 254,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 255,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 256,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 257,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 258,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 259,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 260,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 261,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 262,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 263,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 264,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 265,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "campo-areia",
+      "type": "corner",
+      "tile": -1,
+      "colors": [
+        {
+          "name": "campo",
+          "color": "#ff0000",
+          "probability": 1,
+          "tile": -1
+        },
+        {
+          "name": "areia",
+          "color": "#00ff00",
+          "probability": 1,
+          "tile": -1
+        }
+      ],
+      "wangtiles": [
+        {
+          "tileid": 270,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 271,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 272,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 273,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 274,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 275,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 276,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 277,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 278,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 279,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 280,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 281,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 282,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 283,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 284,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 285,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "areia-agua",
+      "type": "corner",
+      "tile": -1,
+      "colors": [
+        {
+          "name": "areia",
+          "color": "#ff0000",
+          "probability": 1,
+          "tile": -1
+        },
+        {
+          "name": "agua",
+          "color": "#00ff00",
+          "probability": 1,
+          "tile": -1
+        }
+      ],
+      "wangtiles": [
+        {
+          "tileid": 290,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 291,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 292,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 293,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 294,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 295,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 296,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 297,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 298,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 299,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 300,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 301,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 302,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 303,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 304,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 305,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pedra-caverna",
+      "type": "corner",
+      "tile": -1,
+      "colors": [
+        {
+          "name": "pedra",
+          "color": "#ff0000",
+          "probability": 1,
+          "tile": -1
+        },
+        {
+          "name": "caverna",
+          "color": "#00ff00",
+          "probability": 1,
+          "tile": -1
+        }
+      ],
+      "wangtiles": [
+        {
+          "tileid": 310,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 311,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 312,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 313,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 314,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 315,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 316,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 317,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 318,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 319,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 320,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 321,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 322,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 323,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 324,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 325,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "campo-pedra",
+      "type": "corner",
+      "tile": -1,
+      "colors": [
+        {
+          "name": "campo",
+          "color": "#ff0000",
+          "probability": 1,
+          "tile": -1
+        },
+        {
+          "name": "pedra",
+          "color": "#00ff00",
+          "probability": 1,
+          "tile": -1
+        }
+      ],
+      "wangtiles": [
+        {
+          "tileid": 330,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 331,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 332,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 333,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 334,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 335,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 336,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 337,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 338,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 339,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 340,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 341,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 342,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 343,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 344,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 345,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
           ]
         }
       ]

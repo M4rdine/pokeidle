@@ -15,28 +15,32 @@ describe('GET /hunts', () => {
   it('lista hunts do registro com faixa de nível', async () => {
     const r = await api(t.app, cookie).get('/hunts')
     expect(r.statusCode).toBe(200)
-    expect(r.json()).toEqual({ hunts: [{ id: 'route-1', name: expect.any(String), width: 40, height: 30, minLevel: 2, maxLevel: 12 }] })
+    const { hunts } = r.json() as { hunts: { id: string; width: number; height: number; minLevel: number }[] }
+    // Kanto tem oito áreas; a lista vem do registro, então cresce quando a região cresce.
+    expect(hunts).toHaveLength(8)
+    expect(hunts[0]).toMatchObject({ id: 'campo-inicial', name: expect.any(String), width: 24, height: 36 })
+    expect(hunts.every((h) => h.minLevel >= 1)).toBe(true)
   })
 })
 
 describe('start / active / stop', () => {
   it('sem inicial → no-starter; hunt inexistente → 404', async () => {
-    expect((await api(t.app, cookie).post('/hunts/route-1/start')).json()).toMatchObject({ error: { code: 'no-starter' } })
+    expect((await api(t.app, cookie).post('/hunts/campo-inicial/start')).json()).toMatchObject({ error: { code: 'no-starter' } })
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
     expect((await api(t.app, cookie).post('/hunts/nope/start')).statusCode).toBe(404)
   })
   it('start cria a sessão; active devolve o snapshot sem seed/rng_state; start duplicado → hunt-active; stop sincroniza', async () => {
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
     expect((await api(t.app, cookie).get('/hunts/active')).json()).toEqual({ session: null })
-    const start = await api(t.app, cookie).post('/hunts/route-1/start')
+    const start = await api(t.app, cookie).post('/hunts/campo-inicial/start')
     expect(start.statusCode).toBe(201)
-    expect(start.json()).toMatchObject({ session: { huntId: 'route-1', sessionId: expect.stringMatching(/^[0-9a-f-]{36}$/), startedAt: T0.toISOString() } })
+    expect(start.json()).toMatchObject({ session: { huntId: 'campo-inicial', sessionId: expect.stringMatching(/^[0-9a-f-]{36}$/), startedAt: T0.toISOString() } })
     expect(JSON.stringify(start.json())).not.toMatch(/seed|rngState|rng_state/)
     const active = await api(t.app, cookie).get('/hunts/active')
-    expect(active.json()).toMatchObject({ session: { huntId: 'route-1', state: { tick: 0, huntId: 'route-1', player: { mode: 'searching' } } } })
+    expect(active.json()).toMatchObject({ session: { huntId: 'campo-inicial', state: { tick: 0, huntId: 'campo-inicial', player: { mode: 'searching' } } } })
     expect(JSON.stringify(active.json())).not.toMatch(/seed|rngState|rng_state/)
-    expect((await api(t.app, cookie).get('/me')).json()).toMatchObject({ trainer: { activeHuntId: 'route-1' } })
-    const dup = await api(t.app, cookie).post('/hunts/route-1/start')
+    expect((await api(t.app, cookie).get('/me')).json()).toMatchObject({ trainer: { activeHuntId: 'campo-inicial' } })
+    const dup = await api(t.app, cookie).post('/hunts/campo-inicial/start')
     expect(dup.statusCode).toBe(409)
     expect(dup.json()).toMatchObject({ error: { code: 'hunt-active' } })
     const stop = await api(t.app, cookie).post('/hunts/stop')
@@ -48,11 +52,11 @@ describe('start / active / stop', () => {
   it('time todo sem HP → validation', async () => {
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
     await t.db.update(pokemon).set({ hp: 0 })
-    expect((await api(t.app, cookie).post('/hunts/route-1/start')).statusCode).toBe(400)
+    expect((await api(t.app, cookie).post('/hunts/campo-inicial/start')).statusCode).toBe(400)
   })
   it('snapshot corrompido: active → 500 genérico; stop apaga sem sync e permite iniciar de novo', async () => {
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
-    await api(t.app, cookie).post('/hunts/route-1/start')
+    await api(t.app, cookie).post('/hunts/campo-inicial/start')
     // Com o scheduler, active/stop só voltam a ler o banco quando não há runner vivo em memória
     // (ex.: após um restart do processo) — daí o detach simulando essa situação antes de corromper.
     t.scheduler.detach(trainerId)
@@ -67,26 +71,26 @@ describe('start / active / stop', () => {
     expect(stop.json()).toMatchObject({ trainer: { id: trainerId, activeHuntId: null } })
     expect(await t.db.select().from(huntSessions)).toEqual([])
 
-    const start2 = await api(t.app, cookie).post('/hunts/route-1/start')
+    const start2 = await api(t.app, cookie).post('/hunts/campo-inicial/start')
     expect(start2.statusCode).toBe(201)
   })
 })
 
 describe('GET /hunts/:id/map', () => {
   it('devolve o HuntMap completo do registro; 404 para id desconhecido; exige sessão', async () => {
-    const r = await api(t.app, cookie).get('/hunts/route-1/map')
+    const r = await api(t.app, cookie).get('/hunts/campo-inicial/map')
     expect(r.statusCode).toBe(200)
-    expect(r.json()).toMatchObject({ id: 'route-1', width: 40, height: 30, tileSize: 32, spawnPoint: expect.any(Object), pokecenter: expect.any(Object) })
-    expect((r.json() as { layers: { ground: unknown[] } }).layers.ground).toHaveLength(1200)
+    expect(r.json()).toMatchObject({ id: 'campo-inicial', width: 24, height: 36, tileSize: 32, spawnPoint: expect.any(Object), pokecenter: expect.any(Object) })
+    expect((r.json() as { layers: { ground: unknown[] } }).layers.ground).toHaveLength(24 * 36)
     expect((await api(t.app, cookie).get('/hunts/nope/map')).statusCode).toBe(404)
-    expect((await api(t.app).get('/hunts/route-1/map')).statusCode).toBe(401)
+    expect((await api(t.app).get('/hunts/campo-inicial/map')).statusCode).toBe(401)
   })
 })
 
 describe('S2: isolamento entre contas', () => {
   it('conta B não vê nem para a hunt de A; B não reordena o time de A', async () => {
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
-    await api(t.app, cookie).post('/hunts/route-1/start')
+    await api(t.app, cookie).post('/hunts/campo-inicial/start')
     const b = await registerAndLogin(t.app, 2)
     expect((await api(t.app, b.cookie).get('/hunts/active')).json()).toEqual({ session: null })
     expect((await api(t.app, b.cookie).post('/hunts/stop')).json()).toMatchObject({ error: { code: 'no-hunt' } })
@@ -98,7 +102,7 @@ describe('S2: isolamento entre contas', () => {
   it('todas as rotas de hunt exigem login', async () => {
     expect((await api(t.app).get('/hunts')).statusCode).toBe(401)
     expect((await api(t.app).get('/hunts/active')).statusCode).toBe(401)
-    expect((await api(t.app).post('/hunts/route-1/start')).statusCode).toBe(401)
+    expect((await api(t.app).post('/hunts/campo-inicial/start')).statusCode).toBe(401)
     expect((await api(t.app).post('/hunts/stop')).statusCode).toBe(401)
   })
 })

@@ -34,12 +34,12 @@ const snapshotRows = async () => ({
 
 describe('startHunt', () => {
   it('monta o HuntState com time, inventário, settings, seen e trainer absolutos', async () => {
-    const row = await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 'sess-1', seed: 42 })
-    expect(row).toMatchObject({ trainerId, huntId: 'route-1', sessionId: 'sess-1', seed: 42, startedAt: T0, lastSimulatedAt: T0 })
+    const row = await startHunt(db, registry, trainerId, 'campo-inicial', T0, { sessionId: 'sess-1', seed: 42 })
+    expect(row).toMatchObject({ trainerId, huntId: 'campo-inicial', sessionId: 'sess-1', seed: 42, startedAt: T0, lastSimulatedAt: T0 })
     expect(row.rngState).not.toBe(42) // o spawn inicial já consumiu o PRNG
     const active = await loadActive(db, trainerId)
     expect(active?.state).toMatchObject({
-      huntId: 'route-1', sessionId: 'sess-1', tick: 0, trainer: { xp: 10, gold: 7 }, inventory: { 'poke-ball': 5, potion: 3 },
+      huntId: 'campo-inicial', sessionId: 'sess-1', tick: 0, trainer: { xp: 10, gold: 7 }, inventory: { 'poke-ball': 5, potion: 3 },
       settings: { returnHpPercent: 50, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false }, seen: ['charmander'] },
     })
     expect(active?.state.player.team).toEqual([{ id: expect.stringMatching(/^st-/), speciesName: 'charmander', level: 10, xp: expect.any(Number), hp: expect.any(Number), hpMax: expect.any(Number) }])
@@ -47,13 +47,13 @@ describe('startHunt', () => {
   })
   it('erros: hunt inexistente, hunt ativa, sem inicial, time todo desmaiado', async () => {
     await expect(startHunt(db, registry, trainerId, 'nope', T0)).rejects.toMatchObject({ code: 'not-found' })
-    await startHunt(db, registry, trainerId, 'route-1', T0)
-    await expect(startHunt(db, registry, trainerId, 'route-1', T0)).rejects.toMatchObject({ code: 'hunt-active' })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0)
+    await expect(startHunt(db, registry, trainerId, 'campo-inicial', T0)).rejects.toMatchObject({ code: 'hunt-active' })
     await db.delete(huntSessions)
     await db.update(pokemon).set({ hp: 0 })
-    await expect(startHunt(db, registry, trainerId, 'route-1', T0)).rejects.toMatchObject({ code: 'validation' })
+    await expect(startHunt(db, registry, trainerId, 'campo-inicial', T0)).rejects.toMatchObject({ code: 'validation' })
     await db.delete(pokemon)
-    await expect(startHunt(db, registry, trainerId, 'route-1', T0)).rejects.toMatchObject({ code: 'no-starter' })
+    await expect(startHunt(db, registry, trainerId, 'campo-inicial', T0)).rejects.toMatchObject({ code: 'no-starter' })
   })
   it('teamSlot legado além das vagas do nível: rebaixa o excedente (maior team_slot primeiro) para a mochila e começa com o time truncado', async () => {
     // O treinador do beforeEach está em xp: 10 → nível 1 → 3 vagas (tabela do GDD). O inicial já
@@ -64,7 +64,7 @@ describe('startHunt', () => {
       { id: 'extra-2', trainerId, speciesName: 'charmander', level: 5, xp: 100, hp: 10, hpMax: 10, teamSlot: 2 },
       { id: 'extra-3', trainerId, speciesName: 'charmander', level: 5, xp: 100, hp: 10, hpMax: 10, teamSlot: 3 },
     ])
-    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 1 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { sessionId: 's', seed: 1 })
     const active = (await loadActive(db, trainerId))!
     expect(active.state.player.team).toHaveLength(3)
     expect(active.state.player.team.map((p) => p.id)).not.toContain('extra-3')
@@ -73,14 +73,14 @@ describe('startHunt', () => {
     expect(rows.find((r) => r.id === 'extra-2')).toMatchObject({ teamSlot: 2 })
   })
   it('gera sessionId e seed quando não informados', async () => {
-    const row = await startHunt(db, registry, trainerId, 'route-1', T0)
+    const row = await startHunt(db, registry, trainerId, 'campo-inicial', T0)
     expect(row.sessionId).toMatch(/^[0-9a-f-]{36}$/)
     expect(row.seed).toBeGreaterThanOrEqual(0)
   })
   it('duas starts concorrentes: só uma conclui, a outra falha com hunt-active; só uma linha persiste', async () => {
     const [r1, r2] = await Promise.allSettled([
-      startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's1', seed: 1 }),
-      startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's2', seed: 2 }),
+      startHunt(db, registry, trainerId, 'campo-inicial', T0, { sessionId: 's1', seed: 1 }),
+      startHunt(db, registry, trainerId, 'campo-inicial', T0, { sessionId: 's2', seed: 2 }),
     ])
     const fulfilled = [r1, r2].filter((r) => r.status === 'fulfilled')
     const rejected = [r1, r2].filter((r) => r.status === 'rejected')
@@ -92,7 +92,7 @@ describe('startHunt', () => {
   })
   it('settings da hunt carregam potionHpPercent e as vagas do nível do treinador', async () => {
     await db.update(trainers).set({ potionHpPercent: 60, xp: 8000 }).where(eq(trainers.id, trainerId)) // nível 20 → 5 vagas
-    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 1 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { sessionId: 's', seed: 1 })
     const active = (await loadActive(db, trainerId))!
     expect(active.state.settings).toMatchObject({ potionHpPercent: 60, teamSlots: 5 })
     expect(active.state.box).toEqual([])
@@ -101,14 +101,14 @@ describe('startHunt', () => {
 
 describe('snapshot e sync', () => {
   it('start → sync sem tick é no-op', async () => {
-    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 1 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { sessionId: 's', seed: 1 })
     const before = await snapshotRows()
     const active = (await loadActive(db, trainerId))!
     await syncToTables(db, trainerId, active.state, new Date(T0.getTime() + 1000))
     expect(await snapshotRows()).toEqual(before)
   })
   it('box sincroniza como mochila de Pokémon (team_slot nulo) e é idempotente', async () => {
-    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 1 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { sessionId: 's', seed: 1 })
     const active = (await loadActive(db, trainerId))!
     const boxed = { id: 's-w99', speciesName: 'zubat', level: 4, xp: 100, hp: 18, hpMax: 18 }
     const state = { ...active.state, box: [boxed] }
@@ -123,10 +123,10 @@ describe('snapshot e sync', () => {
   it('após 3000 ticks o banco reflete xp, nível, hp, captura, inventário, ouro e pokédex', async () => {
     // seed 1: a seed 42 sugerida pelo brief não captura nada com Charmander nível 10 (inicial);
     // seed 1 foi a primeira, na faixa 1..20, que captura (ver task-5-report.md).
-    const row = await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 1 })
+    const row = await startHunt(db, registry, trainerId, 'campo-inicial', T0, { sessionId: 's', seed: 1 })
     const active = (await loadActive(db, trainerId))!
     const rng = createRng(row.seed, row.rngState)
-    const hunt = registry.hunts.get('route-1')!
+    const hunt = registry.hunts.get('campo-inicial')!
     const { state } = simulate(active.state, 3000, { registry, hunt, rng })
     const T1 = new Date(T0.getTime() + 3000 * 200)
     await saveSnapshot(db, trainerId, state, rng.state(), T1)
@@ -160,7 +160,7 @@ describe('snapshot e sync', () => {
     expect(await snapshotRows()).toEqual(again)
   })
   it('loadActive rejeita jsonb corrompido com CorruptSnapshotError e issues do Zod', async () => {
-    await startHunt(db, registry, trainerId, 'route-1', T0)
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0)
     await db.update(huntSessions).set({ state: { lixo: 1 } }).where(eq(huntSessions.trainerId, trainerId))
     await expect(loadActive(db, trainerId)).rejects.toThrow(CorruptSnapshotError)
     let error: unknown
@@ -179,9 +179,9 @@ describe('snapshot e sync', () => {
 describe('stopHunt', () => {
   it('sincroniza, apaga a sessão e devolve o treinador; sem hunt → no-hunt', async () => {
     await expect(stopHunt(db, trainerId, T0)).rejects.toMatchObject({ code: 'no-hunt' })
-    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 9 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { sessionId: 's', seed: 9 })
     const active = (await loadActive(db, trainerId))!
-    const hunt = registry.hunts.get('route-1')!
+    const hunt = registry.hunts.get('campo-inicial')!
     const { state } = simulate(active.state, 1000, { registry, hunt, rng: createRng(9) })
     await saveSnapshot(db, trainerId, state, 1, T0)
     const trainer = await stopHunt(db, trainerId, T0)
@@ -189,7 +189,7 @@ describe('stopHunt', () => {
     expect(await loadActive(db, trainerId)).toBeNull()
   })
   it('duas paradas concorrentes: o lock de linha serializa; só uma conclui, a outra vê no-hunt', async () => {
-    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 9 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { sessionId: 's', seed: 9 })
     const [r1, r2] = await Promise.allSettled([stopHunt(db, trainerId, T0), stopHunt(db, trainerId, T0)])
     const fulfilled = [r1, r2].filter((r) => r.status === 'fulfilled')
     const rejected = [r1, r2].filter((r) => r.status === 'rejected')
@@ -199,7 +199,7 @@ describe('stopHunt', () => {
     expect(await loadActive(db, trainerId)).toBeNull()
   })
   it('snapshot corrompido: apaga a sessão sem sync e devolve o treinador (não relança)', async () => {
-    await startHunt(db, registry, trainerId, 'route-1', T0, { sessionId: 's', seed: 9 })
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { sessionId: 's', seed: 9 })
     await db.update(huntSessions).set({ state: { lixo: 1 } }).where(eq(huntSessions.trainerId, trainerId))
     const before = await snapshotRows()
     const trainer = await stopHunt(db, trainerId, T0)

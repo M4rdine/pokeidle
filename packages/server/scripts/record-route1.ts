@@ -20,13 +20,13 @@ type HuntSnapshotMsg = Extract<ServerMessage, { t: 'hunt.snapshot' }>
 type HuntTickMsg = Extract<ServerMessage, { t: 'hunt.tick' }>
 
 const registry = loadRegistry()
-const hunt = registry.hunts.get('route-1')!
+const hunt = registry.hunts.get('campo-inicial')!
 const base = registry.species.get('charmander')!.baseStats.hp
 const team = [{ id: 'p1', speciesName: 'charmander', level: 10, xp: xpForLevel('medium-slow', 10), hp: hpAt(base, 10), hpMax: hpAt(base, 10) }]
 const deps = { registry, hunt, rng: createRng(42) }
 const T0 = Date.UTC(2026, 8, 14, 12, 0, 0)
 let state = createHuntState({ hunt, sessionId: 'rec', team, inventory: { potion: 3, 'poke-ball': 5 }, settings: defaultSettings() }, deps)
-const session = { huntId: 'route-1', sessionId: 'rec', startedAt: new Date(T0).toISOString() }
+const session = { huntId: 'campo-inicial', sessionId: 'rec', startedAt: new Date(T0).toISOString() }
 const snapshot: HuntSnapshotMsg = { t: 'hunt.snapshot', session, state, serverTime: T0 }
 const ticks: HuntTickMsg[] = []
 for (let i = 0; i < 300; i++) {

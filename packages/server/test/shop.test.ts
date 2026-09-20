@@ -60,7 +60,7 @@ describe('POST /shop/buy', () => {
   it('recusa com hunt ativa', async () => {
     await setTrainer({ gold: 1000 })
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
-    expect((await api(t.app, cookie).post('/hunts/route-1/start')).statusCode).toBe(201)
+    expect((await api(t.app, cookie).post('/hunts/campo-inicial/start')).statusCode).toBe(201)
     expect((await api(t.app, cookie).post('/shop/buy', { itemId: 'potion', quantity: 1 })).json()).toMatchObject({ error: { code: 'hunt-active' } })
     expect((await api(t.app, cookie).post('/shop/sell', { itemId: 'potion', quantity: 1 })).json()).toMatchObject({ error: { code: 'hunt-active' } })
     await api(t.app, cookie).post('/hunts/stop')
@@ -69,7 +69,7 @@ describe('POST /shop/buy', () => {
     await setTrainer({ gold: 1000 })
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
     const [startResult, buyResult] = await Promise.allSettled([
-      startHunt(t.db, t.registry, trainerId, 'route-1', T0),
+      startHunt(t.db, t.registry, trainerId, 'campo-inicial', T0),
       buy(t.db, t.registry, trainerId, 'potion', 1, T0),
     ])
     expect(startResult.status).toBe('fulfilled') // só a compra pode perder a corrida aqui

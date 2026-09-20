@@ -4,11 +4,12 @@ import { packGrid, toTiledTileset, type AtlasFrame, type TerrainInput } from './
 import type { Catalog, CatalogOutfit } from './catalog.js'
 import { DIRECTION_NAMES, type RgbaImage } from './compose.js'
 import { itemFramePath, loadCatalog, outfitFramePath, type Logger } from './extract.js'
-import { expandedTileNames, loadManifest, validateManifest, type Manifest, type SpeciesEntry, type TerrainSetEntry, type TileEntry, type TransitionEntry } from './manifest.js'
+import { expandedTileNames, loadManifest, validateManifest, type Manifest, type PropEntry, type SpeciesEntry, type TerrainSetEntry, type TileEntry, type TransitionEntry } from './manifest.js'
 import { decodePng, encodePng } from './png.js'
 import { isPhaseFrame, phaseFrameName, phaseFrameNames } from './tile-animation.js'
-import { sliceImage } from './tile-slice.js'
+import { sliceImage, sliceName } from './tile-slice.js'
 import { transitionAnimations, transitionTerrain, transitionTiles } from './transition.js'
+import { removeFlatBackground, trimTransparent } from './background.js'
 import { harmonize, type Rgb } from './harmonize.js'
 import { readWangGrid } from './wang-grid.js'
 
@@ -18,6 +19,8 @@ export interface BuildOptions {
   readonly outDir: string
   /** Pasta dos conjuntos de terreno desenhados; padrão ao lado do manifesto. */
   readonly terrainsDir?: string
+  /** Pasta dos props desenhados; padrão ao lado do manifesto. */
+  readonly propsDir?: string
 }
 
 async function readFrame(name: string, path: string): Promise<AtlasFrame> {
@@ -168,6 +171,31 @@ async function terrainSetFrames(
   return { frames, terrains }
 }
 
+/**
+ * Props desenhados: recorta o fundo chapado, apara, centraliza e — quando ocupa dois tiles —
+ * fatia em peças de 32, no mesmo padrão de nome dos itens grandes do dump.
+ */
+async function propFrames(dir: string, props: readonly PropEntry[]): Promise<AtlasFrame[]> {
+  const frames: AtlasFrame[] = []
+  for (const prop of props) {
+    const path = join(dir, prop.file)
+    if (!(await exists(path))) throw new Error(`prop ${prop.name}: arquivo não encontrado em ${path}`)
+    const recortado = trimTransparent(
+      removeFlatBackground(decodePng(await readFile(path)), prop.tolerance),
+      prop.size,
+    )
+    if (prop.size === 32) {
+      frames.push({ name: prop.name, image: recortado })
+      continue
+    }
+    const pedacos = sliceImage(recortado, 2, 2)
+    pedacos.forEach((image, i) => {
+      frames.push({ name: sliceName(prop.name, i % 2, Math.floor(i / 2)), image })
+    })
+  }
+  return frames
+}
+
 async function writeAtlas(
   outDir: string,
   baseName: string,
@@ -199,7 +227,8 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
     opts.terrainsDir ?? join(opts.manifestPath, '..', 'terrenos'),
     manifest.terrainSets ?? [],
   )
-  const tiles = [...base.frames, ...mixed.frames, ...desenhados.frames]
+  const props = await propFrames(opts.propsDir ?? join(opts.manifestPath, '..', 'props'), manifest.props ?? [])
+  const tiles = [...base.frames, ...mixed.frames, ...desenhados.frames, ...props]
   const animations = { ...base.animations, ...mixed.animations }
   const packedTiles = await writeAtlas(opts.outDir, 'tiles', tiles, animations)
   const tileOrder = tiles.filter((f) => !isPhaseFrame(f.name)).map((f) => f.name)

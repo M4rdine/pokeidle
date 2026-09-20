@@ -27826,7 +27826,7 @@
       {
        "name": "count",
        "type": "int",
-       "value": 4
+       "value": 3
       },
       {
        "name": "respawnSeconds",
@@ -27864,7 +27864,7 @@
       {
        "name": "count",
        "type": "int",
-       "value": 4
+       "value": 3
       },
       {
        "name": "respawnSeconds",
@@ -27902,7 +27902,7 @@
       {
        "name": "count",
        "type": "int",
-       "value": 4
+       "value": 3
       },
       {
        "name": "respawnSeconds",
@@ -27940,7 +27940,7 @@
       {
        "name": "count",
        "type": "int",
-       "value": 4
+       "value": 3
       },
       {
        "name": "respawnSeconds",
@@ -27978,7 +27978,7 @@
       {
        "name": "count",
        "type": "int",
-       "value": 4
+       "value": 3
       },
       {
        "name": "respawnSeconds",

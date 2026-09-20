@@ -1,8 +1,8 @@
 [
-  { "id": "potion", "name": "Poção", "kind": "potion", "healPercent": 20, "buyPrice": 100, "sellPrice": 50 },
-  { "id": "super-potion", "name": "Super Poção", "kind": "potion", "healPercent": 50, "buyPrice": 400, "sellPrice": 200 },
-  { "id": "hyper-potion", "name": "Hiper Poção", "kind": "potion", "healPercent": 100, "buyPrice": 1500, "sellPrice": 750 },
-  { "id": "poke-ball", "name": "Poké Bola", "kind": "ball", "ballBonus": 1, "buyPrice": 200, "sellPrice": 100 },
-  { "id": "great-ball", "name": "Great Bola", "kind": "ball", "ballBonus": 1.5, "buyPrice": 600, "sellPrice": 300 },
-  { "id": "ultra-ball", "name": "Ultra Bola", "kind": "ball", "ballBonus": 2, "buyPrice": 1200, "sellPrice": 600 }
+  {"id": "potion", "name": "Poção", "kind": "potion", "healPercent": 20, "buyPrice": 200, "sellPrice": 100},
+  {"id": "super-potion", "name": "Super Poção", "kind": "potion", "healPercent": 50, "buyPrice": 800, "sellPrice": 400},
+  {"id": "hyper-potion", "name": "Hiper Poção", "kind": "potion", "healPercent": 100, "buyPrice": 3000, "sellPrice": 1500},
+  {"id": "poke-ball", "name": "Poké Bola", "kind": "ball", "ballBonus": 1, "buyPrice": 400, "sellPrice": 200},
+  {"id": "great-ball", "name": "Great Bola", "kind": "ball", "ballBonus": 1.5, "buyPrice": 1200, "sellPrice": 600},
+  {"id": "ultra-ball", "name": "Ultra Bola", "kind": "ball", "ballBonus": 2, "buyPrice": 2400, "sellPrice": 1200}
 ]

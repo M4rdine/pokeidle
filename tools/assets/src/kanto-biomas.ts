@@ -53,12 +53,16 @@ export const BIOMAS: readonly Bioma[] = [
     // Cinco espécies porque a captura só conta espécie nova: com três, o teto de capturas em dez
     // minutos fica abaixo do que o GDD pede. Todas de taxa de captura alta — evolução final numa
     // área inicial é errado de design e derruba as capturas abaixo do mínimo.
+    //
+    // Três de cada, e não quatro: com vinte selvagens a área rendia o dobro do ouro que o GDD §6
+    // prevê para os dez primeiros minutos, e ainda assim sobra folga de três vezes sobre o mínimo
+    // de derrotas.
     especies: [
-      { nome: 'zubat', min: 2, max: 5, quantidade: 4 },
-      { nome: 'bellsprout', min: 2, max: 6, quantidade: 4 },
-      { nome: 'diglett', min: 2, max: 5, quantidade: 4 },
-      { nome: 'gastly', min: 3, max: 6, quantidade: 4 },
-      { nome: 'vulpix', min: 3, max: 6, quantidade: 4 },
+      { nome: 'zubat', min: 2, max: 5, quantidade: 3 },
+      { nome: 'bellsprout', min: 2, max: 6, quantidade: 3 },
+      { nome: 'diglett', min: 2, max: 5, quantidade: 3 },
+      { nome: 'gastly', min: 3, max: 6, quantidade: 3 },
+      { nome: 'vulpix', min: 3, max: 6, quantidade: 3 },
     ] },
   { id: 'bosque-denso', nome: 'Bosque Denso', set: 'campo-caminho', mistura: 0.1, bloqueia: false,
     trilha: TERRA,

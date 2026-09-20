@@ -26,6 +26,16 @@ export interface Bioma {
   readonly set: string
   /** Fração da área coberta pelo segundo material do pincel. */
   readonly mistura: number
+  /**
+   * Como o segundo material se distribui. Omitir é `'ruido'`, o comportamento de sempre.
+   * - `'ruido'`: manchas espalhadas por limiar sobre ruído suave. É o certo para terra batida
+   *   salpicada num campo, e para um arquipélago, onde espalhar é o assunto.
+   * - `'corpo'`: uma massa conectada só, de borda recortada. Um lago é um lago; três poças do
+   *   mesmo tamanho não são a margem de lago nenhum.
+   * - `'margem'`: uma faixa encostada numa borda da área. O mar de uma praia vem de fora do mapa,
+   *   não nasce como lagoa no meio dele.
+   */
+  readonly forma?: 'ruido' | 'corpo' | 'margem'
   /** O segundo material bloqueia passagem (água, rocha). */
   readonly bloqueia: boolean
   /**
@@ -84,7 +94,7 @@ const KANTO: readonly Bioma[] = [
       { nome: 'growlithe', min: 9, max: 14, quantidade: 3 },
       { nome: 'pikachu', min: 9, max: 14, quantidade: 3 },
     ] },
-  { id: 'margem-do-lago', nome: 'Margem do Lago', set: 'campo-agua', mistura: 0.34, bloqueia: true,
+  { id: 'margem-do-lago', nome: 'Margem do Lago', set: 'campo-agua', mistura: 0.34, bloqueia: true, forma: 'corpo',
     trilha: TERRA,
     props: [{ ...ARVORE, densidade: 0.01 }, { ...FLORES, densidade: 0.03 }],
     especies: [
@@ -92,7 +102,7 @@ const KANTO: readonly Bioma[] = [
       { nome: 'staryu', min: 11, max: 16, quantidade: 3 },
       { nome: 'dratini', min: 12, max: 16, quantidade: 2 },
     ] },
-  { id: 'praia-longa', nome: 'Praia Longa', set: 'areia-agua', mistura: 0.38, bloqueia: true,
+  { id: 'praia-longa', nome: 'Praia Longa', set: 'areia-agua', mistura: 0.38, bloqueia: true, forma: 'margem',
     // Primário é areia: o pincel de caminho sobre campo não casaria com a praia.
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.02 }],
@@ -114,7 +124,7 @@ const KANTO: readonly Bioma[] = [
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.045 }],
     especies: [{ nome: 'golbat', min: 20, max: 27, quantidade: 4 }, { nome: 'haunter', min: 21, max: 28, quantidade: 3 }] },
-  { id: 'pico-rochoso', nome: 'Pico Rochoso', set: 'campo-pedra', mistura: 0.46, bloqueia: true,
+  { id: 'pico-rochoso', nome: 'Pico Rochoso', set: 'campo-pedra', mistura: 0.46, bloqueia: true, forma: 'corpo',
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.05 }, { ...PINHEIRO, densidade: 0.01 }],
     especies: [{ nome: 'rhydon', min: 25, max: 32, quantidade: 3 }, { nome: 'arcanine', min: 27, max: 35, quantidade: 3 }] },
@@ -154,11 +164,11 @@ const TERRAS_ALTAS: readonly Bioma[] = [
     trilha: TERRA,
     props: [{ ...ARVORE, densidade: 0.032 }, { ...PINHEIRO, densidade: 0.028 }, { ...ARBUSTO, densidade: 0.03 }],
     especies: [{ nome: 'exeggutor', min: 56, max: 62, quantidade: 5 }, { nome: 'pidgeot', min: 58, max: 64, quantidade: 4 }] },
-  { id: 'trilha-da-vitoria', nome: 'Trilha da Vitória', set: 'campo-pedra', mistura: 0.46, bloqueia: true,
+  { id: 'trilha-da-vitoria', nome: 'Trilha da Vitória', set: 'campo-pedra', mistura: 0.46, bloqueia: true, forma: 'corpo',
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.05 }],
     especies: [{ nome: 'pidgeot', min: 60, max: 66, quantidade: 5 }, { nome: 'wigglytuff', min: 61, max: 68, quantidade: 4 }] },
-  { id: 'cume-indigo', nome: 'Cume Índigo', set: 'campo-pedra', mistura: 0.5, bloqueia: true,
+  { id: 'cume-indigo', nome: 'Cume Índigo', set: 'campo-pedra', mistura: 0.5, bloqueia: true, forma: 'corpo',
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.055 }, { ...PINHEIRO, densidade: 0.008 }],
     especies: [

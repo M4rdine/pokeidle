@@ -11,6 +11,8 @@ import { compact, matchupClass, matchupLabel, percent, seconds } from './format.
 
 interface Props {
   readonly estimate: AreaEstimate
+  /** Nome legível do item; o id cru não diz nada a quem joga. */
+  readonly nomeDoItem: (id: string) => string
   readonly atlas: AtlasData
   readonly tiposDe: (species: string) => readonly string[]
   readonly temNaPokedex: (species: string) => boolean
@@ -24,11 +26,12 @@ const cabecalho = (): HTMLElement => el('tr', {},
   el('th', { scope: 'col', class: 'num' }, 'Ouro'),
   el('th', { scope: 'col', class: 'num' }, 'Tempo'),
   el('th', { scope: 'col', class: 'num' }, 'Captura'),
-  el('th', { scope: 'col' }, 'Confronto'))
+  el('th', { scope: 'col' }, 'Confronto'),
+  el('th', { scope: 'col' }, 'Drops'))
 
 const BOLA_PADRAO = 'Poké Bola'
 
-export function areaAnalyzer({ estimate, atlas, tiposDe, temNaPokedex, ballBonus }: Props): HTMLElement {
+export function areaAnalyzer({ estimate, atlas, tiposDe, temNaPokedex, ballBonus, nomeDoItem }: Props): HTMLElement {
   // O nível é o mesmo em todas as linhas (é a média da área): como legenda ele informa, como
   // coluna ele só repetia o mesmo número e tomava a largura de quem varia.
   const nivel = estimate.species[0]?.level
@@ -44,7 +47,9 @@ export function areaAnalyzer({ estimate, atlas, tiposDe, temNaPokedex, ballBonus
       el('td', { class: 'num' }, compact(s.goldPerDefeat)),
       el('td', { class: 'num' }, seconds(s.secondsPerDefeat)),
       el('td', { class: 'num' }, percent(s.captureChance)),
-      el('td', { class: matchupClass(s.matchup) }, matchupLabel(s.matchup)))
+      el('td', { class: matchupClass(s.matchup) }, matchupLabel(s.matchup)),
+      el('td', { class: 'drops' }, ...s.drops.map((d) =>
+        el('span', { class: 'drop' }, nomeDoItem(d.item), el('span', { class: 'muted' }, ` ${percent(d.chance)}`)))))
   })
 
   const nota = el('p', { class: 'analyzer-note muted' },

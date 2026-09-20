@@ -104,6 +104,11 @@
 .area-metric { align-items: flex-end; text-align: right; }
 .area-levels strong, .area-metric strong { font-variant-numeric: tabular-nums; }
 .area-levels > span, .area-metric > span { font-size: 0.75em; letter-spacing: 0.04em; }
+/* O degrau de raridade fica junto da faixa de nível: é a outra metade de "quanto custa e quanto
+   rende" que a linha responde. */
+.area-rarity { color: var(--accent); }
+.drops { white-space: normal; }
+.drop + .drop::before { content: ' · '; color: var(--muted); }
 /* As três métricas são células próprias do grid: ficam na mesma coluna em todas as linhas. */
 .area-metrics { display: contents; }
 

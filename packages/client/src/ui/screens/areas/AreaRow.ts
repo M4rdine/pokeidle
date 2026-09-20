@@ -18,6 +18,8 @@ export interface AreaView {
   readonly minTrainerLevel: number
   readonly locked: boolean
   readonly species: readonly string[]
+  /** Degrau de raridade: explica por que uma área difícil compensa. */
+  readonly rarity: number
   readonly estimate: AreaEstimate
 }
 
@@ -102,7 +104,9 @@ export function areaRow(props: Props): HTMLElement {
       props.estimado && faltam > 0 ? el('span', { class: 'area-missing' }, faltaTexto(faltam)) : null),
     el('span', { class: 'area-levels' },
       el('strong', {}, `${area.minLevel}–${area.maxLevel}`),
-      el('span', { class: 'muted' }, 'níveis')),
+      el('span', { class: 'muted' }, 'níveis'),
+      // O degrau só aparece quando diz algo: no primeiro, ele é o padrão e não informa nada.
+      area.rarity > 1 ? el('span', { class: 'area-rarity', title: 'chance de drop multiplicada' }, `drops ×${area.rarity}`) : null),
     especies(area, props.atlas, props.tipoDe),
     numeros(area, props.estimado))
 

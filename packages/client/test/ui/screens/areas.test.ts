@@ -113,6 +113,22 @@ describe('navegador de áreas', () => {
     expect(limpar().hasAttribute('disabled')).toBe(true)
   })
 
+  it('o degrau de raridade só aparece onde informa algo, e o detalhe lista os drops', () => {
+    const root = montar()
+    // Campo Inicial é o degrau 1, o padrão: mostrar "drops ×1" seria ruído.
+    expect(root.querySelector('.area-row[data-area=campo-inicial] .area-rarity')).toBeNull()
+    const pico = root.querySelector('.area-row[data-area=pico-rochoso] .area-rarity')!
+    expect(pico.textContent).toBe('drops ×8')
+
+    root.querySelector<HTMLButtonElement>('.area-row[data-area=campo-inicial] .area-main')!.click()
+    const cabecalho = root.querySelector('.analyzer-table thead')!
+    expect(cabecalho.textContent).toContain('Drops')
+    // O item aparece pelo nome, não pelo id, e com a chance em porcentagem.
+    const primeiraLinha = root.querySelector('.analyzer-table tbody tr .drops')!
+    expect(primeiraLinha.textContent).toMatch(/Poção|Bola/)
+    expect(primeiraLinha.textContent).toMatch(/\d+%/)
+  })
+
   it('abrir uma área mostra a tabela por espécie; abrir de novo fecha', () => {
     const root = montar()
     const corpo = () => root.querySelector<HTMLButtonElement>('.area-row[data-area=campo-inicial] .area-main')!

@@ -159,6 +159,7 @@ function distinctImages(images: readonly RgbaImage[]): RgbaImage[] {
 async function terrainSetFrames(
   dir: string,
   sets: readonly TerrainSetEntry[],
+  log: Logger,
 ): Promise<{ frames: AtlasFrame[]; terrains: TerrainInput[]; animations: Record<string, string[]> }> {
   const frames: AtlasFrame[] = []
   const terrains: TerrainInput[] = []
@@ -170,10 +171,15 @@ async function terrainSetFrames(
     const path = join(dir, set.file)
     if (!(await exists(path))) throw new Error(`conjunto de terreno ${set.name}: arquivo não encontrado em ${path}`)
     const grid = readWangGrid(decodePng(await readFile(path)), set)
-    if (grid.missing.length > 0) {
+    if (grid.synthesized.length > MAX_SINTETIZADAS) {
       throw new Error(
-        `conjunto de terreno ${set.name}: faltam ${grid.missing.length} combinações de canto (${grid.missing.join(', ')}); regere o conjunto`,
+        `conjunto de terreno ${set.name}: faltam ${grid.synthesized.length} das 16 combinações de canto (${grid.synthesized.join(', ')}); isto não é um conjunto de terreno, regere`,
       )
+    }
+    if (grid.synthesized.length > 0) {
+      // Não é erro: o gerador raramente entrega os códigos em xadrez, e o build os compõe das
+      // peças puras. Mas é peça inventada, então sai no log — quem cura decide se aceita.
+      log(`  ${set.name}: ${grid.synthesized.length} peça(s) composta(s) — ${grid.synthesized.join(', ')}`)
     }
     const shifts = [
       { nome: set.from, measured: grid.fromColor },
@@ -266,6 +272,7 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
   const desenhados = await terrainSetFrames(
     opts.terrainsDir ?? join(opts.manifestPath, '..', 'terrenos'),
     manifest.terrainSets ?? [],
+    log,
   )
   const props = await propFrames(opts.propsDir ?? join(opts.manifestPath, '..', 'props'), manifest.props ?? [])
   const tiles = [...base.frames, ...mixed.frames, ...desenhados.frames, ...props]
@@ -286,6 +293,13 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
 }
 
 /** Os quatro arquivos que o servidor entrega; o `.tsj` é ferramenta e fica de fora. */
+/**
+ * Quantas das dezesseis peças o build aceita compor sozinho. O gerador costuma pular os códigos
+ * em xadrez, e cinco é normal; mais da metade composta significa que a folha não é um conjunto de
+ * terreno, e aceitar isso esconderia o problema atrás de peças inventadas.
+ */
+const MAX_SINTETIZADAS = 8
+
 const PUBLICADOS = ['tiles.png', 'tiles.json', 'pokemon.png', 'pokemon.json'] as const
 
 /**

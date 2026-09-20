@@ -64,12 +64,14 @@ describe('readWangGrid', () => {
     expect(aaaa.data[0]).toBe(A[0])
   })
 
-  it('relata quais dos dezesseis códigos ficaram faltando', () => {
+  it('relata quais dos dezesseis códigos o gerador não entregou', () => {
     const imagem = grid([cell(A, A, A, A), cell(B, B, B, B)], 2)
     const r = readWangGrid(imagem, { from: 'grama', to: 'terra' })
-    expect(r.missing).toHaveLength(14)
-    expect(r.missing).not.toContain('aaaa')
-    expect(r.missing).not.toContain('bbbb')
+    // As catorze mistas foram compostas; as duas puras vieram da folha.
+    expect(r.synthesized).toHaveLength(14)
+    expect(r.synthesized).not.toContain('aaaa')
+    expect(r.synthesized).not.toContain('bbbb')
+    expect(r.pieces.size).toBe(16)
   })
 
   it('recusa imagem que não fecha em células de 32', () => {
@@ -99,5 +101,51 @@ describe('readWangGrid', () => {
     expect(r.variants.get('aaaa')).toHaveLength(3)
     expect(r.variants.get('bbbb')).toHaveLength(1)
     expect(r.pieces.get('aaaa')).toBe(r.variants.get('aaaa')![0])
+  })
+})
+
+describe('folha incompleta', () => {
+  /** Cor média de um quadrante da peça, para dizer que material caiu ali. */
+  const quadrante = (img: RgbaImage, direita: boolean, baixo: boolean): [number, number, number] => {
+    let r = 0
+    let g = 0
+    let b = 0
+    let n = 0
+    for (let y = baixo ? 20 : 4; y < (baixo ? 28 : 12); y++) {
+      for (let x = direita ? 20 : 4; x < (direita ? 28 : 12); x++) {
+        const i = (y * img.width + x) * 4
+        r += img.data[i]!
+        g += img.data[i + 1]!
+        b += img.data[i + 2]!
+        n += 1
+      }
+    }
+    return [Math.round(r / n), Math.round(g / n), Math.round(b / n)]
+  }
+  const perto = (c: [number, number, number], alvo: [number, number, number]): boolean =>
+    (c[0] - alvo[0]) ** 2 + (c[1] - alvo[1]) ** 2 + (c[2] - alvo[2]) ** 2 < 900
+
+  it('completa as combinações que o gerador não entregou, a partir das peças puras', () => {
+    // O gerador de tileset raramente devolve os códigos em xadrez; sem completar, um conjunto
+    // bom inteiro era recusado por causa de cinco peças.
+    const puroA = cell(A, A, A, A)
+    const puroB = cell(B, B, B, B)
+    const img = grid([puroA, puroB, cell(A, B, A, A), cell(B, A, A, A)], 2)
+
+    const grade = readWangGrid(img, { from: 'campo', to: 'alta' })
+
+    expect(grade.synthesized).toContain('baba')
+    expect(grade.pieces.size).toBe(16)
+    // 'baba' é topRight=b, bottomRight=a, bottomLeft=b, topLeft=a: o xadrez que faltava.
+    const peca = grade.pieces.get('baba')!
+    expect(perto(quadrante(peca, false, false), A), 'superior-esquerdo').toBe(true)
+    expect(perto(quadrante(peca, true, false), B), 'superior-direito').toBe(true)
+    expect(perto(quadrante(peca, false, true), B), 'inferior-esquerdo').toBe(true)
+    expect(perto(quadrante(peca, true, true), A), 'inferior-direito').toBe(true)
+  })
+
+  it('sem peça pura dos dois lados não há do que compor, e o erro continua', () => {
+    const img = grid([cell(A, A, A, A), cell(A, B, A, A)], 2)
+    expect(() => readWangGrid(img, { from: 'campo', to: 'alta' })).toThrow(/dois materiais distintos/)
   })
 })

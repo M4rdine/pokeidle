@@ -20,7 +20,7 @@ await runMigrations(db)
 
 const now = (): Date => new Date()
 const sockets = createSocketRegistry()
-const scheduler = createScheduler({ db, registry: loadRegistry(), now, sockets, logger: loggerInstance })
+const scheduler = createScheduler({ db, registry: loadRegistry(), now, sockets, logger: loggerInstance, ...(config.TICK_MS === undefined ? {} : { tickMs: config.TICK_MS }) })
 const app = await buildApp({ db, config, now, realtime: { scheduler, sockets }, loggerInstance })
 
 const shutdown = createShutdown({ app, scheduler, sockets, close, logger: loggerInstance })

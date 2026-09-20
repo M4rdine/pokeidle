@@ -45,6 +45,8 @@ export const ConfigSchema = z.object({
   DEBUG_VIEWER: bool.default('false'),
   /** Diretório com o atlas de assets (`tiles.png`/`.json`, `pokemon.png`/`.json`) gerado por `pnpm assets build`. */
   ASSETS_DIR: z.string().min(1).default(DEFAULT_ASSETS_DIR),
+  /** Só para teste de ponta a ponta: acelera o relógio do agendador sem mudar a simulação. */
+  TICK_MS: z.coerce.number().int().min(10).max(5000).optional(),
   /** Build do cliente (Vite) servido em `/`. Sem a pasta, `/` continua 404 JSON como hoje. */
   CLIENT_DIST: z.string().min(1).default(DEFAULT_CLIENT_DIST),
 })

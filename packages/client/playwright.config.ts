@@ -16,6 +16,8 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 180_000,
     cwd: '../..',
-    env: { PORT: String(PORT), APP_ORIGIN: `http://localhost:${PORT}`, DATABASE_URL, COOKIE_SECURE: 'false', LOG_LEVEL: 'warn' },
+    // TICK_MS acelera só o relógio do agendador: a simulação é determinística por tick, então o
+    // resultado é o mesmo e o teste deixa de depender da velocidade da máquina.
+    env: { PORT: String(PORT), APP_ORIGIN: `http://localhost:${PORT}`, DATABASE_URL, COOKIE_SECURE: 'false', LOG_LEVEL: 'warn', TICK_MS: '40' },
   },
 })

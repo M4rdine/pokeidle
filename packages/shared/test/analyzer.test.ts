@@ -80,6 +80,17 @@ describe('estimateArea', () => {
     expect(ultraBall.species[0]!.captureChance).toBeLessThanOrEqual(1)
   })
 
+  it('os drops vêm com a chance do degrau da área, não com a chance base', () => {
+    const area = areaDe('campo-inicial')
+    const facil = estimateArea(entrada({ area: { ...area, rarity: 1 } }))
+    const dificil = estimateArea(entrada({ area: { ...area, rarity: 8 } }))
+    const chanceDe = (e: typeof facil, especie: string) =>
+      e.species.find((s) => s.speciesName === especie)!.drops[0]!.chance
+    expect(chanceDe(facil, 'zubat')).toBeGreaterThan(0)
+    expect(chanceDe(dificil, 'zubat')).toBeGreaterThan(chanceDe(facil, 'zubat'))
+    expect(chanceDe(dificil, 'zubat')).toBeLessThan(1)
+  })
+
   it('o confronto médio reflete a vantagem de tipo do time', () => {
     // Bellsprout é planta: fogo arrasa, água não faz nada de especial.
     const soPlanta = { ...areaDe('campo-inicial'), species: ['bellsprout'] }

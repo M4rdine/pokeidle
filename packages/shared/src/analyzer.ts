@@ -6,7 +6,7 @@
  */
 import { captureChance } from './capture.js'
 import { bestMove, expectedDamage, typeMultiplier, type Combatant } from './damage.js'
-import { lootTableFor } from './loot.js'
+import { dropChance, lootTableFor, MIN_RARITY } from './loot.js'
 import { availableMoves, cooldownTicks } from './moves.js'
 import type { Registry } from './registry.js'
 import type { Species } from './schemas/species.js'
@@ -33,6 +33,8 @@ export interface AreaSpecies {
   readonly species: readonly string[]
   readonly minLevel: number
   readonly maxLevel: number
+  /** Degrau de raridade da área: multiplica a chance dos drops. */
+  readonly rarity?: number
   /** Quantos selvagens a área mantém vivos ao mesmo tempo. */
   readonly wildCount: number
   /** Tempo de renascimento do spawn mais lento. */
@@ -54,6 +56,12 @@ export interface EstimateInput {
   readonly ballBonus?: number
 }
 
+export interface DropEstimate {
+  readonly item: string
+  /** Chance já ajustada pelo degrau de raridade da área. */
+  readonly chance: number
+}
+
 export interface SpeciesEstimate {
   readonly speciesName: string
   /** Nível médio da faixa da área. */
@@ -65,6 +73,8 @@ export interface SpeciesEstimate {
   /** Multiplicador de tipo do melhor golpe do time contra esta espécie. */
   readonly matchup: number
   readonly captureChance: number
+  /** O que a espécie derruba nesta área, com a chance do degrau dela. */
+  readonly drops: readonly DropEstimate[]
 }
 
 export interface AreaEstimate {
@@ -112,6 +122,7 @@ function melhorGolpe(input: EstimateInput, alvo: Combatant, alvoSpecies: Species
 }
 
 function estimarEspecie(input: EstimateInput, nome: string, level: number): SpeciesEstimate | null {
+  const rarity = input.area.rarity ?? MIN_RARITY
   const species = input.registry.species.get(nome)
   if (!species) return null
   const alvo = combatente(species, level)
@@ -136,6 +147,7 @@ function estimarEspecie(input: EstimateInput, nome: string, level: number): Spec
       hpCurrent: Math.floor(hpMax * CAPTURE_HP_FRACTION),
       ballBonus: input.ballBonus ?? DEFAULT_BALL_BONUS,
     }),
+    drops: table.drops.map((d) => ({ item: d.item, chance: dropChance(d.chance, rarity) })),
   }
 }
 

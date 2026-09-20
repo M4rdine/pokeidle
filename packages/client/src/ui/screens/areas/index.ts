@@ -83,7 +83,8 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
     if (!area || !estimate) return []
     return [{
       id: hunt.id, name: hunt.name, minLevel: hunt.minLevel, maxLevel: hunt.maxLevel,
-      minTrainerLevel: hunt.minTrainerLevel, locked: hunt.locked, species: area.species, estimate,
+      minTrainerLevel: hunt.minTrainerLevel, locked: hunt.locked, species: area.species,
+      rarity: area.rarity, estimate,
     }]
   })
 
@@ -96,6 +97,7 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
     new Set(areas.flatMap((a) => a.species.flatMap((n) => tiposDe(n) as TypeName[])))
   const tipoDe = (species: string): string => tiposDe(species)[0] ?? 'normal'
   const temNaPokedex = (species: string): boolean => dados?.caught.includes(species) ?? false
+  const nomeDoItem = (id: string): string => ctx.registry.items.get(id)?.name ?? id
 
   const semResultado = (): HTMLElement => el('li', { class: 'area-empty panel' },
     'Nenhuma área combina com esses filtros. ',
@@ -129,7 +131,7 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
       }))
       if (aberta === area.id) {
         lista.append(el('li', { class: 'area-detail' },
-          areaAnalyzer({ estimate: area.estimate, atlas: ctx.atlas, tiposDe, temNaPokedex, ballBonus: BALL_BONUS })))
+          areaAnalyzer({ estimate: area.estimate, atlas: ctx.atlas, tiposDe, temNaPokedex, ballBonus: BALL_BONUS, nomeDoItem })))
       }
     }
   }

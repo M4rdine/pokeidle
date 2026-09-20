@@ -8,7 +8,11 @@ export * from './schemas/items.js'
 export * from './schemas/loot.js'
 export * from './schemas/hunt-map.js'
 export * from './schemas/unlocks.js'
-export { buildRegistry, loadRegistry, type Registry, type RawRegistry } from './registry.js'
+export {
+  buildContentRegistry, buildRegistry, loadContentRegistry,
+  type ContentRegistry, type RawContent, type RawRegistry, type Registry,
+} from './registry.js'
+export { loadRegistry } from './registry-full.js'
 export * from './stats.js'
 export * from './xp.js'
 export * from './unlocks.js'
@@ -17,3 +21,5 @@ export * from './damage.js'
 export * from './capture.js'
 export * from './evolution.js'
 export * from './loot.js'
+export * from './analyzer.js'
+export * from './areas.js'

@@ -1,8 +1,8 @@
-import { nextUnlock, trainerLevel, xpForLevel, type Registry } from '@pokeidle/shared'
+import { nextUnlock, trainerLevel, xpForLevel, type ContentRegistry } from '@pokeidle/shared'
 
 export interface TrainerProgressView { readonly level: number; readonly xpInto: number; readonly xpSpan: number; readonly next: { level: number; what: string } | null }
 
-export function trainerProgress(registry: Registry, xp: number): TrainerProgressView {
+export function trainerProgress(registry: ContentRegistry, xp: number): TrainerProgressView {
   const u = registry.unlocks
   const level = trainerLevel(u, xp)
   const floor = xpForLevel(u.growthRate, level)
@@ -10,7 +10,7 @@ export function trainerProgress(registry: Registry, xp: number): TrainerProgress
 }
 
 /** Textos dos destraves alcançados ao subir de `from` para `to` (para o toast "Destravou: …"). */
-export function unlockedBetween(registry: Registry, from: number, to: number): string[] {
+export function unlockedBetween(registry: ContentRegistry, from: number, to: number): string[] {
   const out: string[] = []
   let level = from
   while (level < to) { const n = nextUnlock(registry.unlocks, level, registry.items); if (!n || n.level > to) break; out.push(n.what); level = n.level }

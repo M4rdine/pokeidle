@@ -34,6 +34,8 @@ input { font: inherit; color: var(--text); background: var(--bg); border: var(--
 .starter-grid, .hunt-grid { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .starter-card, .hunt-card { padding: var(--space-3); min-width: 180px; display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; }
 .hunt-locked { opacity: 0.6; }
+/* O portão é informação, não decoração: fica legível mesmo com o cartão esmaecido. */
+.hunt-gate { color: var(--accent); font-weight: 600; }
 .trainer-bar { display: flex; gap: var(--space-3); align-items: baseline; padding: var(--space-2) var(--space-3); }
 .shortcuts { display: flex; gap: var(--space-2); flex-wrap: wrap; }
 .toasts { position: fixed; right: var(--space-3); bottom: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); z-index: 20; }

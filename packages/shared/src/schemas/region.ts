@@ -23,6 +23,15 @@ export const AreaSchema = z.object({
   species: z.array(kebab).min(1),
   minLevel: z.number().int().positive(),
   maxLevel: z.number().int().positive(),
+  /** Quantos selvagens a área mantém vivos ao mesmo tempo, somando todos os spawns. */
+  wildCount: z.number().int().positive(),
+  /** Tempo de renascimento do spawn mais lento: é ele que limita o ritmo da caçada. */
+  respawnSeconds: z.number().int().positive(),
+  /**
+   * Nível de treinador exigido para entrar. Sai da faixa de níveis da área: entrar dez níveis
+   * abaixo do selvagem mais fraco é só perder tempo e Pokémon.
+   */
+  minTrainerLevel: z.number().int().min(1),
 }).strict().refine((a) => a.minLevel <= a.maxLevel, { message: 'minLevel maior que maxLevel' })
 
 export const RegionSchema = z.object({

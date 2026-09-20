@@ -1,10 +1,10 @@
-import type { Registry } from '@pokeidle/shared'
+import type { ContentRegistry } from '@pokeidle/shared'
 import type { Event, HuntState, StopReason } from '@pokeidle/shared/protocol'
 import { LOG_MAX_LINES } from '../config.js'
 
 export type LogKind = 'combat' | 'reward' | 'info' | 'alert'
 export interface LogLine { readonly tick: number; readonly kind: LogKind; readonly text: string }
-export interface LogContext { readonly registry: Registry; readonly state: HuntState | null }
+export interface LogContext { readonly registry: ContentRegistry; readonly state: HuntState | null }
 
 export const displayName = (kebab: string): string => kebab.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 const STOP_TEXT: Record<StopReason, string> = { 'team-fainted': 'Time caído', intent: 'Parada por você', 'no-route': 'Sem caminho até o Centro', corrupt: 'Sessão corrompida', 'persist-failed': 'Erro ao salvar; tente de novo' }

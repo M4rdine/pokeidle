@@ -9,10 +9,11 @@ const me = (patch: Partial<Me['trainer']> = {}): Me => ({
   user: { id: 'u', email: 'a@a.com', role: 'player' },
   trainer: { id: 't', name: 'Ash', xp: 0, gold: 120, settings: { returnHpPercent: 50, potionHpPercent: 50, capture: { ballTier: 'best', maxWildHpPercent: 30, allowDuplicates: false } }, hasStarter: true, activeHuntId: null, level: 1, xpToNext: 8, teamSlots: 3, nextUnlock: { level: 10, what: '4 vagas no time' }, ...patch },
 })
-// Área real de Kanto: a tela decide o que está bloqueado cruzando as hunts recebidas com as
-// regiões do registro, então uma hunt inventada faria Kanto inteira parecer bloqueada.
-const campoInicial = { id: 'campo-inicial', name: 'Campo Inicial', width: 24, height: 36, minLevel: 2, maxLevel: 6 }
-const ctxWith = (over: Record<string, unknown> = {}) => createContext({ session: createStore({ ...withMe(initialSession(), me()), hunts: [campoInicial] }), ...over })
+// O bloqueio vem pronto do servidor: a tela só desenha `locked` e `minTrainerLevel`.
+const campoInicial = { id: 'campo-inicial', name: 'Campo Inicial', width: 24, height: 36, minLevel: 2, maxLevel: 6, minTrainerLevel: 1, locked: false }
+const picoRochoso = { id: 'pico-rochoso', name: 'Pico Rochoso', width: 24, height: 36, minLevel: 25, maxLevel: 35, minTrainerLevel: 23, locked: true }
+const ctxWith = (over: Record<string, unknown> = {}, hunts = [campoInicial]) =>
+  createContext({ session: createStore({ ...withMe(initialSession(), me()), hunts }), ...over })
 
 describe('tela de hunts', () => {
   it('lista a área disponível com a faixa de nível e o botão de iniciar', () => {
@@ -25,27 +26,21 @@ describe('tela de hunts', () => {
     expect(card.querySelector('button')?.textContent).toBe('Iniciar')
   })
 
-  it('mostra a região ainda bloqueada com o nível que a abre, e sem botão', () => {
-    const ctx = ctxWith()
-    // O registro real só tem Kanto, que já está aberta. Para provar o cartão bloqueado, a
-    // fixture acrescenta uma região futura com portão de nível.
-    const registry = {
-      ...ctx.registry,
-      regions: new Map([...ctx.registry.regions, ['johto', {
-        ...ctx.registry.regions.get('kanto')!,
-        id: 'johto',
-        name: 'Johto',
-        // Área própria: copiar a de Kanto faria a rota-1 parecer pertencer às duas regiões.
-        areas: [{ ...ctx.registry.regions.get('kanto')!.areas[0]!, id: 'rota-10', name: 'Rota 10' }],
-      }]]),
-      unlocks: { ...ctx.registry.unlocks, regions: { ...ctx.registry.unlocks.regions, johto: 50 } },
-    }
+  it('mostra a área bloqueada com o nível que a abre, e sem botão de iniciar', () => {
     const root = document.createElement('div')
-    mountHunts(root, { ...ctx, registry })
+    mountHunts(root, ctxWith({}, [campoInicial, picoRochoso]))
     const locked = root.querySelector('.hunt-locked')!
-    expect(locked.textContent).toContain('Johto')
-    expect(locked.textContent).toContain('nível 50')
+    expect(locked.textContent).toContain('Pico Rochoso')
+    expect(locked.textContent).toContain('abre no nível 23')
     expect(locked.querySelector('button')).toBeNull()
+  })
+
+  it('as liberadas vêm antes das bloqueadas, em ordem de nível', () => {
+    const root = document.createElement('div')
+    const media = { ...picoRochoso, id: 'caverna-funda', name: 'Caverna Funda', minTrainerLevel: 18 }
+    mountHunts(root, ctxWith({}, [picoRochoso, media, campoInicial]))
+    expect([...root.querySelectorAll('.hunt-card')].map((c) => c.getAttribute('data-hunt')))
+      .toEqual(['campo-inicial', 'caverna-funda', 'pico-rochoso'])
   })
   it('iniciar manda POST /hunts/:id/start e chama go(); atalhos abrem os modais', async () => {
     const post = vi.fn(async () => ({ session: { huntId: 'campo-inicial', sessionId: 's', startedAt: 'x' } }))

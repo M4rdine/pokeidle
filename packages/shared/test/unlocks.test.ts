@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { loadRegistry } from '../src/registry.js'
 import { UnlocksSchema } from '../src/schemas/unlocks.js'
 import { regionUnlockLevel, itemUnlockLevel, nextUnlock, teamSlotsFor, trainerLevel, xpToNextLevel } from '../src/unlocks.js'
+import { loadRegistry } from '../src/registry-full.js'
 
 const registry = loadRegistry()
 const u = registry.unlocks

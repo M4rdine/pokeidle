@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
-import { huntSessions, pokemon } from '../src/db/schema.js'
+import { huntSessions, pokemon, trainers } from '../src/db/schema.js'
 import { truncateAll } from './helpers/db.js'
 import { api, registerAndLogin, T0, testApp, type TestApp } from './helpers/app.js'
 
@@ -20,6 +20,33 @@ describe('GET /hunts', () => {
     expect(hunts).toHaveLength(8)
     expect(hunts[0]).toMatchObject({ id: 'campo-inicial', name: expect.any(String), width: 24, height: 36 })
     expect(hunts.every((h) => h.minLevel >= 1)).toBe(true)
+  })
+
+  it('cada área vem com o nível que a abre e se o treinador já pode entrar', async () => {
+    const { hunts } = (await api(t.app, cookie).get('/hunts')).json() as
+      { hunts: { id: string; minTrainerLevel: number; locked: boolean }[] }
+    // Treinador recém-criado está no nível 1: a primeira área abre, a última não.
+    expect(hunts[0]).toMatchObject({ id: 'campo-inicial', minTrainerLevel: 1, locked: false })
+    const pico = hunts.find((h) => h.id === 'pico-rochoso')!
+    expect(pico.minTrainerLevel).toBeGreaterThan(1)
+    expect(pico.locked).toBe(true)
+  })
+})
+
+describe('portão de nível das áreas', () => {
+  it('start numa área acima do nível recusa com 403 e diz o nível que falta', async () => {
+    await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
+    const r = await api(t.app, cookie).post('/hunts/pico-rochoso/start')
+    expect(r.statusCode).toBe(403)
+    expect(r.json()).toMatchObject({ error: { code: 'area-locked', message: expect.stringContaining('nível') } })
+    // E nada foi criado: o treinador continua sem caçada.
+    expect((await api(t.app, cookie).get('/hunts/active')).json()).toEqual({ session: null })
+  })
+
+  it('com xp suficiente a mesma área abre', async () => {
+    await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
+    await t.db.update(trainers).set({ xp: 1_000_000 }).where(eq(trainers.id, trainerId))
+    expect((await api(t.app, cookie).post('/hunts/pico-rochoso/start')).statusCode).toBe(201)
   })
 })
 

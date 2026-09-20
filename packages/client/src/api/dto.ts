@@ -11,7 +11,12 @@ export const PokemonDtoSchema = z.object({ id: z.string(), speciesName: z.string
 export const TeamSchema = z.object({ team: z.array(PokemonDtoSchema), box: z.array(PokemonDtoSchema) })
 export const InventorySchema = z.object({ items: z.array(z.object({ itemId: z.string(), quantity: z.number() })) })
 export const PokedexSchema = z.object({ entries: z.array(z.object({ speciesName: z.string(), seenAt: z.string(), caughtAt: z.string().nullable() })) })
-export const HuntSummarySchema = z.object({ id: z.string(), name: z.string(), width: z.number(), height: z.number(), minLevel: z.number(), maxLevel: z.number() })
+export const HuntSummarySchema = z.object({
+  id: z.string(), name: z.string(), width: z.number(), height: z.number(),
+  minLevel: z.number(), maxLevel: z.number(),
+  /** Nível de treinador que abre a área, e se este treinador já o alcançou. */
+  minTrainerLevel: z.number(), locked: z.boolean(),
+})
 export const HuntsSchema = z.object({ hunts: z.array(HuntSummarySchema) })
 // `kind` é string aberta de propósito: um tipo de item novo no servidor não pode quebrar a loja.
 export const ShopItemSchema = z.object({ itemId: z.string(), name: z.string(), kind: z.string(), buyPrice: z.number(), sellPrice: z.number(), unlockLevel: z.number(), unlocked: z.boolean(), owned: z.number() })

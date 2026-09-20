@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-20T00:00:00.000Z",
+  "title": "Design System: Pokeidle",
+  "extensions": {
+    "colorMeta": {
+      "bg": { "role": "neutral", "displayName": "Preto de Página", "canonical": "#0f0f14", "tonalRamp": ["oklch(12% 0.012 285)", "oklch(18% 0.012 285)", "oklch(26% 0.012 285)", "oklch(38% 0.012 285)", "oklch(50% 0.012 285)", "oklch(64% 0.012 285)", "oklch(80% 0.010 285)", "oklch(94% 0.006 285)"] },
+      "panel": { "role": "neutral", "displayName": "Grafite de Painel", "canonical": "#1a1a22", "tonalRamp": ["oklch(15% 0.013 285)", "oklch(22% 0.013 285)", "oklch(30% 0.013 285)", "oklch(41% 0.013 285)", "oklch(53% 0.013 285)", "oklch(66% 0.012 285)", "oklch(81% 0.010 285)", "oklch(95% 0.006 285)"] },
+      "border": { "role": "neutral", "displayName": "Cinza de Borda", "canonical": "#2e2e3a", "tonalRamp": ["oklch(16% 0.018 285)", "oklch(24% 0.018 285)", "oklch(32% 0.018 285)", "oklch(43% 0.018 285)", "oklch(55% 0.018 285)", "oklch(68% 0.016 285)", "oklch(82% 0.012 285)", "oklch(95% 0.007 285)"] },
+      "text": { "role": "neutral", "displayName": "Branco de Leitura", "canonical": "#f0f0f5", "tonalRamp": ["oklch(18% 0.005 285)", "oklch(28% 0.005 285)", "oklch(38% 0.005 285)", "oklch(50% 0.005 285)", "oklch(62% 0.005 285)", "oklch(74% 0.005 285)", "oklch(86% 0.005 285)", "oklch(96% 0.004 285)"] },
+      "muted": { "role": "neutral", "displayName": "Cinza de Rótulo", "canonical": "#8a8a9a", "tonalRamp": ["oklch(17% 0.017 285)", "oklch(27% 0.017 285)", "oklch(37% 0.017 285)", "oklch(48% 0.017 285)", "oklch(61% 0.017 285)", "oklch(73% 0.015 285)", "oklch(85% 0.011 285)", "oklch(95% 0.006 285)"] },
+      "accent": { "role": "primary", "displayName": "Amarelo Elétrico", "canonical": "#f8d030", "tonalRamp": ["oklch(25% 0.075 92)", "oklch(36% 0.105 92)", "oklch(47% 0.132 92)", "oklch(58% 0.152 92)", "oklch(69% 0.163 92)", "oklch(78% 0.157 92)", "oklch(87% 0.115 92)", "oklch(95% 0.055 92)"] },
+      "ok": { "role": "secondary", "displayName": "Verde Saudável", "canonical": "#50c878", "tonalRamp": ["oklch(22% 0.055 152)", "oklch(32% 0.080 152)", "oklch(43% 0.100 152)", "oklch(54% 0.115 152)", "oklch(65% 0.125 152)", "oklch(76% 0.115 152)", "oklch(86% 0.082 152)", "oklch(95% 0.038 152)"] },
+      "danger": { "role": "secondary", "displayName": "Vermelho de Alerta", "canonical": "#e03030", "tonalRamp": ["oklch(22% 0.075 28)", "oklch(31% 0.110 28)", "oklch(40% 0.145 28)", "oklch(49% 0.175 28)", "oklch(58% 0.195 28)", "oklch(70% 0.160 28)", "oklch(83% 0.105 28)", "oklch(94% 0.045 28)"] },
+      "type-normal": { "role": "tertiary", "displayName": "Normal", "canonical": "#a8a878" },
+      "type-fire": { "role": "tertiary", "displayName": "Fogo", "canonical": "#f08030" },
+      "type-water": { "role": "tertiary", "displayName": "Água", "canonical": "#6890f0" },
+      "type-electric": { "role": "tertiary", "displayName": "Elétrico", "canonical": "#f8d030" },
+      "type-grass": { "role": "tertiary", "displayName": "Planta", "canonical": "#78c850" },
+      "type-ice": { "role": "tertiary", "displayName": "Gelo", "canonical": "#98d8d8" },
+      "type-fighting": { "role": "tertiary", "displayName": "Lutador", "canonical": "#c03028" },
+      "type-poison": { "role": "tertiary", "displayName": "Venenoso", "canonical": "#a040a0" },
+      "type-ground": { "role": "tertiary", "displayName": "Terrestre", "canonical": "#e0c068" },
+      "type-flying": { "role": "tertiary", "displayName": "Voador", "canonical": "#a890f0" },
+      "type-psychic": { "role": "tertiary", "displayName": "Psíquico", "canonical": "#f85888" },
+      "type-bug": { "role": "tertiary", "displayName": "Inseto", "canonical": "#a8b820" },
+      "type-rock": { "role": "tertiary", "displayName": "Pedra", "canonical": "#b8a038" },
+      "type-ghost": { "role": "tertiary", "displayName": "Fantasma", "canonical": "#705898" },
+      "type-dragon": { "role": "tertiary", "displayName": "Dragão", "canonical": "#7038f8" },
+      "type-dark": { "role": "tertiary", "displayName": "Sombrio", "canonical": "#705848" },
+      "type-steel": { "role": "tertiary", "displayName": "Metálico", "canonical": "#b8b8d0" },
+      "type-fairy": { "role": "tertiary", "displayName": "Fada", "canonical": "#ee99ac" }
+    },
+    "typographyMeta": {
+      "title": { "displayName": "Título", "purpose": "h1 e h2: título de tela e de cartão. O topo real da escala — o projeto não tem registro de display." },
+      "row-title": { "displayName": "Título de Linha", "purpose": "Nome da área na ficha; o único degrau entre o título e o corpo." },
+      "body": { "displayName": "Corpo", "purpose": "Todo o texto e todos os números. Sempre com tabular-nums." },
+      "label": { "displayName": "Rótulo", "purpose": "Legenda de fieldset, cabeçalho de tabela e selo de tipo. Caixa alta com espacejamento largo (o selo de tipo é caixa baixa)." },
+      "micro": { "displayName": "Unidade", "purpose": "A unidade sob o número: xp/h, ouro/h, níveis, confronto." }
+    },
+    "shadows": [
+      { "name": "anel-de-estado", "value": "0 0 0 2px color-mix(in srgb, var(--t) 45%, transparent)", "purpose": "Único box-shadow do projeto: anel em volta do ponto marcador de um filtro de tipo ligado. É marcação de estado, não elevação." }
+    ],
+    "scrims": [
+      { "name": "modal-backdrop", "value": "rgb(0 0 0 / 60%)", "purpose": "Cortina atrás de um modal." },
+      { "name": "scene-overlay", "value": "rgb(15 15 20 / 82%)", "purpose": "Cortina sobre a cena do jogo (recuperação, caçada parada). Usa a cor da própria página, não um preto genérico." }
+    ],
+    "motion": [
+      { "name": "borda-de-estado", "value": "border-color 120ms ease-out", "purpose": "A única transição do sistema: a borda responde, a caixa não se mexe." },
+      { "name": "gaveta-abre", "value": "160ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Entrada da gaveta do analisador: opacidade de 0 a 1 e 4px de translateY. Desligada em prefers-reduced-motion." }
+    ],
+    "borders": [
+      { "name": "estrutura", "value": "2px", "purpose": "--border-w. Contorna painel, botão, campo, modal, toast, linha; também a espessura do outline de foco." },
+      { "name": "divisao", "value": "1px", "purpose": "Divisor interno: linha de tabela, item de mochila, célula da Pokédex, selo de tipo." }
+    ],
+    "containers": [
+      { "name": "formulario", "value": "420px", "purpose": "Registro e login (.screen-auth), centrado com margem de 32px." },
+      { "name": "ficha", "value": "1100px", "purpose": "Navegador de áreas e telas de leitura longa (.screen-areas)." },
+      { "name": "janela", "value": "100vh", "purpose": "Tela do jogo: grade de 280px 1fr 200px por auto 1fr 180px, sem rolagem de página." }
+    ],
+    "breakpoints": [
+      { "name": "compacto", "value": "960px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botão",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Botão padrão: retângulo de borda reta que responde só na borda.",
+      "html": "<button class=\"ds-btn\">Ver detalhes</button>",
+      "css": ".ds-btn { font: 14px/1.4 system-ui, sans-serif; color: var(--text, #f0f0f5); background: var(--panel, #1a1a22); border: 2px solid var(--border, #2e2e3a); border-radius: 0; padding: 8px 16px; cursor: pointer; transition: border-color 120ms ease-out; } .ds-btn:hover:not([disabled]) { border-color: var(--accent, #f8d030); } .ds-btn:focus-visible { outline: 2px solid var(--accent, #f8d030); outline-offset: -2px; } .ds-btn[disabled] { opacity: 0.5; cursor: default; }"
+    },
+    {
+      "name": "Botão primário",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "A ação primária se declara pela borda em acento, nunca por fundo preenchido.",
+      "html": "<button class=\"ds-btn-primary\">Caçar</button>",
+      "css": ".ds-btn-primary { font: 14px/1.4 system-ui, sans-serif; color: var(--text, #f0f0f5); background: var(--panel, #1a1a22); border: 2px solid var(--accent, #f8d030); border-radius: 0; padding: 8px 16px; cursor: pointer; transition: border-color 120ms ease-out; } .ds-btn-primary:hover:not([disabled]) { border-color: var(--accent, #f8d030); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent, #f8d030); outline-offset: -2px; } .ds-btn-primary[disabled] { opacity: 0.5; cursor: default; }"
+    },
+    {
+      "name": "Campo de texto",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "O campo afunda: fundo mais escuro que o painel que o contém.",
+      "html": "<p class=\"ds-field\"><label class=\"ds-label\" for=\"ds-input-demo\">E-mail</label><input class=\"ds-input\" id=\"ds-input-demo\" type=\"email\" placeholder=\"treinador@kanto.jp\"></p>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 4px; margin: 0 0 16px; } .ds-label { color: var(--muted, #8a8a9a); font: 14px/1.4 system-ui, sans-serif; } .ds-input { font: 14px/1.4 system-ui, sans-serif; font-variant-numeric: tabular-nums; color: var(--text, #f0f0f5); background: var(--bg, #0f0f14); border: 2px solid var(--border, #2e2e3a); border-radius: 0; padding: 8px; width: 100%; } .ds-input:focus-visible { outline: 2px solid var(--accent, #f8d030); outline-offset: -2px; }"
+    },
+    {
+      "name": "Selo de tipo",
+      "kind": "chip",
+      "refersTo": "type-badge",
+      "description": "O matiz identifica na borda; o rótulo é lido no claro do tema misturado a 45%.",
+      "html": "<span class=\"ds-type\" style=\"--t: #705898\">ghost</span><span class=\"ds-type\" style=\"--t: #f08030\">fire</span>",
+      "css": ".ds-type { display: inline-block; padding: 0 4px; margin-right: 4px; border: 1px solid var(--t, currentColor); border-radius: 0; color: color-mix(in srgb, var(--t, currentColor) 45%, var(--text, #f0f0f5)); font: 14px/1.4 system-ui, sans-serif; font-size: 0.8em; text-transform: lowercase; }"
+    },
+    {
+      "name": "Filtro de tipo",
+      "kind": "chip",
+      "refersTo": "filter-type",
+      "description": "Selo de tipo como alternador: ponto marcador no matiz, fundo em color-mix quando ligado.",
+      "html": "<button class=\"ds-filter-type\" style=\"--t: #6890f0\" aria-pressed=\"false\">water</button><button class=\"ds-filter-type\" style=\"--t: #78c850\" aria-pressed=\"true\">grass</button>",
+      "css": ".ds-filter-type { display: inline-flex; align-items: center; gap: 0.35em; padding: 0 4px; margin-right: 4px; background: transparent; color: var(--text, #f0f0f5); border: 1px solid var(--t); border-radius: 0; font: 14px/1.4 system-ui, sans-serif; font-size: 0.8em; text-transform: lowercase; cursor: pointer; } .ds-filter-type::before { content: ''; width: 0.55em; height: 0.55em; background: var(--t); } .ds-filter-type:hover { filter: brightness(1.35); } .ds-filter-type:focus-visible { outline: 2px solid var(--accent, #f8d030); outline-offset: -2px; } .ds-filter-type[aria-pressed='true'] { background: color-mix(in srgb, var(--t) 28%, var(--panel, #1a1a22)); border-width: 2px; } .ds-filter-type[aria-pressed='true']::before { box-shadow: 0 0 0 2px color-mix(in srgb, var(--t) 45%, transparent); }"
+    },
+    {
+      "name": "Alternador de filtro",
+      "kind": "chip",
+      "refersTo": "filter-toggle",
+      "description": "Alternador de texto: ligado, borda e texto vão para o acento.",
+      "html": "<button class=\"ds-toggle\" aria-pressed=\"false\">leva vantagem</button><button class=\"ds-toggle\" aria-pressed=\"true\">tem espécie que falta</button>",
+      "css": ".ds-toggle { font: 14px/1.4 system-ui, sans-serif; color: var(--text, #f0f0f5); background: var(--panel, #1a1a22); border: 2px solid var(--border, #2e2e3a); border-radius: 0; padding: 4px 8px; margin-right: 8px; cursor: pointer; transition: border-color 120ms ease-out; } .ds-toggle:hover { border-color: var(--accent, #f8d030); } .ds-toggle:focus-visible { outline: 2px solid var(--accent, #f8d030); outline-offset: -2px; } .ds-toggle[aria-pressed='true'] { border-color: var(--accent, #f8d030); color: var(--accent, #f8d030); }"
+    },
+    {
+      "name": "Painel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "A superfície levantada do sistema: grafite sobre preto, borda de 2px, raio zero, sem sombra.",
+      "html": "<section class=\"ds-panel\"><h2 class=\"ds-panel-title\">Rota 1</h2><p class=\"ds-panel-body\">Níveis 2–12 · 5 espécies</p></section>",
+      "css": ".ds-panel { background: var(--panel, #1a1a22); border: 2px solid var(--border, #2e2e3a); border-radius: 0; padding: 16px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; min-width: 180px; } .ds-panel-title { margin: 0; font: 14px/1.4 system-ui, sans-serif; font-size: 1.2rem; font-weight: 700; letter-spacing: 0.02em; color: var(--text, #f0f0f5); } .ds-panel-body { margin: 0; font: 14px/1.4 system-ui, sans-serif; font-variant-numeric: tabular-nums; color: var(--muted, #8a8a9a); }"
+    },
+    {
+      "name": "Linha da ficha de áreas",
+      "kind": "custom",
+      "refersTo": "area-row",
+      "description": "Componente-assinatura: colunas de largura declarada, iguais em todas as linhas, com a ação fora do botão que abre o detalhe.",
+      "html": "<li class=\"ds-area-row\"><button type=\"button\" class=\"ds-area-main\"><span class=\"ds-area-name\"><span class=\"ds-area-title\">Floresta de Viridian</span><span class=\"ds-area-missing\">faltam 2 na Pokédex</span></span><span class=\"ds-area-col\"><strong>8–14</strong><span class=\"ds-area-unit\">níveis</span></span><span class=\"ds-area-metric\"><strong>4,1k</strong><span class=\"ds-area-unit\">xp/h</span></span><span class=\"ds-area-metric\"><strong>980</strong><span class=\"ds-area-unit\">ouro/h</span></span><span class=\"ds-area-metric ds-matchup-good\"><strong>arrasa</strong><span class=\"ds-area-unit\">confronto</span></span></button><button type=\"button\" class=\"ds-area-start\">Caçar</button></li>",
+      "css": ".ds-area-row { list-style: none; display: grid; grid-template-columns: 1fr 7rem; align-items: stretch; gap: 16px; padding-right: 16px; background: var(--panel, #1a1a22); border: 2px solid var(--border, #2e2e3a); border-radius: 0; transition: border-color 120ms ease-out; } .ds-area-row:hover { border-color: var(--accent, #f8d030); } .ds-area-main { display: grid; grid-template-columns: minmax(9rem, 1fr) 4.5rem 4.5rem 4.5rem 7rem; align-items: center; gap: 16px; padding: 8px 16px; background: none; border: 0; text-align: left; color: inherit; font: 14px/1.4 system-ui, sans-serif; font-variant-numeric: tabular-nums; cursor: pointer; } .ds-area-main:focus-visible { outline: 2px solid var(--accent, #f8d030); outline-offset: -2px; } .ds-area-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; } .ds-area-title { font-size: 1rem; font-weight: 600; letter-spacing: 0.02em; } .ds-area-missing { color: var(--accent, #f8d030); font-size: 0.8em; } .ds-area-col, .ds-area-metric { display: flex; flex-direction: column; line-height: 1.15; } .ds-area-metric { align-items: flex-end; text-align: right; } .ds-area-unit { font-size: 0.75em; letter-spacing: 0.04em; color: var(--muted, #8a8a9a); } .ds-matchup-good strong { color: var(--ok, #50c878); } .ds-area-start { align-self: center; white-space: nowrap; font: 14px/1.4 system-ui, sans-serif; color: var(--text, #f0f0f5); background: var(--panel, #1a1a22); border: 2px solid var(--accent, #f8d030); border-radius: 0; padding: 8px 16px; cursor: pointer; }"
+    },
+    {
+      "name": "Linha bloqueada",
+      "kind": "custom",
+      "refersTo": "area-row-locked",
+      "description": "O indisponível recua de plano, não de legibilidade: fundo de página e borda apagada, números em contraste cheio.",
+      "html": "<li class=\"ds-area-row ds-area-row-locked\"><button type=\"button\" class=\"ds-area-main\"><span class=\"ds-area-name\"><span class=\"ds-area-title\">Monte Moon</span></span><span class=\"ds-area-metric\"><strong>7,8k</strong><span class=\"ds-area-unit\">xp/h</span></span></button><span class=\"ds-area-gate\">nível 23</span></li>",
+      "css": ".ds-area-row-locked { background: var(--bg, #0f0f14); border-color: color-mix(in srgb, var(--border, #2e2e3a) 60%, var(--bg, #0f0f14)); } .ds-area-row-locked .ds-area-title { color: var(--muted, #8a8a9a); } .ds-area-row-locked:hover { border-color: var(--accent, #f8d030); } .ds-area-gate { align-self: center; justify-self: center; color: var(--accent, #f8d030); font: 14px/1.4 system-ui, sans-serif; font-size: 0.85em; white-space: nowrap; padding: 2px 8px; background: color-mix(in srgb, var(--accent, #f8d030) 12%, transparent); }"
+    },
+    {
+      "name": "Gaveta do analisador",
+      "kind": "custom",
+      "refersTo": "area-analyzer",
+      "description": "O detalhe abre dentro da própria ficha, colado sob a linha: borda em acento sem topo, fundo de página, tabela de colunas colapsadas.",
+      "html": "<div class=\"ds-analyzer\"><table class=\"ds-analyzer-table\"><thead><tr><th scope=\"col\">Espécie</th><th scope=\"col\" class=\"ds-num\">XP</th><th scope=\"col\" class=\"ds-num\">Ouro</th><th scope=\"col\" class=\"ds-num\">Captura</th></tr></thead><tbody><tr><th scope=\"row\">Caterpie</th><td class=\"ds-num\">39</td><td class=\"ds-num\">24</td><td class=\"ds-num\">62%</td></tr><tr><th scope=\"row\">Pikachu</th><td class=\"ds-num\">82</td><td class=\"ds-num\">51</td><td class=\"ds-num\">31%</td></tr></tbody></table><p class=\"ds-analyzer-note\">XP, ouro e tempo por derrota estimados com o seu time atual.</p></div>",
+      "css": ".ds-analyzer { border: 2px solid var(--accent, #f8d030); border-top: 0; border-radius: 0; background: var(--bg, #0f0f14); padding: 16px; margin-top: -8px; animation: ds-analyzer-open 160ms cubic-bezier(0.16, 1, 0.3, 1); } @keyframes ds-analyzer-open { from { opacity: 0; transform: translateY(-4px); } } @media (prefers-reduced-motion: reduce) { .ds-analyzer { animation: none; } } .ds-analyzer-table { width: 100%; border-collapse: collapse; font: 14px/1.4 system-ui, sans-serif; font-variant-numeric: tabular-nums; color: var(--text, #f0f0f5); } .ds-analyzer-table th:first-child { width: 100%; } .ds-analyzer-table th, .ds-analyzer-table td { padding: 4px 8px; text-align: left; } .ds-analyzer-table thead th { color: var(--muted, #8a8a9a); font-weight: 400; font-size: 0.8em; letter-spacing: 0.06em; text-transform: uppercase; border-bottom: 1px solid var(--border, #2e2e3a); } .ds-analyzer-table tbody th { font-weight: 400; } .ds-analyzer-table tbody tr + tr th, .ds-analyzer-table tbody tr + tr td { border-top: 1px solid var(--border, #2e2e3a); } .ds-num { text-align: right; white-space: nowrap; } .ds-analyzer-note { margin: 16px 0 0; font-size: 0.85em; color: var(--muted, #8a8a9a); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "O Terminal de Campo",
+    "overview": "Pokeidle não é uma vitrine, é um posto de leitura. O servidor caça sozinho e o jogador chega para conferir e decidir: onde farmar, quem está ativo, quando parar. A interface é o painel de um instrumento apontado para essa decisão — fundo quase preto, superfícies retangulares de borda reta, números alinhados em coluna, e um único amarelo que só acende quando algo está ativo, destravado ou valendo dinheiro. A arte pixelada é a única coisa colorida por prazer; o resto do quadro se apaga para deixá-la acesa.\n\nO mundo é construído por subtração. Não há raio de canto em lugar nenhum: border-radius: 0 está escrito à mão no painel e no filtro, e nenhuma outra regra do projeto contradiz. Não há sombra de elevação: a profundidade vem de dois tons de fundo (#0f0f14 para a página, #1a1a22 para a superfície) e de uma borda de 2 px que muda de cor. Não há família tipográfica carregada: o corpo inteiro roda em system-ui a 14 px, e tudo que hierarquiza é peso, caixa alta, espacejamento e opacidade de cor. A escala de espaço tem quatro degraus (4, 8, 16, 32) e quase tudo cai em 8 ou 16.\n\nO que dá caráter é a disciplina do número. font-variant-numeric: tabular-nums está no body e é reafirmado em toda superfície que compara: a ficha de áreas, a tabela do analisador, os medidores do HUD. Colunas de largura fixa, dígitos de largura fixa, mesma coluna em todas as linhas. Onde outros jogos idle põem uma grade de cartões iguais, este põe uma ficha — porque cartão lado a lado não deixa ler a mesma coluna de cima a baixo.",
+    "keyCharacteristics": [
+      "Fundo escuro em dois planos, sem gradiente e sem textura",
+      "Borda reta de 2 px como elemento estrutural único; raio zero em todo o sistema",
+      "Um só acento (amarelo #f8d030) para estado ativo, ação primária e recompensa",
+      "Dezoito cores canônicas de tipo, usadas como identidade e nunca como texto sozinho",
+      "Números tabulares e colunas de largura fixa sempre que houver comparação",
+      "Tipografia de sistema sem fonte de display; hierarquia por peso, caixa e cor",
+      "Movimento quase ausente: 120 ms de borda, 160 ms de gaveta, e nada mais"
+    ],
+    "rules": [
+      { "name": "A Regra do Acento Único", "body": "Só existe um acento. Se algo precisa de destaque e não é estado ativo, ação primária, recompensa ou foco, então não precisa de destaque — precisa de posição. Não se inventa um segundo amarelo, um azul de link ou um roxo de marca.", "section": "colors" },
+      { "name": "A Regra do Tipo na Borda", "body": "A cor de tipo identifica; ela não lê. O matiz vai para a borda, para o ponto marcador e para o fundo em color-mix; o rótulo fica no claro do tema, ou no matiz misturado a 45% com o texto. Motivo medido: ghost e dark como texto cheio sobre o painel dão 2,6:1.", "section": "colors" },
+      { "name": "A Regra da Cor Nunca Sozinha", "body": "Nenhum estado é comunicado só por cor. O confronto verde diz \"arrasa\" por escrito; o vermelho diz \"desvantagem\"; o cinza diz \"não fere\". A cor confirma a palavra, nunca a substitui.", "section": "colors" },
+      { "name": "A Regra do Dígito Alinhado", "body": "font-variant-numeric: tabular-nums é do body e toda superfície de comparação o reafirma. Número que vai para coluna nunca usa dígito proporcional.", "section": "typography" },
+      { "name": "A Regra do Número em Cima, Unidade Embaixo", "body": "Uma métrica é strong com o valor e um span mudo com a unidade, empilhados, alinhados à direita. O valor é lido; a unidade é consultada.", "section": "typography" },
+      { "name": "A Regra do Milhar Curto", "body": "Na ficha, 1240 vira \"1,2k\". A vírgula é a decimal do português e a lista existe para comparar ordens de grandeza, não para somar. O valor cheio fica no detalhe.", "section": "typography" },
+      { "name": "A Regra do Plano, Não da Opacidade", "body": "O indisponível recua de plano, não de legibilidade. A linha de área bloqueada cai para o fundo da página e ganha uma borda mais apagada, mas os números continuam em contraste cheio — é por eles que se decide o que perseguir. O portão de nível é informação, e informação não se esmaece.", "section": "elevation" },
+      { "name": "A Regra da Borda que Responde", "body": "O estado vive na borda. hover e focus levam a borda para o acento; o ativo e o aberto também. O fundo quase nunca muda, então nada salta nem empurra o vizinho.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do usar a borda como canal de estado: 2 px em border em repouso, accent em hover, foco, ativo e aberto.",
+      "Do declarar largura de coluna sempre que uma tela existir para comparar linhas. auto deixa o conteúdo mover o alinhamento, e o alinhamento é a comparação.",
+      "Do escrever o estado por extenso junto da cor (\"arrasa\", \"não fere\", \"faltam 2 na Pokédex\").",
+      "Do distinguir \"ainda não sei\" de \"medi e deu zero\": enquanto o dado não chega, travessão e aria-busy, nunca um zero formatado.",
+      "Do recuar de plano (fundo bg) para marcar o indisponível, mantendo os números em contraste cheio.",
+      "Do manter tabular-nums em qualquer número que entre em coluna.",
+      "Do abrir o detalhe em gaveta, dentro da lista, quando o jogador vai abrir uma, olhar, fechar e abrir a vizinha. Modal só para tarefa que se resolve e se fecha.",
+      "Do escalar sprite em múltiplo inteiro e recortá-lo numa caixa de tamanho declarado quando o frame do atlas variar.",
+      "Do respeitar prefers-reduced-motion: reduce desligando animação e transição, como faz a ficha de áreas."
+    ],
+    "donts": [
+      "Don't introduzir raio de canto. O sistema é de raio zero e a exceção não tem onde se apoiar.",
+      "Don't usar sombra para elevar. Profundidade aqui é plano e borda; o único box-shadow do projeto é anel de estado.",
+      "Don't pintar texto com o matiz cru de um tipo sobre o painel. Misture com o texto do tema (a ficha usa 45%) ou deixe o matiz só na borda e no ponto.",
+      "Don't transformar uma comparação em grade de cartões iguais. Cartão lado a lado é legítimo para escolha única e irreversível (a tela de inicial), não para ler a mesma coluna em oito linhas.",
+      "Don't animar o que muda a caixa. O movimento que existe é de borda (120 ms ease-out) e de entrada da gaveta (160 ms cubic-bezier(0.16, 1, 0.3, 1), opacidade e 4 px de translateY).",
+      "Don't aninhar botão dentro de botão para caber uma ação secundária na linha; a ação sai para uma coluna própria.",
+      "Don't apagar informação para indicar bloqueio. opacity esconde o número que justifica a meta.",
+      "Don't acrescentar um segundo acento. Se dois elementos disputam destaque na mesma tela, o problema é de posição, não de cor."
+    ],
+    "knownState": [
+      "O selo de tipo global (.type em layout.css) ainda pinta o matiz cru como texto sobre o painel; para ghost e dark isso fica em ~2,6:1. A ficha de áreas já sobrepõe com color-mix; a tela de inicial e os modais ainda usam o tratamento original.",
+      "O sistema não tem registro de display: a voz é a pilha system-ui e a escala é plana (h1 a 1,2rem contra corpo de 14 px). É lacuna do mundo, não decisão a ser herdada."
+    ]
+  }
+}

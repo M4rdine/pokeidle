@@ -20,6 +20,7 @@ import { huntRoutes } from './routes/hunts.js'
 import { shopRoutes } from './routes/shop.js'
 import { trainerRoutes } from './routes/trainer.js'
 import { checkOrigin, REDACT_PATHS, sameOrigin } from './security.js'
+import { registerHealth } from './health.js'
 import { registerStatic } from './static.js'
 
 // O `ws` fecha a conexão com 1009 acima disto; o limite de negócio de verdade (4 KB, `error
@@ -124,6 +125,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   await app.register(shopRoutes, routeDeps)
   await app.register(huntRoutes, routeDeps)
   if (config.DEBUG_VIEWER) await app.register(debugRoutes, routeDeps)
+  registerHealth(app)
   await registerStatic(app, config)
   await app.register(wsRoutes, { ...routeDeps, ...(deps.wsOptions && { ws: deps.wsOptions }) })
   deps.extraRoutes?.(app)

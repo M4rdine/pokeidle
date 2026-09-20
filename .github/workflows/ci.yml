@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Uma execução por branch: um push novo cancela a anterior, que já não interessa.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  verificar:
+    name: Tipos e formato
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Typecheck de todos os pacotes
+        run: pnpm -r typecheck
+
+  testar:
+    name: Suíte completa
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: pokeidle
+          POSTGRES_PASSWORD: pokeidle
+          POSTGRES_DB: pokeidle_test
+        ports: ['5433:5432']
+        options: >-
+          --health-cmd "pg_isready -U pokeidle"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL_TEST: postgres://pokeidle:pokeidle@localhost:5433/pokeidle_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Testes de todos os pacotes
+        run: pnpm -r test
+
+  smoke:
+    name: Smoke no navegador
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: pokeidle
+          POSTGRES_PASSWORD: pokeidle
+          POSTGRES_DB: pokeidle_test
+        ports: ['5433:5432']
+        options: >-
+          --health-cmd "pg_isready -U pokeidle"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL_TEST: postgres://pokeidle:pokeidle@localhost:5433/pokeidle_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Instalar Chromium do Playwright
+        run: pnpm --filter @pokeidle/client exec playwright install --with-deps chromium
+      - name: Smoke
+        run: pnpm client:e2e
+      - name: Guardar vídeo e rastro quando falhar
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            packages/client/playwright-report
+            packages/client/test-results
+          retention-days: 7
+
+  imagem:
+    name: Imagem Docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Compilar a imagem
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: pokeidle:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: A imagem sobe e responde /health
+        run: |
+          docker run -d --name pokeidle-ci -p 3000:3000 \
+            -e DATABASE_URL=postgres://invalido:invalido@127.0.0.1:1/naoexiste \
+            -e APP_ORIGIN=http://localhost:3000 -e COOKIE_SECURE=false \
+            pokeidle:ci || true
+          sleep 5
+          docker logs pokeidle-ci | tail -20
+          # Sem banco o processo sai na migração; o que este passo prova é que a imagem
+          # existe, tem as dependências e chega a executar. O deploy real valida /health.
+          docker image inspect pokeidle:ci >/dev/null

@@ -8,7 +8,7 @@ describe('loadConfig', () => {
     expect(loadConfig(base)).toEqual({
       DATABASE_URL: base.DATABASE_URL, PORT: 3000, COOKIE_SECURE: false, APP_ORIGIN: 'http://localhost:3000',
       TRUST_PROXY: false, LOG_LEVEL: 'info', ARGON2_MEMORY_KIB: 65536, ARGON2_TIME_COST: 3,
-      DEBUG_VIEWER: false, ASSETS_DIR: expect.stringMatching(/assets[/\\]atlas$/),
+      DEBUG_VIEWER: false, ASSETS_DIR: expect.stringMatching(/public[/\\]atlas$/),
       CLIENT_DIST: expect.stringMatching(/client[/\\]dist$/),
     })
   })

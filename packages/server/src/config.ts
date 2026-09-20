@@ -4,8 +4,10 @@ import { z } from 'zod'
 
 const bool = z.enum(['true', 'false']).transform((v) => v === 'true')
 
-// `src/config.ts` → `packages/server/src` → três níveis acima é a raiz do repo.
-const DEFAULT_ASSETS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../assets/atlas')
+// `src/config.ts` → `packages/server/src` → um nível acima é `packages/server`. O atlas servido
+// ao navegador é versionado em `public/atlas` (só os quatro arquivos da allowlist), para a imagem
+// de produção não depender do dump de sprites, que é gigante e fica fora do git.
+const DEFAULT_ASSETS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../public/atlas')
 // `src/config.ts` → `packages/server/src` → dois níveis acima é `packages/`.
 const DEFAULT_CLIENT_DIST = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist')
 

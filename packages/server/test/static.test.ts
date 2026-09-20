@@ -23,6 +23,17 @@ describe('atlas público', () => {
   })
 })
 
+describe('saúde', () => {
+  it('/health responde ok com versão e tempo de atividade, sem exigir sessão', async () => {
+    const r = await api(t.app).get('/health')
+    expect(r.statusCode).toBe(200)
+    const body = r.json() as { status: string; version: string; uptimeSeconds: number }
+    expect(body.status).toBe('ok')
+    expect(body.version).toMatch(/^\d+\.\d+\.\d+$/)
+    expect(body.uptimeSeconds).toBeGreaterThanOrEqual(0)
+  })
+})
+
 describe('build do cliente', () => {
   it('sem a pasta dist, / responde 404 JSON como hoje', async () => {
     const app = await freshApp(t, undefined, { CLIENT_DIST: join(tmpdir(), 'pokeidle-nao-existe') })

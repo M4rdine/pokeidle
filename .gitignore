@@ -12,3 +12,7 @@ packages/client/dist
 packages/client/coverage
 packages/client/test-results
 packages/client/playwright-report
+# Atlas servido ao navegador: são sprites de um pack de fã. Rodar é uma coisa,
+# redistribuir num repositório público é outra. Fica fora do git e entra na imagem
+# no build local (ver docs/deploy.md).
+packages/server/public/atlas/

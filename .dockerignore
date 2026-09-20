@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+**/dist
+**/coverage
+**/test-results
+**/playwright-report
+assets
+.git
+.github
+.superpowers
+docs
+*.log
+.DS_Store

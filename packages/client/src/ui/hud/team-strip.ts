@@ -2,7 +2,11 @@ import { MAX_TEAM_SLOTS } from '../../config.js'
 import type { AppContext } from '../../app-context.js'
 import { displayName } from '../../state/log.js'
 import { el } from '../dom.js'
-import { applySpriteStyle } from '../sprite-css.js'
+import { nivelDaVaga } from '../../state/progress.js'
+import { spriteThumb } from '../sprite-css.js'
+
+/** Lado do sprite dentro do slot, em pixels. */
+const LADO_SLOT = 32
 
 /** Seis lugares: os do time, os vazios liberados e os bloqueados pelo nível do treinador. */
 export function mountTeamStrip(root: HTMLElement, ctx: AppContext): () => void {
@@ -17,8 +21,9 @@ export function mountTeamStrip(root: HTMLElement, ctx: AppContext): () => void {
     const nodes = Array.from({ length: MAX_TEAM_SLOTS }, (_unused, index) => {
       const member = team[index]
       if (member) {
-        const sprite = el('div', { class: 'slot-sprite' })
-        applySpriteStyle(sprite, ctx.atlas, member.speciesName)
+        // Mesma caixa das outras telas: o frame do atlas tem 32 ou 64 px conforme a espécie, e
+        // sem caixa um Rhydon sai do slot.
+        const sprite = spriteThumb(ctx.atlas, member.speciesName, LADO_SLOT)
         const slot = el('button', {
           type: 'button',
           class: index === activeIndex ? 'slot slot-active' : 'slot',
@@ -28,9 +33,13 @@ export function mountTeamStrip(root: HTMLElement, ctx: AppContext): () => void {
         slot.addEventListener('click', () => ctx.sendIntent?.({ t: 'team.setActive', pokemonId: member.id }))
         return slot
       }
-      return index < slots
-        ? el('div', { class: 'slot slot-empty' }, '—')
-        : el('div', { class: 'slot slot-locked', title: 'destrava com o nível do treinador' }, '🔒')
+      if (index < slots) return el('div', { class: 'slot slot-empty' }, 'vazio')
+      // O nível que destrava é informação; o cadeado em emoji que estava aqui não era.
+      const nivel = nivelDaVaga(ctx.registry.unlocks, index)
+      return el('div', {
+        class: 'slot slot-locked',
+        title: nivel === null ? 'vaga indisponível' : `destrava no nível ${nivel} do treinador`,
+      }, nivel === null ? 'indisponível' : `nv ${nivel}`)
     })
     strip.replaceChildren(...nodes)
   }

@@ -1,11 +1,30 @@
 {
   "growthRate": "medium-fast",
   "teamSlots": [
-    { "level": 1, "slots": 3 },
-    { "level": 10, "slots": 4 },
-    { "level": 20, "slots": 5 },
-    { "level": 30, "slots": 6 }
+    {
+      "level": 1,
+      "slots": 3
+    },
+    {
+      "level": 10,
+      "slots": 4
+    },
+    {
+      "level": 20,
+      "slots": 5
+    },
+    {
+      "level": 30,
+      "slots": 6
+    }
   ],
-  "items": { "super-potion": 20, "great-ball": 20, "hyper-potion": 30, "ultra-ball": 40 },
-  "hunts": { "route-2": 50 }
+  "items": {
+    "super-potion": 20,
+    "great-ball": 20,
+    "hyper-potion": 30,
+    "ultra-ball": 40
+  },
+  "regions": {
+    "kanto": 1
+  }
 }

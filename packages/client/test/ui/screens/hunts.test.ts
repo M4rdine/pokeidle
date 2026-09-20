@@ -13,7 +13,7 @@ const route1 = { id: 'route-1', name: 'Rota 1', width: 40, height: 30, minLevel:
 const ctxWith = (over: Record<string, unknown> = {}) => createContext({ session: createStore({ ...withMe(initialSession(), me()), hunts: [route1] }), ...over })
 
 describe('tela de hunts', () => {
-  it('lista a hunt disponível e a futura bloqueada pelo nível', () => {
+  it('lista a área disponível com a faixa de nível e o botão de iniciar', () => {
     const root = document.createElement('div')
     mountHunts(root, ctxWith())
     expect(root.querySelector('h1')?.textContent).toBe('Hunts')
@@ -21,8 +21,27 @@ describe('tela de hunts', () => {
     expect(card.textContent).toContain('Rota 1')
     expect(card.textContent).toContain('níveis 2–12')
     expect(card.querySelector('button')?.textContent).toBe('Iniciar')
+  })
+
+  it('mostra a região ainda bloqueada com o nível que a abre, e sem botão', () => {
+    const ctx = ctxWith()
+    // O registro real só tem Kanto, que já está aberta. Para provar o cartão bloqueado, a
+    // fixture acrescenta uma região futura com portão de nível.
+    const registry = {
+      ...ctx.registry,
+      regions: new Map([...ctx.registry.regions, ['johto', {
+        ...ctx.registry.regions.get('kanto')!,
+        id: 'johto',
+        name: 'Johto',
+        // Área própria: copiar a de Kanto faria a rota-1 parecer pertencer às duas regiões.
+        areas: [{ ...ctx.registry.regions.get('kanto')!.areas[0]!, id: 'rota-10', name: 'Rota 10' }],
+      }]]),
+      unlocks: { ...ctx.registry.unlocks, regions: { ...ctx.registry.unlocks.regions, johto: 50 } },
+    }
+    const root = document.createElement('div')
+    mountHunts(root, { ...ctx, registry })
     const locked = root.querySelector('.hunt-locked')!
-    expect(locked.textContent).toContain('Rota 2')
+    expect(locked.textContent).toContain('Johto')
     expect(locked.textContent).toContain('nível 50')
     expect(locked.querySelector('button')).toBeNull()
   })

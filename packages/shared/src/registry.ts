@@ -4,6 +4,7 @@ import { HuntMapSchema, type HuntMap } from './schemas/hunt-map.js'
 import { ItemListSchema, type Item } from './schemas/items.js'
 import { LootListSchema, type LootTable } from './schemas/loot.js'
 import { MoveListSchema, type Move } from './schemas/moves.js'
+import { RegionListSchema, type Region } from './schemas/region.js'
 import { SpeciesListSchema, type Species } from './schemas/species.js'
 import { TypeChartSchema, type TypeChart } from './schemas/type-chart.js'
 import { UnlocksSchema, type Unlocks } from './schemas/unlocks.js'
@@ -15,6 +16,7 @@ export interface Registry {
   readonly items: ReadonlyMap<string, Item>
   readonly loot: ReadonlyMap<string, LootTable>
   readonly hunts: ReadonlyMap<string, HuntMap>
+  readonly regions: ReadonlyMap<string, Region>
   readonly typeChart: TypeChart
   readonly unlocks: Unlocks
 }
@@ -26,6 +28,7 @@ export interface RawRegistry {
   readonly items: unknown
   readonly loot: unknown
   readonly unlocks: unknown
+  readonly regions: unknown
   readonly hunts: readonly unknown[]
 }
 
@@ -54,6 +57,25 @@ function checkReferences(r: Registry, problems: string[]): void {
   for (const itemId of Object.keys(r.unlocks.items)) {
     if (!r.items.has(itemId)) problems.push(`unlocks: item ${itemId} não existe`)
   }
+  // Região e área precisam casar dos dois lados: área sem mapa não é jogável, e mapa sem área
+  // nunca aparece no navegador — os dois casos passariam despercebidos sem esta checagem.
+  const areasDeclaradas = new Set<string>()
+  for (const region of r.regions.values()) {
+    for (const area of region.areas) {
+      if (areasDeclaradas.has(area.id)) problems.push(`área ${area.id} aparece em mais de uma região`)
+      areasDeclaradas.add(area.id)
+      if (!r.hunts.has(area.id)) problems.push(`região ${region.id}: área ${area.id} não tem mapa em hunts`)
+      for (const sp of area.species) {
+        if (!r.species.has(sp)) problems.push(`área ${area.id}: espécie ${sp} não existe`)
+      }
+    }
+  }
+  for (const huntId of r.hunts.keys()) {
+    if (!areasDeclaradas.has(huntId)) problems.push(`mapa ${huntId} não pertence a nenhuma região`)
+  }
+  for (const regionId of Object.keys(r.unlocks.regions)) {
+    if (!r.regions.has(regionId)) problems.push(`unlocks: região ${regionId} não existe`)
+  }
 }
 
 export function buildRegistry(raw: RawRegistry): Registry {
@@ -64,6 +86,7 @@ export function buildRegistry(raw: RawRegistry): Registry {
   const lootList = parseOrThrow(LootListSchema, raw.loot, 'loot.json')
   const unlocks = parseOrThrow(UnlocksSchema, raw.unlocks, 'unlocks.json')
   const huntList = raw.hunts.map((h, i) => parseOrThrow(HuntMapSchema, h, `hunts[${i}]`))
+  const regionList = parseOrThrow(RegionListSchema, raw.regions, 'regions.json')
 
   const problems: string[] = []
   const registry: Registry = {
@@ -73,6 +96,7 @@ export function buildRegistry(raw: RawRegistry): Registry {
     items: indexBy(itemList, (i) => i.id, 'item', problems),
     loot: indexBy(lootList, (l) => l.species, 'loot', problems),
     hunts: indexBy(huntList, (h) => h.id, 'hunt', problems),
+    regions: indexBy(regionList, (r) => r.id, 'região', problems),
     typeChart,
     unlocks,
   }

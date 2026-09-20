@@ -53,6 +53,12 @@ export const ConfigSchema = z.object({
   TICK_MS: z.coerce.number().int().min(10).max(5000).optional(),
   /** Build do cliente (Vite) servido em `/`. Sem a pasta, `/` continua 404 JSON como hoje. */
   CLIENT_DIST: z.string().min(1).default(DEFAULT_CLIENT_DIST),
+  /**
+   * Credencial do `/metrics`. Configurado, o endpoint exige `Authorization: Bearer <token>` de
+   * qualquer origem. Ausente, ele só responde ao loopback. Não há configuração que o deixe
+   * aberto — ver `metrics/http.ts`.
+   */
+  METRICS_TOKEN: z.string().min(16).optional(),
 })
 
 export type Config = z.infer<typeof ConfigSchema>

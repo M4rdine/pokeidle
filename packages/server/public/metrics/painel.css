@@ -1,0 +1,73 @@
+/*
+ * Herda o mundo do jogo (DESIGN.md): fundo escuro em dois planos, painel de borda reta de 2 px
+ * sem raio, acento amarelo, número tabular. É uma ferramenta de operação, então a hierarquia é
+ * do maior número para o detalhe, e nada aqui compete com o dado.
+ */
+:root {
+  --bg: #0f0f14;
+  --panel: #1a1a22;
+  --border: #2e2e3a;
+  --text: #f0f0f5;
+  --muted: #8a8a9a;
+  --accent: #f8d030;
+  --danger: #e03030;
+  --ok: #50c878;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 32px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: var(--space-3);
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.4 system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.barra {
+  display: flex; align-items: baseline; gap: var(--space-3); flex-wrap: wrap;
+  background: var(--panel); border: 2px solid var(--border);
+  padding: var(--space-2) var(--space-3); margin-bottom: var(--space-3);
+}
+.muted { color: var(--muted); }
+
+.estado { margin-left: auto; font-size: 0.85em; }
+.estado[data-estado='ok'] { color: var(--ok); }
+.estado[data-estado='erro'] { color: var(--danger); }
+.estado[data-estado='carregando'] { color: var(--muted); }
+
+main { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-4); }
+
+h2 { margin: 0 0 var(--space-1); font-size: 1rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.nota { margin: 0 0 var(--space-2); font-size: 0.85em; }
+
+/* Os quatro números que respondem "como está agora" sem precisar ler tabela. */
+.cartoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: var(--space-2); }
+.cartao {
+  background: var(--panel); border: 2px solid var(--border);
+  padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-1);
+}
+.cartao strong { font-size: 2rem; line-height: 1; }
+.cartao span { color: var(--muted); font-size: 0.8em; letter-spacing: 0.04em; }
+
+.tabela { width: 100%; border-collapse: collapse; background: var(--panel); border: 2px solid var(--border); }
+.tabela + .tabela { margin-top: var(--space-3); }
+.tabela th, .tabela td { padding: var(--space-1) var(--space-3); text-align: left; }
+.tabela thead th {
+  color: var(--muted); font-weight: 400; font-size: 0.8em;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+.tabela tbody tr + tr th, .tabela tbody tr + tr td { border-top: 1px solid var(--border); }
+.tabela tbody th { font-weight: 400; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 600px) {
+  .tabela th, .tabela td { padding: var(--space-1) var(--space-2); }
+  .cartao strong { font-size: 1.5rem; }
+}

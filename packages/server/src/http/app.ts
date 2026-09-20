@@ -14,9 +14,12 @@ import type { SocketRegistry } from '../realtime/sockets.js'
 import type { WsOptions } from '../realtime/ws.js'
 import { wsRoutes } from '../realtime/ws.js'
 import { AppError, errorBody } from './errors.js'
+import { createMetrics, type Metrics } from '../metrics/registry.js'
+import { instrumentHttp } from '../metrics/http.js'
 import { authRoutes } from './routes/auth.js'
 import { debugRoutes } from './routes/debug.js'
 import { huntRoutes } from './routes/hunts.js'
+import { metricsRoutes } from './routes/metrics.js'
 import { shopRoutes } from './routes/shop.js'
 import { trainerRoutes } from './routes/trainer.js'
 import { checkOrigin, REDACT_PATHS, sameOrigin } from './security.js'
@@ -37,6 +40,11 @@ export interface AppDeps {
   readonly loggerInstance?: FastifyBaseLogger
   readonly realtime: { readonly scheduler: Scheduler; readonly sockets: SocketRegistry }
   readonly wsOptions?: Partial<WsOptions>
+  /**
+   * Registro de métricas compartilhado com o agendador. Ausente, o app cria o seu — o que serve
+   * aos testes, mas em produção o `main.ts` passa o mesmo que instrumentou o scheduler.
+   */
+  readonly metrics?: Metrics
   /** @internal só para testes — a camada HTTP nunca deve passar isto. */
   readonly extraRoutes?: (app: FastifyInstance) => void
 }
@@ -119,11 +127,14 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
   })
 
   const registry = loadRegistry()
+  const metrics = deps.metrics ?? createMetrics()
+  instrumentHttp(app, metrics)
   const routeDeps = { db, config, now, realtime: deps.realtime, registry }
   await app.register(authRoutes, routeDeps)
   await app.register(trainerRoutes, routeDeps)
   await app.register(shopRoutes, routeDeps)
   await app.register(huntRoutes, routeDeps)
+  await app.register(metricsRoutes, { ...routeDeps, metrics })
   if (config.DEBUG_VIEWER) await app.register(debugRoutes, routeDeps)
   registerHealth(app)
   await registerStatic(app, config)

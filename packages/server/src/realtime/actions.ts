@@ -44,6 +44,7 @@ function toIntentPatch(patch: SettingsPatch): UpdateSettingsPatch {
 
 export async function startAndAttach(d: RealtimeDeps, trainerId: string, huntId: string): Promise<{ huntId: string; sessionId: string; startedAt: Date }> {
   const row = await startHunt(d.db, d.registry, trainerId, huntId, d.now())
+  d.scheduler.noteHuntStarted()
   await d.scheduler.attach(trainerId)
   return { huntId: row.huntId, sessionId: row.sessionId, startedAt: row.startedAt }
 }

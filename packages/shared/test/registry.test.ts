@@ -11,7 +11,8 @@ const minimal = () => ({
   typeChart: Object.fromEntries(TYPE_NAMES.map((a) => [a, Object.fromEntries(TYPE_NAMES.map((d) => [d, 1]))])),
   items: [{ id: 'potion', name: 'Poção', kind: 'potion', healPercent: 20, buyPrice: 100, sellPrice: 50 }],
   loot: [{ species: 'charmander', gold: [1, 2], drops: [{ item: 'potion', chance: 0.5 }] }],
-  unlocks: { growthRate: 'medium-fast', teamSlots: [{ level: 1, slots: 3 }], items: {}, hunts: {} },
+  unlocks: { growthRate: 'medium-fast', teamSlots: [{ level: 1, slots: 3 }], items: {}, regions: {} },
+  regions: [{ id: 'kanto', name: 'Kanto', order: 1, minTrainerLevel: 1, width: 1, height: 2, areas: [{ id: 'r', name: 'R', bounds: { x: 0, y: 0, width: 1, height: 2 }, anchor: { x: 0, y: 1 }, species: ['charmander'], minLevel: 1, maxLevel: 3 }] }],
   hunts: [{ id: 'r', name: 'R', width: 1, height: 2, tileSize: 32, layers: { ground: ['grass', 'grass'], detail: [null, null], blocking: [false, false] }, spawnPoint: { x: 0, y: 0 }, pokecenter: { x: 0, y: 1 }, spawns: [{ speciesName: 'charmander', minLevel: 1, maxLevel: 3, x: 0, y: 0, radius: 0, count: 1, respawnSeconds: 10 }] }],
 })
 

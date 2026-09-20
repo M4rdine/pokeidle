@@ -1,0 +1,35 @@
+[
+  {
+    "id": "kanto",
+    "name": "Kanto",
+    "order": 1,
+    "minTrainerLevel": 1,
+    "width": 40,
+    "height": 30,
+    "areas": [
+      {
+        "id": "route-1",
+        "name": "Rota 1",
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 40,
+          "height": 30
+        },
+        "anchor": {
+          "x": 20,
+          "y": 15
+        },
+        "species": [
+          "zubat",
+          "bellsprout",
+          "diglett",
+          "horsea",
+          "gastly"
+        ],
+        "minLevel": 2,
+        "maxLevel": 12
+      }
+    ]
+  }
+]

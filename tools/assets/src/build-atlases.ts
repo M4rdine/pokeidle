@@ -1,19 +1,23 @@
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { packGrid, toTiledTileset, type AtlasFrame } from './atlas.js'
+import { packGrid, toTiledTileset, type AtlasFrame, type TerrainInput } from './atlas.js'
 import type { Catalog, CatalogOutfit } from './catalog.js'
 import { DIRECTION_NAMES, type RgbaImage } from './compose.js'
 import { itemFramePath, loadCatalog, outfitFramePath, type Logger } from './extract.js'
-import { expandedTileNames, loadManifest, validateManifest, type Manifest, type SpeciesEntry, type TileEntry, type TransitionEntry } from './manifest.js'
+import { expandedTileNames, loadManifest, validateManifest, type Manifest, type SpeciesEntry, type TerrainSetEntry, type TileEntry, type TransitionEntry } from './manifest.js'
 import { decodePng, encodePng } from './png.js'
 import { isPhaseFrame, phaseFrameName, phaseFrameNames } from './tile-animation.js'
 import { sliceImage } from './tile-slice.js'
 import { transitionAnimations, transitionTerrain, transitionTiles } from './transition.js'
+import { harmonize, type Rgb } from './harmonize.js'
+import { readWangGrid } from './wang-grid.js'
 
 export interface BuildOptions {
   readonly extractedDir: string
   readonly manifestPath: string
   readonly outDir: string
+  /** Pasta dos conjuntos de terreno desenhados; padrão ao lado do manifesto. */
+  readonly terrainsDir?: string
 }
 
 async function readFrame(name: string, path: string): Promise<AtlasFrame> {
@@ -120,6 +124,50 @@ function transitionFrames(
   }
 }
 
+/**
+ * Conjuntos de terreno desenhados: cada PNG em grade vira dezesseis peças nomeadas e um pincel
+ * completo. Um conjunto que não cobre os dezesseis códigos é recusado, porque o pincel ficaria
+ * com buraco e o autor só descobriria pintando.
+ */
+async function terrainSetFrames(
+  dir: string,
+  sets: readonly TerrainSetEntry[],
+): Promise<{ frames: AtlasFrame[]; terrains: TerrainInput[] }> {
+  const frames: AtlasFrame[] = []
+  const terrains: TerrainInput[] = []
+  // Primeira aparição de um material define a cor que todos os conjuntos passam a usar. Sem isto,
+  // quatro conjuntos de campo trazem quatro verdes e a grama muda de cor na emenda entre áreas.
+  const canonical = new Map<string, Rgb>()
+  for (const set of sets) {
+    const path = join(dir, set.file)
+    if (!(await exists(path))) throw new Error(`conjunto de terreno ${set.name}: arquivo não encontrado em ${path}`)
+    const grid = readWangGrid(decodePng(await readFile(path)), set)
+    if (grid.missing.length > 0) {
+      throw new Error(
+        `conjunto de terreno ${set.name}: faltam ${grid.missing.length} combinações de canto (${grid.missing.join(', ')}); regere o conjunto`,
+      )
+    }
+    const shifts = [
+      { nome: set.from, measured: grid.fromColor },
+      { nome: set.to, measured: grid.toColor },
+    ].map((m) => {
+      const alvo = canonical.get(m.nome) ?? m.measured
+      canonical.set(m.nome, alvo)
+      return { measured: m.measured, canonical: alvo }
+    })
+    for (const [code, image] of grid.pieces) frames.push({ name: `${set.name}-${code}`, image: harmonize(image, shifts) })
+    terrains.push({
+      name: set.name,
+      colors: [set.from, set.to],
+      tiles: [...grid.pieces.keys()].map((code) => ({
+        tile: `${set.name}-${code}`,
+        corners: [...code].map((c) => (c === 'a' ? set.from : set.to)) as [string, string, string, string],
+      })),
+    })
+  }
+  return { frames, terrains }
+}
+
 async function writeAtlas(
   outDir: string,
   baseName: string,
@@ -147,11 +195,15 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
   const base = await tileFrames(opts.extractedDir, manifest.tiles, catalog)
   const transitions = manifest.transitions ?? []
   const mixed = transitionFrames(base.frames, transitions, base.animations)
-  const tiles = [...base.frames, ...mixed.frames]
+  const desenhados = await terrainSetFrames(
+    opts.terrainsDir ?? join(opts.manifestPath, '..', 'terrenos'),
+    manifest.terrainSets ?? [],
+  )
+  const tiles = [...base.frames, ...mixed.frames, ...desenhados.frames]
   const animations = { ...base.animations, ...mixed.animations }
   const packedTiles = await writeAtlas(opts.outDir, 'tiles', tiles, animations)
   const tileOrder = tiles.filter((f) => !isPhaseFrame(f.name)).map((f) => f.name)
-  const terrains = [...(manifest.terrains ?? []), ...transitions.map(transitionTerrain)]
+  const terrains = [...(manifest.terrains ?? []), ...transitions.map(transitionTerrain), ...desenhados.terrains]
   await writeFile(
     join(opts.outDir, 'tiles.tsj'),
     JSON.stringify(toTiledTileset(packedTiles.sheet, 'tibia-tiles', tileOrder, terrains), null, 2),

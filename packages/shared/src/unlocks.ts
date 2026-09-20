@@ -11,16 +11,16 @@ export const teamSlotsFor = (u: Unlocks, level: number): number =>
 
 export const itemUnlockLevel = (u: Unlocks, itemId: string): number => u.items[itemId] ?? 0
 
-export const huntUnlockLevel = (u: Unlocks, huntId: string): number => u.hunts[huntId] ?? 0
+export const regionUnlockLevel = (u: Unlocks, regionId: string): number => u.regions[regionId] ?? 0
 
 export function nextUnlock(u: Unlocks, level: number, items: ReadonlyMap<string, Item>): { level: number; what: string } | null {
-  const levels = [...u.teamSlots.map((s) => s.level), ...Object.values(u.items), ...Object.values(u.hunts)].filter((l) => l > level)
+  const levels = [...u.teamSlots.map((s) => s.level), ...Object.values(u.items), ...Object.values(u.regions)].filter((l) => l > level)
   if (levels.length === 0) return null
   const next = Math.min(...levels)
   const parts = [
     ...Object.entries(u.items).filter(([, l]) => l === next).map(([id]) => items.get(id)?.name ?? id),
     ...u.teamSlots.filter((s) => s.level === next).map((s) => `${s.slots} vagas no time`),
-    ...Object.entries(u.hunts).filter(([, l]) => l === next).map(([id]) => `hunt ${id}`),
+    ...Object.entries(u.regions).filter(([, l]) => l === next).map(([id]) => `região ${id}`),
   ]
   return { level: next, what: parts.join(', ') }
 }

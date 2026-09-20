@@ -51,14 +51,32 @@ const TransitionSchema = z.object({
   softness: z.number().int().min(1).max(12).optional(),
 }).strict()
 
+/**
+ * Conjunto de terreno desenhado, gerado fora do dump: um PNG em grade que já traz as dezesseis
+ * combinações de canto. Diferente de `transitions`, que compõe as peças por código com máscara,
+ * aqui a margem é desenhada de verdade.
+ */
+const TerrainSetSchema = z.object({
+  name: nameSchema,
+  /** Rótulos dos dois materiais, usados como cores do pincel no Tiled. */
+  from: nameSchema,
+  to: nameSchema,
+  /** Arquivo do conjunto, relativo à pasta de terrenos. */
+  file: z.string().min(1),
+  /** Liga quando o gerador inverteu qual material virou fundo. */
+  swap: z.boolean().optional(),
+}).strict()
+
 export const ManifestSchema = z.object({
   version: z.literal(1),
   species: z.array(SpeciesSchema),
   tiles: z.array(TileSchema),
   terrains: z.array(TerrainSchema).optional(),
   transitions: z.array(TransitionSchema).optional(),
+  terrainSets: z.array(TerrainSetSchema).optional(),
 })
 
+export type TerrainSetEntry = z.infer<typeof TerrainSetSchema>
 export type Manifest = z.infer<typeof ManifestSchema>
 export type SpeciesEntry = Manifest['species'][number]
 export type TileEntry = Manifest['tiles'][number]

@@ -33,7 +33,11 @@ export function miniRegistry(): Registry {
       { id: 'ultra-ball', name: 'Ultra Bola', kind: 'ball', ballBonus: 2, buyPrice: 1200, sellPrice: 600 },
     ],
     loot: [{ species: 'zubat', gold: [4, 9], drops: [{ item: 'potion', chance: 0.08 }] }],
-    unlocks: { growthRate: 'medium-fast', teamSlots: [{ level: 1, slots: 6 }], items: {}, hunts: {} },
+    unlocks: { growthRate: 'medium-fast', teamSlots: [{ level: 1, slots: 6 }], items: {}, regions: {} },
+    regions: [{
+      id: 'mini-regiao', name: 'Mini', order: 1, minTrainerLevel: 1, width: 5, height: 5,
+      areas: [{ id: 'mini', name: 'Mini', bounds: { x: 0, y: 0, width: 5, height: 5 }, anchor: { x: 2, y: 2 }, species: ['zubat'], minLevel: 3, maxLevel: 3 }],
+    }],
     hunts: [miniHunt()],
   })
 }

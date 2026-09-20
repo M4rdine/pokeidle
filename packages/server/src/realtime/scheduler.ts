@@ -19,6 +19,12 @@ export interface SchedulerDeps {
   readonly db: Db; readonly registry: Registry; readonly now: () => Date
   readonly sockets: SocketRegistry; readonly logger: SchedulerLogger
   readonly yieldNow?: () => Promise<void>
+  /**
+   * Intervalo entre ticks. O padrão é o do jogo; o smoke de navegador acelera para não depender
+   * da velocidade do runner — a simulação é determinística por tick, então só muda o relógio de
+   * parede, não o resultado.
+   */
+  readonly tickMs?: number
   /** @internal só para testes */
   readonly hooks?: { onPersistStart?(kind: 'save' | 'sync' | 'finish', trainerId: string): void }
   /** @internal só para testes */
@@ -264,7 +270,7 @@ export function createScheduler(deps: SchedulerDeps): Scheduler {
   }
 
   return {
-    start: () => { if (timer) return; stopping = false; timer = setInterval(tick, TICK_MS) },
+    start: () => { if (timer) return; stopping = false; timer = setInterval(tick, deps.tickMs ?? TICK_MS) },
     stop: () => { stopping = true; if (timer) { clearInterval(timer); timer = null } },
     isStopping: () => stopping,
     tick,

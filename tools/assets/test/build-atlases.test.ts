@@ -405,6 +405,44 @@ describe('buildAtlases', () => {
     expect(nomes).not.toContain('campo-agua-bbbb_1')
   })
 
+  it('sem destino de publicação, o build não toca em pasta nenhuma além da sua', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }],
+    }))
+    const publish = join(dir, 'publicado')
+
+    await buildAtlases({ extractedDir, manifestPath, outDir: dir }, () => {})
+
+    // Nada foi criado: publicar é opção, não efeito colateral. Sem isto, um teste que chamasse o
+    // build pelo CLI sobrescreveria o atlas que o servidor entrega de verdade.
+    await expect(readFile(join(publish, 'tiles.json'), 'utf8')).rejects.toThrow()
+  })
+
+  it('com destino, publica exatamente os quatro arquivos servidos — e não o .tsj do Tiled', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }],
+    }))
+    const publish = join(dir, 'publicado')
+
+    await buildAtlases({ extractedDir, manifestPath, outDir: dir, publishDir: publish }, () => {})
+
+    for (const nome of ['tiles.png', 'tiles.json', 'pokemon.png', 'pokemon.json']) {
+      await expect(readFile(join(publish, nome)), nome).resolves.toBeDefined()
+    }
+    // O tileset do Tiled é ferramenta de autoria; servir ao navegador seria peso morto.
+    await expect(readFile(join(publish, 'tiles.tsj'), 'utf8')).rejects.toThrow()
+    // E o publicado é igual ao gerado, não uma versão de outro momento.
+    expect(await readFile(join(publish, 'tiles.json'), 'utf8')).toBe(await readFile(join(dir, 'tiles.json'), 'utf8'))
+  })
+
   it('recusa conjunto de terreno incompleto, em vez de gerar pincel com buraco', async () => {
     const { dir, extractedDir } = await setupFixtures()
     const manifestPath = join(dir, 'manifest.json')

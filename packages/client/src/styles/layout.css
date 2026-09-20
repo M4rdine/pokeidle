@@ -22,13 +22,22 @@ input { font: inherit; color: var(--text); background: var(--bg); border: var(--
 .tabs { display: flex; gap: var(--space-2); }
 .tab-active { border-color: var(--accent); }
 .form-error { color: var(--danger); min-height: 1.2em; margin: var(--space-2) 0 0; }
-.type { display: inline-block; padding: 0 var(--space-1); margin-right: var(--space-1); border: 1px solid currentColor; font-size: 0.8em; text-transform: lowercase; }
-.type-fire { color: var(--type-fire); } .type-water { color: var(--type-water); } .type-grass { color: var(--type-grass); }
-.type-electric { color: var(--type-electric); } .type-poison { color: var(--type-poison); } .type-normal { color: var(--type-normal); }
-.type-ground { color: var(--type-ground); } .type-flying { color: var(--type-flying); } .type-psychic { color: var(--type-psychic); }
-.type-bug { color: var(--type-bug); } .type-rock { color: var(--type-rock); } .type-ghost { color: var(--type-ghost); }
-.type-ice { color: var(--type-ice); } .type-dragon { color: var(--type-dragon); } .type-fighting { color: var(--type-fighting); }
-.type-dark { color: var(--type-dark); } .type-steel { color: var(--type-steel); } .type-fairy { color: var(--type-fairy); }
+/*
+ * O matiz do tipo identifica na borda; o rótulo é lido numa mistura com o texto do tema. Os
+ * dezoito matizes canônicos foram feitos para fundo claro: `ghost` e `dark` como texto puro sobre
+ * o painel escuro ficam em ~2,6:1, abaixo do mínimo legível.
+ */
+.type {
+  display: inline-block; padding: 0 var(--space-1); margin-right: var(--space-1);
+  border: 1px solid var(--t, currentColor); font-size: 0.8em; text-transform: lowercase;
+  color: color-mix(in srgb, var(--t, currentColor) 45%, var(--text));
+}
+.type-fire { --t: var(--type-fire); } .type-water { --t: var(--type-water); } .type-grass { --t: var(--type-grass); }
+.type-electric { --t: var(--type-electric); } .type-poison { --t: var(--type-poison); } .type-normal { --t: var(--type-normal); }
+.type-ground { --t: var(--type-ground); } .type-flying { --t: var(--type-flying); } .type-psychic { --t: var(--type-psychic); }
+.type-bug { --t: var(--type-bug); } .type-rock { --t: var(--type-rock); } .type-ghost { --t: var(--type-ghost); }
+.type-ice { --t: var(--type-ice); } .type-dragon { --t: var(--type-dragon); } .type-fighting { --t: var(--type-fighting); }
+.type-dark { --t: var(--type-dark); } .type-steel { --t: var(--type-steel); } .type-fairy { --t: var(--type-fairy); }
 .sprite { background-repeat: no-repeat; transform: scale(2); transform-origin: top left; margin-bottom: var(--space-3); }
 .sprite-unknown { width: 32px; height: 32px; background: var(--border); }
 .starter-grid, .hunt-grid { display: flex; flex-wrap: wrap; gap: var(--space-3); }

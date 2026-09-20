@@ -31,26 +31,7 @@
   font-size: 0.8em; text-transform: lowercase;
 }
 .filter-type:hover { filter: brightness(1.35); }
-/* Cada tipo empresta a cor por uma variável: a borda e o ponto usam o tom, mas o rótulo fica no
-   texto claro do tema — `dark` e `ghost` são escuros demais para serem lidos sobre o painel. */
-.type-normal { --t: var(--type-normal); }
-.type-fire { --t: var(--type-fire); }
-.type-water { --t: var(--type-water); }
-.type-electric { --t: var(--type-electric); }
-.type-grass { --t: var(--type-grass); }
-.type-ice { --t: var(--type-ice); }
-.type-fighting { --t: var(--type-fighting); }
-.type-poison { --t: var(--type-poison); }
-.type-ground { --t: var(--type-ground); }
-.type-flying { --t: var(--type-flying); }
-.type-psychic { --t: var(--type-psychic); }
-.type-bug { --t: var(--type-bug); }
-.type-rock { --t: var(--type-rock); }
-.type-ghost { --t: var(--type-ghost); }
-.type-dragon { --t: var(--type-dragon); }
-.type-dark { --t: var(--type-dark); }
-.type-steel { --t: var(--type-steel); }
-.type-fairy { --t: var(--type-fairy); }
+/* `--t` é o matiz do tipo, definido uma vez em layout.css para todo o sistema. */
 .filter-type { color: var(--text); border-color: var(--t); display: inline-flex; align-items: center; gap: 0.35em; }
 .filter-type::before { content: ''; width: 0.55em; height: 0.55em; background: var(--t); }
 .filter-type[aria-pressed='true'] { background: color-mix(in srgb, var(--t) 28%, var(--panel)); border-width: 2px; }
@@ -117,9 +98,6 @@
 .area-more { font-size: 0.8em; }
 .area-types { display: flex; flex-wrap: wrap; gap: 2px; }
 .area-types .type { margin: 0; }
-/* `ghost` e `dark` como texto sobre o painel ficam em 2,6:1. O tom identifica na borda; o rótulo
-   é lido no claro do tema. (O mesmo vale para `.type` nas outras telas, ainda por revisar.) */
-.area-types .type, .analyzer-table .type { color: color-mix(in srgb, var(--t, currentColor) 45%, var(--text)); border-color: var(--t, currentColor); }
 /* Caixa de tamanho fixo: o frame do atlas tem 32 ou 64 px e o sprite é escalado para caber.
    O filho é posicionado, não item de grid, senão o grid o encolhe para 32 px e corta o quadro. */
 .sprite-thumb { position: relative; display: inline-block; overflow: hidden; flex: none; }

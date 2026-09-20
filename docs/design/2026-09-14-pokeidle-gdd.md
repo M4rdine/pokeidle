@@ -34,7 +34,7 @@ para destravar itens e vagas, chegar na hunt seguinte.
    Poção. Ajuste em Configurações quando usar e quando voltar ao Centro."
 7. **Minuto ~7**: Charmander chega ao nível 16 e evolui (fanfarra). Meta seguinte aparece no HUD:
    nível de treinador para destravar a Super Poção e a Great Ball.
-8. **Minuto 10**: ~180 derrotas, 3–5 capturas, ~1 500 de ouro. A loja do Centro já é útil.
+8. **Minuto 10**: ~290 derrotas, 4–5 capturas, ~2 700 de ouro. A loja do Centro já é útil.
 
 Com as regras atuais (retorno em 30 %, poção de 20 %), metade das primeiras sessões termina com o
 time caído no primeiro minuto. Com as regras deste documento, zero quedas em 3 de 4 seeds.
@@ -54,8 +54,8 @@ time caído no primeiro minuto. Com as regras deste documento, zero quedas em 3 
   cubra o HP faltante, senão a mais forte que tiver. Sem poção e abaixo de Y: volta ao Centro
   (cura completa em 5 s, grátis). Padrão 50 (não 30): medido em 8 seeds, 30 % derruba o inicial
   em metade delas.
-- Poções em três níveis, por percentual do HP máximo: Poção 20 % (100 ouro), Super Poção 50 %
-  (400), Hiper Poção 100 % (1 500). Venda pela metade.
+- Poções em três níveis, por percentual do HP máximo: Poção 20 % (200 ouro), Super Poção 50 %
+  (800), Hiper Poção 100 % (3 000). Venda pela metade. (Preços dobrados em 2026-09-20; ver §6.)
 - Medido: retorno em 50 % + poção de 50 % dá ~180 derrotas em 10 min sem quedas.
 
 ### 3.3 Captura e time
@@ -122,20 +122,28 @@ Charmander nível 10 na Rota 1, 10 minutos, regras deste documento: 170–210 de
 capturas, ~7 000 XP, ~1 500 ouro, nível 21–22 do Pokémon, 7–15 retornos ao Centro, 0–1 queda.
 Custo de CPU do servidor: 58 µs por tick por hunt (~850 hunts simultâneas em 25 % de um núcleo).
 
-**Medição de 2026-09-20, depois do sprint 5.** A Rota 1 deu lugar ao Campo Inicial, que tem cinco
-espécies e vinte selvagens — densidade subida de propósito para alcançar as 150 derrotas e as três
-capturas que este documento exige. O ouro veio junto e dobrou: **~3 200 em dez minutos** (medido
-em três seeds), contra os ~1 500 previstos aqui. Os preços da loja continuam como estão, o que na
-prática deixa a primeira sessão com o dobro do poder de compra planejado.
+**Recalibragem de 2026-09-20.** A Rota 1 deu lugar ao Campo Inicial, e a densidade subiu para
+alcançar as 150 derrotas e as três capturas que este documento exige. Com isso o ouro de dez
+minutos foi a ~3 200, o dobro dos ~1 500 previstos aqui. Os dois números deste documento eram
+incompatíveis entre si: 150 derrotas × ~9 de ouro médio já passa de 1 300, e a folga necessária
+sobre esse mínimo leva o resto.
 
-Decisão em aberto para o dono do jogo, porque é balanceamento e não implementação: aceitar o
-número novo, dobrar os preços da loja, ou cortar o ouro por derrota pela metade. O teste
-`packages/server/test/balance.test.ts` trava a faixa medida hoje (2 500–4 000) para que o número
-não volte a mudar sem ninguém ver.
+O que foi feito, nesta ordem:
+
+1. A área inicial passou de vinte para **quinze** selvagens (três por espécie, cinco espécies).
+   Sobram 283–310 derrotas e 4–5 capturas em dez minutos, com folga confortável sobre o mínimo, e
+   o ouro caiu para **~2 700**.
+2. Os preços da loja **dobraram**, mantendo as proporções originais: Poção 200, Super 800, Hiper
+   3 000; Poké Bola 400, Great 1 200, Ultra 2 400. Venda continua pela metade. O poder de compra
+   da primeira sessão volta ao que este documento planejava — cerca de treze poções ou sete bolas.
+
+O motor não foi tocado: o ouro por derrota e o XP continuam como estavam. `balance.test.ts` trava
+a faixa medida (2 500–4 000) e o smoke espera o jogador juntar os 200 de uma Poção, então nenhum
+dos dois números volta a mudar sem alguém ver.
 
 ## 7. O que muda no código (entra como "fase 3a: regras e economia", antes do cliente)
 
-1. `items.json`: Poção 20 %/100, Super 50 %/400, Hiper 100 %/1 500; `sellPrice` = metade.
+1. `items.json`: Poção 20 %/200, Super 50 %/800, Hiper 100 %/3 000; `sellPrice` = metade.
 2. Motor: `HuntSettings.potionHpPercent` (padrão 50) além de `returnHpPercent` (30); escolha da
    poção por HP faltante; quem chega ataca primeiro; `state.box` para capturas com o time cheio
    (o motor é a única fonte de verdade, inclusive no catch-up); vagas do time vindas de

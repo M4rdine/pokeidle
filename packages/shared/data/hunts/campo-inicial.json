@@ -3486,7 +3486,7 @@
       "x": 4,
       "y": 5,
       "radius": 4,
-      "count": 4,
+      "count": 3,
       "respawnSeconds": 20
     },
     {
@@ -3496,7 +3496,7 @@
       "x": 11,
       "y": 16,
       "radius": 4,
-      "count": 4,
+      "count": 3,
       "respawnSeconds": 20
     },
     {
@@ -3506,7 +3506,7 @@
       "x": 18,
       "y": 27,
       "radius": 4,
-      "count": 4,
+      "count": 3,
       "respawnSeconds": 20
     },
     {
@@ -3516,7 +3516,7 @@
       "x": 10,
       "y": 13,
       "radius": 4,
-      "count": 4,
+      "count": 3,
       "respawnSeconds": 20
     },
     {
@@ -3526,7 +3526,7 @@
       "x": 17,
       "y": 24,
       "radius": 4,
-      "count": 4,
+      "count": 3,
       "respawnSeconds": 20
     }
   ]

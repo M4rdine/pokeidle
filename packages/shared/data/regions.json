@@ -29,7 +29,7 @@
         ],
         "minLevel": 2,
         "maxLevel": 6,
-        "wildCount": 20,
+        "wildCount": 15,
         "respawnSeconds": 20,
         "minTrainerLevel": 1,
         "rarity": 1

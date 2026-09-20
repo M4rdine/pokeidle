@@ -27,26 +27,26 @@ type Body = { gold: number; item: { itemId: string; quantity: number } }
 
 describe('GET /shop', () => {
   it('catálogo ordenado por nível e preço, com unlocked por nível e owned', async () => {
-    await setTrainer({ gold: 250, xp: 1000 })
+    await setTrainer({ gold: 500, xp: 1000 })
     await t.db.insert(inventory).values({ trainerId, itemId: 'potion', quantity: 2 })
     const body = (await api(t.app, cookie).get('/shop')).json() as { level: number; gold: number; items: Record<string, unknown>[] }
-    expect(body).toMatchObject({ level: 10, gold: 250 })
+    expect(body).toMatchObject({ level: 10, gold: 500 })
     expect(body.items.map((i) => i.itemId)).toEqual(['potion', 'poke-ball', 'super-potion', 'great-ball', 'hyper-potion', 'ultra-ball'])
-    expect(body.items[0]).toEqual({ itemId: 'potion', name: 'Poção', kind: 'potion', buyPrice: 100, sellPrice: 50, unlockLevel: 0, unlocked: true, owned: 2 })
+    expect(body.items[0]).toEqual({ itemId: 'potion', name: 'Poção', kind: 'potion', buyPrice: 200, sellPrice: 100, unlockLevel: 0, unlocked: true, owned: 2 })
     expect(body.items[2]).toMatchObject({ itemId: 'super-potion', unlockLevel: 20, unlocked: false, owned: 0 })
   })
 })
 
 describe('POST /shop/buy', () => {
   it('compra debitando o ouro e somando ao inventário', async () => {
-    await setTrainer({ gold: 350 })
+    await setTrainer({ gold: 900 })
     const r = await api(t.app, cookie).post('/shop/buy', { itemId: 'potion', quantity: 3 })
     expect(r.statusCode).toBe(200)
-    expect(r.json()).toEqual({ gold: 50, item: { itemId: 'potion', quantity: 3 } })
+    expect(r.json()).toEqual({ gold: 300, item: { itemId: 'potion', quantity: 3 } })
     expect(await owned('potion')).toBe(3)
     const again = (await api(t.app, cookie).post('/shop/buy', { itemId: 'poke-ball', quantity: 1 })).json() as { error: { code: string } }
     expect(again.error.code).toBe('insufficient-gold')
-    expect(await goldOf()).toBe(50)
+    expect(await goldOf()).toBe(300)
   })
   it('locked abaixo do nível; not-found para item inexistente; validation para quantidade 100', async () => {
     await setTrainer({ gold: 100000 })
@@ -88,10 +88,10 @@ describe('POST /shop/buy', () => {
     await stopHunt(t.db, trainerId, T0)
   })
   it('compras concorrentes nunca deixam o ouro negativo', async () => {
-    await setTrainer({ gold: 250 })
+    await setTrainer({ gold: 500 })
     const results = await Promise.all(Array.from({ length: 4 }, () => api(t.app, cookie).post('/shop/buy', { itemId: 'potion', quantity: 1 })))
     expect(results.filter((r) => r.statusCode === 200)).toHaveLength(2)
-    expect(await goldOf()).toBe(50)
+    expect(await goldOf()).toBe(100)
     expect(await owned('potion')).toBe(2)
   })
   it('a conta B não compra com o ouro de A', async () => {
@@ -106,7 +106,7 @@ describe('POST /shop/sell', () => {
   it('vende pela metade, decrementa e apaga em zero; além do que tem → validation', async () => {
     await t.db.insert(inventory).values({ trainerId, itemId: 'potion', quantity: 2 })
     const r = await api(t.app, cookie).post('/shop/sell', { itemId: 'potion', quantity: 2 })
-    expect(r.json()).toEqual({ gold: 100, item: { itemId: 'potion', quantity: 0 } })
+    expect(r.json()).toEqual({ gold: 200, item: { itemId: 'potion', quantity: 0 } })
     expect(await t.db.select().from(inventory).where(eq(inventory.trainerId, trainerId))).toEqual([])
     expect((await api(t.app, cookie).post('/shop/sell', { itemId: 'potion', quantity: 1 })).statusCode).toBe(400)
   })

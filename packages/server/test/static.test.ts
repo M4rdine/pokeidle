@@ -75,3 +75,51 @@ describe('política de conteúdo', () => {
     await app.close()
   })
 })
+
+describe('arquivo com hash criado depois do boot', () => {
+  it('serve o que apareceu em /app enquanto o servidor estava no ar', async () => {
+    // `wildcard: false` faz o @fastify/static varrer a pasta no registro e criar uma rota por
+    // arquivo. Um build com o servidor rodando gera nomes com hash novos, que não existiam
+    // naquela varredura — e a página abria em branco com 404 em JSON no lugar do CSS.
+    const dist = await mkdtemp(join(tmpdir(), 'pokeidle-dist-'))
+    await mkdir(join(dist, 'app'), { recursive: true })
+    await writeFile(join(dist, 'index.html'), '<!doctype html><title>t</title>')
+    const app = await freshApp(t, undefined, { CLIENT_DIST: dist })
+
+    await writeFile(join(dist, 'app', 'index-DEPOIS.css'), 'body{color:red}')
+    const r = await api(app).get('/app/index-DEPOIS.css')
+
+    expect(r.statusCode).toBe(200)
+    expect(r.headers['content-type']).toMatch(/text\/css/)
+    expect(r.body).toContain('color:red')
+    await app.close()
+  })
+
+  it('não serve nada de fora da pasta do build', async () => {
+    // A ameaça é escapar da `CLIENT_DIST`, não alcançar outro arquivo dentro dela: tudo que está
+    // na pasta do build é público por definição. O segredo mora um nível acima, onde ninguém
+    // deveria chegar.
+    const base = await mkdtemp(join(tmpdir(), 'pokeidle-base-'))
+    const dist = join(base, 'dist')
+    await mkdir(join(dist, 'app'), { recursive: true })
+    await writeFile(join(dist, 'index.html'), '<!doctype html><title>t</title>')
+    await writeFile(join(base, 'segredo.txt'), 'nao vazar')
+    const app = await freshApp(t, undefined, { CLIENT_DIST: dist })
+
+    for (const caminho of ['/app/..%2F..%2Fsegredo.txt', '/app/%2e%2e/%2e%2e/segredo.txt', '/app/sub/../../../segredo.txt']) {
+      const r = await api(app).get(caminho)
+      expect(r.body, caminho).not.toContain('nao vazar')
+    }
+    await app.close()
+  })
+
+  it('arquivo que não existe em /app continua 404, e não index.html', async () => {
+    const dist = await mkdtemp(join(tmpdir(), 'pokeidle-dist-'))
+    await mkdir(join(dist, 'app'), { recursive: true })
+    await writeFile(join(dist, 'index.html'), '<!doctype html><title>t</title>')
+    const app = await freshApp(t, undefined, { CLIENT_DIST: dist })
+    const r = await api(app).get('/app/nao-existe.js')
+    expect(r.statusCode).toBe(404)
+    await app.close()
+  })
+})

@@ -80,7 +80,12 @@ const PropSchema = z.object({
   name: nameSchema,
   file: z.string().min(1),
   /** Lado da célula em pixels: 32 ocupa um tile, 64 ocupa dois por dois. */
-  size: z.union([z.literal(32), z.literal(64)]),
+  /**
+   * Lado do prop em pixels, múltiplo de 32: 32 é um tile, 64 é a árvore de 2×2, 96 o Centro
+   * Pokémon de 3×3. O corte é sempre quadrado — um prédio mais largo que alto se desenha dentro
+   * de um quadrado, com transparência sobrando, e o recorte de fundo cuida do resto.
+   */
+  size: z.number().int().min(32).max(256).refine((v) => v % 32 === 0, 'o lado do prop tem que ser múltiplo de 32'),
   /** Tolerância do recorte de fundo; sobe quando a peça tem sombra colada. */
   tolerance: z.number().int().min(0).max(80).optional(),
 }).strict()

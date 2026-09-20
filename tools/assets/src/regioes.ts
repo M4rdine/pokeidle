@@ -44,6 +44,12 @@ export interface Bioma {
    * pincel do caminho casa.
    */
   readonly trilha: string | null
+  /**
+   * Prop grande que dá identidade à área, colocado uma vez só num canto livre. É o que separa
+   * "uma caverna" de "a Entrada da Caverna": sem marco, duas áreas do mesmo bioma são a mesma
+   * textura com nomes diferentes. Omitir deixa a área sem marco.
+   */
+  readonly marco?: string
   readonly props: readonly PropSpec[]
   readonly especies: readonly EspecieSpec[]
 }
@@ -102,7 +108,7 @@ const KANTO: readonly Bioma[] = [
       { nome: 'staryu', min: 11, max: 16, quantidade: 3 },
       { nome: 'dratini', min: 12, max: 16, quantidade: 2 },
     ] },
-  { id: 'praia-longa', nome: 'Praia Longa', set: 'areia-agua', mistura: 0.38, bloqueia: true, forma: 'margem',
+  { id: 'praia-longa', nome: 'Praia Longa', set: 'areia-agua', mistura: 0.38, bloqueia: true, forma: 'margem', marco: 'naufragio',
     // Primário é areia: o pincel de caminho sobre campo não casaria com a praia.
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.02 }],
@@ -111,7 +117,7 @@ const KANTO: readonly Bioma[] = [
       { nome: 'staryu', min: 13, max: 18, quantidade: 3 },
       { nome: 'doduo', min: 13, max: 18, quantidade: 4 },
     ] },
-  { id: 'entrada-da-caverna', nome: 'Entrada da Caverna', set: 'pedra-caverna', mistura: 0.3, bloqueia: true,
+  { id: 'entrada-da-caverna', nome: 'Entrada da Caverna', set: 'pedra-caverna', mistura: 0.3, bloqueia: true, marco: 'boca-de-caverna',
     // Primário é pedra: o chão de rocha já faz o papel de caminho.
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.03 }],
@@ -120,11 +126,11 @@ const KANTO: readonly Bioma[] = [
       { nome: 'gastly', min: 16, max: 22, quantidade: 3 },
       { nome: 'grimer', min: 17, max: 22, quantidade: 3 },
     ] },
-  { id: 'caverna-funda', nome: 'Caverna Funda', set: 'pedra-caverna', mistura: 0.42, bloqueia: true,
+  { id: 'caverna-funda', nome: 'Caverna Funda', set: 'pedra-caverna', mistura: 0.42, bloqueia: true, marco: 'boca-de-caverna',
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.045 }],
     especies: [{ nome: 'golbat', min: 20, max: 27, quantidade: 4 }, { nome: 'haunter', min: 21, max: 28, quantidade: 3 }] },
-  { id: 'pico-rochoso', nome: 'Pico Rochoso', set: 'campo-pedra', mistura: 0.46, bloqueia: true, forma: 'corpo',
+  { id: 'pico-rochoso', nome: 'Pico Rochoso', set: 'campo-pedra', mistura: 0.46, bloqueia: true, forma: 'corpo', marco: 'pedras-erguidas',
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.05 }, { ...PINHEIRO, densidade: 0.01 }],
     especies: [{ nome: 'rhydon', min: 25, max: 32, quantidade: 3 }, { nome: 'arcanine', min: 27, max: 35, quantidade: 3 }] },
@@ -140,11 +146,11 @@ const KANTO: readonly Bioma[] = [
  * ele seria um degrau para baixo logo depois do portão.
  */
 const TERRAS_ALTAS: readonly Bioma[] = [
-  { id: 'gruta-umida', nome: 'Gruta Úmida', set: 'pedra-caverna', mistura: 0.28, bloqueia: true,
+  { id: 'gruta-umida', nome: 'Gruta Úmida', set: 'pedra-caverna', mistura: 0.28, bloqueia: true, marco: 'boca-de-caverna',
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.03 }],
     especies: [{ nome: 'arbok', min: 36, max: 42, quantidade: 6 }, { nome: 'magmar', min: 38, max: 44, quantidade: 4 }] },
-  { id: 'tunel-rocha', nome: 'Túnel Rocha', set: 'pedra-caverna', mistura: 0.44, bloqueia: true,
+  { id: 'tunel-rocha', nome: 'Túnel Rocha', set: 'pedra-caverna', mistura: 0.44, bloqueia: true, marco: 'boca-de-caverna',
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.045 }],
     especies: [{ nome: 'kabutops', min: 40, max: 46, quantidade: 3 }, { nome: 'beedrill', min: 41, max: 48, quantidade: 6 }] },
@@ -156,7 +162,7 @@ const TERRAS_ALTAS: readonly Bioma[] = [
     trilha: TERRA,
     props: [{ ...PEDRA, densidade: 0.04 }, { ...ARBUSTO, densidade: 0.01 }],
     especies: [{ nome: 'raichu', min: 48, max: 54, quantidade: 2 }, { nome: 'magmar', min: 49, max: 56, quantidade: 7 }] },
-  { id: 'ilhas-espuma', nome: 'Ilhas Espuma', set: 'areia-agua', mistura: 0.4, bloqueia: true,
+  { id: 'ilhas-espuma', nome: 'Ilhas Espuma', set: 'areia-agua', mistura: 0.4, bloqueia: true, marco: 'naufragio',
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.025 }],
     especies: [{ nome: 'kabutops', min: 52, max: 58, quantidade: 2 }, { nome: 'wigglytuff', min: 53, max: 60, quantidade: 7 }] },
@@ -164,11 +170,11 @@ const TERRAS_ALTAS: readonly Bioma[] = [
     trilha: TERRA,
     props: [{ ...ARVORE, densidade: 0.032 }, { ...PINHEIRO, densidade: 0.028 }, { ...ARBUSTO, densidade: 0.03 }],
     especies: [{ nome: 'exeggutor', min: 56, max: 62, quantidade: 5 }, { nome: 'pidgeot', min: 58, max: 64, quantidade: 4 }] },
-  { id: 'trilha-da-vitoria', nome: 'Trilha da Vitória', set: 'campo-pedra', mistura: 0.46, bloqueia: true, forma: 'corpo',
+  { id: 'trilha-da-vitoria', nome: 'Trilha da Vitória', set: 'campo-pedra', mistura: 0.46, bloqueia: true, forma: 'corpo', marco: 'pedras-erguidas',
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.05 }],
     especies: [{ nome: 'pidgeot', min: 60, max: 66, quantidade: 5 }, { nome: 'wigglytuff', min: 61, max: 68, quantidade: 4 }] },
-  { id: 'cume-indigo', nome: 'Cume Índigo', set: 'campo-pedra', mistura: 0.5, bloqueia: true, forma: 'corpo',
+  { id: 'cume-indigo', nome: 'Cume Índigo', set: 'campo-pedra', mistura: 0.5, bloqueia: true, forma: 'corpo', marco: 'pedras-erguidas',
     trilha: null,
     props: [{ ...PEDRA, densidade: 0.055 }, { ...PINHEIRO, densidade: 0.008 }],
     especies: [

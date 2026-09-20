@@ -230,13 +230,15 @@ async function propFrames(dir: string, props: readonly PropEntry[]): Promise<Atl
       removeFlatBackground(decodePng(await readFile(path)), prop.tolerance),
       prop.size,
     )
-    if (prop.size === 32) {
+    const lado = prop.size / TILE
+    if (lado === 1) {
+      // Um tile só não ganha sufixo: quem posiciona usa o nome direto, e inventar `-x0-y0` aqui
+      // obrigaria todo chamador a saber o tamanho do prop antes de nomeá-lo.
       frames.push({ name: prop.name, image: recortado })
       continue
     }
-    const pedacos = sliceImage(recortado, 2, 2)
-    pedacos.forEach((image, i) => {
-      frames.push({ name: sliceName(prop.name, i % 2, Math.floor(i / 2)), image })
+    sliceImage(recortado, lado, lado).forEach((image, i) => {
+      frames.push({ name: sliceName(prop.name, i % lado, Math.floor(i / lado)), image })
     })
   }
   return frames
@@ -299,6 +301,9 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
  * terreno, e aceitar isso esconderia o problema atrás de peças inventadas.
  */
 const MAX_SINTETIZADAS = 8
+
+/** Lado do tile em pixels; o tamanho de um prop é sempre um múltiplo dele. */
+const TILE = 32
 
 const PUBLICADOS = ['tiles.png', 'tiles.json', 'pokemon.png', 'pokemon.json'] as const
 

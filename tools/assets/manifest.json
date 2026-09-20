@@ -661,6 +661,26 @@
       "name": "flores-4",
       "file": "flores-3.png",
       "size": 32
+    },
+    {
+      "name": "centro-pokemon",
+      "file": "centro-pokemon.png",
+      "size": 96
+    },
+    {
+      "name": "boca-de-caverna",
+      "file": "boca-de-caverna.png",
+      "size": 96
+    },
+    {
+      "name": "naufragio",
+      "file": "naufragio.png",
+      "size": 96
+    },
+    {
+      "name": "pedras-erguidas",
+      "file": "pedras-erguidas.png",
+      "size": 96
     }
   ]
 }

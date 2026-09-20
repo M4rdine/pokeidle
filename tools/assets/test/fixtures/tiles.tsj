@@ -3,12 +3,12 @@
   "version": "1.10",
   "name": "tibia-tiles",
   "image": "tiles.png",
-  "imagewidth": 672,
-  "imageheight": 640,
+  "imagewidth": 704,
+  "imageheight": 672,
   "tilewidth": 32,
   "tileheight": 32,
-  "tilecount": 420,
-  "columns": 21,
+  "tilecount": 462,
+  "columns": 22,
   "margin": 0,
   "spacing": 0,
   "tiles": [
@@ -3359,6 +3359,366 @@
           "name": "name",
           "type": "string",
           "value": "flores-4"
+        }
+      ]
+    },
+    {
+      "id": 414,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "centro-pokemon-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 415,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "centro-pokemon-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 416,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "centro-pokemon-x2-y0"
+        }
+      ]
+    },
+    {
+      "id": 417,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "centro-pokemon-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 418,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "centro-pokemon-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 419,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "centro-pokemon-x2-y1"
+        }
+      ]
+    },
+    {
+      "id": 420,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "centro-pokemon-x0-y2"
+        }
+      ]
+    },
+    {
+      "id": 421,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "centro-pokemon-x1-y2"
+        }
+      ]
+    },
+    {
+      "id": 422,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "centro-pokemon-x2-y2"
+        }
+      ]
+    },
+    {
+      "id": 423,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 424,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 425,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x2-y0"
+        }
+      ]
+    },
+    {
+      "id": 426,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 427,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 428,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x2-y1"
+        }
+      ]
+    },
+    {
+      "id": 429,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x0-y2"
+        }
+      ]
+    },
+    {
+      "id": 430,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x1-y2"
+        }
+      ]
+    },
+    {
+      "id": 431,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x2-y2"
+        }
+      ]
+    },
+    {
+      "id": 432,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 433,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 434,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x2-y0"
+        }
+      ]
+    },
+    {
+      "id": 435,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 436,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 437,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x2-y1"
+        }
+      ]
+    },
+    {
+      "id": 438,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x0-y2"
+        }
+      ]
+    },
+    {
+      "id": 439,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x1-y2"
+        }
+      ]
+    },
+    {
+      "id": 440,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x2-y2"
+        }
+      ]
+    },
+    {
+      "id": 441,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 442,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 443,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x2-y0"
+        }
+      ]
+    },
+    {
+      "id": 444,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 445,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 446,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x2-y1"
+        }
+      ]
+    },
+    {
+      "id": 447,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x0-y2"
+        }
+      ]
+    },
+    {
+      "id": 448,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x1-y2"
+        }
+      ]
+    },
+    {
+      "id": 449,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x2-y2"
         }
       ]
     }

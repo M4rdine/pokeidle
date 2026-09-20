@@ -1,12 +1,17 @@
 /**
- * Compõe a região de Kanto: oito áreas de biomas distintos, cada uma pintada com um pincel de
- * canto desenhado e povoada com os props gerados. Devolve um rascunho em nomes de tile — quem
- * chama traduz para gid e grava o `.tmj`. É ponto de partida para o Tiled, não substituto: o
- * usuário abre o arquivo e ajusta qualquer área à mão.
+ * Compõe uma região: oito áreas de biomas distintos, cada uma pintada com um pincel de canto
+ * desenhado e povoada com os props gerados. Devolve um rascunho em nomes de tile — quem chama
+ * traduz para gid e grava o `.tmj`. É ponto de partida para o Tiled, não substituto: o usuário
+ * abre o arquivo e ajusta qualquer área à mão.
+ *
+ * O gerador não conhece região nenhuma: recebe a lista de biomas e desenha. Kanto e as Terras
+ * Altas saem do mesmo código, e é por isso que o mapa de uma não pode quebrar quando a outra
+ * muda.
  */
-import { BIOMAS, type Bioma } from './kanto-biomas.js'
+import type { Bioma, RegionSpec } from './regioes.js'
 
-export const KANTO = { width: 96, height: 72, areaWidth: 24, areaHeight: 36, tileSize: 32 } as const
+/** Toda região tem a mesma grade: oito áreas de 24×36 numa folha de 96×72. */
+export const GRADE = { width: 96, height: 72, areaWidth: 24, areaHeight: 36, tileSize: 32 } as const
 /**
  * Anel de material primário na borda da área, em tiles. Como o material sai dos quatro cantos do
  * tile, um anel de dois cantos garante dois tiles puros em toda a volta: é o que mantém a borda
@@ -37,7 +42,7 @@ export interface ObjetoDraft {
   readonly properties: readonly { readonly name: string; readonly type: 'string' | 'int'; readonly value: string | number }[]
 }
 
-export interface KantoDraft {
+export interface RegionDraft {
   readonly width: number
   readonly height: number
   /** Nome do tile de cada célula; todas preenchidas. */
@@ -70,7 +75,7 @@ function smooth(x: number, y: number, escala: number, seed: number): number {
     ty)
 }
 
-/** Grade mutável de trabalho: a mutação não escapa de `desenharKanto`, que congela o resultado. */
+/** Grade mutável de trabalho: a mutação não escapa de `desenharRegiao`, que congela o resultado. */
 interface Grade {
   readonly ground: string[]
   readonly detail: (string | null)[]
@@ -87,19 +92,19 @@ interface Area {
   readonly seed: number
 }
 
-const indiceDe = (area: Area, x: number, y: number): number => (area.ay + y) * KANTO.width + area.ax + x
+const indiceDe = (area: Area, x: number, y: number): number => (area.ay + y) * GRADE.width + area.ax + x
 
 /** Pinta o terreno da área com o pincel de canto do bioma, variando as peças puras. */
 function pintarTerreno(grade: Grade, area: Area, temTile: (nome: string) => boolean): void {
   const { bioma, ax, ay, seed } = area
   const secundario = (cx: number, cy: number): boolean => {
-    const dentro = cx > MARGEM && cy > MARGEM && cx < KANTO.areaWidth - MARGEM && cy < KANTO.areaHeight - MARGEM
+    const dentro = cx > MARGEM && cy > MARGEM && cx < GRADE.areaWidth - MARGEM && cy < GRADE.areaHeight - MARGEM
     return dentro && smooth(cx, cy, ESCALA_RUIDO, seed) < bioma.mistura
   }
   const canto = (cx: number, cy: number): string => (secundario(cx, cy) ? 'b' : 'a')
 
-  for (let y = 0; y < KANTO.areaHeight; y++) {
-    for (let x = 0; x < KANTO.areaWidth; x++) {
+  for (let y = 0; y < GRADE.areaHeight; y++) {
+    for (let x = 0; x < GRADE.areaWidth; x++) {
       const code = `${canto(x + 1, y)}${canto(x + 1, y + 1)}${canto(x, y + 1)}${canto(x, y)}`
       const i = indiceDe(area, x, y)
       // Peça pura ganha variação quando o atlas trouxe alternativas: sem isso o campo fica
@@ -120,7 +125,7 @@ function livre(grade: Grade, area: Area, x: number, y: number, largura: number, 
     for (let dx = 0; dx < largura; dx++) {
       const px = x + dx
       const py = y + dy
-      if (px < 1 || py < 1 || px >= KANTO.areaWidth - 1 || py >= KANTO.areaHeight - 1) return false
+      if (px < 1 || py < 1 || px >= GRADE.areaWidth - 1 || py >= GRADE.areaHeight - 1) return false
       const i = indiceDe(area, px, py)
       if (grade.blocked[i] || grade.detail[i] !== null || grade.canopy[i] !== null) return false
       if (grade.reservado.has(i)) return false
@@ -137,8 +142,8 @@ function espalharProps(grade: Grade, area: Area): void {
   // O índice separa a máscara de cada prop. Usar o nome (ou o comprimento dele) faria dois props
   // do mesmo bioma sortearem as mesmas células, e o segundo nunca apareceria.
   bioma.props.forEach((prop, ordem) => {
-    for (let y = 1; y < KANTO.areaHeight - 1; y++) {
-      for (let x = 1; x < KANTO.areaWidth - 1; x++) {
+    for (let y = 1; y < GRADE.areaHeight - 1; y++) {
+      for (let x = 1; x < GRADE.areaWidth - 1; x++) {
         if (noise(ax + x, ay + y, seed + ordem * 13 + 1) > prop.densidade) continue
         const variante = 1 + Math.floor(noise(ax + x, ay + y, seed + 991) * prop.variantes)
         const nome = `${prop.nome}-${variante}`
@@ -167,7 +172,7 @@ function espalharProps(grade: Grade, area: Area): void {
  * jogador nunca o vê, porque a copa desenha acima dele.
  */
 function acharLivre(grade: Grade, area: Area, x0: number, y0: number, dx: number): { x: number; y: number } {
-  const { areaWidth: aw, areaHeight: ah } = KANTO
+  const { areaWidth: aw, areaHeight: ah } = GRADE
   let x = x0
   let y = y0
   for (let passo = 0; passo < aw * ah; passo++) {
@@ -197,7 +202,7 @@ interface Pontos {
  */
 function escolherPontos(grade: Grade, area: Area): Pontos {
   const { bioma } = area
-  const { areaWidth: aw, areaHeight: ah } = KANTO
+  const { areaWidth: aw, areaHeight: ah } = GRADE
   // Os spawns primeiro: a partida nasce perto do primeiro deles — a caçada começa sem uma
   // travessia longa — e o Centro fica no canto oposto, para a volta custar alguma coisa.
   const alvos = bioma.especies.map((_esp, n) =>
@@ -243,8 +248,8 @@ function pintarTrilha(grade: Grade, area: Area, pontos: Pontos): void {
   const naTrilha = (cx: number, cy: number): boolean =>
     trechos.some(([de, para]) => distanciaAoSegmento(cx, cy, de, para) <= LARGURA_TRILHA)
 
-  for (let y = 0; y < KANTO.areaHeight; y++) {
-    for (let x = 0; x < KANTO.areaWidth; x++) {
+  for (let y = 0; y < GRADE.areaHeight; y++) {
+    for (let x = 0; x < GRADE.areaWidth; x++) {
       const i = indiceDe(area, x, y)
       // Só sobre material primário: a trilha não atravessa água nem rocha, e é o primário do
       // bioma que combina com o campo do conjunto de caminho.
@@ -260,7 +265,7 @@ function pintarTrilha(grade: Grade, area: Area, pontos: Pontos): void {
 /** Objetos da área: retângulo da área, ponto de partida, Centro e um spawn por espécie. */
 function objetosDaArea(area: Area, pontos: Pontos): ObjetoDraft[] {
   const { bioma, ax, ay } = area
-  const { areaWidth: aw, areaHeight: ah, tileSize: tile } = KANTO
+  const { areaWidth: aw, areaHeight: ah, tileSize: tile } = GRADE
   const px = (t: number): number => t * tile
   const { alvos, partida, centro } = pontos
   const unitario = (classe: ObjetoDraft['classe'], p: { x: number; y: number }): ObjetoDraft =>
@@ -292,11 +297,12 @@ function objetosDaArea(area: Area, pontos: Pontos): ObjetoDraft[] {
 }
 
 /**
+ * @param spec a região a desenhar: metadados e a lista de biomas, um por área.
  * @param temTile diz se um nome existe no atlas; as variações de peça pura são opcionais e o
  * gerador só as usa quando o conjunto de terreno realmente as produziu.
  */
-export function desenharKanto(temTile: (nome: string) => boolean): KantoDraft {
-  const celulas = KANTO.width * KANTO.height
+export function desenharRegiao(spec: RegionSpec, temTile: (nome: string) => boolean): RegionDraft {
+  const celulas = GRADE.width * GRADE.height
   const grade: Grade = {
     ground: Array.from({ length: celulas }, () => ''),
     detail: Array.from({ length: celulas }, () => null),
@@ -304,20 +310,21 @@ export function desenharKanto(temTile: (nome: string) => boolean): KantoDraft {
     blocked: Array.from({ length: celulas }, () => false),
     reservado: new Set<number>(),
   }
-  const porLinha = Math.floor(KANTO.width / KANTO.areaWidth)
-  const cabem = porLinha * Math.floor(KANTO.height / KANTO.areaHeight)
+  const { biomas } = spec
+  const porLinha = Math.floor(GRADE.width / GRADE.areaWidth)
+  const cabem = porLinha * Math.floor(GRADE.height / GRADE.areaHeight)
   // Sem esta guarda, um bioma a mais escreveria fora da grade em silêncio: os arrays crescem e a
   // área extra simplesmente não aparece no mapa recortado.
-  if (BIOMAS.length > cabem) {
-    throw new Error(`${BIOMAS.length} biomas não cabem em ${KANTO.width}x${KANTO.height}: a grade comporta ${cabem}`)
+  if (biomas.length > cabem) {
+    throw new Error(`região ${spec.id}: ${biomas.length} biomas não cabem em ${GRADE.width}x${GRADE.height}, que comporta ${cabem}`)
   }
   const objetos: ObjetoDraft[] = []
 
-  BIOMAS.forEach((bioma, indice) => {
+  biomas.forEach((bioma, indice) => {
     const area: Area = {
       bioma,
-      ax: (indice % porLinha) * KANTO.areaWidth,
-      ay: Math.floor(indice / porLinha) * KANTO.areaHeight,
+      ax: (indice % porLinha) * GRADE.areaWidth,
+      ay: Math.floor(indice / porLinha) * GRADE.areaHeight,
       seed: SEMENTE_POR_AREA(indice),
     }
     pintarTerreno(grade, area, temTile)
@@ -328,8 +335,8 @@ export function desenharKanto(temTile: (nome: string) => boolean): KantoDraft {
   })
 
   return Object.freeze({
-    width: KANTO.width,
-    height: KANTO.height,
+    width: GRADE.width,
+    height: GRADE.height,
     ground: Object.freeze([...grade.ground]),
     detail: Object.freeze([...grade.detail]),
     canopy: Object.freeze([...grade.canopy]),

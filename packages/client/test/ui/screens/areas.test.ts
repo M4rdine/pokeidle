@@ -69,6 +69,23 @@ describe('navegador de áreas', () => {
     expect(bloqueada.querySelector('.area-start')).toBeNull()
   })
 
+  it('agrupa por região, na ordem em que o jogo as abre, com o portão da fechada', () => {
+    const grutaUmida: Resumo = { id: 'gruta-umida', name: 'Gruta Úmida', width: 24, height: 36, minLevel: 36, maxLevel: 44, minTrainerLevel: 34, locked: true }
+    const root = montar({}, [grutaUmida, campo])
+    const cabecalhos = [...root.querySelectorAll('.area-region')]
+    expect(cabecalhos.map((c) => c.querySelector('h2')?.textContent)).toEqual(['Kanto', 'Terras Altas'])
+    // A região inteira bloqueada mostra o nível que a abre; a liberada não mostra portão nenhum.
+    expect(cabecalhos[0]!.querySelector('.area-gate')).toBeNull()
+    expect(cabecalhos[1]!.querySelector('.area-gate')?.textContent).toBe('abre no nível 34')
+    // A ordem das linhas segue a das regiões, não a ordem em que o servidor mandou.
+    expect(idsVisiveis(root)).toEqual(['campo-inicial', 'gruta-umida'])
+  })
+
+  it('dentro da região, as liberadas vêm antes das bloqueadas, em ordem de nível', () => {
+    const root = montar({}, [pico, lago, campo])
+    expect(idsVisiveis(root)).toEqual(['campo-inicial', 'margem-do-lago', 'pico-rochoso'])
+  })
+
   it('filtrar por tipo estreita a lista e a contagem passa a dizer quantas de quantas', () => {
     const root = montar()
     tipo(root, 'water').click()
@@ -80,12 +97,13 @@ describe('navegador de áreas', () => {
 
   it('só aparecem os tipos que alguma área tem: nada de filtro que só leva ao vazio', () => {
     const root = montar()
-    // As três áreas do fixture cobrem água, pedra, fogo, terra, planta, veneno, voador e fantasma.
+    // As três áreas do fixture cobrem água, pedra, fogo, terra, planta, veneno, voador, fantasma
+    // e dragão (o dratini da Margem do Lago).
     expect(tipoOpcional(root, 'water')).not.toBeNull()
     expect(tipoOpcional(root, 'rock')).not.toBeNull()
-    // Nenhuma tem dragão ou fada, então esses botões não existem.
-    expect(tipoOpcional(root, 'dragon')).toBeNull()
-    expect(tipoOpcional(root, 'fairy')).toBeNull()
+    // Nenhuma tem gelo ou aço, então esses botões não existem.
+    expect(tipoOpcional(root, 'ice')).toBeNull()
+    expect(tipoOpcional(root, 'steel')).toBeNull()
   })
 
   it('filtro sem resultado explica o que fazer, em vez de deixar a tela vazia', () => {

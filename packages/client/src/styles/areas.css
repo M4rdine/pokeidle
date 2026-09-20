@@ -47,6 +47,17 @@
 .filter-clear { padding: var(--space-1) var(--space-2); font-size: 0.9em; }
 
 /* --- ficha --- */
+/* Cabeçalho de região: a régua entre "onde estou" e "o que vem depois". */
+.area-region {
+  display: flex; align-items: baseline; gap: var(--space-2);
+  padding: var(--space-3) 0 var(--space-1);
+  border-bottom: 1px solid var(--border);
+}
+.area-region:first-child { padding-top: 0; }
+.area-region h2 { font-size: 1rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.area-region-locked h2 { color: var(--muted); }
+.area-region .area-gate { margin-left: auto; }
+
 .area-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 .area-row {
   /* A coluna da ação é fixa: com `auto` ela media pelo texto ("Caçar" ou "nível 23") e empurrava

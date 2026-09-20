@@ -20,14 +20,16 @@ describe('unlocks', () => {
     expect(itemUnlockLevel(u, 'hyper-potion')).toBe(30)
     expect(itemUnlockLevel(u, 'ultra-ball')).toBe(40)
     expect(regionUnlockLevel(u, 'kanto')).toBe(1)
+    expect(regionUnlockLevel(u, 'terras-altas')).toBe(34)
     // Região que não existe no registro devolve 0: sem portão, em vez de quebrar.
     expect(regionUnlockLevel(u, 'johto')).toBe(0)
   })
   it('nextUnlock caminha pela tabela', () => {
     expect(nextUnlock(u, 1, items)).toEqual({ level: 10, what: '4 vagas no time' })
     expect(nextUnlock(u, 10, items)).toEqual({ level: 20, what: 'Super Poção, Great Bola, 5 vagas no time' })
-    expect(nextUnlock(u, 30, items)).toEqual({ level: 40, what: 'Ultra Bola' })
-    // Hoje só existe Kanto, que abre no nível 1: depois do 40 não há mais destrave.
+    // Depois do nível 30 a meta é a região nova, não um item: ela abre antes da Ultra Bola.
+    expect(nextUnlock(u, 30, items)).toEqual({ level: 34, what: 'região terras-altas' })
+    expect(nextUnlock(u, 34, items)).toEqual({ level: 40, what: 'Ultra Bola' })
     expect(nextUnlock(u, 40, items)).toBeNull()
   })
   it('schema valida growthRate e teamSlots', () => {

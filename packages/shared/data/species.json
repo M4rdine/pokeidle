@@ -38,7 +38,8 @@
     "evolvesTo": {
       "species": "ivysaur",
       "level": 16
-    }
+    },
+    "obtainable": "starter"
   },
   {
     "id": 2,
@@ -164,7 +165,8 @@
     "evolvesTo": {
       "species": "charmeleon",
       "level": 16
-    }
+    },
+    "obtainable": "starter"
   },
   {
     "id": 5,
@@ -317,7 +319,8 @@
     "evolvesTo": {
       "species": "wartortle",
       "level": 16
-    }
+    },
+    "obtainable": "starter"
   },
   {
     "id": 8,
@@ -1709,7 +1712,8 @@
         "move": "future-sight",
         "level": 88
       }
-    ]
+    ],
+    "obtainable": "legendary"
   },
   {
     "id": 151,
@@ -1745,6 +1749,7 @@
         "move": "ancient-power",
         "level": 50
       }
-    ]
+    ],
+    "obtainable": "legendary"
   }
 ]

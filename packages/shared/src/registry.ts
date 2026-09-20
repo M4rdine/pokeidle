@@ -82,6 +82,20 @@ function checkContent(r: ContentRegistry, problems: string[]): void {
 }
 
 /**
+ * Toda espécie precisa de um caminho até o jogador: uma área onde ela apareça, uma evolução que a
+ * produza, ou a declaração de que ela vem da escolha inicial ou é lendária. Espécie sem nenhum
+ * desses caminhos é conteúdo que ninguém alcança e Pokédex que nunca fecha.
+ */
+function checkReachableSpecies(r: ContentRegistry, problems: string[]): void {
+  const comArea = new Set([...r.regions.values()].flatMap((região) => região.areas.flatMap((a) => a.species)))
+  const porEvolucao = new Set([...r.species.values()].flatMap((s) => (s.evolvesTo ? [s.evolvesTo.species] : [])))
+  for (const s of r.species.values()) {
+    if (comArea.has(s.name) || porEvolucao.has(s.name) || s.obtainable !== undefined) continue
+    problems.push(`espécie ${s.name}: não aparece em nenhuma área, não vem de evolução e não declara obtainable`)
+  }
+}
+
+/**
  * Um item existe para ser conseguido. A referência descobriu em produção que 34 evoluções
  * dependiam de uma pedra que nenhuma hunt dropava; a checagem custa pouco e fecha essa classe
  * inteira de bug antes do jogo subir.

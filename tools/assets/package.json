@@ -7,7 +7,7 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "cli": "tsx src/main.ts",
-    "desenhar:kanto": "tsx scripts/desenhar-kanto.ts"
+    "desenhar": "tsx scripts/desenhar-regiao.ts"
   },
   "dependencies": {
     "@pokeidle/shared": "workspace:*",

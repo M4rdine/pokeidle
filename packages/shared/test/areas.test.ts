@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { areaUnlockLevel, findArea } from '../src/areas.js'
+import { areaUnlockLevel, canEnterArea, findArea } from '../src/areas.js'
 import { loadRegistry } from '../src/registry-full.js'
 
 const registry = loadRegistry()
@@ -31,6 +31,21 @@ describe('portão de nível por área', () => {
     // Portão da região no meio: a área mais exigente continua mandando.
     expect(areaUnlockLevel(comPortao(10), 'campo-inicial')).toBe(10)
     expect(areaUnlockLevel(comPortao(10), 'pico-rochoso')).toBe(areaDe('pico-rochoso').minTrainerLevel)
+  })
+
+  it('nenhuma área da segunda região abre abaixo do portão da região', () => {
+    const portao = registry.unlocks.regions['terras-altas']!
+    for (const area of registry.regions.get('terras-altas')!.areas) {
+      expect(areaUnlockLevel(registry, area.id), area.id).toBeGreaterThanOrEqual(portao)
+      expect(canEnterArea(registry, area.id, portao - 1), area.id).toBe(false)
+    }
+    // E a área de entrada abre exatamente no portão: o jogador que alcança o nível entra.
+    expect(canEnterArea(registry, registry.regions.get('terras-altas')!.areas[0]!.id, portao)).toBe(true)
+  })
+
+  it('nenhuma área aparece em duas regiões', () => {
+    const todas = [...registry.regions.values()].flatMap((r) => r.areas.map((a) => a.id))
+    expect(new Set(todas).size).toBe(todas.length)
   })
 
   it('área desconhecida não tem portão: quem barra é o 404 de quem procura o mapa', () => {

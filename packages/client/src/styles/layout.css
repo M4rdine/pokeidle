@@ -52,3 +52,42 @@ input { font: inherit; color: var(--text); background: var(--bg); border: var(--
 .toast-error { border-color: var(--danger); }
 .toast-big { border-color: var(--accent); font-size: 1.1em; }
 .overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(15 15 20 / 82%); text-align: center; }
+
+/*
+ * Superfícies que o navegador desenha por conta própria. Elas chegam no padrão do sistema por
+ * cima de um mundo visual inteiro — e são o sinal mais barato de que a tela foi construída e não
+ * montada. O DESIGN.md manda: borda reta, dois planos de fundo e um acento só.
+ */
+::selection { background: var(--accent); color: var(--bg); }
+:focus-visible { outline: var(--border-w) solid var(--accent); outline-offset: 1px; }
+/* O anel só aparece no foco por teclado; o clique já se explica sozinho. */
+:focus:not(:focus-visible) { outline: none; }
+
+* { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); background-clip: content-box; }
+
+input[type="checkbox"] {
+  appearance: none; width: 14px; height: 14px; margin: 0; padding: 0;
+  background: var(--bg); border: var(--border-w) solid var(--border); cursor: pointer;
+  display: inline-grid; place-content: center;
+}
+input[type="checkbox"]:hover { border-color: var(--muted); }
+input[type="checkbox"]:checked { border-color: var(--accent); }
+/* O "aceso" é um quadrado, não um tique: o sistema não tem ícone nenhum, e um glifo aqui seria o primeiro. */
+input[type="checkbox"]:checked::after { content: ""; width: 6px; height: 6px; background: var(--accent); }
+
+/*
+ * Medidor. O `<progress>` nativo chega em azul de navegador, que não existe na paleta. Vestir o
+ * elemento em vez de trocá-lo por uma div mantém a semântica e o leitor de tela.
+ */
+progress { appearance: none; border: none; background: var(--border); display: block; }
+progress::-webkit-progress-bar { background: var(--border); }
+progress::-webkit-progress-value { background: var(--medidor, var(--accent)); transition: width 120ms linear; }
+progress::-moz-progress-bar { background: var(--medidor, var(--accent)); }
+/* HP é leitura de instrumento: a cor diz o estado antes de o número ser lido. */
+[data-hp-state="ok"] { --medidor: var(--ok); }
+[data-hp-state="ferido"] { --medidor: var(--accent); }
+[data-hp-state="critico"] { --medidor: var(--danger); }

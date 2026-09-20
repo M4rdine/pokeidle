@@ -30,6 +30,13 @@ export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
     if (ev.key === '-') scene.setZoom(1)
   }
   const onResize = (): void => scene?.resize()
+  /**
+   * A cena mede o pai, não a janela. `resizeTo` do Pixi só reage a `window.resize`, então quando o
+   * layout mudava sozinho — a barra de topo passando de uma linha para duas ao chegarem os dados
+   * da sessão — o centro encolhia e o canvas ficava com uma banda preta embaixo. Observar o
+   * elemento corrige na raiz, e cobre qualquer mudança de layout futura.
+   */
+  const observador = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onResize)
 
   const huntId = ctx.hunt.get().session?.huntId ?? ctx.session.get().me?.trainer.activeHuntId
   if (huntId) {
@@ -42,6 +49,7 @@ export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
         offEvents = ctx.loop?.onEvent((event, view) => scene?.onEvent(event, view)) ?? null
         window.addEventListener('keydown', onKey)
         window.addEventListener('resize', onResize)
+        observador?.observe(center)
       })
       .catch((error: unknown) => {
         if (disposed) return
@@ -53,6 +61,7 @@ export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
     disposed = true
     window.removeEventListener('keydown', onKey)
     window.removeEventListener('resize', onResize)
+    observador?.disconnect()
     offScene?.()
     offEvents?.()
     scene?.destroy()

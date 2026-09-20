@@ -1,43 +1,149 @@
-/* HUD da tela de jogo: preenchido na etapa da tela do jogo. */
-/* Ocupa a janela inteira e não rola: a cena é o centro e cada painel rola por dentro. */
+/*
+ * HUD da tela de jogo — o painel de instrumento do DESIGN.md.
+ *
+ * A cena é o centro e cada painel rola por dentro; a janela não rola. A proporção é a decisão
+ * principal daqui: antes a moldura comia 40 % da altura (barra de 107 px quebrada em duas linhas
+ * mais 180 px fixos de log), e o log, a superfície menos ligada a decisão, era o maior painel do
+ * quadro. Agora a barra cabe numa linha e o log encolhe com a janela.
+ */
 .screen.game-grid { max-width: none; margin: 0; padding: var(--space-2); }
 .game-grid {
   display: grid;
   grid-template-columns: 280px 1fr 200px;
-  grid-template-rows: auto 1fr 180px;
+  /* O log encolhe com a janela em vez de tomar 180 px fixos de qualquer tela. */
+  grid-template-rows: auto 1fr clamp(88px, 13vh, 150px);
   grid-template-areas: "top top top" "left center right" "bottom bottom bottom";
   gap: var(--space-2);
   height: 100vh;
   padding: var(--space-2);
 }
-.grid-top { grid-area: top; } .grid-left { grid-area: left; display: flex; flex-direction: column; gap: var(--space-2); }
-.grid-center { grid-area: center; position: relative; overflow: hidden; background: #000; min-width: 0; min-height: 0; }
-.grid-right { grid-area: right; min-height: 0; overflow-y: auto; } .grid-bottom { grid-area: bottom; min-height: 0; }
-.top-bar { display: flex; gap: var(--space-2) var(--space-3); align-items: center; padding: var(--space-2) var(--space-3); flex-wrap: wrap; }
-.top-bar .xp-bar { width: 120px; }
-.top-bar button[data-open] { margin-left: 0; }
-/* Os botões de sair da hunt ficam na ponta direita, longe dos atalhos. */
-.top-bar .intent { margin-left: auto; }
-.conn[data-conn="open"] { color: var(--ok); } .conn[data-conn="reconnecting"], .conn[data-conn="connecting"] { color: var(--accent); }
-.conn[data-conn="closed"] { color: var(--danger); } .conn[data-conn="catching-up"] { color: var(--accent); }
+.grid-top { grid-area: top; }
+.grid-left { grid-area: left; display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; }
+/* A tarja que sobra quando o mundo é menor que o painel usa o preto da página, não `#000`: o
+ * DESIGN.md tem dois planos de fundo, e um terceiro preto não pertence a nenhum deles. */
+.grid-center { grid-area: center; position: relative; overflow: hidden; background: var(--bg); min-width: 0; min-height: 0; }
+.grid-right { grid-area: right; min-height: 0; display: flex; }
+.grid-bottom { grid-area: bottom; min-height: 0; }
+
+/* ── Barra de topo ───────────────────────────────────────────────────────────
+ * Três zonas: quem é o jogador, o que ele veio ler, e o que ele pode fazer. Antes era uma fila
+ * corrida onde o ouro tinha o mesmo peso de `tick`, que é telemetria de desenvolvedor.
+ */
+.top-bar {
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  /* Uma linha só. A quebra encolhia o centro depois que os dados chegavam, e a cena ficava com
+   * uma banda preta embaixo porque o Pixi não re-mede sozinho. */
+  flex-wrap: nowrap; overflow-x: auto;
+}
+.tb-id { display: flex; align-items: baseline; gap: var(--space-2); flex-shrink: 0; }
+.tb-id strong { font-size: 1rem; letter-spacing: 0.02em; }
+.tb-id .xp-bar { width: 88px; height: 6px; }
+
+/* Leitura: rótulo micro em caixa alta sobre o número, como mostrador de instrumento. */
+.tb-leitura { display: flex; gap: var(--space-3); flex-shrink: 0; }
+.leitura { display: flex; flex-direction: column; line-height: 1.1; }
+.leitura > span:first-child {
+  font-size: 0.7em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+}
+.leitura > :last-child { font-size: 0.95rem; }
+/* "Hiper Poção, 6 vagas no time · nv 30" não cabe numa barra de uma linha; o título devolve o resto. */
+.tb-corta { max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* O ouro é o número que o jogador veio ver; é recompensa, e recompensa acende. */
+.leitura-ouro > :last-child { color: var(--accent); font-weight: 600; font-size: 1.1rem; }
+
+.tb-acoes { display: flex; gap: var(--space-1); margin-left: auto; flex-shrink: 0; }
+/* Atalho de modal é navegação, não ação primária: fica mais leve que Parar e Sair. */
+.tb-acoes button[data-open] { padding: var(--space-1) var(--space-2); font-size: 0.9em; color: var(--muted); }
+.tb-acoes button[data-open]:hover:not([disabled]) { color: var(--text); }
+/* O par que sai da hunt fica separado do resto por um divisor, não por distância. */
+.tb-saida { display: flex; gap: var(--space-1); padding-left: var(--space-2); margin-left: var(--space-1); border-left: 1px solid var(--border); flex-shrink: 0; }
+
+.tb-status { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; flex-shrink: 0; font-size: 0.75em; }
+.conn { display: flex; align-items: center; gap: var(--space-1); }
+.conn::before { content: ""; width: 6px; height: 6px; background: currentColor; flex-shrink: 0; }
+.conn[data-conn="open"] { color: var(--ok); }
+.conn[data-conn="reconnecting"], .conn[data-conn="connecting"], .conn[data-conn="catching-up"] { color: var(--accent); }
+.conn[data-conn="closed"] { color: var(--danger); }
+
+/* ── Ficha do ativo ─────────────────────────────────────────────────────────── */
 .active-card { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); }
-.active-sprite { transform: scale(2); transform-origin: top left; margin-bottom: var(--space-3); }
-progress { width: 100%; height: 10px; }
-.moves { list-style: none; margin: 0; padding: var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); }
+/* Cabeçalho em linha: o sprite vive numa caixa de tamanho fixo, então não invade o nome. Antes
+ * `transform: scale(2)` transbordava da caixa do frame e cobria o texto de baixo. */
+.active-topo { display: flex; align-items: center; gap: var(--space-3); }
+.active-card h2 { font-size: 1.05rem; min-width: 0; overflow-wrap: anywhere; }
+.active-sprite-box { flex-shrink: 0; }
+.active-corpo { display: flex; flex-direction: column; gap: var(--space-2); }
+.medidor { display: flex; flex-direction: column; gap: 2px; }
+.medidor-topo { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.75em; }
+.medidor-topo > :first-child { letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.active-card progress { height: 8px; }
+.active-vazio { color: var(--muted); padding: var(--space-2) 0; }
+
+/* ── Golpes ─────────────────────────────────────────────────────────────────── */
+.moves { list-style: none; margin: 0; padding: var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); overflow-y: auto; min-height: 0; }
 .move { display: flex; gap: var(--space-2); align-items: baseline; }
-.move-cd { margin-left: auto; width: 40px; height: 6px; background: var(--border); position: relative; overflow: hidden; }
+.move-cd { margin-left: auto; width: 40px; height: 6px; background: var(--border); position: relative; overflow: hidden; flex-shrink: 0; }
 .move-cd::after { content: ""; position: absolute; inset: 0; background: var(--accent); transform: scaleX(var(--cd, 0)); transform-origin: left; }
 .move-cd[data-cd="0"] { background: var(--ok); }
-.team-strip { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-2); }
-.slot { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); min-height: 56px; }
+
+/* ── Time ───────────────────────────────────────────────────────────────────── */
+.team-strip { display: grid; grid-template-rows: repeat(6, 1fr); gap: var(--space-1); padding: var(--space-2); width: 100%; }
+.slot {
+  display: flex; align-items: center; justify-content: center; gap: var(--space-2);
+  min-height: 0; padding: var(--space-1); overflow: hidden;
+}
+.slot-hp { font-size: 0.8em; }
 .slot-active { border-color: var(--accent); }
-.slot-empty, .slot-locked { color: var(--muted); display: grid; place-items: center; border: var(--border-w) dashed var(--border); }
-.slot-sprite { transform: scale(1); }
+.slot-empty, .slot-locked { color: var(--muted); border: var(--border-w) dashed var(--border); font-size: 0.8em; }
+/* O slot travado diz o nível que o destrava: é informação, e substitui o cadeado em emoji que
+ * estava fazendo papel de ícone num sistema que não tem ícone nenhum. */
+.slot-locked { letter-spacing: 0.04em; }
+
+/* ── Log ────────────────────────────────────────────────────────────────────── */
 .log { height: 100%; display: flex; flex-direction: column; min-height: 0; }
-.log-header { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-1) var(--space-2); border-bottom: var(--border-w) solid var(--border); }
+.log-header {
+  display: flex; gap: var(--space-2); align-items: center;
+  padding: var(--space-1) var(--space-3); border-bottom: var(--border-w) solid var(--border);
+  font-size: 0.75em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+}
+.log-header label { display: flex; align-items: center; gap: var(--space-1); cursor: pointer; }
+.log-filtro { margin-left: auto; }
 .log-header input { width: auto; }
-.log-lines { list-style: none; margin: 0; padding: var(--space-2); overflow-y: auto; flex: 1; min-height: 0; }
-.log-line { padding: 1px 0; } .log-combat { color: var(--text); } .log-reward { color: var(--accent); }
+.log-lines { list-style: none; margin: 0; padding: var(--space-2) var(--space-3); overflow-y: auto; flex: 1; min-height: 0; }
+.log-line { padding: 1px 0; }
+.log-combat { color: var(--text); } .log-reward { color: var(--accent); }
 .log-info { color: var(--muted); } .log-alert { color: var(--danger); }
+.log-vazio { color: var(--muted); padding: var(--space-2) var(--space-3); }
+
 .scene-error { color: var(--danger); padding: var(--space-3); }
 .catchup, .stopped { display: flex; flex-direction: column; gap: var(--space-2); align-items: center; padding: var(--space-4); }
+
+/* ── Janela estreita ────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .game-grid {
+    grid-template-columns: 1fr;
+    /* Altura explícita para a cena. Com `1fr` numa grade de altura automática a linha resolve
+     * pelo conteúdo, e o container da cena crescia sem limite: a página virava um corredor preto
+     * de milhares de pixels com o mapa perdido no meio. */
+    grid-template-rows: auto 55vh auto auto;
+    grid-template-areas: "top" "center" "left" "bottom";
+    height: auto; min-height: 100vh;
+  }
+  .grid-right { display: none; }
+  .grid-bottom { min-height: 120px; }
+
+  /* Numa janela estreita tudo pode quebrar e encolher. Sem soltar o `flex-shrink` dos grupos, a
+   * fileira de botões continuava numa linha só e empurrava a página para fora da tela. */
+  .top-bar { flex-wrap: wrap; overflow-x: visible; gap: var(--space-2); }
+  .top-bar > * { flex-shrink: 1; min-width: 0; }
+  .tb-acoes { margin-left: 0; flex-wrap: wrap; gap: var(--space-1); }
+  .tb-leitura { flex-wrap: wrap; gap: var(--space-3); }
+  /* A barra inteira encolhe: cinco linhas de moldura num telefone não sobram tela para o jogo. */
+  .top-bar button { padding: var(--space-1) var(--space-2); font-size: 0.85em; }
+  .tb-saida { padding-left: var(--space-1); margin-left: 0; }
+  /* Estado vira uma linha só, ao lado do nome, em vez de uma quarta faixa. */
+  .tb-status { flex-direction: row; align-items: baseline; gap: var(--space-2); }
+  /* "Próximo destrave" é o que menos decide numa tela estreita. */
+  .tb-leitura .leitura:last-child { display: none; }
+}

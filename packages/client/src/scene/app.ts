@@ -42,7 +42,9 @@ const PENDING_EVOLVE_FLASH_MS = 1000
 export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise<Scene> {
   const isHidden = deps.isHidden ?? (() => document.hidden)
   const app = new Application()
-  await app.init({ background: 0x101418, resizeTo: parent, resolution: window.devicePixelRatio || 1, autoDensity: true, antialias: false, roundPixels: true })
+  // Mesmo preto de página do `--bg` do tema: a tarja que sobra quando o mundo é menor que o
+  // painel tem que sumir contra o fundo, não virar um terceiro plano.
+  await app.init({ background: 0x0f0f14, resizeTo: parent, resolution: window.devicePixelRatio || 1, autoDensity: true, antialias: false, roundPixels: true })
   app.canvas.style.imageRendering = 'pixelated'
   parent.appendChild(app.canvas)
 

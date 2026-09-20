@@ -3,34 +3,66 @@ import type { AppContext } from '../../app-context.js'
 import { activePokemon } from '../../state/hunt-view.js'
 import { displayName } from '../../state/log.js'
 import { el, pct } from '../dom.js'
-import { applySpriteStyle } from '../sprite-css.js'
+import { spriteThumb } from '../sprite-css.js'
+
+/** Lado do sprite do ativo, em pixels. Dobro da miniatura das listas: aqui ele é o assunto. */
+const LADO_SPRITE = 64
+/** Acima disto o HP é saudável; abaixo do segundo degrau é crítico. Leitura de instrumento. */
+const HP_SAUDAVEL = 0.5
+const HP_CRITICO = 0.2
+
+const estadoDoHp = (hp: number, hpMax: number): string => {
+  const fracao = hpMax > 0 ? hp / hpMax : 0
+  if (fracao > HP_SAUDAVEL) return 'ok'
+  return fracao > HP_CRITICO ? 'ferido' : 'critico'
+}
+
+/** Um medidor rotulado: rótulo e número na mesma linha, barra embaixo. */
+function medidor(rotulo: string, valor: HTMLElement, barra: HTMLElement): HTMLElement {
+  return el('div', { class: 'medidor' },
+    el('div', { class: 'medidor-topo' }, el('span', {}, rotulo), valor), barra)
+}
 
 /** Cartão do Pokémon ativo: sprite, nome, nível, HP e XP até o próximo nível. */
 export function mountActivePokemon(root: HTMLElement, ctx: AppContext): () => void {
-  const sprite = el('div', { class: 'active-sprite' })
-  const title = el('h2', { 'data-name': '' }, '—')
-  const hp = el('progress', { class: 'hp-bar', 'data-hp': '', max: '1', value: '0' })
-  const hpText = el('span', { class: 'muted', 'data-hp-text': '' }, '0/0')
+  // O sprite vive numa caixa de tamanho fixo. Antes era `transform: scale(2)` solto, que mantinha
+  // a caixa do tamanho do frame e transbordava por cima do nome — "Charizard L61" saía ilegível.
+  const caixaSprite = el('div', { class: 'active-sprite-box' })
+  const title = el('h2', { 'data-name': '' }, 'sem Pokémon em campo')
+  const hp = el('progress', { class: 'hp-bar', 'data-hp': '', 'data-hp-state': 'ok', max: '1', value: '0' })
+  const hpText = el('span', { 'data-hp-text': '' }, '—')
   const xp = el('progress', { class: 'xp-bar', 'data-xp': '', max: '100', value: '0' })
-  root.append(el('section', { class: 'active-card panel' }, sprite, title, hp, hpText, el('span', { class: 'muted' }, 'XP'), xp))
+  const xpText = el('span', { class: 'muted', 'data-xp-text': '' }, '—')
+  const corpo = el('div', { class: 'active-corpo' }, medidor('HP', hpText, hp), medidor('XP', xpText, xp))
+  root.append(el('section', { class: 'active-card panel' },
+    el('div', { class: 'active-topo' }, caixaSprite, title), corpo))
 
   let species = ''
   return ctx.hunt.subscribe(activePokemon, (active) => {
-    if (!active) { title.textContent = '—'; return }
+    if (!active) {
+      // Estado vazio com palavra, não travessão: quem chega e vê "—" não sabe se quebrou ou se
+      // ainda não começou.
+      title.textContent = 'sem Pokémon em campo'
+      corpo.hidden = true
+      caixaSprite.replaceChildren()
+      species = ''
+      return
+    }
+    corpo.hidden = false
     if (active.speciesName !== species) {
       species = active.speciesName
-      sprite.replaceChildren()
-      sprite.className = 'active-sprite'
-      sprite.removeAttribute('style')
-      applySpriteStyle(sprite, ctx.atlas, species)
+      caixaSprite.replaceChildren(spriteThumb(ctx.atlas, species, LADO_SPRITE))
     }
     title.textContent = `${displayName(active.speciesName)} L${active.level}`
     hp.setAttribute('max', String(active.hpMax))
     hp.setAttribute('value', String(active.hp))
+    hp.setAttribute('data-hp-state', estadoDoHp(active.hp, active.hpMax))
     hpText.textContent = `${active.hp}/${active.hpMax}`
     const growth = ctx.registry.species.get(active.speciesName)?.growthRate ?? 'medium-fast'
     const floor = xpForLevel(growth, active.level)
     const span = xpForLevel(growth, active.level + 1) - floor
-    xp.setAttribute('value', String(pct(Math.max(0, active.xp - floor), span)))
+    const dentro = pct(Math.max(0, active.xp - floor), span)
+    xp.setAttribute('value', String(dentro))
+    xpText.textContent = `${dentro}%`
   })
 }

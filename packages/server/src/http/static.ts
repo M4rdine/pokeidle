@@ -12,6 +12,17 @@ import { parseBody } from './validate.js'
 const AtlasParams = z.object({ file: z.string().min(1).max(64) }).strict()
 const IMMUTABLE = 'public, max-age=31536000, immutable'
 
+/** Tipos que o build do cliente emite dentro de `/app`. O que não estiver aqui não é servido. */
+const TIPOS_DE_APP: Readonly<Record<string, string>> = {
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.map': 'application/json; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.woff2': 'font/woff2',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+}
+
 async function fileOr404(filePath: string): Promise<Buffer | null> {
   try { return await readFile(filePath) } catch { return null }
 }
@@ -27,6 +38,29 @@ export async function registerStatic(app: FastifyInstance, config: Config): Prom
     return reply.header('cache-control', 'public, max-age=3600').type(type).send(body)
   })
   if (!existsSync(config.CLIENT_DIST)) return
+  const pastaApp = path.join(config.CLIENT_DIST, 'app')
+  /**
+   * Reserva para os arquivos com hash. `wildcard: false` faz o `@fastify/static` varrer a pasta
+   * no registro e criar uma rota por arquivo: um build feito com o servidor no ar gera nomes que
+   * não existiam naquela varredura, e a página abre em branco porque o CSS volta 404 em JSON.
+   *
+   * O alcance é só `/app`, onde moram os arquivos com hash — nenhuma rota de API muda de
+   * comportamento, e o 404 de rota desconhecida continua sendo JSON.
+   */
+  app.get<{ Params: { '*': string } }>('/app/*', async (request, reply) => {
+    const pedido = path.resolve(pastaApp, request.params['*'])
+    const relativo = path.relative(pastaApp, pedido)
+    // Fora de `/app` não se serve nada, por mais que o caminho se contorça para chegar lá.
+    if (relativo.startsWith('..') || path.isAbsolute(relativo)) {
+      return reply.status(404).send(errorBody('not-found', 'arquivo não encontrado'))
+    }
+    const tipo = TIPOS_DE_APP[path.extname(pedido).toLowerCase()]
+    if (tipo === undefined) return reply.status(404).send(errorBody('not-found', 'arquivo não encontrado'))
+    const corpo = await fileOr404(pedido)
+    if (!corpo) return reply.status(404).send(errorBody('not-found', 'arquivo não encontrado'))
+    return reply.header('cache-control', IMMUTABLE).type(tipo).send(corpo)
+  })
+
   await app.register(fastifyStatic, {
     root: config.CLIENT_DIST,
     prefix: '/',

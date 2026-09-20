@@ -31,30 +31,30 @@
   font-size: 0.8em; text-transform: lowercase;
 }
 .filter-type:hover { filter: brightness(1.35); }
-/* Cada tipo empresta a cor por uma variável: a borda e o ponto usam o tom, mas o rótulo
-   fica no texto claro do tema — `dark` e `ghost` são escuros demais para serem lidos. */
-.filter-type.type-normal { --t: var(--type-normal); }
-.filter-type.type-fire { --t: var(--type-fire); }
-.filter-type.type-water { --t: var(--type-water); }
-.filter-type.type-electric { --t: var(--type-electric); }
-.filter-type.type-grass { --t: var(--type-grass); }
-.filter-type.type-ice { --t: var(--type-ice); }
-.filter-type.type-fighting { --t: var(--type-fighting); }
-.filter-type.type-poison { --t: var(--type-poison); }
-.filter-type.type-ground { --t: var(--type-ground); }
-.filter-type.type-flying { --t: var(--type-flying); }
-.filter-type.type-psychic { --t: var(--type-psychic); }
-.filter-type.type-bug { --t: var(--type-bug); }
-.filter-type.type-rock { --t: var(--type-rock); }
-.filter-type.type-ghost { --t: var(--type-ghost); }
-.filter-type.type-dragon { --t: var(--type-dragon); }
-.filter-type.type-dark { --t: var(--type-dark); }
-.filter-type.type-steel { --t: var(--type-steel); }
-.filter-type.type-fairy { --t: var(--type-fairy); }
+/* Cada tipo empresta a cor por uma variável: a borda e o ponto usam o tom, mas o rótulo fica no
+   texto claro do tema — `dark` e `ghost` são escuros demais para serem lidos sobre o painel. */
+.type-normal { --t: var(--type-normal); }
+.type-fire { --t: var(--type-fire); }
+.type-water { --t: var(--type-water); }
+.type-electric { --t: var(--type-electric); }
+.type-grass { --t: var(--type-grass); }
+.type-ice { --t: var(--type-ice); }
+.type-fighting { --t: var(--type-fighting); }
+.type-poison { --t: var(--type-poison); }
+.type-ground { --t: var(--type-ground); }
+.type-flying { --t: var(--type-flying); }
+.type-psychic { --t: var(--type-psychic); }
+.type-bug { --t: var(--type-bug); }
+.type-rock { --t: var(--type-rock); }
+.type-ghost { --t: var(--type-ghost); }
+.type-dragon { --t: var(--type-dragon); }
+.type-dark { --t: var(--type-dark); }
+.type-steel { --t: var(--type-steel); }
+.type-fairy { --t: var(--type-fairy); }
 .filter-type { color: var(--text); border-color: var(--t); display: inline-flex; align-items: center; gap: 0.35em; }
 .filter-type::before { content: ''; width: 0.55em; height: 0.55em; background: var(--t); }
-.filter-type[aria-pressed='true'] { background: var(--t); color: var(--bg); }
-.filter-type[aria-pressed='true']::before { background: var(--bg); }
+.filter-type[aria-pressed='true'] { background: color-mix(in srgb, var(--t) 28%, var(--panel)); border-width: 2px; }
+.filter-type[aria-pressed='true']::before { background: var(--t); box-shadow: 0 0 0 2px color-mix(in srgb, var(--t) 45%, transparent); }
 
 .filter-level-field { display: inline-flex; align-items: center; gap: var(--space-1); }
 .filter-level-field label { color: var(--muted); }
@@ -68,7 +68,10 @@
 /* --- ficha --- */
 .area-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 .area-row {
-  display: grid; grid-template-columns: 1fr auto; align-items: stretch; gap: var(--space-3);
+  /* A coluna da ação é fixa: com `auto` ela media pelo texto ("Caçar" ou "nível 23") e empurrava
+     todas as colunas de dados para um x diferente em cada linha, que é justamente o que esta
+     ficha existe para não fazer. */
+  display: grid; grid-template-columns: 1fr 7rem; align-items: stretch; gap: var(--space-3);
   background: var(--panel); border: var(--border-w) solid var(--border);
   padding-right: var(--space-3);
   /* Só a borda muda no hover: a linha não se mexe, então a coluna não pisca ao passar o mouse. */
@@ -76,8 +79,12 @@
 }
 .area-row:hover { border-color: var(--accent); }
 .area-row-open { border-color: var(--accent); }
-.area-row-locked { opacity: 0.55; }
-.area-row-locked:hover { border-color: var(--border); }
+/* O que dá para caçar agora é painel levantado; o que ainda não abriu fica rente ao fundo da
+   página. A separação é o plano, não a opacidade: os números da área bloqueada continuam em
+   contraste cheio, porque é por eles que se decide o que perseguir. */
+.area-row-locked { background: var(--bg); border-color: color-mix(in srgb, var(--border) 60%, var(--bg)); }
+.area-row-locked:hover { border-color: var(--accent); }
+.area-row-locked .area-title { color: var(--muted); }
 
 /* As larguras são fixas de propósito: é o alinhamento entre linhas que torna a ficha comparável. */
 .area-main {
@@ -94,6 +101,7 @@
 .area-title { font-size: 1rem; font-weight: 600; letter-spacing: 0.02em; }
 .area-missing { color: var(--accent); font-size: 0.8em; }
 .area-levels, .area-metric { display: flex; flex-direction: column; line-height: 1.15; }
+.area-metric { align-items: flex-end; text-align: right; }
 .area-levels strong, .area-metric strong { font-variant-numeric: tabular-nums; }
 .area-levels > span, .area-metric > span { font-size: 0.75em; letter-spacing: 0.04em; }
 /* As três métricas são células próprias do grid: ficam na mesma coluna em todas as linhas. */
@@ -104,6 +112,9 @@
 .area-more { font-size: 0.8em; }
 .area-types { display: flex; flex-wrap: wrap; gap: 2px; }
 .area-types .type { margin: 0; }
+/* `ghost` e `dark` como texto sobre o painel ficam em 2,6:1. O tom identifica na borda; o rótulo
+   é lido no claro do tema. (O mesmo vale para `.type` nas outras telas, ainda por revisar.) */
+.area-types .type, .analyzer-table .type { color: color-mix(in srgb, var(--t, currentColor) 45%, var(--text)); border-color: var(--t, currentColor); }
 /* Caixa de tamanho fixo: o frame do atlas tem 32 ou 64 px e o sprite é escalado para caber.
    O filho é posicionado, não item de grid, senão o grid o encolhe para 32 px e corta o quadro. */
 .sprite-thumb { position: relative; display: inline-block; overflow: hidden; flex: none; }
@@ -113,7 +124,12 @@
   translate: -50% -50%;
 }
 
-.area-gate { align-self: center; color: var(--accent); font-size: 0.85em; white-space: nowrap; }
+.area-gate {
+  align-self: center; justify-self: center;
+  color: var(--accent); font-size: 0.85em; white-space: nowrap;
+  padding: 2px var(--space-2);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
 .area-start { align-self: center; white-space: nowrap; }
 
 .matchup-good strong { color: var(--ok); }
@@ -134,6 +150,10 @@
   .area-row { transition: none; }
 }
 .analyzer-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+/* A primeira coluna fica com toda a sobra: sem isso, tirar a coluna "Nível" deixou uma faixa
+   morta entre os nomes e os números, e as colunas numéricas amontoadas no meio. */
+.analyzer-table th:first-child { width: 100%; }
+.analyzer-table .num, .analyzer-table td:last-child { white-space: nowrap; }
 .analyzer-table th, .analyzer-table td { padding: var(--space-1) var(--space-2); text-align: left; }
 .analyzer-table thead th {
   color: var(--muted); font-weight: 400; font-size: 0.8em;
@@ -151,16 +171,22 @@
 
 @media (max-width: 960px) {
   .area-filters { grid-template-columns: 1fr; }
+  /* O nome ocupa a linha inteira: espremido ao lado da faixa de nível, "Entrada da Caverna"
+     quebrava em duas e deixava a faixa pendurada ao lado da primeira palavra. */
+  .area-row { grid-template-columns: 1fr 5rem; }
   .area-main {
     grid-template-columns: 1fr auto auto;
-    grid-template-areas: 'nome faixa faixa' 'especies metrica-xp metrica-ouro' 'confronto confronto confronto';
+    grid-template-areas: 'nome nome nome' 'faixa metrica-xp metrica-ouro' 'especies especies especies' 'confronto confronto confronto';
     gap: var(--space-2);
+    padding: var(--space-2);
   }
   .area-name { grid-area: nome; }
   .area-levels { grid-area: faixa; flex-direction: row; gap: var(--space-1); align-items: baseline; }
   .area-species { grid-area: especies; }
-  .area-metric:nth-of-type(1) { grid-area: metrica-xp; }
-  .area-metric:nth-of-type(2) { grid-area: metrica-ouro; }
+  /* Largura fixa também aqui: sem ela o número de dígitos move a borda direita de linha para
+     linha, e a comparação entre áreas, que é o ponto da tela, não sobrevive ao celular. */
+  .area-metric:nth-of-type(1) { grid-area: metrica-xp; min-width: 4.5rem; }
+  .area-metric:nth-of-type(2) { grid-area: metrica-ouro; min-width: 4.5rem; }
   .area-metric:nth-of-type(3) { grid-area: confronto; flex-direction: row; gap: var(--space-1); align-items: baseline; }
   .analyzer-table { display: block; overflow-x: auto; white-space: nowrap; }
 }

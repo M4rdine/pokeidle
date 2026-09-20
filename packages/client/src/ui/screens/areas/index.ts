@@ -15,7 +15,7 @@
  *
  * Os filtros vivem na URL para a busca ser guardável e compartilhável.
  */
-import { estimateArea, type AreaEstimate, type TeamMember } from '@pokeidle/shared'
+import { estimateArea, type AreaEstimate, type TeamMember, type TypeName } from '@pokeidle/shared'
 import type { AppContext, ModalName } from '../../../app-context.js'
 import { PokedexSchema, StartHuntSchema, TeamSchema } from '../../../api/dto.js'
 import { MODAL_LABELS } from '../../../config.js'
@@ -34,7 +34,8 @@ interface Carregado {
   readonly caught: readonly string[]
 }
 
-const vazio: Carregado = { team: [], caught: [] }
+/** `null` enquanto a resposta não chegou: distingue "ainda não sei" de "seu time não fere". */
+const semDados = null
 
 export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
   const { me, hunts } = ctx.session.get()
@@ -46,7 +47,7 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
 
   let filters: AreaFilters = filtersFromSearch(typeof location === 'undefined' ? '' : location.search)
   let aberta: string | null = null
-  let dados: Carregado = vazio
+  let dados: Carregado | null = semDados
 
   const start = (id: string, button: HTMLElement): void => {
     error.textContent = ''
@@ -70,7 +71,10 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
   const estimativaDe = (id: string): AreaEstimate | null => {
     const area = areaDe(id)
     if (!area) return null
-    return estimateArea({ registry: ctx.registry, area, team: dados.team, caught: dados.caught, ballBonus: BALL_BONUS })
+    return estimateArea({
+      registry: ctx.registry, area,
+      team: dados?.team ?? [], caught: dados?.caught ?? [], ballBonus: BALL_BONUS,
+    })
   }
 
   const views = (): readonly AreaView[] => hunts.flatMap((hunt) => {
@@ -84,8 +88,14 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
   })
 
   const tiposDe = (species: string): readonly string[] => ctx.registry.species.get(species)?.types ?? []
+  /**
+   * Só os tipos que alguma área realmente tem. Dos dezoito, onze não existem em Kanto hoje: eram
+   * onze becos sem saída ocupando o maior bloco da tela e levando direto ao estado vazio.
+   */
+  const tiposDisponiveis = (areas: readonly AreaView[]): ReadonlySet<TypeName> =>
+    new Set(areas.flatMap((a) => a.species.flatMap((n) => tiposDe(n) as TypeName[])))
   const tipoDe = (species: string): string => tiposDe(species)[0] ?? 'normal'
-  const temNaPokedex = (species: string): boolean => dados.caught.includes(species)
+  const temNaPokedex = (species: string): boolean => dados?.caught.includes(species) ?? false
 
   const semResultado = (): HTMLElement => el('li', { class: 'area-empty panel' },
     'Nenhuma área combina com esses filtros. ',
@@ -107,19 +117,19 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
       ? `${todas.length} áreas`
       : `${escolhidas.length} de ${todas.length} áreas`
 
-    mount(filtrosBox, areaFilters({ filters, onChange: aplicar }))
+    mount(filtrosBox, areaFilters({ filters, onChange: aplicar, disponiveis: tiposDisponiveis(todas) }))
     limparBox.replaceChildren(contagem, clearFiltersButton({ filters, onChange: aplicar }))
     lista.replaceChildren()
     if (escolhidas.length === 0) { lista.append(semResultado()); return }
     for (const area of escolhidas) {
       lista.append(areaRow({
-        area, atlas: ctx.atlas, tipoDe, selecionada: aberta === area.id,
+        area, atlas: ctx.atlas, tipoDe, selecionada: aberta === area.id, estimado: dados !== null,
         onSelect: (id) => { aberta = aberta === id ? null : id; render() },
         onStart: start,
       }))
       if (aberta === area.id) {
         lista.append(el('li', { class: 'area-detail' },
-          areaAnalyzer({ estimate: area.estimate, atlas: ctx.atlas, tiposDe, temNaPokedex })))
+          areaAnalyzer({ estimate: area.estimate, atlas: ctx.atlas, tiposDe, temNaPokedex, ballBonus: BALL_BONUS })))
       }
     }
   }

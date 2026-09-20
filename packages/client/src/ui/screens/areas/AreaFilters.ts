@@ -9,13 +9,18 @@ import { el } from '../../dom.js'
 interface Props {
   readonly filters: AreaFilters
   readonly onChange: (filters: AreaFilters) => void
+  /** Tipos que alguma área realmente tem; os outros não viram botão. */
+  readonly disponiveis: ReadonlySet<TypeName>
 }
 
 const grupo = (legenda: string, ...filhos: HTMLElement[]): HTMLElement =>
   el('fieldset', { class: 'filter-group' }, el('legend', {}, legenda), ...filhos)
 
-function tipos({ filters, onChange }: Props): HTMLElement {
-  const botoes = TYPE_NAMES.map((tipo: TypeName) => {
+function tipos({ filters, onChange, disponiveis }: Props): HTMLElement {
+  // Um tipo já marcado continua aparecendo mesmo se sumir da lista: senão o filtro ficaria
+  // ativo sem nenhum botão que o desligue.
+  const visiveis = TYPE_NAMES.filter((t: TypeName) => disponiveis.has(t) || filters.types.includes(t))
+  const botoes = visiveis.map((tipo: TypeName) => {
     const ativo = filters.types.includes(tipo)
     return el('button', {
       type: 'button',
@@ -71,7 +76,7 @@ export function areaFilters(props: Props): HTMLElement {
 }
 
 /** Fica no cabeçalho, junto da contagem: é ela que o botão muda. */
-export function clearFiltersButton(props: Props): HTMLElement {
+export function clearFiltersButton(props: Pick<Props, 'filters' | 'onChange'>): HTMLElement {
   return el('button', {
     type: 'button', class: 'filter-clear', disabled: isEmpty(props.filters),
     onclick: () => props.onChange(emptyFilters()),

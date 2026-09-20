@@ -16,8 +16,8 @@ describe('GET /hunts', () => {
     const r = await api(t.app, cookie).get('/hunts')
     expect(r.statusCode).toBe(200)
     const { hunts } = r.json() as { hunts: { id: string; width: number; height: number; minLevel: number }[] }
-    // Kanto tem oito áreas; a lista vem do registro, então cresce quando a região cresce.
-    expect(hunts).toHaveLength(8)
+    // Duas regiões de oito áreas; a lista vem do registro, então cresce quando o conteúdo cresce.
+    expect(hunts).toHaveLength(16)
     expect(hunts[0]).toMatchObject({ id: 'campo-inicial', name: expect.any(String), width: 24, height: 36 })
     expect(hunts.every((h) => h.minLevel >= 1)).toBe(true)
   })
@@ -34,6 +34,16 @@ describe('GET /hunts', () => {
 })
 
 describe('portão de nível das áreas', () => {
+  it('a segunda região barra quem não alcançou o nível dela, e abre quando alcança', async () => {
+    await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
+    const barrado = await api(t.app, cookie).post('/hunts/gruta-umida/start')
+    expect(barrado.statusCode).toBe(403)
+    expect(barrado.json()).toMatchObject({ error: { code: 'area-locked', message: expect.stringContaining('34') } })
+    // 34 é o portão da região inteira, e nenhuma área dela abre antes disso. xp = nível³.
+    await t.db.update(trainers).set({ xp: 34 ** 3 }).where(eq(trainers.id, trainerId))
+    expect((await api(t.app, cookie).post('/hunts/gruta-umida/start')).statusCode).toBe(201)
+  })
+
   it('start numa área acima do nível recusa com 403 e diz o nível que falta', async () => {
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })
     const r = await api(t.app, cookie).post('/hunts/pico-rochoso/start')

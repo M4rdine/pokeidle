@@ -22,6 +22,11 @@ export const SpeciesSchema = z.object({
   captureRate: z.number().int().min(1).max(255),
   learnset: z.array(z.object({ move: kebab, level: z.number().int().min(1) })),
   evolvesTo: z.object({ species: kebab, level: z.number().int().min(2) }).optional(),
+  /**
+   * Como a espécie chega ao jogador quando não é caçando. Ausente significa selvagem, e o
+   * registro então exige que ela tenha uma área — senão é conteúdo que ninguém alcança.
+   */
+  obtainable: z.enum(['starter', 'legendary']).optional(),
 })
 export type Species = z.infer<typeof SpeciesSchema>
 export const SpeciesListSchema = z.array(SpeciesSchema)

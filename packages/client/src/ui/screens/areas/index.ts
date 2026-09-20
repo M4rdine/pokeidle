@@ -77,6 +77,13 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
     })
   }
 
+  const regiaoDe = (id: string) => {
+    for (const region of ctx.registry.regions.values()) {
+      if (region.areas.some((a) => a.id === id)) return region
+    }
+    return undefined
+  }
+
   const views = (): readonly AreaView[] => hunts.flatMap((hunt) => {
     const area = areaDe(hunt.id)
     const estimate = estimativaDe(hunt.id)
@@ -123,15 +130,29 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
     limparBox.replaceChildren(contagem, clearFiltersButton({ filters, onChange: aplicar }))
     lista.replaceChildren()
     if (escolhidas.length === 0) { lista.append(semResultado()); return }
-    for (const area of escolhidas) {
-      lista.append(areaRow({
-        area, atlas: ctx.atlas, tipoDe, selecionada: aberta === area.id, estimado: dados !== null,
-        onSelect: (id) => { aberta = aberta === id ? null : id; render() },
-        onStart: start,
-      }))
-      if (aberta === area.id) {
-        lista.append(el('li', { class: 'area-detail' },
-          areaAnalyzer({ estimate: area.estimate, atlas: ctx.atlas, tiposDe, temNaPokedex, ballBonus: BALL_BONUS, nomeDoItem })))
+
+    // Agrupado por região, na ordem em que o jogo as abre: com dezesseis áreas numa lista
+    // contínua some a noção de "onde estou e o que vem depois", que é metade do que a tela faz.
+    const regioes = [...ctx.registry.regions.values()].sort((a, b) => a.order - b.order)
+    for (const regiao of regioes) {
+      const daRegiao = escolhidas.filter((a) => regiaoDe(a.id)?.id === regiao.id)
+      if (daRegiao.length === 0) continue
+      const portao = ctx.registry.unlocks.regions[regiao.id] ?? 0
+      const fechada = daRegiao.every((a) => a.locked)
+      lista.append(el('li', { class: `area-region${fechada ? ' area-region-locked' : ''}` },
+        el('h2', {}, regiao.name),
+        el('span', { class: 'muted' }, `${daRegiao.length} ${daRegiao.length === 1 ? 'área' : 'áreas'}`),
+        fechada && portao > 1 ? el('span', { class: 'area-gate' }, `abre no nível ${portao}`) : null))
+      for (const area of daRegiao) {
+        lista.append(areaRow({
+          area, atlas: ctx.atlas, tipoDe, selecionada: aberta === area.id, estimado: dados !== null,
+          onSelect: (id) => { aberta = aberta === id ? null : id; render() },
+          onStart: start,
+        }))
+        if (aberta === area.id) {
+          lista.append(el('li', { class: 'area-detail' },
+            areaAnalyzer({ estimate: area.estimate, atlas: ctx.atlas, tiposDe, temNaPokedex, ballBonus: BALL_BONUS, nomeDoItem })))
+        }
       }
     }
   }

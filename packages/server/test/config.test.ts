@@ -12,6 +12,11 @@ describe('loadConfig', () => {
       CLIENT_DIST: expect.stringMatching(/client[/\\]dist$/),
     })
   })
+  it('TICK_MS é opcional e recusa valor fora da faixa', () => {
+    expect(loadConfig(base).TICK_MS).toBeUndefined()
+    expect(loadConfig({ ...base, TICK_MS: '40' }).TICK_MS).toBe(40)
+    expect(() => loadConfig({ ...base, TICK_MS: '1' })).toThrow()
+  })
   it('DEBUG_VIEWER, ASSETS_DIR e CLIENT_DIST aceitam override', () => {
     const c = loadConfig({ ...base, DEBUG_VIEWER: 'true', ASSETS_DIR: '/tmp/x', CLIENT_DIST: '/tmp/y' })
     expect(c).toMatchObject({ DEBUG_VIEWER: true, ASSETS_DIR: '/tmp/x', CLIENT_DIST: '/tmp/y' })

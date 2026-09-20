@@ -13,6 +13,7 @@ import { encodePng } from './png.js'
 import type { PixiSpritesheet } from './atlas.js'
 import { renderTilesetSheet, writeContactSheet } from './contact-sheet.js'
 import { importTiledMap, parseTiledTileset, type ImportOptions } from './tiled-import.js'
+import { importRegion } from './region-import.js'
 
 const out = (line: string): void => void process.stdout.write(`${line}\n`)
 
@@ -77,8 +78,9 @@ program
   .option('--extracted <dir>', 'pasta com PNGs extraídos e catalog.json', 'assets/extracted')
   .option('--manifest <file>', 'manifest de curadoria', 'tools/assets/manifest.json')
   .option('--out <dir>', 'pasta de saída dos atlases', 'assets/atlas')
-  .action(async (opts: { extracted: string; manifest: string; out: string }) => {
-    await buildAtlases({ extractedDir: opts.extracted, manifestPath: opts.manifest, outDir: opts.out }, out)
+  .option('--terrains <dir>', 'conjuntos de terreno desenhados', 'tools/assets/terrenos')
+  .action(async (opts: { extracted: string; manifest: string; out: string; terrains: string }) => {
+    await buildAtlases({ extractedDir: opts.extracted, manifestPath: opts.manifest, outDir: opts.out, terrainsDir: opts.terrains }, out)
   })
 
 program
@@ -115,6 +117,29 @@ program
     const target = join(opts.out, `${map.id}.json`)
     await writeFile(target, JSON.stringify(map, null, 2))
     out(`hunt gravada em ${target} (${map.width}x${map.height}, ${map.spawns.length} spawns)`)
+  })
+
+program
+  .command('region-import')
+  .argument('<tiled>', 'região exportada do Tiled em JSON (.tmj), com objetos "area"')
+  .option('--tileset <file>', 'tileset gerado pelo build', 'assets/atlas/tiles.tsj')
+  .option('--manifest <file>', 'opcional: usa os nomes do manifest em vez do registro do shared')
+  .option('--out <dir>', 'pasta dos mapas de área', 'packages/shared/data/hunts')
+  .option('--regions <file>', 'arquivo das regiões', 'packages/shared/data/regions.json')
+  .action(async (tiledPath: string, opts: { tileset: string; manifest?: string; out: string; regions: string }) => {
+    const tiled = await readJson(tiledPath)
+    const tileset = parseTiledTileset(await readJson(opts.tileset))
+    const { region, hunts } = importRegion(tiled, tileset, await importOptions(opts.manifest))
+    await mkdir(opts.out, { recursive: true })
+    for (const hunt of hunts) {
+      await writeFile(join(opts.out, `${hunt.id}.json`), JSON.stringify(hunt, null, 2))
+    }
+    // A região substitui a entrada de mesmo id e preserva as outras, para importar uma de cada vez.
+    const anteriores = (await readJson(opts.regions).catch(() => [])) as { id: string }[]
+    const lista = [...anteriores.filter((r) => r.id !== region.id), region].sort((a, b) =>
+      (a as { order?: number }).order === undefined ? 0 : ((a as { order: number }).order - (b as { order: number }).order))
+    await writeFile(opts.regions, `${JSON.stringify(lista, null, 2)}\n`)
+    out(`região ${region.id} com ${hunts.length} área(s): ${hunts.map((h) => `${h.id} (${h.width}x${h.height})`).join(', ')}`)
   })
 
 program

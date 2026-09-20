@@ -29,12 +29,19 @@ export function mountHunts(root: HTMLElement, ctx: AppContext): () => void {
       el('p', { class: 'hunt-levels' }, `níveis ${hunt.minLevel}–${hunt.maxLevel}`),
       button)
   })
+  // Região bloqueada aparece como um cartão só, com o nível que a abre: as áreas dela ainda não
+  // vêm do servidor, então não há o que listar por dentro.
   const known = new Set(hunts.map((h) => h.id))
-  const locked = Object.entries(ctx.registry.unlocks.hunts)
-    .filter(([id]) => !known.has(id))
+  const regionOf = new Map<string, string>()
+  for (const region of ctx.registry.regions.values()) {
+    for (const area of region.areas) regionOf.set(area.id, region.id)
+  }
+  const visibleRegions = new Set([...known].map((id) => regionOf.get(id)).filter((r): r is string => r !== undefined))
+  const locked = Object.entries(ctx.registry.unlocks.regions)
+    .filter(([id]) => !visibleRegions.has(id))
     .sort((a, b) => a[1] - b[1])
     .map(([id, level]) => el('article', { class: 'hunt-card hunt-locked panel', 'data-hunt': id },
-      el('h2', {}, huntName(id)),
+      el('h2', {}, ctx.registry.regions.get(id)?.name ?? huntName(id)),
       el('p', { class: 'hunt-levels' }, `destrava no nível ${level}`)))
 
   const progress = me ? trainerProgress(ctx.registry, me.trainer.xp) : null

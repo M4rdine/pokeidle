@@ -461,3 +461,45 @@ describe('buildAtlases', () => {
   })
 
 })
+
+describe('props de mais de dois tiles', () => {
+  it('corta um prop grande em N×N pedaços nomeados por coluna e linha', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }],
+      // Um prédio de 3×3: o Centro Pokémon não cabe nos 2×2 das árvores.
+      props: [{ name: 'centro', file: 'centro.png', size: 96 }],
+    }))
+    const propsDir = join(dir, 'props')
+    await writePng(join(propsDir, 'centro.png'), 96, 96, 120)
+
+    await buildAtlases({ extractedDir, manifestPath, outDir: dir, propsDir }, () => {})
+
+    const folha = JSON.parse(await readFile(join(dir, 'tiles.json'), 'utf8')) as { frames: Record<string, unknown> }
+    const esperados = [0, 1, 2].flatMap((y) => [0, 1, 2].map((x) => `centro-x${x}-y${y}`))
+    for (const nome of esperados) expect(folha.frames[nome], nome).toBeDefined()
+    expect(folha.frames['centro-x3-y0'], 'não pode inventar uma quarta coluna').toBeUndefined()
+  })
+
+  it('prop de um tile só continua saindo inteiro, sem sufixo de corte', async () => {
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }],
+      props: [{ name: 'pedra', file: 'pedra.png', size: 32 }],
+    }))
+    const propsDir = join(dir, 'props')
+    await writePng(join(propsDir, 'pedra.png'), 32, 32, 120)
+
+    await buildAtlases({ extractedDir, manifestPath, outDir: dir, propsDir }, () => {})
+
+    const folha = JSON.parse(await readFile(join(dir, 'tiles.json'), 'utf8')) as { frames: Record<string, unknown> }
+    expect(folha.frames['pedra']).toBeDefined()
+    expect(folha.frames['pedra-x0-y0']).toBeUndefined()
+  })
+})

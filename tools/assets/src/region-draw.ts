@@ -50,6 +50,11 @@ const RAIO_GRAMA_ALTA = RAIO_SPAWN - 1
  * mancha pequena um ruído lento desenha degraus retos, e o que se quer aqui é franja.
  */
 const ESCALA_BORDA_ALTA = 3
+/** Prop do prédio do Centro Pokémon e o lado dele em tiles. */
+const CENTRO_PREDIO = 'centro-pokemon'
+const LADO_CENTRO = 3
+/** Quantas linhas do prédio ficam acima do jogador; a de baixo é a parede que ele encosta. */
+const LINHAS_ACIMA_DO_CENTRO = 2
 /** Deformação da borda de uma massa: multiplica o raio entre 0,7 e 1,3 em volta do contorno. */
 const BORDA_MIN = 0.7
 const BORDA_VAO = 0.6
@@ -245,6 +250,55 @@ function espalharProps(grade: Grade, area: Area): void {
   })
 }
 
+/** Canto superior esquerdo do prédio cuja coluna do meio fica em cima da porta. */
+const cantoDoPredio = (porta: Ponto): Ponto => ({ x: porta.x - 1, y: porta.y - LADO_CENTRO })
+
+/**
+ * Assenta um prop de 3×3 com o canto superior esquerdo em `canto`. As duas linhas de cima vão
+ * para a copa, desenhada acima do jogador, e a de baixo para o detalhe; as nove barram passagem,
+ * porque prédio e rochedo são sólidos.
+ */
+function colocarPredio(grade: Grade, area: Area, prop: string, canto: Ponto): void {
+  for (let dy = 0; dy < LADO_CENTRO; dy++) {
+    for (let dx = 0; dx < LADO_CENTRO; dx++) {
+      const i = indiceDe(area, canto.x + dx, canto.y + dy)
+      const nome = `${prop}-x${dx}-y${dy}`
+      if (dy < LINHAS_ACIMA_DO_CENTRO) grade.canopy[i] = nome
+      else grade.detail[i] = nome
+      grade.blocked[i] = true
+      grade.reservado.add(i)
+    }
+  }
+}
+
+/**
+ * Desenha o prédio do Centro acima da porta. Antes disto o Centro era só um ponto no `HuntMap`: o
+ * jogador andava até um lugar invisível para curar, o que é a definição de mapa que não conta nada.
+ * A porta, que fica fora da moldura, continua livre.
+ */
+function pintarCentro(grade: Grade, area: Area, porta: Ponto, temTile: (nome: string) => boolean): void {
+  if (!temTile(`${CENTRO_PREDIO}-x0-y0`)) return
+  colocarPredio(grade, area, CENTRO_PREDIO, cantoDoPredio(porta))
+}
+
+/**
+ * Assenta o marco da área, se ela declarar um. Roda depois do Centro: a busca usa `livre`, que
+ * respeita o que já está reservado, então o marco nunca pisa no prédio.
+ *
+ * Varre a partir do canto superior esquerdo, ao contrário do Centro, que parte do inferior
+ * direito — os dois marcos da área ficam longe um do outro sem ninguém precisar coordenar.
+ */
+function pintarMarco(grade: Grade, area: Area, temTile: (nome: string) => boolean): void {
+  const { marco } = area.bioma
+  if (marco === undefined || !temTile(`${marco}-x0-y0`)) return
+  const cabe = (x: number, y: number): boolean => livre(grade, area, x, y, LADO_CENTRO, LADO_CENTRO)
+  // Sem lugar para o marco a área simplesmente fica sem ele: uma caverna quase toda de rocha é
+  // um mapa válido, e derrubar o desenho por causa de um enfeite seria desproporcional.
+  const canto = tentarAcharLivre(grade, area, 2, 2, 1, cabe)
+  if (canto === null) return
+  colocarPredio(grade, area, marco, canto)
+}
+
 /**
  * Pinta uma mancha de grama alta em volta de cada alvo de spawn, com o pincel de `campo-alta`.
  * É o que transforma o mapa em informação: quem olha vê onde os Pokémon aparecem, em vez de
@@ -284,7 +338,24 @@ function pintarGramaAlta(grade: Grade, area: Area, alvos: readonly Ponto[], temT
  * chega na borda. Andável, vazio e fora da copa: um Centro debaixo de uma árvore existe, mas o
  * jogador nunca o vê, porque a copa desenha acima dele.
  */
-function acharLivre(grade: Grade, area: Area, x0: number, y0: number, dx: number, margem = 1): { x: number; y: number } {
+/** Como `acharLivre`, mas devolve `null` quando não acha, para quem pode seguir sem o lugar. */
+function tentarAcharLivre(grade: Grade, area: Area, x0: number, y0: number, dx: number, cabe: (x: number, y: number) => boolean): Ponto | null {
+  const { areaWidth: aw, areaHeight: ah } = GRADE
+  let x = x0
+  let y = y0
+  for (let passo = 0; passo < aw * ah; passo++) {
+    if (cabe(x, y)) return { x, y }
+    x += dx
+    if (x < 1 || x >= aw - 1) {
+      x = dx > 0 ? 1 : aw - 2
+      y += 1
+      if (y >= ah - 1) y = 1
+    }
+  }
+  return null
+}
+
+function acharLivre(grade: Grade, area: Area, x0: number, y0: number, dx: number, margem = 1, cabe?: (x: number, y: number) => boolean): { x: number; y: number } {
   const { areaWidth: aw, areaHeight: ah } = GRADE
   const vago = (i: number): boolean =>
     !grade.blocked[i] && grade.detail[i] === null && grade.canopy[i] === null && !grade.reservado.has(i)
@@ -298,7 +369,7 @@ function acharLivre(grade: Grade, area: Area, x0: number, y0: number, dx: number
     let y = Math.min(Math.max(y0, margem), ah - margem - 1)
     for (let passo = 0; passo < aw * ah; passo++) {
       const i = indiceDe(area, x, y)
-      if (vago(i) && (!exigePuro || grade.ground[i]!.includes('-aaaa'))) return { x, y }
+      if (vago(i) && (!exigePuro || grade.ground[i]!.includes('-aaaa')) && (cabe === undefined || cabe(x, y))) return { x, y }
       x += dx
       if (x < margem || x >= aw - margem) {
         x = dx > 0 ? margem : aw - margem - 1
@@ -334,7 +405,13 @@ function escolherPontos(grade: Grade, area: Area): Pontos {
   const primeiro = alvos[0]!
   const partida = acharLivre(grade, area, Math.max(1, primeiro.x - 2), Math.max(1, primeiro.y - 2), 1)
   grade.reservado.add(indiceDe(area, partida.x, partida.y))
-  const centro = acharLivre(grade, area, aw - 3, ah - 3, -1)
+  // O Centro precisa de 3×3 livres acima da porta para o prédio caber. Exigir isso na busca, e
+  // não depois, evita escolher uma porta boa e descobrir que o prédio não cabe nela.
+  const cabePredio = (x: number, y: number): boolean => {
+    const canto = cantoDoPredio({ x, y })
+    return livre(grade, area, canto.x, canto.y, LADO_CENTRO, LADO_CENTRO)
+  }
+  const centro = acharLivre(grade, area, aw - 3, ah - 3, -1, 1, cabePredio)
   grade.reservado.add(indiceDe(area, centro.x, centro.y))
   return { alvos, partida, centro }
 }
@@ -351,11 +428,37 @@ function distanciaAoSegmento(cx: number, cy: number, de: Ponto, para: Ponto): nu
  * O percurso da trilha: da partida até o Centro com a dobra no meio da área, não no canto. Um L
  * colado na borda vira moldura; o Z pelo meio cruza a área e é o que dá direção ao olho.
  */
-function percurso(partida: Ponto, centro: Ponto): readonly (readonly [Ponto, Ponto])[] {
-  const meio = Math.round((partida.x + centro.x) / 2)
-  const dobra1 = { x: meio, y: partida.y }
-  const dobra2 = { x: meio, y: centro.y }
-  return [[partida, dobra1], [dobra1, dobra2], [dobra2, centro]]
+const manhattan = (a: Ponto, b: Ponto): number => Math.abs(a.x - b.x) + Math.abs(a.y - b.y)
+
+/**
+ * O caminho sai da partida, passa por todas as zonas de spawn e termina na porta do Centro. Antes
+ * era um Z entre partida e Centro pelo meio da área: atravessava o mapa sem tocar em nada, e é o
+ * que fazia a trilha parecer enfeite. Agora ela liga o que interessa — onde se caça e onde se cura.
+ *
+ * A ordem é a do vizinho mais próximo. Não é a rota ótima, e não precisa ser: o que importa é não
+ * ziguezaguear de um lado ao outro da área entre duas paradas vizinhas.
+ */
+function percurso(partida: Ponto, alvos: readonly Ponto[], centro: Ponto): readonly (readonly [Ponto, Ponto])[] {
+  const restantes = [...alvos]
+  const paradas: Ponto[] = [partida]
+  let atual = partida
+  while (restantes.length > 0) {
+    let melhor = 0
+    for (let i = 1; i < restantes.length; i++) {
+      if (manhattan(atual, restantes[i]!) < manhattan(atual, restantes[melhor]!)) melhor = i
+    }
+    atual = restantes.splice(melhor, 1)[0]!
+    paradas.push(atual)
+  }
+  paradas.push(centro)
+
+  // Cada perna vira um L, porque o desenho só sabe pintar segmento reto. A dobra alterna de lado
+  // a cada perna: dobrando sempre igual, o caminho vira escada e denuncia o gerador.
+  return paradas.slice(1).flatMap((para, i): (readonly [Ponto, Ponto])[] => {
+    const de = paradas[i]!
+    const dobra = i % 2 === 0 ? { x: para.x, y: de.y } : { x: de.x, y: para.y }
+    return [[de, dobra], [dobra, para]]
+  })
 }
 
 /**
@@ -367,8 +470,8 @@ function percurso(partida: Ponto, centro: Ponto): readonly (readonly [Ponto, Pon
 function pintarTrilha(grade: Grade, area: Area, pontos: Pontos): void {
   const { bioma } = area
   if (bioma.trilha === null) return
-  const { partida, centro } = pontos
-  const trechos = percurso(partida, centro)
+  const { partida, alvos, centro } = pontos
+  const trechos = percurso(partida, alvos, centro)
   const naTrilha = (cx: number, cy: number): boolean =>
     trechos.some(([de, para]) => distanciaAoSegmento(cx, cy, de, para) <= LARGURA_TRILHA)
 
@@ -453,8 +556,13 @@ export function desenharRegiao(spec: RegionSpec, temTile: (nome: string) => bool
     }
     pintarTerreno(grade, area, temTile)
     const pontos = escolherPontos(grade, area)
-    pintarGramaAlta(grade, area, pontos.alvos, temTile)
+    pintarCentro(grade, area, pontos.centro, temTile)
+    pintarMarco(grade, area, temTile)
+    // A trilha antes da grama alta: ela só pinta sobre material primário puro, então o que já é
+    // caminho sobrevive e a grama cresce em volta. Na ordem inversa a grama cobria a zona de
+    // spawn e a trilha não conseguia mais entrar nela.
     pintarTrilha(grade, area, pontos)
+    pintarGramaAlta(grade, area, pontos.alvos, temTile)
     espalharProps(grade, area)
     objetos.push(...objetosDaArea(area, pontos))
   })

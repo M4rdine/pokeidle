@@ -42,6 +42,7 @@ const montar = (over: Record<string, unknown> = {}, hunts?: readonly Resumo[]) =
 const idsVisiveis = (root: HTMLElement) => [...root.querySelectorAll('.area-row')].map((r) => r.getAttribute('data-area'))
 /** A barra de filtros é recriada a cada render: guardar o nó antigo lê o estado de antes. */
 const tipo = (root: HTMLElement, nome: string) => root.querySelector<HTMLButtonElement>(`.filter-type.type-${nome}`)!
+const tipoOpcional = (root: HTMLElement, nome: string) => root.querySelector<HTMLButtonElement>(`.filter-type.type-${nome}`)
 
 // A tela escreve os filtros na URL, e o happy-dom compartilha `location` entre os casos do
 // arquivo: sem limpar, um filtro vaza para o teste seguinte.
@@ -77,15 +78,28 @@ describe('navegador de áreas', () => {
     expect(root.querySelector('.area-count')?.textContent).toMatch(/^\d+ de 3 áreas$/)
   })
 
+  it('só aparecem os tipos que alguma área tem: nada de filtro que só leva ao vazio', () => {
+    const root = montar()
+    // As três áreas do fixture cobrem água, pedra, fogo, terra, planta, veneno, voador e fantasma.
+    expect(tipoOpcional(root, 'water')).not.toBeNull()
+    expect(tipoOpcional(root, 'rock')).not.toBeNull()
+    // Nenhuma tem dragão ou fada, então esses botões não existem.
+    expect(tipoOpcional(root, 'dragon')).toBeNull()
+    expect(tipoOpcional(root, 'fairy')).toBeNull()
+  })
+
   it('filtro sem resultado explica o que fazer, em vez de deixar a tela vazia', () => {
     const root = montar()
-    tipo(root, 'dragon').click()
+    // Pedra só existe no Pico Rochoso, que é de nível 25 a 35: com a faixa 2–6 não sobra nada.
+    tipo(root, 'rock').click()
+    root.querySelector<HTMLInputElement>('#filtro-maxLevel')!.value = '6'
+    root.querySelector<HTMLInputElement>('#filtro-maxLevel')!.dispatchEvent(new Event('input', { bubbles: true }))
     expect(idsVisiveis(root)).toEqual([])
     const vazio = root.querySelector('.area-empty')!
     expect(vazio.textContent).toContain('Nenhuma área')
-    // E o atalho devolve a lista inteira.
+    // O atalho solta tipo e confronto, e a lista volta a ter o que mostrar.
     vazio.querySelector<HTMLButtonElement>('button')!.click()
-    expect(idsVisiveis(root).length).toBe(3)
+    expect(idsVisiveis(root).length).toBeGreaterThan(0)
   })
 
   it('limpar filtros volta ao estado inicial e o botão desliga sozinho quando não há o que limpar', () => {
@@ -134,12 +148,22 @@ describe('navegador de áreas', () => {
     expect(root.querySelector('.area-analyzer')).toBeNull()
   })
 
+  it('antes do time chegar, a tela diz que está calculando em vez de dar um veredito falso', () => {
+    const root = montar()
+    const metricas = root.querySelector('.area-row[data-area=campo-inicial] .area-metrics')!
+    expect(metricas.getAttribute('aria-busy')).toBe('true')
+    expect(metricas.textContent).toContain('calculando')
+    // Com o time vazio a estimativa daria "não fere" em tudo; isso não pode aparecer como fato.
+    expect(metricas.textContent).not.toContain('não fere')
+    // Nem a contagem da Pokédex, que marcaria todas as espécies como faltando.
+    expect(root.querySelector('.area-row[data-area=campo-inicial] .area-missing')).toBeNull()
+  })
+
   it('sem o time carregado a ficha continua de pé, com aviso em vez de número inventado', async () => {
     const root = montar()
     for (let i = 0; i < 5; i++) await Promise.resolve()
     expect(idsVisiveis(root).length).toBe(3)
     expect(root.querySelector('.form-error')?.textContent).toContain('time')
-    // Sem time não há como estimar: a coluna mostra o travessão, não um zero que parece medido.
     expect(root.querySelector('.area-row[data-area=campo-inicial] .area-metrics')?.textContent).toContain('—')
   })
 })

@@ -26,6 +26,8 @@ interface Props {
   readonly atlas: AtlasData
   readonly tipoDe: (species: string) => string
   readonly selecionada: boolean
+  /** Falso enquanto o time e a Pokédex não chegaram: sem eles não há veredito a dar. */
+  readonly estimado: boolean
   readonly onSelect: (id: string) => void
   readonly onStart: (id: string, botao: HTMLElement) => void
 }
@@ -55,8 +57,16 @@ const metrica = (valor: string, rotulo: string, extra = ''): HTMLElement =>
     el('strong', {}, valor),
     el('span', { class: 'muted' }, rotulo))
 
-function numeros(area: AreaView): HTMLElement {
+/**
+ * Enquanto o time não chegou, a estimativa sairia toda zerada e a tela anunciaria "não fere" em
+ * todas as áreas como se fosse medida. Antes disso as células dizem que estão carregando.
+ */
+function numeros(area: AreaView, estimado: boolean): HTMLElement {
   const { estimate } = area
+  if (!estimado) {
+    return el('span', { class: 'area-metrics', 'aria-busy': 'true' },
+      metrica('—', 'xp/h'), metrica('—', 'ouro/h'), metrica('…', 'calculando'))
+  }
   const semDados = estimate.xpPerHour === 0
   return el('span', { class: 'area-metrics' },
     metrica(semDados ? '—' : compact(estimate.xpPerHour), 'xp/h'),
@@ -64,10 +74,13 @@ function numeros(area: AreaView): HTMLElement {
     metrica(matchupLabel(estimate.matchup), 'confronto', matchupClass(estimate.matchup)))
 }
 
+/** "falta 1" / "faltam 2": o plural do verbo acompanha a contagem. */
+const faltaTexto = (quantas: number): string => `${quantas === 1 ? 'falta' : 'faltam'} ${quantas} na Pokédex`
+
 /** Rótulo curto para quem navega por leitor de tela, no lugar do despejo de todas as colunas. */
-const rotulo = (area: AreaView): string => {
+const rotulo = (area: AreaView, estimado: boolean): string => {
   const faltam = area.estimate.missing.length
-  const pokedex = faltam > 0 ? `, ${faltam} espécie(s) faltando na Pokédex` : ''
+  const pokedex = estimado && faltam > 0 ? `, ${faltaTexto(faltam)}` : ''
   const portao = area.locked ? `, bloqueada até o nível ${area.minTrainerLevel}` : ''
   return `${area.name}, níveis ${area.minLevel} a ${area.maxLevel}${pokedex}${portao}. Ver detalhes`
 }
@@ -75,23 +88,23 @@ const rotulo = (area: AreaView): string => {
 export function areaRow(props: Props): HTMLElement {
   const { area, selecionada } = props
 
+  const faltam = area.estimate.missing.length
   const corpo = el('button', {
     type: 'button',
     class: 'area-main',
     'aria-expanded': selecionada ? 'true' : 'false',
-    'aria-label': rotulo(area),
+    'aria-label': rotulo(area, props.estimado),
     onclick: () => props.onSelect(area.id),
   },
     el('span', { class: 'area-name' },
       el('span', { class: 'area-title' }, area.name),
-      area.estimate.missing.length > 0
-        ? el('span', { class: 'area-missing' }, `${area.estimate.missing.length} na Pokédex`)
-        : null),
+      // "3 na Pokédex" se lia como "três já registradas", o contrário do que significa.
+      props.estimado && faltam > 0 ? el('span', { class: 'area-missing' }, faltaTexto(faltam)) : null),
     el('span', { class: 'area-levels' },
       el('strong', {}, `${area.minLevel}–${area.maxLevel}`),
       el('span', { class: 'muted' }, 'níveis')),
     especies(area, props.atlas, props.tipoDe),
-    numeros(area))
+    numeros(area, props.estimado))
 
   const acao = area.locked
     ? el('span', { class: 'area-gate' }, `nível ${area.minTrainerLevel}`)

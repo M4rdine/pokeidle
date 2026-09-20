@@ -14,18 +14,24 @@ interface Props {
   readonly atlas: AtlasData
   readonly tiposDe: (species: string) => readonly string[]
   readonly temNaPokedex: (species: string) => boolean
+  /** Bônus da bola usada no cálculo da captura; a nota diz qual é. */
+  readonly ballBonus: number
 }
 
 const cabecalho = (): HTMLElement => el('tr', {},
   el('th', { scope: 'col' }, 'Espécie'),
-  el('th', { scope: 'col' }, 'Nível'),
   el('th', { scope: 'col', class: 'num' }, 'XP'),
   el('th', { scope: 'col', class: 'num' }, 'Ouro'),
   el('th', { scope: 'col', class: 'num' }, 'Tempo'),
   el('th', { scope: 'col', class: 'num' }, 'Captura'),
   el('th', { scope: 'col' }, 'Confronto'))
 
-export function areaAnalyzer({ estimate, atlas, tiposDe, temNaPokedex }: Props): HTMLElement {
+const BOLA_PADRAO = 'Poké Bola'
+
+export function areaAnalyzer({ estimate, atlas, tiposDe, temNaPokedex, ballBonus }: Props): HTMLElement {
+  // O nível é o mesmo em todas as linhas (é a média da área): como legenda ele informa, como
+  // coluna ele só repetia o mesmo número e tomava a largura de quem varia.
+  const nivel = estimate.species[0]?.level
   const linhas = estimate.species.map((s) => {
     const sprite = spriteThumb(atlas, s.speciesName)
     const nova = !temNaPokedex(s.speciesName)
@@ -34,7 +40,6 @@ export function areaAnalyzer({ estimate, atlas, tiposDe, temNaPokedex }: Props):
         el('span', { class: 'especie-nome' }, sprite, s.speciesName),
         ...tiposDe(s.speciesName).map(typeBadge),
         nova ? el('span', { class: 'area-missing' }, 'falta') : null),
-      el('td', {}, String(s.level)),
       el('td', { class: 'num' }, compact(s.xpPerDefeat)),
       el('td', { class: 'num' }, compact(s.goldPerDefeat)),
       el('td', { class: 'num' }, seconds(s.secondsPerDefeat)),
@@ -43,8 +48,9 @@ export function areaAnalyzer({ estimate, atlas, tiposDe, temNaPokedex }: Props):
   })
 
   const nota = el('p', { class: 'analyzer-note muted' },
-    'XP, ouro e tempo por derrota, estimados com o nível médio da área e o seu time atual. ',
-    'A caçada real varia com a sorte dos golpes.')
+    nivel === undefined ? '' : `Selvagens no nível ${nivel}, a média da área. `,
+    `XP, ouro e tempo por derrota estimados com o seu time atual; a captura, com ${ballBonus > 1 ? 'a melhor bola do inventário' : BOLA_PADRAO}`,
+    ' e o HP em 30%. A caçada real varia com a sorte dos golpes.')
 
   return el('div', { class: 'area-analyzer' },
     el('table', { class: 'analyzer-table' },

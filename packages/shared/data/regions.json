@@ -31,7 +31,8 @@
         "maxLevel": 6,
         "wildCount": 20,
         "respawnSeconds": 20,
-        "minTrainerLevel": 1
+        "minTrainerLevel": 1,
+        "rarity": 1
       },
       {
         "id": "bosque-denso",
@@ -54,7 +55,8 @@
         "maxLevel": 10,
         "wildCount": 7,
         "respawnSeconds": 20,
-        "minTrainerLevel": 3
+        "minTrainerLevel": 3,
+        "rarity": 2
       },
       {
         "id": "trilha-pedregosa",
@@ -77,7 +79,8 @@
         "maxLevel": 14,
         "wildCount": 7,
         "respawnSeconds": 20,
-        "minTrainerLevel": 6
+        "minTrainerLevel": 6,
+        "rarity": 3
       },
       {
         "id": "margem-do-lago",
@@ -100,7 +103,8 @@
         "maxLevel": 16,
         "wildCount": 7,
         "respawnSeconds": 20,
-        "minTrainerLevel": 8
+        "minTrainerLevel": 8,
+        "rarity": 4
       },
       {
         "id": "praia-longa",
@@ -123,7 +127,8 @@
         "maxLevel": 18,
         "wildCount": 6,
         "respawnSeconds": 20,
-        "minTrainerLevel": 10
+        "minTrainerLevel": 10,
+        "rarity": 5
       },
       {
         "id": "entrada-da-caverna",
@@ -146,7 +151,8 @@
         "maxLevel": 22,
         "wildCount": 8,
         "respawnSeconds": 20,
-        "minTrainerLevel": 13
+        "minTrainerLevel": 13,
+        "rarity": 6
       },
       {
         "id": "caverna-funda",
@@ -169,7 +175,8 @@
         "maxLevel": 28,
         "wildCount": 7,
         "respawnSeconds": 20,
-        "minTrainerLevel": 18
+        "minTrainerLevel": 18,
+        "rarity": 7
       },
       {
         "id": "pico-rochoso",
@@ -192,7 +199,8 @@
         "maxLevel": 35,
         "wildCount": 6,
         "respawnSeconds": 20,
-        "minTrainerLevel": 23
+        "minTrainerLevel": 23,
+        "rarity": 8
       }
     ]
   }

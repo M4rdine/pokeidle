@@ -36,7 +36,7 @@ export function miniRegistry(): Registry {
     unlocks: { growthRate: 'medium-fast', teamSlots: [{ level: 1, slots: 6 }], items: {}, regions: {} },
     regions: [{
       id: 'mini-regiao', name: 'Mini', order: 1, minTrainerLevel: 1, width: 5, height: 5,
-      areas: [{ id: 'mini', name: 'Mini', bounds: { x: 0, y: 0, width: 5, height: 5 }, anchor: { x: 2, y: 2 }, species: ['zubat'], minLevel: 3, maxLevel: 3, wildCount: 3, respawnSeconds: 20, minTrainerLevel: 1 }],
+      areas: [{ id: 'mini', name: 'Mini', bounds: { x: 0, y: 0, width: 5, height: 5 }, anchor: { x: 2, y: 2 }, species: ['zubat'], minLevel: 3, maxLevel: 3, wildCount: 3, respawnSeconds: 20, minTrainerLevel: 1, rarity: 1 }],
     }],
     hunts: [miniHunt()],
   })

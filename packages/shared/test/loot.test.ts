@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createRng, type LootTable, type Species } from '../src/index.js'
-import { lootTableFor, rollLoot } from '../src/loot.js'
+import { lootTableFor, MAX_RARITY, MIN_RARITY, rollLoot } from '../src/loot.js'
 
 const zubat: Species = { id: 41, name: 'zubat', types: ['poison', 'flying'], baseStats: { hp: 40, attack: 45, defense: 35, spAttack: 30, spDefense: 40, speed: 55 }, baseExperience: 49, growthRate: 'medium-fast', captureRate: 255, learnset: [] }
 const table: LootTable = { species: 'zubat', gold: [4, 9], drops: [{ item: 'potion', chance: 0.08 }, { item: 'poke-ball', chance: 0.5 }] }
@@ -19,6 +19,20 @@ describe('rollLoot', () => {
   it('ouro dentro da faixa e drops conforme o sorteio', () => {
     const r = rollLoot(zubat, loot, { int: (min, max) => max, next: () => 0.3, state: () => 0 })
     expect(r).toEqual({ gold: 9, drops: [{ item: 'poke-ball', quantity: 1 }] })
+  })
+  it('o degrau da área multiplica a chance do drop, e não mexe no ouro', () => {
+    // Sorteio fixo em 0,1: a poção (8 % base) não cai no degrau 1 e cai no degrau 8, onde a
+    // chance ajustada passa de 48 %.
+    const rng = { int: (_min: number, max: number) => max, next: () => 0.1, state: () => 0 }
+    const facil = rollLoot(zubat, loot, rng)
+    const dificil = rollLoot(zubat, loot, rng, MAX_RARITY)
+    expect(facil.drops.map((d) => d.item)).toEqual(['poke-ball'])
+    expect(dificil.drops.map((d) => d.item)).toEqual(['potion', 'poke-ball'])
+    expect(dificil.gold).toBe(facil.gold)
+  })
+  it('sem degrau declarado, nada muda em relação ao comportamento de sempre', () => {
+    const rng = () => ({ int: (_min: number, max: number) => max, next: () => 0.3, state: () => 0 })
+    expect(rollLoot(zubat, loot, rng())).toEqual(rollLoot(zubat, loot, rng(), MIN_RARITY))
   })
   it('com PRNG seedado é determinístico e respeita a faixa em mil rolagens', () => {
     const a = createRng(5), b = createRng(5)

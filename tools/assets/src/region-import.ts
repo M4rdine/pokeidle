@@ -3,7 +3,7 @@
  * região em mapas de área no formato que `importTiledMap` já consome, então toda a validação
  * existente continua valendo, área por área, sem o motor mudar de comportamento.
  */
-import { TILE_SIZE, type HuntMap } from '@pokeidle/shared'
+import { MAX_RARITY, MIN_RARITY, TILE_SIZE, type HuntMap } from '@pokeidle/shared'
 import type { TiledTileset } from './atlas.js'
 import { importTiledMap, type ImportOptions } from './tiled-import.js'
 
@@ -111,6 +111,17 @@ const FOLGA_DE_NIVEL = 2
 
 const nivelMinimoDeTreinador = (menorNivelDaArea: number): number => Math.max(1, menorNivelDaArea - FOLGA_DE_NIVEL)
 
+/**
+ * Espalha os degraus de raridade pela ordem de dificuldade: a primeira área fica em 1, a última
+ * em 8, o resto distribuído por igual. Uma região com menos de oito áreas pula degraus em vez de
+ * amontoar todas no começo da escala.
+ */
+function degrauDeRaridade(posicao: number, total: number): number {
+  if (total <= 1) return MIN_RARITY
+  const passo = (MAX_RARITY - MIN_RARITY) / (total - 1)
+  return Math.round(MIN_RARITY + posicao * passo)
+}
+
 /** Metadados de uma área, no referencial da região, para o navegador de áreas do cliente. */
 export interface AreaMeta {
   readonly id: string
@@ -127,6 +138,8 @@ export interface AreaMeta {
   readonly respawnSeconds: number
   /** Nível de treinador exigido para entrar, derivado da faixa de níveis da área. */
   readonly minTrainerLevel: number
+  /** Degrau de raridade, derivado da posição da área na ordem de dificuldade da região. */
+  readonly rarity: number
 }
 
 export interface RegionMeta {
@@ -245,7 +258,10 @@ export function importRegion(
 
   const hunts: HuntMap[] = []
   const metas: AreaMeta[] = []
-  for (const area of areas) {
+  // A ordem de dificuldade é a ordem em que as áreas aparecem no mapa, que é como a região foi
+  // desenhada: da mais fácil para a mais difícil.
+  const porNivel = [...areas]
+  for (const [posicao, area] of porNivel.entries()) {
     const recorte = cropRegion(map, area.rect)
     let hunt: HuntMap
     try {
@@ -267,6 +283,7 @@ export function importRegion(
       wildCount: hunt.spawns.reduce((total, s) => total + s.count, 0),
       respawnSeconds: Math.max(...hunt.spawns.map((s) => s.respawnSeconds)),
       minTrainerLevel: nivelMinimoDeTreinador(Math.min(...niveis)),
+      rarity: degrauDeRaridade(posicao, porNivel.length),
     })
   }
 

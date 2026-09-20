@@ -65,6 +65,7 @@ function checkContent(r: ContentRegistry, problems: string[]): void {
   for (const itemId of Object.keys(r.unlocks.items)) {
     if (!r.items.has(itemId)) problems.push(`unlocks: item ${itemId} não existe`)
   }
+  checkEconomy(r, problems)
   const areasDeclaradas = new Set<string>()
   for (const region of r.regions.values()) {
     for (const area of region.areas) {
@@ -77,6 +78,33 @@ function checkContent(r: ContentRegistry, problems: string[]): void {
   }
   for (const regionId of Object.keys(r.unlocks.regions)) {
     if (!r.regions.has(regionId)) problems.push(`unlocks: região ${regionId} não existe`)
+  }
+}
+
+/**
+ * Um item existe para ser conseguido. A referência descobriu em produção que 34 evoluções
+ * dependiam de uma pedra que nenhuma hunt dropava; a checagem custa pouco e fecha essa classe
+ * inteira de bug antes do jogo subir.
+ */
+function checkEconomy(r: ContentRegistry, problems: string[]): void {
+  const obtenivel = new Set<string>()
+  for (const item of r.items.values()) if (item.buyPrice > 0) obtenivel.add(item.id)
+  for (const tabela of r.loot.values()) for (const d of tabela.drops) obtenivel.add(d.item)
+
+  for (const itemId of Object.keys(r.unlocks.items)) {
+    if (r.items.has(itemId) && !obtenivel.has(itemId)) {
+      problems.push(`item ${itemId} é exigido mas não cai de ninguém nem está à venda`)
+    }
+  }
+  for (const item of r.items.values()) {
+    if (item.buyPrice > 0 && item.sellPrice >= item.buyPrice) {
+      problems.push(`item ${item.id}: vender por ${item.sellPrice} rende mais que comprar por ${item.buyPrice}`)
+    }
+  }
+  for (const tabela of r.loot.values()) {
+    for (const d of tabela.drops) {
+      if (d.chance <= 0) problems.push(`loot de ${tabela.species}: ${d.item} tem chance ${d.chance} e nunca cai`)
+    }
   }
 }
 

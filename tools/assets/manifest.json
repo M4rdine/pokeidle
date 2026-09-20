@@ -553,6 +553,12 @@
       "to": "pedra",
       "file": "campo-pedra.png",
       "swap": true
+    },
+    {
+      "name": "campo-alta",
+      "from": "campo",
+      "to": "grama-alta",
+      "file": "campo-alta.png"
     }
   ],
   "props": [

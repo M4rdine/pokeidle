@@ -3,12 +3,12 @@
   "version": "1.10",
   "name": "tibia-tiles",
   "image": "tiles.png",
-  "imagewidth": 640,
+  "imagewidth": 672,
   "imageheight": 640,
   "tilewidth": 32,
   "tileheight": 32,
-  "tilecount": 400,
-  "columns": 20,
+  "tilecount": 420,
+  "columns": 21,
   "margin": 0,
   "spacing": 0,
   "tiles": [
@@ -2718,7 +2718,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x0-y0"
+          "value": "campo-alta-aaaa"
         }
       ]
     },
@@ -2728,7 +2728,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x1-y0"
+          "value": "campo-alta-abba"
         }
       ]
     },
@@ -2738,7 +2738,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x0-y1"
+          "value": "campo-alta-aaba"
         }
       ]
     },
@@ -2748,7 +2748,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x1-y1"
+          "value": "campo-alta-abaa"
         }
       ]
     },
@@ -2758,7 +2758,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x0-y0"
+          "value": "campo-alta-bbbb"
         }
       ]
     },
@@ -2768,7 +2768,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x1-y0"
+          "value": "campo-alta-baaa"
         }
       ]
     },
@@ -2778,7 +2778,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x0-y1"
+          "value": "campo-alta-babb"
         }
       ]
     },
@@ -2788,7 +2788,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x1-y1"
+          "value": "campo-alta-baab"
         }
       ]
     },
@@ -2798,7 +2798,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x0-y0"
+          "value": "campo-alta-abbb"
         }
       ]
     },
@@ -2808,7 +2808,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x1-y0"
+          "value": "campo-alta-bbba"
         }
       ]
     },
@@ -2818,7 +2818,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x0-y1"
+          "value": "campo-alta-aaab"
         }
       ]
     },
@@ -2828,7 +2828,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x1-y1"
+          "value": "campo-alta-bbaa"
         }
       ]
     },
@@ -2838,7 +2838,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x0-y0"
+          "value": "campo-alta-baba"
         }
       ]
     },
@@ -2848,7 +2848,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x1-y0"
+          "value": "campo-alta-abab"
         }
       ]
     },
@@ -2858,7 +2858,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x0-y1"
+          "value": "campo-alta-bbab"
         }
       ]
     },
@@ -2868,7 +2868,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x1-y1"
+          "value": "campo-alta-aabb"
         }
       ]
     },
@@ -2878,7 +2878,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x0-y0"
+          "value": "campo-alta-aaaa-v2"
         }
       ]
     },
@@ -2888,7 +2888,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x1-y0"
+          "value": "campo-alta-aaaa-v3"
         }
       ]
     },
@@ -2898,7 +2898,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x0-y1"
+          "value": "campo-alta-aaaa-v4"
         }
       ]
     },
@@ -2908,7 +2908,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x1-y1"
+          "value": "campo-alta-bbbb-v2"
         }
       ]
     },
@@ -2918,7 +2918,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x0-y0"
+          "value": "campo-alta-bbbb-v3"
         }
       ]
     },
@@ -2928,7 +2928,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x1-y0"
+          "value": "arvore-larga-1-x0-y0"
         }
       ]
     },
@@ -2938,7 +2938,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x0-y1"
+          "value": "arvore-larga-1-x1-y0"
         }
       ]
     },
@@ -2948,7 +2948,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x1-y1"
+          "value": "arvore-larga-1-x0-y1"
         }
       ]
     },
@@ -2958,7 +2958,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x0-y0"
+          "value": "arvore-larga-1-x1-y1"
         }
       ]
     },
@@ -2968,7 +2968,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x1-y0"
+          "value": "pinheiro-1-x0-y0"
         }
       ]
     },
@@ -2978,7 +2978,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x0-y1"
+          "value": "pinheiro-1-x1-y0"
         }
       ]
     },
@@ -2988,7 +2988,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x1-y1"
+          "value": "pinheiro-1-x0-y1"
         }
       ]
     },
@@ -2998,7 +2998,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x0-y0"
+          "value": "pinheiro-1-x1-y1"
         }
       ]
     },
@@ -3008,7 +3008,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x1-y0"
+          "value": "arvore-larga-2-x0-y0"
         }
       ]
     },
@@ -3018,7 +3018,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x0-y1"
+          "value": "arvore-larga-2-x1-y0"
         }
       ]
     },
@@ -3028,7 +3028,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x1-y1"
+          "value": "arvore-larga-2-x0-y1"
         }
       ]
     },
@@ -3038,7 +3038,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-1"
+          "value": "arvore-larga-2-x1-y1"
         }
       ]
     },
@@ -3048,7 +3048,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-1"
+          "value": "pinheiro-2-x0-y0"
         }
       ]
     },
@@ -3058,7 +3058,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "flores-1"
+          "value": "pinheiro-2-x1-y0"
         }
       ]
     },
@@ -3068,7 +3068,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-2"
+          "value": "pinheiro-2-x0-y1"
         }
       ]
     },
@@ -3078,7 +3078,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-2"
+          "value": "pinheiro-2-x1-y1"
         }
       ]
     },
@@ -3088,7 +3088,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "flores-2"
+          "value": "arvore-larga-3-x0-y0"
         }
       ]
     },
@@ -3098,7 +3098,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-3"
+          "value": "arvore-larga-3-x1-y0"
         }
       ]
     },
@@ -3108,7 +3108,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-3"
+          "value": "arvore-larga-3-x0-y1"
         }
       ]
     },
@@ -3118,7 +3118,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "flores-3"
+          "value": "arvore-larga-3-x1-y1"
         }
       ]
     },
@@ -3128,7 +3128,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-4"
+          "value": "pinheiro-3-x0-y0"
         }
       ]
     },
@@ -3138,12 +3138,222 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-4"
+          "value": "pinheiro-3-x1-y0"
         }
       ]
     },
     {
       "id": 392,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-3-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 393,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-3-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 394,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-4-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 395,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-4-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 396,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-4-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 397,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arvore-larga-4-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 398,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-4-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 399,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-4-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 400,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-4-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 401,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pinheiro-4-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 402,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arbusto-1"
+        }
+      ]
+    },
+    {
+      "id": 403,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-1"
+        }
+      ]
+    },
+    {
+      "id": 404,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "flores-1"
+        }
+      ]
+    },
+    {
+      "id": 405,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arbusto-2"
+        }
+      ]
+    },
+    {
+      "id": 406,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-2"
+        }
+      ]
+    },
+    {
+      "id": 407,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "flores-2"
+        }
+      ]
+    },
+    {
+      "id": 408,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arbusto-3"
+        }
+      ]
+    },
+    {
+      "id": 409,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-3"
+        }
+      ]
+    },
+    {
+      "id": 410,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "flores-3"
+        }
+      ]
+    },
+    {
+      "id": 411,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "arbusto-4"
+        }
+      ]
+    },
+    {
+      "id": 412,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedra-4"
+        }
+      ]
+    },
+    {
+      "id": 413,
       "properties": [
         {
           "name": "name",
@@ -5440,6 +5650,235 @@
             2,
             0,
             1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "campo-alta",
+      "type": "corner",
+      "tile": -1,
+      "colors": [
+        {
+          "name": "campo",
+          "color": "#ff0000",
+          "probability": 1,
+          "tile": -1
+        },
+        {
+          "name": "grama-alta",
+          "color": "#00ff00",
+          "probability": 1,
+          "tile": -1
+        }
+      ],
+      "wangtiles": [
+        {
+          "tileid": 349,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 350,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 351,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 352,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 353,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 354,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 355,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 356,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 357,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 358,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 359,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 360,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 361,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 362,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 363,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 364,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
           ]
         }
       ]

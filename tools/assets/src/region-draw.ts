@@ -26,6 +26,34 @@ const RESPAWN_SEGUNDOS = 20
 /** Escala do ruído do terreno, em tiles: manchas desse tamanho em vez de chuvisco. */
 const ESCALA_RUIDO = 7
 /**
+ * Escala do ruído que deforma a borda de uma massa. Menor que a do terreno de propósito: a borda
+ * de um lago precisa de recorte miúdo, senão a massa sai com cara de círculo aproximado.
+ */
+const ESCALA_BORDA = 5
+/** Escala do campo que decide onde os props se juntam: bosques e clareiras desse tamanho. */
+const ESCALA_DENSIDADE = 9
+/** Contraste do campo de densidade. Expoente 1 quase não agrupa; alto demais deixa metade vazia. */
+const CONTRASTE_DENSIDADE = 3
+/**
+ * Conjunto da grama alta. O material primário dele é o mesmo `campo` dos outros pincéis — o
+ * build reancora todos na cor canônica —, então a mancha casa com o terreno do bioma sem emenda.
+ */
+const SET_GRAMA_ALTA = 'campo-alta'
+/**
+ * Raio da mancha de grama alta em volta de um alvo de spawn, em cantos de tile. Menor que o
+ * retângulo de spawn de propósito: com raio igual ao dele as manchas de cinco espécies se
+ * encostavam e viravam uma massa só, que não marca zona nenhuma.
+ */
+const RAIO_GRAMA_ALTA = RAIO_SPAWN - 1
+/**
+ * Escala do ruído que recorta a borda da grama alta. Menor que a das massas de terreno: numa
+ * mancha pequena um ruído lento desenha degraus retos, e o que se quer aqui é franja.
+ */
+const ESCALA_BORDA_ALTA = 3
+/** Deformação da borda de uma massa: multiplica o raio entre 0,7 e 1,3 em volta do contorno. */
+const BORDA_MIN = 0.7
+const BORDA_VAO = 0.6
+/**
  * Meia largura da trilha, em cantos de tile. Zero dá a faixa mais estreita que o pincel de canto
  * consegue desenhar — dois tiles, contando as bordas. Mais que isso vira praça, não caminho.
  */
@@ -94,12 +122,50 @@ interface Area {
 
 const indiceDe = (area: Area, x: number, y: number): number => (area.ay + y) * GRADE.width + area.ax + x
 
+/**
+ * Onde o material secundário aparece, conforme `bioma.forma`. Antes isto era um limiar sobre
+ * ruído para todo mundo, e era a razão de um lago sair como três poças iguais: ruído espalha, e
+ * espalhar é o oposto de ser um lugar.
+ */
+function formaDaMancha(bioma: Bioma, seed: number): (cx: number, cy: number) => boolean {
+  const { areaWidth: aw, areaHeight: ah } = GRADE
+  const forma = bioma.forma ?? 'ruido'
+  if (forma === 'ruido') return (cx, cy) => smooth(cx, cy, ESCALA_RUIDO, seed) < bioma.mistura
+
+  // A borda multiplica o raio (ou a fundura) por algo em torno de 1, então a fração coberta fica
+  // perto de `mistura` sem bater nela exatamente — e é justamente o desvio que tira a cara de forma.
+  const recorte = (cx: number, cy: number): number => BORDA_MIN + BORDA_VAO * smooth(cx, cy, ESCALA_BORDA, seed + 47)
+
+  if (forma === 'corpo') {
+    const raio = Math.sqrt((bioma.mistura * aw * ah) / Math.PI)
+    // O centro cabe inteiro dentro do anel de margem quando a área permite; quando não permite,
+    // `max` evita largura negativa e a massa encosta na borda, que é degradação aceitável.
+    const folgaX = Math.max(1, aw - 2 * raio - 2 * MARGEM)
+    const folgaY = Math.max(1, ah - 2 * raio - 2 * MARGEM)
+    const centroX = raio + MARGEM + noise(0, 0, seed + 41) * folgaX
+    const centroY = raio + MARGEM + noise(1, 0, seed + 43) * folgaY
+    return (cx, cy) => Math.hypot(cx - centroX, cy - centroY) / raio < recorte(cx, cy)
+  }
+
+  const lado = Math.floor(noise(2, 0, seed + 53) * 4)
+  const vertical = lado < 2
+  const fundura = bioma.mistura * (vertical ? aw : ah)
+  return (cx, cy) => {
+    const distancia = lado === 0 ? cx : lado === 1 ? aw - cx : lado === 2 ? cy : ah - cy
+    return distancia < fundura * recorte(cx, cy)
+  }
+}
+
 /** Pinta o terreno da área com o pincel de canto do bioma, variando as peças puras. */
 function pintarTerreno(grade: Grade, area: Area, temTile: (nome: string) => boolean): void {
   const { bioma, ax, ay, seed } = area
+  const mancha = formaDaMancha(bioma, seed)
   const secundario = (cx: number, cy: number): boolean => {
+    // A faixa de mar nasce colada na borda de propósito: ela vem de fora do mapa. As outras
+    // formas respeitam o anel de material primário que mantém a volta da área caminhável.
+    if (bioma.forma === 'margem') return mancha(cx, cy)
     const dentro = cx > MARGEM && cy > MARGEM && cx < GRADE.areaWidth - MARGEM && cy < GRADE.areaHeight - MARGEM
-    return dentro && smooth(cx, cy, ESCALA_RUIDO, seed) < bioma.mistura
+    return dentro && mancha(cx, cy)
   }
   const canto = (cx: number, cy: number): string => (secundario(cx, cy) ? 'b' : 'a')
 
@@ -142,9 +208,22 @@ function espalharProps(grade: Grade, area: Area): void {
   // O índice separa a máscara de cada prop. Usar o nome (ou o comprimento dele) faria dois props
   // do mesmo bioma sortearem as mesmas células, e o segundo nunca apareceria.
   bioma.props.forEach((prop, ordem) => {
+    const semente = seed + ordem * 13 + 1
+    // Campo de densidade próprio de cada prop. Ruído branco por tile espalha tudo por igual, e é
+    // por isso que o campo parecia confete: densidade igual em toda parte não é um lugar.
+    const campo = (x: number, y: number): number =>
+      smooth(ax + x, ay + y, ESCALA_DENSIDADE, semente + 101) ** CONTRASTE_DENSIDADE
+    // Dividir pela média do campo na área mantém a contagem esperada em `densidade`: o campo
+    // decide ONDE, nunca QUANTOS. Sem isso, mexer no contraste mudaria a densidade junto.
+    let soma = 0
+    let celulas = 0
+    for (let y = 1; y < GRADE.areaHeight - 1; y++) {
+      for (let x = 1; x < GRADE.areaWidth - 1; x++) { soma += campo(x, y); celulas += 1 }
+    }
+    const medio = soma / celulas
     for (let y = 1; y < GRADE.areaHeight - 1; y++) {
       for (let x = 1; x < GRADE.areaWidth - 1; x++) {
-        if (noise(ax + x, ay + y, seed + ordem * 13 + 1) > prop.densidade) continue
+        if (noise(ax + x, ay + y, semente) > prop.densidade * (campo(x, y) / medio)) continue
         const variante = 1 + Math.floor(noise(ax + x, ay + y, seed + 991) * prop.variantes)
         const nome = `${prop.nome}-${variante}`
         if (prop.grande) {
@@ -167,22 +246,65 @@ function espalharProps(grade: Grade, area: Area): void {
 }
 
 /**
+ * Pinta uma mancha de grama alta em volta de cada alvo de spawn, com o pincel de `campo-alta`.
+ * É o que transforma o mapa em informação: quem olha vê onde os Pokémon aparecem, em vez de
+ * descobrir andando.
+ *
+ * Roda depois de escolher os pontos e antes da trilha, de propósito: um caminho que atravessa a
+ * grama alta a abre, e não o contrário.
+ */
+function pintarGramaAlta(grade: Grade, area: Area, alvos: readonly Ponto[], temTile: (nome: string) => boolean): void {
+  const { bioma, seed } = area
+  // Só onde o material primário é campo. Grama alta em piso de caverna ou em areia de praia seria
+  // mentira, e o pincel nem casaria: campo é o material que os dois conjuntos têm em comum.
+  if (!bioma.set.startsWith('campo-') || !temTile(`${SET_GRAMA_ALTA}-bbbb`)) return
+
+  const alta = (cx: number, cy: number): boolean =>
+    alvos.some((alvo) => Math.hypot(cx - (alvo.x + 0.5), cy - (alvo.y + 0.5)) / RAIO_GRAMA_ALTA
+      < BORDA_MIN + BORDA_VAO * smooth(cx, cy, ESCALA_BORDA_ALTA, seed + 61))
+  const canto = (cx: number, cy: number): string => (alta(cx, cy) ? 'b' : 'a')
+
+  for (let y = 0; y < GRADE.areaHeight; y++) {
+    for (let x = 0; x < GRADE.areaWidth; x++) {
+      const code = `${canto(x + 1, y)}${canto(x + 1, y + 1)}${canto(x, y + 1)}${canto(x, y)}`
+      // Fora da mancha o tile do bioma continua valendo: trocar campo puro por campo puro de
+      // outro conjunto não mudaria nada na tela e só encheria o atlas de uso inútil.
+      if (code === 'aaaa') continue
+      const i = indiceDe(area, x, y)
+      // Só campo puro vira grama alta. Sem esta guarda a mancha comeria a margem do lago e a
+      // borda da rocha, que são justamente as peças que fazem aquelas áreas parecerem lugares.
+      if (!grade.ground[i]!.includes('-aaaa')) continue
+      grade.ground[i] = `${SET_GRAMA_ALTA}-${code}`
+    }
+  }
+}
+
+/**
  * Varre a área inteira a partir de (x0,y0), linha a linha na direção `dx`, dando a volta quando
  * chega na borda. Andável, vazio e fora da copa: um Centro debaixo de uma árvore existe, mas o
  * jogador nunca o vê, porque a copa desenha acima dele.
  */
-function acharLivre(grade: Grade, area: Area, x0: number, y0: number, dx: number): { x: number; y: number } {
+function acharLivre(grade: Grade, area: Area, x0: number, y0: number, dx: number, margem = 1): { x: number; y: number } {
   const { areaWidth: aw, areaHeight: ah } = GRADE
-  let x = x0
-  let y = y0
-  for (let passo = 0; passo < aw * ah; passo++) {
-    const i = indiceDe(area, x, y)
-    if (!grade.blocked[i] && grade.detail[i] === null && grade.canopy[i] === null && !grade.reservado.has(i)) return { x, y }
-    x += dx
-    if (x < 1 || x >= aw - 1) {
-      x = dx > 0 ? 1 : aw - 2
-      y += 1
-      if (y >= ah - 1) y = 1
+  const vago = (i: number): boolean =>
+    !grade.blocked[i] && grade.detail[i] === null && grade.canopy[i] === null && !grade.reservado.has(i)
+
+  // Duas passadas. A primeira exige material primário puro: um spawn na beira do lago fica meio
+  // dentro da água, e a mancha de grama alta não pode cobrir a margem sem comer justamente a peça
+  // que faz aquela área parecer um lugar. A segunda aceita qualquer célula vaga, porque uma área
+  // quase toda de rocha ou água ainda precisa de partida e Centro em algum lugar.
+  for (const exigePuro of [true, false]) {
+    let x = Math.min(Math.max(x0, margem), aw - margem - 1)
+    let y = Math.min(Math.max(y0, margem), ah - margem - 1)
+    for (let passo = 0; passo < aw * ah; passo++) {
+      const i = indiceDe(area, x, y)
+      if (vago(i) && (!exigePuro || grade.ground[i]!.includes('-aaaa'))) return { x, y }
+      x += dx
+      if (x < margem || x >= aw - margem) {
+        x = dx > 0 ? margem : aw - margem - 1
+        y += 1
+        if (y >= ah - margem) y = margem
+      }
     }
   }
   throw new Error(`área ${area.bioma.id}: nenhum tile livre em ${aw}x${ah} para posicionar spawn, partida ou Centro`)
@@ -205,8 +327,10 @@ function escolherPontos(grade: Grade, area: Area): Pontos {
   const { areaWidth: aw, areaHeight: ah } = GRADE
   // Os spawns primeiro: a partida nasce perto do primeiro deles — a caçada começa sem uma
   // travessia longa — e o Centro fica no canto oposto, para a volta custar alguma coisa.
+  // Os alvos ficam a pelo menos `RAIO_SPAWN` da borda: o retângulo de spawn é desse raio, e um
+  // canto dele fora da área vira conteúdo que o importador recusa — ele recorta área por área.
   const alvos = bioma.especies.map((_esp, n) =>
-    acharLivre(grade, area, 4 + ((n * 7) % (aw - 9)), 5 + ((n * 11) % (ah - 11)), 1))
+    acharLivre(grade, area, 4 + ((n * 7) % (aw - 9)), 5 + ((n * 11) % (ah - 11)), 1, RAIO_SPAWN))
   const primeiro = alvos[0]!
   const partida = acharLivre(grade, area, Math.max(1, primeiro.x - 2), Math.max(1, primeiro.y - 2), 1)
   grade.reservado.add(indiceDe(area, partida.x, partida.y))
@@ -329,6 +453,7 @@ export function desenharRegiao(spec: RegionSpec, temTile: (nome: string) => bool
     }
     pintarTerreno(grade, area, temTile)
     const pontos = escolherPontos(grade, area)
+    pintarGramaAlta(grade, area, pontos.alvos, temTile)
     pintarTrilha(grade, area, pontos)
     espalharProps(grade, area)
     objetos.push(...objetosDaArea(area, pontos))

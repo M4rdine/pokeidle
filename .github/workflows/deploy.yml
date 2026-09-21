@@ -39,7 +39,7 @@ jobs:
           # A chave é restrita a um comando só no servidor (`command=` no authorized_keys),
           # então o que se pede aqui é ignorado: ela sempre roda /opt/pokeidle/deploy.sh.
           ssh -o IdentitiesOnly=yes -o BatchMode=yes \
-            -i ~/.ssh/id_ed25519 root@${{ secrets.VPS_HOST }} deploy
+            -i ~/.ssh/id_ed25519 ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} deploy
 
       - name: Conferir que o jogo responde de fora
         run: |

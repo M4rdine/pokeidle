@@ -67,9 +67,14 @@
 }
 .cabeca-barra {
   padding: var(--space-2) var(--space-3);
-  background: linear-gradient(180deg, rgb(0 0 0 / 22%), rgb(0 0 0 / 34%));
+  /* Bem mais escura que o painel: a faixa de título tem que SER uma faixa, não um tom a mais. */
+  background: linear-gradient(180deg, rgb(0 0 0 / 34%), rgb(0 0 0 / 52%));
   border-radius: var(--raio-g) var(--raio-g) 0 0;
-  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 7%), 0 1px 0 rgb(0 0 0 / 35%);
+  /* A ARESTA embaixo: um fio escuro e, logo abaixo dele, um fio claro. São dois pixels que fazem
+   * a faixa parecer rebaixada na peça em vez de pintada em cima dela — o mesmo par de luz e
+   * sombra do resto do sistema, aplicado a uma linha. */
+  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 55%), 0 1px 0 rgb(255 255 255 / 9%);
+  position: relative; z-index: 1;
 }
 .cabeca-conta { color: var(--texto); font-weight: 400; }
 

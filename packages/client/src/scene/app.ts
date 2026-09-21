@@ -51,7 +51,7 @@ const PENDING_EVOLVE_FLASH_MS = 1000
  * painel, e tarja escura continua parecendo tarja escura. É por isso que existe o teste que
  * confere se o token que este arquivo lê está declarado.
  */
-const FUNDO_PADRAO = 0x141a29
+const FUNDO_PADRAO = 0x0b0f1a
 export const TOKEN_DO_FUNDO = '--fundo'
 function corDaMesa(parent: HTMLElement): number {
   const declarado = getComputedStyle(parent).getPropertyValue(TOKEN_DO_FUNDO).trim()

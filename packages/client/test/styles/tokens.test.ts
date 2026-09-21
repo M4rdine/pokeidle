@@ -149,6 +149,19 @@ describe('todo token lido em tempo de execução existe no CSS', () => {
     expect(nome, 'TOKEN_DO_FUNDO sumiu de scene/app.ts').toBeDefined()
     expect([...(await cores())]).toContain(nome!.slice(2))
   })
+
+  it('o valor de reserva da cena é o mesmo do token', async () => {
+    // Ele só entra quando o CSS ainda não chegou, e por isso envelhece sem ninguém ver: ficou
+    // marrom por duas trocas de mundo visual. Um número que diverge do token é o mesmo bug de
+    // novo, só que dentro do prazo em que a folha carrega.
+    const cena = await readFile(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'src', 'scene', 'app.ts'), 'utf8')
+    const reserva = /const FUNDO_PADRAO = 0x([0-9a-f]{6})/.exec(cena)?.[1]
+    const folha = await readFile(join(ESTILOS, 'tokens.css'), 'utf8')
+    const token = /^\s*--fundo:\s*(#[0-9a-f]{6});/im.exec(folha)?.[1]
+    expect(reserva, 'FUNDO_PADRAO sumiu de scene/app.ts').toBeDefined()
+    expect(token, '--fundo sumiu de tokens.css').toBeDefined()
+    expect(`#${reserva}`).toBe(token)
+  })
 })
 
 /**

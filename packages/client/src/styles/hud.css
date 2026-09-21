@@ -74,18 +74,32 @@
 .conn[data-conn="closed"] { color: var(--perigo); }
 
 /* ── Ficha do ativo ─────────────────────────────────────────────────────────── */
-.active-card { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); }
+/*
+ * O cartão do ativo é o RETRATO da peça em campo, e por isso o sprite ganha um poço grande. Antes
+ * o sprite flutuava ao lado do nome e o resto do cartão era vazio: 64 px de figura num painel de
+ * 400 px de largura, com as barras encostadas na borda de baixo e um vão morto no meio.
+ */
+.active-card { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
 /* Cabeçalho em linha: o sprite vive numa caixa de tamanho fixo, então não invade o nome. Antes
  * `transform: scale(2)` transbordava da caixa do frame e cobria o texto de baixo. */
 .active-topo { display: flex; align-items: center; gap: var(--space-3); }
 .active-card h2 { font-size: var(--t-l); min-width: 0; overflow-wrap: anywhere; }
 .active-nome { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
-.active-sprite-box { flex-shrink: 0; }
+/* O mesmo poço do slot, no dobro do tamanho: as duas superfícies que mostram o mesmo Pokémon
+ * usam a mesma moldura, e é isso que faz a coluna inteira ler como um sistema. */
+.active-sprite-box {
+  flex-shrink: 0;
+  display: grid; place-items: center;
+  width: 84px; height: 84px;
+  background: var(--face-cava);
+  border-radius: var(--raio);
+  box-shadow: var(--relevo-cava);
+}
 .active-corpo { display: flex; flex-direction: column; gap: var(--space-2); }
 .medidor { display: flex; flex-direction: column; gap: 2px; }
 .medidor-topo { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.75em; }
 .medidor-topo > :first-child { font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--texto-fraco); }
-.active-card progress { height: 8px; }
+.active-card progress { height: 12px; }
 .active-vazio { color: var(--texto-fraco); padding: var(--space-2) 0; }
 
 /* ── Golpes ───────────────────────────────────────────────────────────────────
@@ -147,6 +161,10 @@
 .situacao-alvo { display: flex; flex-direction: column; gap: 2px; }
 /* O botão de encerrar mora aqui, encostado no que ele encerra, e some quando não há caçada.
  * A margem em cima é a única do painel: separa "o que está acontecendo" de "o que eu faço". */
+/* Ícone e rótulo LADO A LADO. Sem isto o `span` do ícone é bloco e empilha em cima do texto:
+ * o botão saía com um quadradinho branco sobre a palavra "Parar", alto e estranho. Nenhuma regra
+ * cobria `.intent` — o botão só existia dentro do menu, que tinha a sua própria. */
+.intent { display: inline-flex; align-items: center; gap: var(--space-1); }
 .situacao-parar { align-self: flex-start; margin-top: var(--space-1); }
 .situacao-parar:hover:not([disabled]) { color: var(--perigo); }
 .situacao { min-height: 0; }
@@ -164,19 +182,51 @@
 }
 /* O dado do slot é uma coluna estreita: nome e nível na primeira linha, tipos na segunda,
  * medidor na terceira. Repetir a mesma ordem em seis slots é o que deixa comparar de relance. */
-.slot-dados { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.slot-dados { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
 .slot-linha { display: flex; align-items: center; gap: var(--space-1); min-width: 0; }
 .slot-nome { font-weight: 700; font-size: var(--t-s); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .slot-tipos .chip { font-size: 0.62em; }
-.slot-hp { font-size: 0.78em; }
-.slot progress { height: 6px; }
+
+/* O POÇO do retrato: caixa afundada com o sprite dentro. É o que separa "peça de jogo" de "item
+ * de lista com uma figurinha ao lado" — e custa uma sombra interna. */
+.slot-poco {
+  display: grid; place-items: center; flex-shrink: 0;
+  width: 42px; height: 42px;
+  background: var(--face-cava);
+  border-radius: var(--raio-p);
+  box-shadow: var(--relevo-cava);
+}
+
+/* O número DENTRO do trilho, à direita. Era uma terceira linha de texto miúdo por slot — seis
+ * vezes na mesma coluna — e ninguém liga "14/14" à barra de cima sem contar as linhas. */
+.slot-medidor { position: relative; display: block; }
+.slot progress { height: 14px; }
+.slot-hp {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: var(--space-1);
+  font-size: var(--t-xs); font-weight: 700; font-variant-numeric: tabular-nums;
+  color: var(--texto);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 90%), 0 0 3px rgb(0 0 0 / 80%);
+  pointer-events: none;
+}
 /* O marca-texto tem um trabalho só no sistema inteiro: dizer qual linha é a de agora. Gastá-lo
  * também no log e na situação o transformaria em decoração, e aí ele não marcaria mais nada. */
+/*
+ * O ativo não vira um bloco lavanda inteiro: ganha um TRILHO de acento na borda esquerda e um
+ * brilho. Preenchimento cheio fazia a linha parecer item selecionado de gerenciador de arquivos,
+ * e engolia os selos de tipo — que são a identidade da espécie e a única cor semântica do slot.
+ */
 .slot-active {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--selecao) 82%, white), var(--selecao));
-  color: var(--selecao-texto);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 45%), var(--brilho-selecao);
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--selecao) 28%, var(--painel-topo)),
+    var(--painel-topo) 40%, var(--painel-pe));
+  box-shadow:
+    inset 3px 0 0 var(--selecao),
+    inset 0 1px 0 rgb(255 255 255 / 22%),
+    var(--brilho-selecao);
 }
+.slot-active .slot-nome { color: var(--texto); }
 /* Vaga vazia e vaga travada são lugares onde ainda não há nada: afundam, em vez de se levantar
  * como as ocupadas. Mesma regra do resto do sistema — o que se lê afunda, o que se age levanta. */
 /* Vaga vazia é ausência, e ausência não ocupa o mesmo espaço que presença: ela encolhe para uma

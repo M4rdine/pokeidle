@@ -69,11 +69,15 @@
    * no pé; quem AFUNDA faz o contrário. É essa inversão — não o fio — que diz se um retângulo é
    * um botão ou uma fenda, e ela funciona mesmo para quem não distingue as cores.
    */
-  --fundo: #141a29;        /* fora de tudo, e a tarja em volta do mundo */
+  /* O chão é QUASE PRETO, e é isso que faz o painel existir. Ele era #141a29 — a dois passos do
+   * painel #222a40 —, e com três azuis tão próximos empilhados a tela inteira virava um degradê
+   * só: nada parecia estar na frente de nada. Separação entre planos é o que interface de jogo
+   * tem de sobra e interface de site não precisa, porque no site o branco separa tudo de graça. */
+  --fundo: #0b0f1a;        /* fora de tudo, e a tarja em volta do mundo */
 
-  --painel: #222a40;       /* a superfície */
-  --painel-topo: #28314b;
-  --painel-pe: #1d2437;
+  --painel: #202a44;       /* a superfície */
+  --painel-topo: #2a3655;
+  --painel-pe: #1a2238;
 
   --painel-alto: #2c3650;  /* a mesma, um degrau à frente: botão, linha em destaque */
   /* O topo do botão parou aqui por MEDIÇÃO, não por gosto: a primeira tentativa foi `#364161`, e
@@ -99,7 +103,9 @@
    */
   --borda: #171d2c;
   --borda-clara: #3a4560;  /* onde o fio ainda precisa ser visto: divisória dentro de um painel */
-  --borda-forte: #6b7aa3;
+  /* Clareado de #6b7aa3 quando o painel clareou: ele media 2,81:1 no alto do gradiente, e a
+   WCAG 1.4.11 pede 3:1 de quem identifica um controle. O teste pegou. */
+  --borda-forte: #7b8db5;
 
   /* ── Texto ── */
   --texto: #eef1f8;
@@ -174,8 +180,11 @@
    * e é o que dá a "borda com contraste": ela não é grossa, é dupla — escura de um lado da linha,
    * clara do outro. Uma borda de cor única, por mais grossa, nunca chega nisso.
    */
-  --luz: rgb(255 255 255 / 10%);
-  --luz-forte: rgb(255 255 255 / 18%);
+  /* O fio de luz precisa SER VISTO. A 10% ele existia no inspetor e não na tela — e um bisel que
+   * não se vê não é bisel, é uma linha de CSS. É a peça mais barata do sistema e a que mais
+   * decide se a superfície parece ter espessura. */
+  --luz: rgb(255 255 255 / 20%);
+  --luz-forte: rgb(255 255 255 / 30%);
   /* O contorno. É preto e não um cinza da paleta: o contorno tem que funcionar contra o painel,
    * contra a fenda e contra o mundo pixelado do jogo, e só o preto funciona contra os três. */
   --contorno: rgb(0 0 0 / 55%);
@@ -184,25 +193,36 @@
   --sombra-1: 0 1px 2px rgb(0 0 0 / 30%);
   --sombra-2: 0 8px 24px rgb(0 0 0 / 45%);
 
-  /* Apoiado na superfície: painel, seção. Degrau duro de 2 px. */
+  /*
+   * Apoiado na superfície: painel, seção.
+   *
+   * São CINCO camadas, não quatro: entre o fio de luz e o contorno entra um ANEL INTERNO CLARO de
+   * 1 px, que corre pelos quatro lados. O fio de luz sozinho só marca o topo, e a peça continua
+   * derretendo no fundo pelas laterais e pelo pé. O anel fecha o contorno, e é o par dele com o
+   * anel escuro de fora que dá a borda dupla — clara por dentro, escura por fora — que se lê como
+   * "moldura" sem custar um pixel de layout.
+   */
   --relevo-1:
     inset 0 1px 0 var(--luz),
+    inset 0 0 0 1px rgb(255 255 255 / 7%),
     0 0 0 1px var(--contorno),
-    0 2px 0 rgb(0 0 0 / 30%),
-    0 4px 10px rgb(0 0 0 / 32%);
+    0 2px 0 rgb(0 0 0 / 45%),
+    0 6px 16px rgb(0 0 0 / 45%);
   /* Levantado e agarrável: botão, cartão clicável. Degrau de 3 px — é ele que se vê sumir no
    * `:active`, e é esse sumiço que faz o botão parecer ter sido apertado. */
   --relevo-2:
     inset 0 1px 0 var(--luz-forte),
+    inset 0 0 0 1px rgb(255 255 255 / 9%),
     0 0 0 1px var(--contorno-forte),
-    0 3px 0 rgb(0 0 0 / 38%),
-    0 5px 12px rgb(0 0 0 / 35%);
+    0 3px 0 rgb(0 0 0 / 55%),
+    0 6px 14px rgb(0 0 0 / 45%);
   /* Por cima de tudo: modal, cartão da entrada. */
   --relevo-3:
     inset 0 1px 0 var(--luz-forte),
+    inset 0 0 0 1px rgb(255 255 255 / 9%),
     0 0 0 1px var(--contorno-forte),
-    0 4px 0 rgb(0 0 0 / 30%),
-    0 22px 50px rgb(0 0 0 / 60%);
+    0 4px 0 rgb(0 0 0 / 55%),
+    0 24px 60px rgb(0 0 0 / 70%);
   /* Afundado: trilho, campo, lista. A luz inverte — sombra em cima, fio claro no pé — e o
    * contorno vem por DENTRO, porque fenda não projeta sombra para fora. */
   --relevo-cava:

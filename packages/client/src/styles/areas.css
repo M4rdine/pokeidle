@@ -16,6 +16,8 @@
 
 .screen-areas { max-width: 1180px; width: 100%; margin: 0 auto; }
 .area-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
+.area-head .muted { margin: 0; }
+.area-ouro { color: var(--ouro); font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* ── A composição ────────────────────────────────────────────────────────────
  * O mapa manda na largura e o analisador fica com o que sobra, com piso: abaixo de 300 px a

@@ -15,7 +15,8 @@
     "client:test": "pnpm --filter @pokeidle/client test",
     "client:e2e": "pnpm --filter @pokeidle/client e2e",
     "db:up": "docker compose up -d",
-    "cores": "tsx tools/assets/scripts/cores-do-mundo.ts"
+    "cores": "tsx tools/assets/scripts/cores-do-mundo.ts",
+    "ui": "tsx tools/assets/scripts/ui-moldura.ts"
   },
   "devDependencies": {
     "tsx": "^4.19.0"

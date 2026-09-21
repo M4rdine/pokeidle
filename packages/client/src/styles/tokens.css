@@ -1,18 +1,16 @@
 /*
- * O mundo visual: a caderneta de campo do treinador.
+ * O mundo visual: a interface de um MMO de Pokémon.
  *
- * TESE: a interface é o caderno de quem anda pelo mundo — papel, couro e latão em volta, e o
- * mundo pixelado no meio, com a cor toda. O chrome emoldura o jogo em vez de competir com ele.
- * Antes daqui, o mundo era azul-noite com moldura bronze: a combinação de fábrica de todo idle
- * de navegador, e que não tinha nada a ver com o verde e a terra que emoldurava.
+ * TESE: o chrome é MADEIRA E FERRO sobre penumbra, e o mundo pixelado é a única coisa saturada
+ * da tela. A moldura é ARTE — peça do Kenney (CC0) repintada na paleta do nosso atlas — e não
+ * `box-shadow`. Foi a queixa que derrubou as duas versões anteriores: bisel de CSS tem teto, e
+ * por mais certo que esteja o contraste, lê como página web tematizada.
  *
- * A COR NÃO FOI INVENTADA. Cada superfície sai de um material do atlas, medido no próprio PNG:
- * o papel é a AREIA dos tiles (#dcd1ac), o couro é a TERRA BATIDA da trilha (#a87b5b), a sombra
- * é a ROCHA DE CAVERNA (#614845), a barra de vida é o CAMPO (#398e45) e a de experiência é a
- * ÁGUA (#56c3f0). Quem olha a tela e o mapa vê o mesmo mundo, porque é o mesmo mundo.
+ * A COR NÃO FOI INVENTADA. A madeira da moldura é a TERRA BATIDA da trilha (#a97c5c), medida no
+ * próprio atlas por `pnpm cores`; a barra de vida é o CAMPO, a de experiência é a ÁGUA. Quem
+ * olha a tela e o mapa vê o mesmo mundo, porque é o mesmo mundo.
  *
- * `tools/assets/scripts/cores-do-mundo.ts` remede o atlas e imprime estes valores; quando o
- * tileset mudar, é de lá que sai a paleta nova.
+ * As molduras saem de `pnpm ui` (`tools/assets/scripts/ui-moldura.ts`) para `styles/ui/`.
  */
 
 /* ── As duas vozes ───────────────────────────────────────────────────────────────────────────
@@ -55,38 +53,37 @@
   --fonte-hud: 'Pixelify Sans', 'Courier New', monospace;
   --fonte-texto: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
 
-  /* ── Superfícies: a mesa, e a caderneta em cima dela ── */
-  --mesa: #33261f;         /* fora de tudo; o mundo é a coisa mais clara da tela, não o chrome */
-  --papel-luz: #fff8e8;    /* a quina iluminada do papel: só o fio de cima do bisel */
-  --papel-alto: #f5ecd6;   /* o que se levanta: cabeçalho, botão, linha ativa */
-  --papel: #e9ddbe;        /* a folha; deriva da areia do atlas */
-  --papel-cava: #d3c49f;   /* o que afunda: trilho, campo, lista */
+  /* ── Superfícies: penumbra, e a madeira em cima dela ──
+   * Os miolos batem com os das molduras geradas em `ui-moldura.ts`. Se um mudar, o outro muda
+   * junto, senão a superfície pintada pelo CSS deixa de casar com a pintada no PNG. */
+  --fora: #15110e;         /* fora de tudo; o mundo é a coisa mais clara da tela, não o chrome */
+  --painel: #2b231c;       /* o miolo do painel */
+  --painel-alto: #3a3026;  /* o miolo do botão levantado */
+  --cava: #12100d;         /* o miolo da fenda: trilho, lista, campo */
 
-  /* ── Couro e latão: três tons fazem o bisel, todos da trilha e da rocha ── */
-  --couro: #a07556;
-  --couro-luz: #d0a684;
-  --couro-sombra: #5d4438;
+  /* ── Madeira: as três cores da moldura, da trilha do atlas ── */
+  --madeira-luz: #c9a173;
+  --madeira: #a97c5c;
+  --madeira-escura: #5d4438;
 
-  /* ── Tinta ── */
-  --tinta: #2c211a;
-  /* Secundária tingida do próprio papel, nunca cinza: 4,6:1 sobre `--papel-cava`, o pior fundo. */
-  --tinta-fraca: #5a4938;
+  /* ── Texto ── */
+  --tinta: #f2e7d6;
+  /* Puxada do próprio marrom da madeira, nunca cinza: 4,9:1 sobre `--painel-alto`, o pior fundo. */
+  --tinta-fraca: #b0a08c;
 
-  /* ── Papéis semânticos. A cor aqui é informação; decoração não ganha nenhuma. ──
-   * Não existe "cor de acento": ação primária e seleção são desenhadas com o COURO invertido,
-   * que é o material da própria caderneta. Sobra cor para o que precisa dizer alguma coisa. */
-  --marca: #f7d979;        /* marca-texto: o amarelo do projeto virou o grifo da linha ativa */
-  --marca-borda: #97791d;
+  /* ── Papéis semânticos. A cor aqui é informação; decoração não ganha nenhuma. ── */
+  --marca: #f7d979;        /* marca-texto: o grifo da linha ativa */
+  --marca-borda: #c9a227;
   /* Duas cores por material, e não uma, porque os dois papéis pedem contrastes opostos: o valor
-   * em texto vive sobre papel claro e precisa ser escuro; o preenchimento vive dentro da fenda
-   * escura do medidor e precisa ser claro. Um token só reprovaria num dos dois, sempre. */
-  --ouro: #6f5310;
+   * em texto vive sobre superfície escura; o preenchimento vive dentro da fenda, mais escura
+   * ainda. Um token só reprovaria num dos dois. */
+  --ouro: #e8b53c;
   --ouro-cheio: #d9a521;
-  --xp: #1a698c;
-  --xp-cheio: #56c4f1;     /* a água do atlas, sem escurecer: o trilho é escuro */
-  --perigo: #8f2820;
-  --ok: #2c6431;
-  --hp: #398e45;           /* campo */
+  --xp: #6ec6ef;
+  --xp-cheio: #56c4f1;
+  --perigo: #f07368;
+  --ok: #6ecb78;
+  --hp: #4fb35d;           /* campo, clareado para ler sobre a fenda */
 
   /* ── Escala de texto: fixa em rem, razão ~1,2. Interface de tarefa não usa tipo fluido. ── */
   --t-xs: 0.6875rem;  /* 11px — só em rótulo caixa-alta com entreletra, nunca em leitura */
@@ -103,8 +100,7 @@
   --space-4: 32px;
   --space-5: 48px;
 
-  /* ── Bisel e traço ── */
-  --bisel: 2px;
+  /* ── Traço ── */
   --border-w: 2px;
   /* Alvo mínimo de toque (WCAG 2.2 SC 2.5.8). Sai daqui para não virar número solto. */
   --alvo: 24px;
@@ -141,7 +137,7 @@ html, body {
 
 body {
   margin: 0;
-  background: var(--mesa);
+  background: var(--fora);
   color: var(--tinta);
   font-family: var(--fonte-texto);
   font-size: var(--t-m);
@@ -153,14 +149,14 @@ body {
  * As superfícies que o navegador desenha e que nenhum sistema de design costuma reclamar. Deixá-
  * las no padrão é o jeito mais barato de a tela denunciar que foi montada, não desenhada.
  */
-::selection { background: var(--marca); color: var(--tinta); }
-:root { accent-color: var(--couro-sombra); caret-color: var(--tinta); scrollbar-color: var(--couro) var(--papel-cava); }
+::selection { background: var(--marca); color: var(--fora); }
+:root { accent-color: var(--madeira); caret-color: var(--tinta); scrollbar-color: var(--madeira) var(--cava); }
 
-:where(a) { color: var(--couro-sombra); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+:where(a) { color: var(--madeira-luz); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 
-/* Foco visível em qualquer coisa focável, com o contraste do couro sobre papel. */
+/* Foco visível em qualquer coisa focável: a madeira clara é o que contrasta sobre a penumbra. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: var(--border-w) solid var(--couro-sombra);
+  outline: var(--border-w) solid var(--madeira-luz);
   outline-offset: 2px;
 }
 

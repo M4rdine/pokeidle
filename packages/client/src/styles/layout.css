@@ -15,40 +15,29 @@
  * dedo — vale para o filtro de tipo, o fechar do modal e o rótulo do log. */
 button, [role="button"], label:has(> input[type="checkbox"]) { min-height: var(--alvo); }
 
-/** `.panel` é o `.quadro` de `quadro.css`; existe para não reescrever toda tela de uma vez. */
-.panel {
-  background: var(--papel);
-  border: var(--border-w) solid var(--couro-sombra);
-  box-shadow:
-    inset var(--bisel) var(--bisel) 0 var(--papel-alto),
-    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--couro);
-}
+/* `.panel` é o `.quadro` de `quadro.css`, que já o inclui na regra de moldura; existe para não
+ * reescrever toda tela de uma vez. */
 .muted { color: var(--tinta-fraca); }
 
 .screen { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
 
 /*
- * Toda tela que não é a do jogo é UMA FOLHA da caderneta apoiada na mesa: papel por baixo do
- * conteúdo inteiro, moldura de couro em volta, e a mesa aparecendo só na margem.
- *
- * Sem isto, o título e os rótulos ficavam em tinta escura direto sobre a mesa escura — 1,3:1, e
- * "Onde caçar" simplesmente não aparecia na tela. A tela do jogo é o caso oposto e fica de fora:
- * lá os painéis é que são as folhas, e a mesa aparecendo entre eles é o que os separa.
+ * Toda tela que não é a do jogo ganha a moldura de painel em volta do conteúdo, com a penumbra
+ * aparecendo só na margem. A tela do jogo é o caso oposto e fica de fora: lá cada painel tem a
+ * sua moldura, e a penumbra entre eles é o que os separa.
  */
 .screen:not(.game-grid) {
-  background: var(--papel);
-  border: var(--border-w) solid var(--couro-sombra);
-  box-shadow:
-    inset var(--bisel) var(--bisel) 0 var(--papel-alto),
-    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--couro);
+  --moldura: url('./ui/painel.png');
+  border-style: solid; border-width: 12px;
+  border-image-source: var(--moldura); border-image-slice: 6 fill; border-image-repeat: repeat;
+  image-rendering: pixelated; background: none;
   margin: var(--space-3) auto;
-  /* A folha tem largura máxima mesmo numa tela larga: linha de texto sem limite não se lê, e
-   * ficha de comparação com 2000 px de largura perde a coluna de vista. */
+  /* Largura máxima mesmo numa tela larga: ficha de comparação com 2000 px perde a coluna de vista. */
   max-width: 1280px;
   width: calc(100% - var(--space-4));
 }
 /* Só as telas de formulário são estreitas: a do jogo ocupa a janela inteira (grade em hud.css). */
-.screen-auth { max-width: 420px; margin: var(--space-5) auto; padding: var(--space-4); }
+.screen-auth { max-width: 420px; margin: var(--space-5) auto; }
 
 /*
  * Títulos na voz de HUD. O salto de tamanho entre h1 e h2 é pequeno de propósito: interface de
@@ -59,76 +48,68 @@ h1 { font-size: var(--t-xl); }
 h2 { font-size: var(--t-l); }
 
 /*
- * Botão: papel entalhado que afunda um pixel ao ser pressionado. O gênero inteiro comunica
- * clique assim, e sai mais barato que animação. A voz é a de HUD, porque botão é rótulo curto.
+ * Botão: a mesma madeira dos painéis, um degrau mais claro no miolo, e a peça APERTADA trocada
+ * no `:active`. O gênero inteiro comunica clique assim; trocar a arte é mais honesto que simular
+ * o afundamento com sombra, e é exatamente o que uma moldura desenhada dá de graça.
  */
 button {
   font-size: var(--t-s); font-weight: 700;
   color: var(--tinta); cursor: pointer;
-  background: var(--papel-alto);
-  border: var(--border-w) solid var(--couro-sombra);
-  padding: var(--space-2) var(--space-3);
-  box-shadow:
-    inset var(--bisel) var(--bisel) 0 var(--papel-luz),
-    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--couro);
-  transition: background var(--rapido) ease-out;
+  --moldura: url('./ui/botao.png');
+  /* `--moldura-w` em vez de um número fixo: a peça tem 6 px de madeira, então só múltiplos
+   * inteiros dela mantêm o pixel quadrado. 12 px é a moldura de painel e de botão; 6 px é a de
+   * linha de lista, onde a de 12 comeria a altura inteira da linha. */
+  border-style: solid; border-width: var(--moldura-w, 12px);
+  border-image-source: var(--moldura); border-image-slice: 6 fill; border-image-repeat: repeat;
+  image-rendering: pixelated; background: none;
+  padding: 2px var(--space-1);
+  min-width: var(--alvo);
 }
-button:hover:not([disabled]) { background: color-mix(in srgb, var(--papel-alto) 84%, var(--marca)); }
-button:active:not([disabled]) {
-  background: var(--papel-cava);
-  box-shadow:
-    inset var(--bisel) var(--bisel) 0 var(--couro-sombra),
-    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--papel-alto);
-}
-button[disabled] { opacity: 0.55; cursor: default; }
+button:hover:not([disabled]) { color: var(--marca); }
+button:active:not([disabled]) { --moldura: url('./ui/botao-apertado.png'); }
+button[disabled] { opacity: 0.5; cursor: default; }
 
 /*
- * Ação primária: o COURO invertido. Não existe "cor de acento" neste sistema — a ênfase vem de
- * inverter o material da própria caderneta, o que deixa a cor livre para dizer o que é moeda, o
- * que é perigo e o que é vida. Uma cor a mais aqui seria uma cor a menos lá.
+ * Ação primária: a mesma moldura, com o rótulo em marca-texto. Não existe "cor de acento" neste
+ * sistema — a ênfase vem do grifo, e a cor fica livre para dizer o que é moeda, perigo e vida.
  */
-button.primary {
-  background: var(--couro-sombra); color: var(--papel-alto); border-color: var(--couro-sombra);
-  box-shadow:
-    inset var(--bisel) var(--bisel) 0 var(--couro),
-    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--mesa);
-}
-button.primary:hover:not([disabled]) { background: color-mix(in srgb, var(--couro-sombra) 82%, var(--couro)); }
+button.primary { color: var(--marca); }
 
 /*
- * Campo é papel entalhado: é onde se escreve, não onde se aperta. O `select` entra junto —
- * sem regra, ele saía no padrão do navegador, o único elemento sem mundo na tela inteira.
+ * Campo é fenda: é onde se escreve, não onde se aperta. O `select` entra junto — sem regra, ele
+ * saía no padrão do navegador, o único elemento sem mundo na tela inteira.
  */
 input, select {
   font: inherit; color: var(--tinta); width: 100%;
-  background: var(--papel-cava);
-  border: var(--border-w) solid var(--couro-sombra);
-  box-shadow: inset var(--bisel) var(--bisel) 0 var(--couro-sombra);
-  padding: var(--space-2);
+  --moldura: url('./ui/cava.png');
+  border-style: solid; border-width: 12px;
+  border-image-source: var(--moldura); border-image-slice: 6 fill; border-image-repeat: repeat;
+  image-rendering: pixelated; background: none;
+  padding: 2px var(--space-1);
 }
-select { appearance: none; cursor: pointer; padding-right: var(--space-3); }
-select option { background: var(--papel); color: var(--tinta); }
+select { appearance: none; cursor: pointer; }
+select option { background: var(--painel); color: var(--tinta); }
 .field { display: flex; flex-direction: column; gap: var(--space-1); margin: 0 0 var(--space-3); }
 
 /*
  * Aba ativa: o marca-texto. O amarelo elétrico que o projeto usava como acento sobrevive aqui,
- * no único papel que o papel comporta — grifo. Ele marca a linha atual sem virar decoração, e a
- * borda inferior some para a aba encostar na superfície que ela abre.
+ * no único trabalho que ele comporta — grifo. Marca a aba atual sem virar decoração, e o texto em
+ * cima dele vira escuro, porque num mundo escuro o grifo é a única ilha clara.
  */
 .tabs { display: flex; gap: var(--space-2); }
-.tab-active { background: var(--marca); border-color: var(--marca-borda); }
+.tab-active { background: var(--marca); border-color: var(--marca-borda); color: var(--fora); }
 
 .form-error { color: var(--perigo); min-height: 1.2em; margin: var(--space-2) 0 0; font-weight: 700; }
 
 /*
- * O matiz do tipo identifica; o rótulo é escurecido contra o papel para poder ser lido. Os
- * dezoito matizes canônicos foram desenhados como preenchimento sobre fundo claro, e vários
- * deles — `electric`, `ice`, `ground` — como texto puro sobre papel ficam abaixo de 2:1.
+ * O matiz do tipo identifica; o rótulo é lido numa mistura com a tinta do tema. Os dezoito
+ * matizes canônicos foram desenhados como preenchimento sobre fundo claro, então sobre a
+ * penumbra eles entram clareados, em fundo tingido e borda, nunca como texto puro.
  */
 .type {
   display: inline-block; padding: 0 var(--space-1); margin-right: var(--space-1);
   border: 1px solid color-mix(in srgb, var(--t, currentColor) 70%, var(--tinta));
-  background: color-mix(in srgb, var(--t, currentColor) 28%, var(--papel-alto));
+  background: color-mix(in srgb, var(--t, currentColor) 28%, var(--painel-alto));
   font-size: var(--t-xs); text-transform: lowercase;
   color: color-mix(in srgb, var(--t, currentColor) 30%, var(--tinta));
 }
@@ -145,7 +126,7 @@ select option { background: var(--papel); color: var(--tinta); }
 .sprite { background-repeat: no-repeat; }
 .sprite-thumb { display: inline-block; overflow: hidden; flex-shrink: 0; }
 .sprite-thumb > * { display: block; transform-origin: top left; }
-.sprite-unknown { width: 32px; height: 32px; background: var(--papel-cava); }
+.sprite-unknown { width: 32px; height: 32px; background: var(--cava); }
 
 .starter-grid, .hunt-grid { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .starter-card, .hunt-card { padding: var(--space-3); min-width: 180px; display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; }
@@ -163,29 +144,30 @@ select option { background: var(--papel); color: var(--tinta); }
 .trainer-bar .muted { margin-left: auto; font-size: var(--t-s); }
 .shortcuts { display: flex; gap: var(--space-2); flex-wrap: wrap; }
 
-/* Toast e sobreposição flutuam acima da caderneta: sombra projetada, não bisel. */
+/* Toast e sobreposição flutuam acima de tudo: sombra projetada, que é o segundo registro de
+ * profundidade e o único lugar onde ele é gasto. */
 .toasts { position: fixed; right: var(--space-3); bottom: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); z-index: 20; }
 .toast {
-  background: var(--papel-alto); border: var(--border-w) solid var(--couro-sombra);
-  box-shadow: 0 2px 0 var(--couro), 0 8px 20px rgb(51 38 31 / 38%);
+  background: var(--painel-alto); border: var(--border-w) solid var(--madeira-escura);
+  box-shadow: 0 2px 0 var(--madeira), 0 8px 20px rgb(51 38 31 / 38%);
   padding: var(--space-2) var(--space-3); max-width: 360px;
 }
 .toast-error { border-color: var(--perigo); }
-.toast-big { border-color: var(--marca-borda); background: var(--marca); font-size: var(--t-l); }
-.overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(51 38 31 / 88%); color: var(--papel-alto); text-align: center; }
+.toast-big { border-color: var(--marca-borda); background: var(--marca); color: var(--fora); font-size: var(--t-l); }
+.overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(51 38 31 / 88%); color: var(--painel-alto); text-align: center; }
 
 /* A caixa de marcar não tem ícone porque o sistema não tem nenhum: o "aceso" é um quadrado
  * cheio, e um glifo Unicode aqui seria o primeiro ícone de uma biblioteca que não existe. */
 input[type="checkbox"] {
   appearance: none; width: 14px; height: 14px; margin: 0; padding: 0;
-  background: var(--papel-cava); border: var(--border-w) solid var(--couro-sombra); cursor: pointer;
+  background: var(--cava); border: var(--border-w) solid var(--madeira-escura); cursor: pointer;
   display: inline-grid; place-content: center; box-shadow: none;
 }
 input[type="checkbox"]:hover { border-color: var(--tinta); }
-input[type="checkbox"]:checked { background: var(--marca); border-color: var(--marca-borda); }
+input[type="checkbox"]:checked { background: var(--marca); border-color: var(--marca-borda); color: var(--fora); }
 input[type="checkbox"]:checked::after { content: ""; width: 6px; height: 6px; background: var(--tinta); }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--papel-cava); }
-::-webkit-scrollbar-thumb { background: var(--couro); border: 3px solid transparent; background-clip: content-box; }
-::-webkit-scrollbar-thumb:hover { background: var(--couro-sombra); background-clip: content-box; }
+::-webkit-scrollbar-track { background: var(--cava); }
+::-webkit-scrollbar-thumb { background: var(--madeira); border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--madeira-escura); background-clip: content-box; }

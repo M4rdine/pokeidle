@@ -20,9 +20,9 @@
 .grid-top { grid-area: top; }
 .grid-left { grid-area: left; display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; }
 /* A tarja que sobra quando o mundo é menor que o painel mostra a MESA: o mundo visual tem três
- * planos de papel e uma mesa, e um preto puro não pertence a nenhum deles. O mesmo valor é lido
+ * uma penumbra só, e um preto puro não pertenceria a ela. O mesmo valor é lido
  * do token pelo renderizador, em `scene/app.ts`, para os dois não poderem divergir. */
-.grid-center { grid-area: center; position: relative; overflow: hidden; background: var(--mesa); min-width: 0; min-height: 0; }
+.grid-center { grid-area: center; position: relative; overflow: hidden; background: var(--fora); min-width: 0; min-height: 0; }
 .grid-right { grid-area: right; min-height: 0; display: flex; }
 .grid-bottom { grid-area: bottom; min-height: 0; }
 
@@ -56,22 +56,24 @@
 
 .tb-acoes { display: flex; gap: var(--space-1); margin-left: auto; flex-shrink: 0; }
 /*
- * Atalho de modal é NAVEGAÇÃO, não ação. Sem moldura e sem bisel: um botão entalhado diz "isto
+ * Atalho de modal é NAVEGAÇÃO, não ação. Sem moldura: um botão emoldurado diz "isto
  * faz alguma coisa acontecer no mundo", e abrir a Pokédex não faz. Antes eram cinco molduras
  * idênticas em fila disputando o mesmo peso visual de Parar e de Sair, que são as duas únicas
  * coisas ali que mudam o estado do jogo.
  */
 .tb-acoes button[data-open] {
   padding: var(--space-1) var(--space-2); font-size: var(--t-s); color: var(--tinta-fraca);
-  background: none; border-color: transparent; box-shadow: none;
+  /* Tira a MOLDURA, não a cor da borda: o relevo agora vem de `border-image`, e zerar
+   * `border-color` deixava a peça de madeira desenhada do mesmo jeito. */
+  border-image-source: none; border-width: 0; background: none;
 }
 .tb-acoes button[data-open]:hover:not([disabled]) {
-  background: none; color: var(--tinta); text-decoration: underline; text-underline-offset: 0.25em;
+  color: var(--tinta); text-decoration: underline; text-underline-offset: 0.25em;
 }
 /* Sair tira o jogador da caçada: fica discreto até o ponteiro chegar, e aí se declara. */
-.tb-saida button:hover:not([disabled]) { background: none; color: var(--perigo); border-color: var(--perigo); }
+.tb-saida button:hover:not([disabled]) { color: var(--perigo); }
 /* O par que sai da hunt fica separado do resto por um divisor, não por distância. */
-.tb-saida { display: flex; gap: var(--space-1); padding-left: var(--space-2); margin-left: var(--space-1); border-left: 1px solid var(--couro-sombra); flex-shrink: 0; }
+.tb-saida { display: flex; gap: var(--space-1); padding-left: var(--space-2); margin-left: var(--space-1); border-left: 1px solid var(--madeira-escura); flex-shrink: 0; }
 
 .tb-status { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; flex-shrink: 0; font-size: 0.75em; }
 .conn { display: flex; align-items: center; gap: var(--space-1); }
@@ -100,15 +102,15 @@
  * coluna alinhada que deixa comparar oito golpes de relance; antes, com o rótulo "poder" dentro
  * de cada linha, o número caía num lugar diferente conforme o tamanho do nome.
  */
-.moves-caixa { display: flex; flex-direction: column; min-height: 0; }
+.moves-caixa { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
 .moves-cabeca { justify-content: space-between; padding: var(--space-2) var(--space-2) var(--space-1); }
 .moves { list-style: none; margin: 0; padding: 0 var(--space-2) var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); overflow-y: auto; min-height: 0; }
 .move { display: grid; grid-template-columns: 1fr auto 3ch 40px; gap: var(--space-2); align-items: center; }
 .move-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .move-poder { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
-/* A recarga é uma fenda: fundo de mesa, preenchimento de latão. Pronto fica VERDE e cheio — e o
+/* A recarga é uma fenda: fundo de penumbra, preenchimento de latão. Pronto fica VERDE e cheio — e o
  * "cheio" importa tanto quanto a cor, porque quem não distingue verde de âmbar lê o comprimento. */
-.move-cd { height: 6px; background: var(--mesa); position: relative; overflow: hidden; }
+.move-cd { height: 6px; background: var(--fora); position: relative; overflow: hidden; }
 .move-cd::after { content: ""; position: absolute; inset: 0; background: var(--ouro-cheio); transform: scaleX(var(--cd, 0)); transform-origin: left; }
 .move-cd[data-cd="0"] { background: var(--hp); }
 
@@ -130,6 +132,7 @@
 .team-strip { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-2); width: 100%; overflow-y: auto; }
 .team-strip .slot { flex-shrink: 0; }
 .slot {
+  --moldura-w: 6px;
   display: flex; align-items: center; gap: var(--space-2);
   min-height: 0; padding: var(--space-1) var(--space-2); overflow: hidden; text-align: left;
 }
@@ -143,28 +146,29 @@
 .slot progress { height: 6px; }
 /* O marca-texto tem um trabalho só no sistema inteiro: dizer qual linha é a de agora. Gastá-lo
  * também no log e na situação o transformaria em decoração, e aí ele não marcaria mais nada. */
-.slot-active { background: var(--marca); border-color: var(--marca-borda); }
+.slot-active { background: var(--marca); border-color: var(--marca-borda); color: var(--fora); }
 /* Vaga vazia e vaga travada são lugares onde ainda não há nada: afundam, em vez de se levantar
  * como as ocupadas. Mesma regra do resto do sistema — o que se lê afunda, o que se age levanta. */
 /* Vaga vazia é ausência, e ausência não ocupa o mesmo espaço que presença: ela encolhe para uma
  * linha. Com a altura das ocupadas, três vagas vazias tomavam um terço da coluna do time para
  * não dizer nada. */
 .slot-empty, .slot-locked {
+  --moldura-w: 6px; --moldura: url('./ui/cava.png');
   justify-content: center; color: var(--tinta-fraca); font-size: var(--t-xs);
   letter-spacing: 0.08em; min-height: var(--alvo); padding: 2px var(--space-2);
-  background: var(--papel-cava);
-  border: var(--border-w) solid var(--couro-sombra);
-  box-shadow: inset var(--bisel) var(--bisel) 0 var(--couro-sombra);
+  background: var(--cava);
+  border: var(--border-w) solid var(--madeira-escura);
+  box-shadow: none;
 }
 /* O slot travado diz o nível que o destrava: é informação, e substitui o cadeado em emoji que
- * estava fazendo papel de ícone num sistema que não tem ícone nenhum. */
+ * estava fazendo as vezes de ícone num sistema que não tem biblioteca de ícones. */
 .slot-locked { letter-spacing: 0.04em; }
 
 /* ── Log ────────────────────────────────────────────────────────────────────── */
 .log { height: 100%; display: flex; flex-direction: column; min-height: 0; }
 .log-header {
   display: flex; gap: var(--space-2); align-items: center;
-  padding: var(--space-1) var(--space-3); border-bottom: var(--border-w) solid var(--couro-sombra);
+  padding: var(--space-1) var(--space-3); border-bottom: var(--border-w) solid var(--madeira-escura);
   font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.12em;
   text-transform: uppercase; color: var(--tinta-fraca);
 }

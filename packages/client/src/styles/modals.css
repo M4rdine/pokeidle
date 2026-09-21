@@ -1,20 +1,20 @@
 /*
- * O modal é o único elemento desta folha que está POR CIMA da caderneta, e é o único que ganha
- * sombra projetada: papel sobre papel projeta sombra, papel entalhado não. Bisel aqui diria que
+ * O modal é o único elemento desta folha que está POR CIMA de tudo, e é o único que ganha
+ * sombra projetada: o que está por cima projeta sombra, o que está embutido não. Moldura sozinha diria que
  * o diálogo faz parte da folha, que é exatamente o contrário do que ele é.
  */
-/* Atrás dele não fica preto, fica a mesa: é a superfície que estava debaixo da caderneta o tempo
-   todo, e preto puro sobre papel claro lê como buraco, não como profundidade. */
-.modal-backdrop { position: fixed; inset: 0; background: color-mix(in srgb, var(--mesa) 70%, transparent); display: grid; place-items: center; z-index: 30; }
+/* Atrás dele o véu é o próprio fundo da página com transparência, não um preto novo: o mundo
+   visual tem uma penumbra só, e um segundo preto não pertenceria a ela. */
+.modal-backdrop { position: fixed; inset: 0; background: color-mix(in srgb, var(--fora) 70%, transparent); display: grid; place-items: center; z-index: 30; }
 /* Cabeçalho preso e corpo rolante. Com a rolagem no modal inteiro, uma ficha longa levava o
  * botão de fechar para fora da tela junto com o resto. */
 .modal {
   width: min(560px, 92vw); max-height: 86vh;
   display: flex; flex-direction: column; min-height: 0;
-  background: var(--papel-alto); border: var(--border-w) solid var(--couro-sombra);
-  box-shadow: 0 2px 0 var(--couro), 0 8px 20px rgb(51 38 31 / 38%);
+  background: var(--painel-alto); border: var(--border-w) solid var(--madeira-escura);
+  box-shadow: 0 2px 0 var(--madeira), 0 8px 20px rgb(51 38 31 / 38%);
 }
-.modal-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border-bottom: var(--border-w) solid var(--couro-sombra); }
+.modal-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border-bottom: var(--border-w) solid var(--madeira-escura); }
 /*
  * O X é desenhado, não escrito: duas barras de 2 px cruzadas, do mesmo traço reto do resto do
  * mundo. Um "×" de fonte seria o único ícone de um sistema que não tem biblioteca de ícones.
@@ -29,8 +29,8 @@
 .modal-close::after { transform: rotate(-45deg); }
 .modal-close:hover::before, .modal-close:hover::after { background: var(--perigo); }
 .modal-body { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); overflow-y: auto; min-height: 0; }
-/* Linha de lista não é objeto: só o fio de couro que a separa da seguinte, sem bisel e sem fundo. */
-.bag-item, .team-row, .shop-item { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-1) 0; border-bottom: 1px solid var(--couro); }
+/* Linha de lista não é objeto: só o fio de madeira que a separa da seguinte, sem moldura e sem fundo. */
+.bag-item, .team-row, .shop-item { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-1) 0; border-bottom: 1px solid var(--madeira); }
 .bag-item button, .team-row button, .shop-item button { margin-left: auto; }
 .shop-item button { margin-left: 0; }
 .shop-item input { width: 64px; margin-left: auto; }
@@ -39,9 +39,9 @@
 .field-check { flex-direction: row; align-items: center; gap: var(--space-2); }
 .field-check input[type="checkbox"] { width: 14px; flex-shrink: 0; }
 .pokedex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--space-2); }
-/* Célula de grade: um fio de 1 px e nada mais — o registro de uma espécie é uma marca no papel,
+/* Célula de grade: um fio de 1 px e nada mais — o registro de uma espécie é uma marca na página,
    não uma peça levantada. O nome fica na face de leitura, porque neste corpo a bitmap embola. */
-.dex-cell { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); padding: var(--space-1); border: 1px solid var(--couro); font-size: var(--t-s); }
+.dex-cell { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); padding: var(--space-1); border: 1px solid var(--madeira); font-size: var(--t-s); }
 /* Capturado é notável, não urgente nem selecionado: ouro na borda, que a varredura da grade pega
    de relance sem confundir com o grifo da linha aberta. */
 .dex-cell.unknown { color: var(--tinta-fraca); } .dex-cell.caught { border-color: var(--ouro); }

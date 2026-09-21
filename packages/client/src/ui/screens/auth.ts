@@ -39,7 +39,14 @@ export function mountAuth(root: HTMLElement, ctx: AppContext): () => void {
         el('button', { type: 'button', 'data-tab': name, class: name === tab ? 'tab tab-active' : 'tab', onclick: () => { tab = name; render() } },
           name === 'login' ? 'Entrar' : 'Registrar')),
     )
-    mount(root, el('main', { class: 'screen screen-auth panel' }, el('h1', {}, 'Pokeidle'), tabs, form))
+    // O `main` é o palco de tela cheia; o cartão é o objeto no meio dele. Antes o `main` ERA o
+    // cartão, e por isso a folha de login se esticava pela janela inteira com dois campos
+    // gigantes dentro — a primeira tela que alguém vê do jogo.
+    mount(root, el('main', { class: 'screen screen-auth' },
+      el('div', { class: 'auth-cartao panel' },
+        el('h1', {}, 'Pokeidle'),
+        el('p', { class: 'auth-lema' }, 'Seu time caça sozinho. Você escolhe onde.'),
+        tabs, form)))
   }
   render()
   return () => { root.replaceChildren() }

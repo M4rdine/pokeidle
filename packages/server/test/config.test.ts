@@ -9,6 +9,7 @@ describe('loadConfig', () => {
       DATABASE_URL: base.DATABASE_URL, PORT: 3000, COOKIE_SECURE: false, APP_ORIGIN: 'http://localhost:3000',
       TRUST_PROXY: false, LOG_LEVEL: 'info', ARGON2_MEMORY_KIB: 65536, ARGON2_TIME_COST: 3,
       DEBUG_VIEWER: false, ASSETS_DIR: expect.stringMatching(/public[/\\]atlas$/),
+      MAPS_DIR: expect.stringMatching(/public[/\\]maps$/),
       CLIENT_DIST: expect.stringMatching(/client[/\\]dist$/),
     })
   })
@@ -17,8 +18,9 @@ describe('loadConfig', () => {
     expect(loadConfig({ ...base, TICK_MS: '40' }).TICK_MS).toBe(40)
     expect(() => loadConfig({ ...base, TICK_MS: '1' })).toThrow()
   })
-  it('DEBUG_VIEWER, ASSETS_DIR e CLIENT_DIST aceitam override', () => {
-    const c = loadConfig({ ...base, DEBUG_VIEWER: 'true', ASSETS_DIR: '/tmp/x', CLIENT_DIST: '/tmp/y' })
+  it('DEBUG_VIEWER, ASSETS_DIR, MAPS_DIR e CLIENT_DIST aceitam override', () => {
+    const c = loadConfig({ ...base, DEBUG_VIEWER: 'true', ASSETS_DIR: '/tmp/x', CLIENT_DIST: '/tmp/y', MAPS_DIR: '/tmp/m' })
+    expect(c.MAPS_DIR).toBe('/tmp/m')
     expect(c).toMatchObject({ DEBUG_VIEWER: true, ASSETS_DIR: '/tmp/x', CLIENT_DIST: '/tmp/y' })
   })
   it('converte booleanos e números', () => {

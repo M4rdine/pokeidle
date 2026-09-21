@@ -23,6 +23,7 @@ import { applyFilters, filtersFromSearch, isEmpty, searchFromFilters, type AreaF
 import { trainerProgress } from '../../../state/progress.js'
 import { el, mount } from '../../dom.js'
 import { areaAnalyzer } from './AreaAnalyzer.js'
+import { mapaRegiao } from './MapaRegiao.js'
 import { areaRow, type AreaView } from './AreaRow.js'
 import { areaFilters, clearFiltersButton } from './AreaFilters.js'
 
@@ -143,6 +144,23 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
         el('h2', {}, regiao.name),
         el('span', { class: 'muted' }, `${daRegiao.length} ${daRegiao.length === 1 ? 'área' : 'áreas'}`),
         fechada && portao > 1 ? el('span', { class: 'area-gate' }, `abre no nível ${portao}`) : null))
+
+      // O mapa vem antes da lista: escolher onde caçar é uma decisão sobre o mundo, e ver o
+      // mundo responde de relance o que uma tabela só responde lendo linha por linha.
+      const comAncora = daRegiao.flatMap((a) => {
+        const noRegistro = regiao.areas.find((r) => r.id === a.id)
+        return noRegistro ? [{ ...a, anchor: noRegistro.anchor }] : []
+      })
+      if (comAncora.length > 0) {
+        lista.append(el('li', { class: 'area-mapa' }, mapaRegiao({
+          regiaoId: regiao.id,
+          regiaoNome: regiao.name,
+          grade: { width: regiao.width, height: regiao.height },
+          areas: comAncora,
+          selecionada: aberta,
+          aoEscolher: (id) => { aberta = aberta === id ? null : id; render() },
+        })))
+      }
       for (const area of daRegiao) {
         lista.append(areaRow({
           area, atlas: ctx.atlas, tipoDe, selecionada: aberta === area.id, estimado: dados !== null,

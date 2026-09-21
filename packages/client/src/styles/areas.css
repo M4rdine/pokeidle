@@ -184,3 +184,39 @@
   .area-metric:nth-of-type(3) { grid-area: confronto; flex-direction: row; gap: var(--space-1); align-items: baseline; }
   .analyzer-table { display: block; overflow-x: auto; white-space: nowrap; }
 }
+
+/* ── Mapa da região ──────────────────────────────────────────────────────────
+ * A imagem sai do mesmo pipeline que gera as áreas que o servidor simula, então o que se vê
+ * aqui é o mapa de verdade — não uma ilustração que pode divergir do jogo.
+ */
+.area-mapa { list-style: none; margin: var(--space-2) 0 var(--space-3); }
+.mapa { position: relative; line-height: 0; }
+.mapa-imagem {
+  display: block; width: 100%; height: auto;
+  image-rendering: pixelated;
+  border: var(--border-w) solid var(--moldura-sombra);
+  box-shadow: inset var(--bisel) var(--bisel) 0 rgb(0 0 0 / 45%);
+}
+/* A camada de marcadores não intercepta o clique; só os botões dentro dela interceptam. */
+.mapa-marcadores { position: absolute; inset: 0; pointer-events: none; }
+
+.mapa-marcador {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+  padding: var(--space-1) var(--space-2); line-height: 1.15;
+  pointer-events: auto; white-space: nowrap;
+  min-height: 24px;
+}
+.mapa-nome { font-size: 0.78em; font-weight: 700; }
+.mapa-nivel { font-size: 0.68em; color: var(--muted); font-variant-numeric: tabular-nums; }
+/* O marcador aberto é o único aceso: o acento marca onde se está, não onde dá para ir. */
+.mapa-marcador-ativo { border-color: var(--accent); }
+.mapa-marcador-ativo .mapa-nome { color: var(--accent); }
+/* Travado recua de plano e mantém o número legível: é por ele que se decide o que perseguir. */
+.mapa-marcador-travado { background: var(--cava); }
+.mapa-marcador-travado .mapa-nivel { color: var(--accent); }
+
+@media (max-width: 600px) {
+  .mapa-nome { display: none; }
+  .mapa-marcador { padding: var(--space-1); }
+}

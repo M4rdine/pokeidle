@@ -5,10 +5,18 @@ progresso continua com a aba fechada. A simulação inteira acontece no servidor
 
 [![CI](https://github.com/M4rdine/pokeidle/actions/workflows/ci.yml/badge.svg)](https://github.com/M4rdine/pokeidle/actions/workflows/ci.yml)
 
-![Campo Inicial: a trilha liga a partida ao Centro Pokémon e as manchas escuras de grama alta marcam onde os selvagens aparecem](docs/imagens/campo-inicial.png)
+![A tela de jogo: mapa ao centro, ficha do Pokémon ativo à esquerda, time à direita e registro embaixo](docs/imagens/jogo.png)
 
-O cenário acima é gerado pelo pipeline deste repositório — terreno, props e o prédio saem de
-conjuntos próprios, e o mapa é composto por código a partir de uma lista de biomas.
+O servidor simula; o cliente desenha o que recebe e manda intenção. O cenário é gerado pelo
+pipeline deste repositório — terreno, props e prédios saem de conjuntos próprios, e o mapa é
+composto por código a partir de uma lista de biomas.
+
+| Ficha de espécie | Painel de operação |
+|---|---|
+| ![Ficha do Vulpix: onde aparece, atributos-base, evolução e golpes por nível](docs/imagens/ficha.png) | ![Painel lendo /metrics: caçadas ativas, duração do tick, persistência e HTTP](docs/imagens/metricas.png) |
+
+A ficha responde a pergunta que decide a próxima caçada — onde essa espécie aparece, em que faixa
+de nível e se o portão já abriu. O painel lê o mesmo `/metrics` que um Prometheus raparia.
 
 ## Como as peças se encaixam
 
@@ -95,7 +103,14 @@ rode duas suítes ao mesmo tempo na mesma máquina.
 
 ## Licença dos assets
 
-Os sprites usados em desenvolvimento vêm de um pack de fã e **não são redistribuídos aqui**.
-Nem o dump em `assets/`, nem o atlas servido ao navegador em `packages/server/public/atlas`:
-os dois são ignorados pelo git. Quem clonar este repositório recebe o código inteiro e monta o
+Os sprites de Pokémon usados em desenvolvimento vêm de um pack de fã. **Os arquivos de arte não
+são redistribuídos aqui** — nem o dump em `assets/`, nem o atlas servido ao navegador em
+`packages/server/public/atlas`, que são ignorados pelo git. As capturas de tela acima mostram o
+jogo rodando, como qualquer captura de jogo mostra.
+
+O cenário — terreno, props, prédios e marcos — é gerado pelo pipeline deste repositório e não vem
+do pack; o teste `kanto-cenario` trava isso, recusando qualquer tile que não seja de conjunto
+próprio. A prévia abaixo sai de `pnpm assets map-preview` e é composta só desse material:
+
+![Recorte do Campo Inicial: trilha, grama alta e o Centro Pokémon, tudo em arte gerada pelo projeto](docs/imagens/campo-inicial.png) Quem clonar este repositório recebe o código inteiro e monta o
 próprio atlas com `pnpm assets build`, apontando para os assets que tiver. O código é do autor.

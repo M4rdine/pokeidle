@@ -119,10 +119,6 @@ O que ajuda a PR a ser aceita rápido:
 Se quiser uma ideia do que fazer, as specs em `docs/superpowers/specs/` terminam com uma seção
 "fora de escopo" que registra, com o motivo, o que ficou por fazer em cada entrega.
 
-> **Sobre rodar com sprites.** Os arquivos de arte do pack de fã não estão no repositório, então
-> `pnpm assets build` precisa de um dump próprio para gerar o atlas. Sem ele o servidor sobe e o
-> mapa fica em branco. Nada que seja lógica de jogo, servidor, motor ou teste depende disso.
-
 ## Documentação
 
 - `docs/design/` — documento de design, plano de três meses e triagem da referência
@@ -132,10 +128,13 @@ Se quiser uma ideia do que fazer, as specs em `docs/superpowers/specs/` terminam
 
 ## Licença dos assets
 
-Os sprites de Pokémon usados em desenvolvimento vêm de um pack de fã. **Os arquivos de arte não
-são redistribuídos aqui** — nem o dump em `assets/`, nem o atlas servido ao navegador em
-`packages/server/public/atlas`, que são ignorados pelo git. As capturas de tela acima mostram o
-jogo rodando, como qualquer captura de jogo mostra.
+Os sprites de Pokémon vêm de um pack de fã. O **atlas servido ao navegador** (4 arquivos, 2,4 MB,
+em `packages/server/public/atlas`) está versionado: sem ele quem clona não consegue rodar o jogo,
+e um projeto aberto a PR precisa ser "clonou, rodou". O **dump bruto de 647 MB** continua fora, em
+`assets/` — é material de origem, e nada no build precisa dele depois que o atlas existe.
+
+Pokémon é marca da Nintendo, Creatures e Game Freak. Este é um projeto de fã, sem fim comercial e
+sem vínculo com elas. Se algum detentor de direito pedir a remoção de um asset, ele sai.
 
 O cenário — terreno, props, prédios e marcos — é gerado pelo pipeline deste repositório e não vem
 do pack; o teste `kanto-cenario` trava isso, recusando qualquer tile que não seja de conjunto

@@ -12,10 +12,9 @@ packages/client/dist
 packages/client/coverage
 packages/client/test-results
 packages/client/playwright-report
-# Atlas servido ao navegador: são sprites de um pack de fã. Rodar é uma coisa,
-# redistribuir num repositório público é outra. Fica fora do git e entra na imagem
-# no build local (ver docs/deploy.md).
-packages/server/public/atlas/
+# O atlas servido ao navegador (4 arquivos, 2,4 MB) É versionado: sem ele quem clona não
+# consegue rodar o jogo, e o projeto aceita PR. O dump bruto de 647 MB continua fora, em
+# /assets/ — é material de origem, e nada no build precisa dele depois que o atlas existe.
 
 # Capturas da revisão de design são material de trabalho; o design.json ao lado do DESIGN.md é
 # sistema e fica versionado.

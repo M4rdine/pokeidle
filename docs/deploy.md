@@ -15,7 +15,8 @@ documento e o `fly.toml`.
 
 `ASSETS_DIR` e `CLIENT_DIST` têm padrão correto dentro da imagem e não precisam ser definidos.
 
-Para gerar o atlas na sua máquina antes do primeiro deploy:
+O atlas servido já vem no repositório, então um clone limpo constrói e roda. Para regerá-lo depois
+de mexer em tile, prop ou conjunto de terreno:
 
 ```bash
 pnpm assets build --extracted assets/extracted-otp2019
@@ -57,7 +58,7 @@ docker info                  # Docker precisa estar no ar (Colima, Docker Deskto
 pnpm assets build --extracted assets/extracted-otp2019   # gera o atlas que a imagem leva
 ```
 
-Vale construir a imagem antes de gastar um deploy — é exatamente o que o `--local-only` faz:
+Vale construir a imagem antes de gastar um deploy:
 
 ```bash
 docker build -t pokeidle:local .
@@ -79,19 +80,17 @@ Se isso passa, o deploy só pode falhar por credencial, variável ou banco — n
      APP_ORIGIN='https://<app>.fly.dev' \
      METRICS_TOKEN="$(openssl rand -hex 24)"
    ```
-4. `fly deploy --local-only`
+4. `fly deploy`
 
-   O `--local-only` é obrigatório: o atlas de sprites **não está no repositório**, porque são
-   assets de um pack de fã e publicá-los seria redistribuição. Ele existe só na máquina de quem
-   desenvolve, em `packages/server/public/atlas`, e entra no contexto do build local. Um build
-   remoto geraria uma imagem sem sprites.
+   O atlas servido está no repositório, então o build remoto do Fly produz a mesma imagem que o
+   local. `--local-only` continua valendo quando se quer construir na própria máquina — só não é
+   mais obrigatório.
 5. Conferir `https://<app>.fly.dev/health`, que responde status, versão e tempo de atividade.
-6. Conferir que o mapa desenha: abrir o jogo, registrar e entrar numa área. Mapa em branco com o
-   `/health` verde significa atlas fora da imagem — veja o passo 4.
+6. Conferir que o mapa desenha: abrir o jogo, registrar e entrar numa área.
 
 ## Deploy seguinte
 
-`fly deploy --local-only`. As migrações rodam no boot; se uma falhar, o processo sai e o Fly mantém a máquina
+`fly deploy`. As migrações rodam no boot; se uma falhar, o processo sai e o Fly mantém a máquina
 antiga no ar.
 
 ## Como está publicado hoje
@@ -116,7 +115,6 @@ Para atualizar:
 
 ```bash
 cd /opt/pokeidle/src && git pull
-# o atlas não vem do git; copie o seu para packages/server/public/atlas/ antes de construir
 docker build -t pokeidle:vps . && cd /opt/pokeidle && docker compose up -d --force-recreate app
 ```
 

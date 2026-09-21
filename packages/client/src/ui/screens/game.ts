@@ -7,21 +7,31 @@ import { mountSituacao } from '../hud/situacao.js'
 import { mountMoves } from '../hud/moves.js'
 import { mountOverlays } from '../hud/overlays.js'
 import { mountTeamStrip } from '../hud/team-strip.js'
-import { mountTopBar } from '../hud/top-bar.js'
+import { mountMenu } from '../hud/menu.js'
+import { mountPerfil } from '../hud/perfil.js'
 import { el, mount } from '../dom.js'
 
-/** Grade da tela: barra no topo, ativo e golpes à esquerda, cena no centro, time à direita, log embaixo. */
+/**
+ * Grade da tela, em três colunas: PERFIL à esquerda (quem é o jogador, o Pokémon em campo e o
+ * time), CENTRO com o menu de funções em cima do mundo e o registro embaixo, e COMBATE à direita
+ * (golpes e situação).
+ *
+ * Antes o perfil era uma barra de topo de uma linha, com treze elementos do mesmo peso. Agrupar
+ * por PERGUNTA — quem eu sou, o que está acontecendo, o que posso fazer — é o que dá para ler a
+ * tela de relance, e é a forma que o gênero já usa.
+ */
 export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
-  const top = el('div', { class: 'grid-top' })
   const left = el('div', { class: 'grid-left' })
+  const menu = el('div', { class: 'grid-menu' })
   const center = el('div', { class: 'grid-center', id: 'scene' })
   const right = el('div', { class: 'grid-right' })
   const bottom = el('div', { class: 'grid-bottom' })
   const titulo = el('h1', { class: 'so-leitor' }, 'Caçada em andamento')
-  mount(root, el('main', { class: 'screen screen-game game-grid' }, titulo, top, left, center, right, bottom))
+  mount(root, el('main', { class: 'screen screen-game game-grid' }, titulo, left, menu, center, right, bottom))
 
-  const offs = [mountTopBar(top, ctx), mountActivePokemon(left, ctx), mountMoves(left, ctx),
-    mountSituacao(left, ctx), mountTeamStrip(right, ctx), mountLog(bottom, ctx), mountOverlays(center, ctx)]
+  const offs = [mountPerfil(left, ctx), mountActivePokemon(left, ctx), mountTeamStrip(left, ctx),
+    mountMenu(menu, ctx), mountMoves(right, ctx), mountSituacao(right, ctx),
+    mountLog(bottom, ctx), mountOverlays(center, ctx)]
   let scene: Scene | null = null
   let offScene: (() => void) | null = null
   let offEvents: (() => void) | null = null

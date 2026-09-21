@@ -28,7 +28,7 @@ test('registrar, inicial, Campo Inicial, derrota, mochila, parar e comprar na lo
 
   await expect(async () => {
     // O preço da Poção: o smoke espera até o jogador poder comprar uma de verdade.
-    expect(Number(await page.locator('.top-bar [data-gold]').textContent())).toBeGreaterThanOrEqual(200)
+    expect(Number(await page.locator('.perfil [data-gold]').textContent())).toBeGreaterThanOrEqual(200)
   }).toPass({ timeout: 120_000 })
 
   await page.getByRole('button', { name: 'Parar' }).click()

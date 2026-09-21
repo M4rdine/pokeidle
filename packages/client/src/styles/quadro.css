@@ -1,54 +1,64 @@
 /*
- * O material da caderneta, e o vocabulário que nasce dele.
+ * O material da interface, e o vocabulário que nasce dele.
  *
- * DOIS REGISTROS DE PROFUNDIDADE, e cada um diz uma coisa diferente:
+ * A MOLDURA É ARTE, NÃO CSS. Cada superfície usa `border-image` sobre uma peça de 32×32 do pack
+ * do Kenney (CC0), repintada na paleta do nosso atlas por `pnpm ui`. As versões anteriores
+ * desenhavam moldura com duas `box-shadow` internas, e é essa a diferença que as derrubou:
+ * box-shadow não tem canto desenhado, não tem textura e não tem estado apertado. Acertar
+ * contraste e espaçamento em cima de box-shadow ainda entrega uma página web tematizada.
  *
- *  1. O BISEL — duas sombras internas sem desfoque, clara em cima à esquerda e escura embaixo à
- *     direita. Diz "isto é entalhado no papel": botão que afunda ao ser pressionado, fenda de
- *     medidor, campo de entrada. É a gramática do HUD de 16 bits, e em CSS ela fica nítida em
- *     qualquer tamanho e troca de cor por token — coisa que um 9-slice em PNG não faz.
- *  2. A SOMBRA PROJETADA — com deslocamento e desfoque de verdade. Diz "isto está POR CIMA da
- *     caderneta": modal, toast, menu. Papel sobre papel projeta sombra; papel entalhado, não.
- *
- * Gastar os dois por papel é o ponto. Antes daqui havia um bisel só, carimbado em painel, botão,
- * chip e moldura por igual — e emphasis uniforme em tudo é o mesmo que ênfase em nada.
+ * COMO O RECORTE FUNCIONA: a peça tem 32 px e a madeira ocupa 6 px de cada lado. `slice: 6` corta
+ * os nove pedaços; `border-width: 12px` desenha a moldura em dobro, e `repeat` faz as laterais
+ * ladrilharem em vez de esticarem — é o que mantém o pixel quadrado em qualquer tamanho de
+ * painel. O miolo vem do próprio PNG (`fill`), então a cor da superfície e a da moldura não
+ * podem divergir.
  */
 
-/** Superfície de papel que se levanta: painel, moldura de seção. Não é para chip nem para dado. */
-.quadro {
-  background: var(--papel);
-  border: var(--border-w) solid var(--couro-sombra);
-  box-shadow:
-    inset var(--bisel) var(--bisel) 0 var(--papel-alto),
-    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--couro);
+/** Onde a moldura entra. `--moldura` é trocada por quem usa; o resto é igual em todas. */
+.quadro, .quadro-alto, .quadro-fundo, .quadro-flutua, .panel {
+  border-style: solid;
+  border-width: var(--moldura-w, 12px);
+  border-image-source: var(--moldura, url('./ui/painel.png'));
+  border-image-slice: 6 fill;
+  border-image-repeat: repeat;
+  /* Sem isto o navegador interpola a madeira ao dobrar de tamanho e o pixel vira borrão. */
+  image-rendering: pixelated;
+  background: none;
 }
 
-/** A mesma folha, um degrau à frente: usada dentro de um `.quadro`. */
-.quadro-alto { background: var(--papel-alto); }
+/** Superfície que se levanta: painel, moldura de seção. Não é para chip nem para dado. */
+.quadro, .panel { --moldura: url('./ui/painel.png'); }
+
+/** A mesma superfície, um degrau à frente. */
+.quadro-alto { --moldura: url('./ui/botao.png'); }
 
 /**
- * A fenda: cortada através do papel, e o que se vê no fundo dela é a mesa. É onde se LÊ — trilho
- * de medidor, lista, campo. Inverter a luz separa "aqui se age" de "aqui se lê" sem cor nova, e
- * o fundo escuro é o que deixa a barra de vida e a de experiência atingirem contraste sobre ela.
+ * A fenda: é onde se LÊ — lista, campo, área de rolagem. O miolo quase preto é o que deixa a
+ * barra de vida e a de experiência atingirem contraste sobre ela.
  */
-.quadro-fundo {
-  background: var(--papel-cava);
-  border: var(--border-w) solid var(--couro-sombra);
-  box-shadow:
-    inset var(--bisel) var(--bisel) 0 var(--couro-sombra),
-    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--papel-alto);
-}
+.quadro-fundo { --moldura: url('./ui/cava.png'); }
 
-/** Flutua acima da caderneta: a borda do papel, e a sombra que ele joga na mesa. */
+/**
+ * Flutua acima de tudo: modal e toast. A moldura é a mesma; o que diz "está por cima" é a sombra
+ * projetada, com deslocamento e desfoque de verdade. É o segundo registro de profundidade, e o
+ * único lugar onde ele é gasto.
+ */
 .quadro-flutua {
-  background: var(--papel-alto);
-  border: var(--border-w) solid var(--couro-sombra);
-  box-shadow: 0 2px 0 var(--couro), 0 8px 20px rgb(51 38 31 / 38%);
+  --moldura: url('./ui/painel.png');
+  box-shadow: 0 6px 24px rgb(0 0 0 / 55%);
 }
 
-/* Cabeçalho de seção: caixa alta espacejada, em negrito, no menor degrau da escala. Não é a face
- * de HUD: ela não se sustenta a 11 px — ver a restrição em `tokens.css`. O título não compete
- * com o dado. */
+/*
+ * O GRIFO. Marca a linha de agora, e tem um trabalho só no sistema inteiro — gastá-lo em mais de
+ * um lugar por tela o transforma em decoração, e aí ele não marca mais nada.
+ *
+ * Num mundo escuro ele é a ÚNICA ilha clara, então quem escreve em cima dele escreve com a tinta
+ * do fundo da página. Esta regra existe para o texto não ficar claro sobre claro: a inversão foi
+ * exatamente o que a troca do mundo claro para o escuro quebrou em sete lugares de uma vez.
+ * Cada uso declara `color: var(--fora)` junto do fundo, e o teste de contraste cobre o par.
+ */
+
+/** Cabeçalho de seção: caixa alta espacejada, no menor degrau da escala. Não compete com o dado. */
 .cabeca {
   display: flex; align-items: baseline; gap: var(--space-2);
   font-size: var(--t-xs); font-weight: 700;
@@ -57,9 +67,9 @@
 .cabeca-conta { color: var(--tinta); font-weight: 400; }
 
 /**
- * Chip: um atributo curto e repetível. SEM bisel e SEM sombra de propósito — chip não é objeto
- * separado, é uma marca no papel. A cor identifica a família do dado, nunca o valor; é a
- * repetição em coluna que deixa comparar Pokémon com Pokémon de relance.
+ * Chip: um atributo curto e repetível. SEM moldura de propósito — chip não é objeto separado, é
+ * uma marca sobre a superfície. A cor identifica a família do dado, nunca o valor; é a repetição
+ * em coluna que deixa comparar Pokémon com Pokémon de relance.
  */
 .chip {
   display: inline-flex; align-items: center;
@@ -67,11 +77,11 @@
   /* Declara a face em vez de herdar: chip quase sempre carrega NÚMERO, e ele aparece dentro de
    * títulos que falam na voz de HUD. Herdando, o "nv 65" do cartão do ativo saía "nv 68". */
   font-family: var(--fonte-texto); font-size: var(--t-xs); font-weight: 700;
-  background: var(--papel-cava); border: 1px solid var(--couro); color: var(--tinta);
+  background: var(--cava); border: 1px solid var(--madeira-escura); color: var(--tinta);
   white-space: nowrap;
 }
-.chip-nivel { background: color-mix(in srgb, var(--xp) 18%, var(--papel-cava)); }
-.chip-poder { background: color-mix(in srgb, var(--ouro-cheio) 30%, var(--papel-cava)); }
+.chip-nivel { background: color-mix(in srgb, var(--xp) 22%, var(--cava)); }
+.chip-poder { background: color-mix(in srgb, var(--ouro-cheio) 26%, var(--cava)); }
 
 /** Moeda: o número em coluna tabular, para somar de olho. */
 .moeda { display: inline-flex; align-items: center; gap: var(--space-1); font-variant-numeric: tabular-nums; }
@@ -86,8 +96,8 @@
 
 /**
  * Medidor. Veste o `<progress>` nativo em vez de trocá-lo por uma div: mantém a semântica e o
- * leitor de tela. O trilho é fenda; o preenchimento é chapado — sem gradiente e sem brilho,
- * porque o que informa é o comprimento, e decoração em cima disso só atrapalha a leitura.
+ * leitor de tela. O preenchimento é chapado — sem gradiente e sem brilho, porque o que informa é
+ * o comprimento, e decoração em cima disso só atrapalha a leitura.
  */
 .medidor { display: flex; flex-direction: column; gap: 2px; }
 .medidor-topo { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--t-xs); }
@@ -95,13 +105,15 @@
   font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-fraca);
 }
 
+/* A barra é fina demais para levar a moldura de 12 px: aqui a fenda continua sendo desenhada com
+ * borda e uma sombra interna, que no tamanho de 10 px lê igual e não come a altura inteira. */
 progress {
   appearance: none; display: block; width: 100%; height: 10px;
-  background: var(--mesa);
-  border: 1px solid var(--couro-sombra);
-  box-shadow: inset 1px 1px 0 rgb(0 0 0 / 45%);
+  background: var(--cava);
+  border: 1px solid var(--madeira-escura);
+  box-shadow: inset 1px 1px 0 rgb(0 0 0 / 55%);
 }
-progress::-webkit-progress-bar { background: var(--mesa); }
+progress::-webkit-progress-bar { background: var(--cava); }
 progress::-webkit-progress-value { background: var(--medidor-cor, var(--ouro-cheio)); transition: width var(--rapido) linear; }
 progress::-moz-progress-bar { background: var(--medidor-cor, var(--ouro-cheio)); }
 

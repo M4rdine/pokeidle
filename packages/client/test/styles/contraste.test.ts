@@ -49,33 +49,32 @@ async function paleta(): Promise<ReadonlyMap<string, Rgb>> {
 
 /** frente sobre fundo, e o mínimo que o papel daquele texto exige. */
 const PARES: readonly { readonly frente: string; readonly fundo: string; readonly minimo: number; readonly onde: string }[] = [
-  { frente: 'tinta', fundo: 'papel', minimo: TEXTO_NORMAL, onde: 'corpo sobre a folha' },
-  { frente: 'tinta', fundo: 'papel-alto', minimo: TEXTO_NORMAL, onde: 'corpo sobre superfície levantada' },
-  { frente: 'tinta', fundo: 'papel-cava', minimo: TEXTO_NORMAL, onde: 'corpo sobre superfície afundada' },
-  { frente: 'tinta', fundo: 'marca', minimo: TEXTO_NORMAL, onde: 'linha grifada' },
-  { frente: 'tinta-fraca', fundo: 'papel', minimo: TEXTO_NORMAL, onde: 'rótulo discreto sobre a folha' },
-  { frente: 'tinta-fraca', fundo: 'papel-alto', minimo: TEXTO_NORMAL, onde: 'rótulo discreto levantado' },
-  { frente: 'tinta-fraca', fundo: 'papel-cava', minimo: TEXTO_NORMAL, onde: 'rótulo discreto afundado' },
-  { frente: 'ouro', fundo: 'papel', minimo: TEXTO_NORMAL, onde: 'valor em moeda' },
-  { frente: 'ouro', fundo: 'papel-alto', minimo: TEXTO_NORMAL, onde: 'valor em moeda no cabeçalho' },
-  { frente: 'perigo', fundo: 'papel', minimo: TEXTO_NORMAL, onde: 'mensagem de erro' },
-  { frente: 'perigo', fundo: 'papel-alto', minimo: TEXTO_NORMAL, onde: 'erro em superfície levantada' },
-  { frente: 'ok', fundo: 'papel', minimo: TEXTO_NORMAL, onde: 'confirmação' },
-  { frente: 'ok', fundo: 'papel-alto', minimo: TEXTO_NORMAL, onde: 'confirmação levantada' },
-  { frente: 'xp', fundo: 'papel', minimo: TEXTO_NORMAL, onde: 'rótulo de experiência' },
-  // Ação primária e seleção: o couro invertido, com o papel por cima.
-  { frente: 'papel-alto', fundo: 'couro-sombra', minimo: TEXTO_NORMAL, onde: 'texto do botão primário' },
-  { frente: 'papel-alto', fundo: 'mesa', minimo: TEXTO_NORMAL, onde: 'texto sobre a mesa' },
+  { frente: 'tinta', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'corpo sobre o painel' },
+  { frente: 'tinta', fundo: 'painel-alto', minimo: TEXTO_NORMAL, onde: 'corpo sobre o botão' },
+  { frente: 'tinta', fundo: 'cava', minimo: TEXTO_NORMAL, onde: 'corpo sobre a fenda' },
+  { frente: 'tinta', fundo: 'fora', minimo: TEXTO_NORMAL, onde: 'corpo sobre o fundo da página' },
+  { frente: 'tinta-fraca', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no painel' },
+  { frente: 'tinta-fraca', fundo: 'painel-alto', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no botão' },
+  { frente: 'tinta-fraca', fundo: 'cava', minimo: TEXTO_NORMAL, onde: 'rótulo discreto na fenda' },
+  { frente: 'ouro', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'valor em moeda' },
+  { frente: 'ouro', fundo: 'painel-alto', minimo: TEXTO_NORMAL, onde: 'moeda no cabeçalho' },
+  { frente: 'perigo', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'mensagem de erro' },
+  { frente: 'perigo', fundo: 'painel-alto', minimo: TEXTO_NORMAL, onde: 'erro em botão' },
+  { frente: 'ok', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'confirmação' },
+  { frente: 'xp', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'rótulo de experiência' },
+  { frente: 'marca', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'rótulo da ação primária' },
+  // O grifo é CLARO num mundo escuro: quem escreve em cima dele escreve com a tinta do fundo da
+  // página, não com a do corpo. Foi o que a troca para o escuro inverteu — no mundo de papel o
+  // grifo era a superfície mais clara e o texto continuava escuro; aqui ele é a única ilha clara.
+  { frente: 'fora', fundo: 'marca', minimo: TEXTO_NORMAL, onde: 'texto sobre a linha grifada' },
   // Limites de componente e preenchimento de medidor: 3:1 basta, não são texto.
-  { frente: 'couro', fundo: 'papel', minimo: TEXTO_GRANDE, onde: 'traço da moldura sobre a folha' },
-  { frente: 'couro-sombra', fundo: 'papel', minimo: TEXTO_GRANDE, onde: 'anel de foco sobre a folha' },
-  { frente: 'couro-sombra', fundo: 'papel-alto', minimo: TEXTO_GRANDE, onde: 'anel de foco sobre o levantado' },
-  // O trilho do medidor é uma fenda cortada no papel: o que aparece no fundo dela é a mesa. Daí
-  // o preenchimento ser medido contra `--mesa`, e não contra uma superfície de papel.
-  { frente: 'hp', fundo: 'mesa', minimo: TEXTO_GRANDE, onde: 'barra de vida na fenda' },
-  { frente: 'xp-cheio', fundo: 'mesa', minimo: TEXTO_GRANDE, onde: 'barra de experiência na fenda' },
-  { frente: 'ouro-cheio', fundo: 'mesa', minimo: TEXTO_GRANDE, onde: 'preenchimento de moeda' },
-  { frente: 'marca-borda', fundo: 'papel', minimo: TEXTO_GRANDE, onde: 'borda do grifo' },
+  { frente: 'madeira-luz', fundo: 'painel', minimo: TEXTO_GRANDE, onde: 'anel de foco sobre o painel' },
+  { frente: 'madeira-luz', fundo: 'fora', minimo: TEXTO_GRANDE, onde: 'anel de foco sobre o fundo' },
+  { frente: 'madeira', fundo: 'painel', minimo: TEXTO_GRANDE, onde: 'madeira da moldura sobre o miolo' },
+  { frente: 'hp', fundo: 'cava', minimo: TEXTO_GRANDE, onde: 'barra de vida no trilho' },
+  { frente: 'xp-cheio', fundo: 'cava', minimo: TEXTO_GRANDE, onde: 'barra de experiência no trilho' },
+  { frente: 'ouro-cheio', fundo: 'cava', minimo: TEXTO_GRANDE, onde: 'preenchimento de moeda' },
+  { frente: 'marca-borda', fundo: 'painel', minimo: TEXTO_GRANDE, onde: 'borda do grifo' },
 ]
 
 describe('a paleta passa no contraste que a WCAG exige', () => {

@@ -1,5 +1,5 @@
 /*
- * Ficha de espécie. Segue o DESIGN.md: borda reta, dois planos de papel, nenhuma cor de acento —
+ * Ficha de espécie. Segue o DESIGN.md: canto reto, madeira sobre penumbra, nenhuma cor de acento —
  * o grifo marca o que está aberto, o ouro marca o que é valor — e número tabular. O que
  * hierarquiza é peso, caixa alta, voz da fonte e cor de rótulo — não um segundo tamanho de fonte.
  */
@@ -23,7 +23,7 @@
 .ficha-areas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .ficha-area {
   display: grid; grid-template-columns: 1fr auto auto auto; gap: var(--space-3);
-  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--papel);
+  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--painel);
 }
 /* A linha inteira é dado denso e fica na face de leitura, nome incluído: a bitmap só entra a
    partir de --t-l, e aqui não há tamanho sobrando para chegar lá. */
@@ -40,8 +40,8 @@
 .stat-valor { text-align: right; font-variant-numeric: tabular-nums; }
 /* Mesma escala nas seis barras: é a comparação entre elas que mostra o formato da espécie.
    O trilho é a fenda do medidor, com a mesa no fundo — é ela que deixa o preenchimento de ouro
-   atingir contraste. Sobre papel afundado, ouro sobre bege mede 1,3:1 e a barra desaparece. */
-.stat-barra { height: 8px; background: var(--mesa); position: relative; }
+   atingir contraste. Sobre superfície clara, ouro mede 1,3:1 e a barra desaparece. */
+.stat-barra { height: 8px; background: var(--fora); position: relative; }
 .stat-barra::after {
   content: ""; position: absolute; inset: 0;
   background: var(--ouro-cheio); transform: scaleX(var(--fracao, 0)); transform-origin: left;
@@ -51,17 +51,17 @@
 .ficha-evo { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
 .evo-estagio {
   display: flex; align-items: center; gap: var(--space-2);
-  padding: var(--space-1) var(--space-2); border: var(--border-w) solid var(--couro-sombra); background: var(--papel);
+  padding: var(--space-1) var(--space-2); border: var(--border-w) solid var(--madeira-escura); background: var(--painel);
 }
 /* O estágio aberto é o único grifado: a linha é contexto, e o marca-texto diz onde se está. */
-.evo-atual { background: var(--marca); border-color: var(--marca-borda); }
+.evo-atual { background: var(--marca); border-color: var(--marca-borda); color: var(--fora); }
 .evo-seta { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* ── Golpes ────────────────────────────────────────────────────────────────── */
 .ficha-learnset { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .learn-linha {
   display: grid; grid-template-columns: 4rem 1fr auto auto; gap: var(--space-2);
-  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--papel);
+  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--painel);
 }
 .learn-nivel, .learn-poder { font-variant-numeric: tabular-nums; }
 
@@ -83,7 +83,7 @@
 /* O nome no Time é a porta para a ficha: botão sem moldura que, no hover, pega a tinta de link
    do sistema — a mesma de qualquer outra coisa que leva a outro lugar. */
 .team-nome { background: none; border: none; padding: 0; text-align: left; font: inherit; color: inherit; cursor: pointer; }
-.team-nome:hover { color: var(--couro-sombra); }
+.team-nome:hover { color: var(--madeira-escura); }
 
 @media (max-width: 600px) {
   .ficha-area { grid-template-columns: 1fr auto; row-gap: var(--space-1); }

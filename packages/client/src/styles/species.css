@@ -1,0 +1,84 @@
+/*
+ * Ficha de espécie. Segue o DESIGN.md: borda reta, dois planos de fundo, um acento só e número
+ * tabular. O que hierarquiza é peso, caixa alta e cor de rótulo — não um segundo tamanho de fonte.
+ */
+.ficha { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.ficha-topo { display: flex; align-items: center; gap: var(--space-3); }
+.ficha-id { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
+.ficha-id h2 { font-size: 1.2rem; }
+.ficha-tipos { display: flex; gap: var(--space-1); }
+
+.ficha-secao { display: flex; flex-direction: column; gap: var(--space-2); }
+/* Mais espaço acima do título do que abaixo: o título pertence ao que vem depois dele. */
+.ficha-secao h3 {
+  margin: 0; font-size: 0.75em; font-weight: 400;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+}
+.ficha-vazio { margin: 0; }
+
+/* ── Onde aparece ──────────────────────────────────────────────────────────── */
+.ficha-areas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.ficha-area {
+  display: grid; grid-template-columns: 1fr auto auto auto; gap: var(--space-3);
+  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--panel);
+}
+.area-nome { font-weight: 600; }
+.area-faixa, .area-porta { font-variant-numeric: tabular-nums; }
+/* O portão é informação, não enfeite. Só acende quando ainda barra: apagado quer dizer que já dá. */
+.area-porta { font-variant-numeric: tabular-nums; }
+.porta-longe { color: var(--accent); }
+
+/* ── Atributos ─────────────────────────────────────────────────────────────── */
+.ficha-stats { display: flex; flex-direction: column; gap: var(--space-1); }
+.stat-linha { display: grid; grid-template-columns: 5.5rem 2.5rem 1fr; gap: var(--space-2); align-items: center; }
+.stat-rotulo { color: var(--muted); font-size: 0.85em; }
+.stat-valor { text-align: right; font-variant-numeric: tabular-nums; }
+/* Mesma escala nas seis barras: é a comparação entre elas que mostra o formato da espécie. */
+.stat-barra { height: 8px; background: var(--border); position: relative; }
+.stat-barra::after {
+  content: ""; position: absolute; inset: 0;
+  background: var(--accent); transform: scaleX(var(--fracao, 0)); transform-origin: left;
+}
+
+/* ── Evolução ──────────────────────────────────────────────────────────────── */
+.ficha-evo { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.evo-estagio {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-1) var(--space-2); border: var(--border-w) solid var(--border); background: var(--panel);
+}
+/* O estágio aberto é o único aceso: a linha é contexto, e o acento marca onde se está. */
+.evo-atual { border-color: var(--accent); }
+.evo-seta { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ── Golpes ────────────────────────────────────────────────────────────────── */
+.ficha-learnset { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
+.learn-linha {
+  display: grid; grid-template-columns: 4rem 1fr auto auto; gap: var(--space-2);
+  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--panel);
+}
+.learn-nivel, .learn-poder { font-variant-numeric: tabular-nums; }
+
+/* ── Números soltos ────────────────────────────────────────────────────────── */
+.ficha-numeros {
+  display: grid; grid-template-columns: repeat(3, auto); gap: var(--space-1) var(--space-3);
+  margin: 0; justify-content: start;
+}
+.ficha-numeros dt { font-size: 0.75em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.ficha-numeros dd { margin: 0; font-variant-numeric: tabular-nums; }
+/* dt e dd em colunas pareadas: rótulo em cima, número embaixo, como mostrador. */
+.ficha-numeros dt { grid-row: 1; }
+.ficha-numeros dd { grid-row: 2; }
+
+/* A célula da Pokédex que abre ficha precisa parecer clicável. */
+.dex-cell[role="button"] { cursor: pointer; }
+.dex-cell[role="button"]:hover { border-color: var(--accent); }
+/* O nome no Time é a porta para a ficha: botão sem moldura, sublinhado no hover. */
+.team-nome { background: none; border: none; padding: 0; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.team-nome:hover { color: var(--accent); }
+
+@media (max-width: 600px) {
+  .ficha-area { grid-template-columns: 1fr auto; row-gap: var(--space-1); }
+  .learn-linha { grid-template-columns: 3.5rem 1fr; row-gap: var(--space-1); }
+  .stat-linha { grid-template-columns: 4.5rem 2.5rem 1fr; }
+}

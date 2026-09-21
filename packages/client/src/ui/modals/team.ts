@@ -3,6 +3,8 @@ import { TeamSchema, type PokemonDto } from '../../api/dto.js'
 import { displayName } from '../../state/log.js'
 import { hasActiveHunt } from '../../state/hunt-active.js'
 import { el } from '../dom.js'
+import { botaoVoltar } from './pokedex.js'
+import { speciesSheet } from '../species/sheet.js'
 import { openModal, type Modal } from './modal.js'
 
 const swap = (ids: readonly string[], a: number, b: number): string[] => {
@@ -28,28 +30,39 @@ export function openTeam(ctx: AppContext): Modal {
       .then((next) => { render(next.team, next.box) })
       .catch((err: unknown) => { error.textContent = err instanceof Error ? err.message : 'não foi possível salvar' })
   }
-  const line = (pokemon: PokemonDto, extra: HTMLElement[]): HTMLElement =>
-    el('div', { class: 'team-row', 'data-pokemon': pokemon.id },
-      el('span', {}, `${displayName(pokemon.speciesName)} L${pokemon.level}`),
+  /** Mostra a ficha da espécie no lugar da lista; `voltar` refaz a lista de onde ela parou. */
+  const mostrarFicha = (speciesName: string, voltar: () => void): void => {
+    body.replaceChildren(botaoVoltar('Time', voltar), speciesSheet(ctx, speciesName))
+  }
+
+  const line = (pokemon: PokemonDto, extra: HTMLElement[], abrirFicha: () => void): HTMLElement => {
+    // O nome vira botão: ele é a porta para a ficha da espécie, e era o lugar onde o jogador já
+    // tentava clicar sem que nada acontecesse.
+    const nome = el('button', { type: 'button', class: 'team-nome', 'data-ficha': pokemon.id },
+      `${displayName(pokemon.speciesName)} L${pokemon.level}`)
+    nome.addEventListener('click', abrirFicha)
+    return el('div', { class: 'team-row', 'data-pokemon': pokemon.id },
+      nome,
       el('span', { class: 'muted' }, `${pokemon.hp}/${pokemon.hpMax}`),
       ...extra)
+  }
 
   function render(team: readonly PokemonDto[], box: readonly PokemonDto[]): void {
     const ids = team.map((p) => p.id)
     const disabled = inHunt
     const rows = team.map((pokemon, index) => {
-      const up = el('button', { type: 'button', 'aria-label': 'subir', ...((disabled || index === 0) && { disabled: true }) }, '↑')
-      const down = el('button', { type: 'button', 'aria-label': 'descer', ...((disabled || index === team.length - 1) && { disabled: true }) }, '↓')
-      const store = el('button', { type: 'button', ...(disabled && { disabled: true }) }, 'Guardar')
+      const up = el('button', { type: 'button', 'data-acao': 'subir', 'aria-label': 'subir', ...((disabled || index === 0) && { disabled: true }) }, '↑')
+      const down = el('button', { type: 'button', 'data-acao': 'descer', 'aria-label': 'descer', ...((disabled || index === team.length - 1) && { disabled: true }) }, '↓')
+      const store = el('button', { type: 'button', 'data-acao': 'guardar', ...(disabled && { disabled: true }) }, 'Guardar')
       up.addEventListener('click', () => save(swap(ids, index, index - 1)))
       down.addEventListener('click', () => save(swap(ids, index, index + 1)))
       store.addEventListener('click', () => save(ids.filter((id) => id !== pokemon.id)))
-      return line(pokemon, [up, down, store])
+      return line(pokemon, [up, down, store], () => mostrarFicha(pokemon.speciesName, () => render(team, box)))
     })
     const boxRows = box.map((pokemon) => {
-      const add = el('button', { type: 'button', ...((disabled || team.length >= slots) && { disabled: true }) }, 'Colocar no time')
+      const add = el('button', { type: 'button', 'data-acao': 'colocar', ...((disabled || team.length >= slots) && { disabled: true }) }, 'Colocar no time')
       add.addEventListener('click', () => save([...ids, pokemon.id]))
-      return line(pokemon, [add])
+      return line(pokemon, [add], () => mostrarFicha(pokemon.speciesName, () => render(team, box)))
     })
     body.replaceChildren(
       el('p', { class: 'muted' }, `vagas: ${team.length}/${slots}`),

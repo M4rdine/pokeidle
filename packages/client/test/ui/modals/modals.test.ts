@@ -64,7 +64,7 @@ describe('time', () => {
     modal().querySelector<HTMLButtonElement>('[data-pokemon=b] [aria-label=subir]')!.click()
     await flush()
     expect(put).toHaveBeenCalledWith('/trainer/team', { slots: ['b', 'a'] }, expect.anything())
-    modal().querySelector<HTMLButtonElement>('[data-pokemon=c] button')!.click()
+    modal().querySelector<HTMLButtonElement>('[data-pokemon=c] [data-acao=colocar]')!.click()
     await flush()
     expect(put).toHaveBeenLastCalledWith('/trainer/team', { slots: ['a', 'b', 'c'] }, expect.anything())
   })
@@ -73,7 +73,10 @@ describe('time', () => {
     openTeam(ctxWith({ http: { get } as never, hunt: createStore(inHuntView), session: inHuntSession() }))
     await flush()
     expect(modal().textContent).toContain('pare a hunt para mexer no time')
-    expect([...modal().querySelectorAll('button')].every((b) => b.hasAttribute('disabled'))).toBe(true)
+    // Só o que muda o time trava. Abrir a ficha da espécie é leitura, e continuar podendo
+    // consultá-la durante a caçada é justamente quando ela mais serve.
+    expect([...modal().querySelectorAll('[data-acao]')].every((b) => b.hasAttribute('disabled'))).toBe(true)
+    expect(modal().querySelector('[data-ficha=a]')?.hasAttribute('disabled')).toBe(false)
   })
 })
 
@@ -144,5 +147,51 @@ describe('hunt parada mas estado ainda espelhado', () => {
     openShop(ctxWith({ http: { get } as never, hunt: createStore(stopped) }))
     await flush()
     expect(modal().querySelector<HTMLButtonElement>('[data-item=potion] button')?.hasAttribute('disabled')).toBe(false)
+  })
+})
+
+describe('ficha de espécie dentro dos modais', () => {
+  const flushDex = async () => { for (let i = 0; i < 12; i++) await Promise.resolve() }
+
+  it('clicar numa espécie vista abre a ficha dentro da própria Pokédex, e volta para a lista', async () => {
+    const get = vi.fn(async () => ({ entries: [{ speciesName: 'charizard', caughtAt: new Date().toISOString() }] }))
+    openPokedex(ctxWith({ http: { get } as never }))
+    await flushDex()
+    expect(modal().querySelector('.pokedex-grid'), 'a lista começa aberta').not.toBeNull()
+
+    modal().querySelector<HTMLElement>('[data-species=charizard]')!.click()
+
+    // Um modal por vez é invariante do projeto: a ficha tem que morar dentro deste, senão abrir
+    // um segundo fecharia a Pokédex e o jogador perderia o lugar na lista.
+    expect(document.querySelectorAll('.modal')).toHaveLength(1)
+    expect(modal().querySelector('.ficha')).not.toBeNull()
+    expect(modal().textContent).toContain('Charizard')
+    expect(modal().querySelector('.pokedex-grid')).toBeNull()
+
+    modal().querySelector<HTMLButtonElement>('[data-voltar]')!.click()
+    expect(modal().querySelector('.pokedex-grid')).not.toBeNull()
+    expect(modal().querySelector('.ficha')).toBeNull()
+  })
+
+  it('espécie desconhecida não abre ficha: ela ainda não foi vista', async () => {
+    const get = vi.fn(async () => ({ entries: [] }))
+    openPokedex(ctxWith({ http: { get } as never }))
+    await flushDex()
+    const desconhecida = modal().querySelector<HTMLElement>('.dex-cell.unknown')!
+    desconhecida.click()
+    expect(modal().querySelector('.ficha')).toBeNull()
+    expect(modal().querySelector('.pokedex-grid')).not.toBeNull()
+  })
+
+  it('no Time, a linha do Pokémon abre a ficha da espécie dele', async () => {
+    const time = [{ id: 'p1', speciesName: 'charizard', level: 30, hp: 100, hpMax: 100, xp: 0, moves: [] }]
+    const get = vi.fn(async () => ({ team: time, box: [] }))
+    openTeam(ctxWith({ http: { get } as never }))
+    await flushDex()
+    modal().querySelector<HTMLButtonElement>('[data-ficha=p1]')!.click()
+    expect(modal().querySelector('.ficha')).not.toBeNull()
+    expect(modal().textContent).toContain('Charizard')
+    modal().querySelector<HTMLButtonElement>('[data-voltar]')!.click()
+    expect(modal().querySelector('[data-pokemon=p1]')).not.toBeNull()
   })
 })

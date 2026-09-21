@@ -116,6 +116,9 @@ O que ajuda a PR a ser aceita rápido:
 - **`pnpm -r test` e `pnpm -r exec tsc --noEmit` verdes.** O CI roda os dois.
 - **Um assunto por PR.** Duas mudanças independentes revisam melhor separadas.
 
+A `main` é protegida: PR precisa de aprovação e dos quatro checks do CI verdes. Quando entra,
+publica sozinha em produção.
+
 Se quiser uma ideia do que fazer, as specs em `docs/superpowers/specs/` terminam com uma seção
 "fora de escopo" que registra, com o motivo, o que ficou por fazer em cada entrega.
 

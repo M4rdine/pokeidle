@@ -118,6 +118,33 @@ cd /opt/pokeidle/src && git pull
 docker build -t pokeidle:vps . && cd /opt/pokeidle && docker compose up -d --force-recreate app
 ```
 
+## Deploy automático
+
+Commit na `main` publica sozinho. A corrente é: **CI verde → workflow `Deploy` → a VPS puxa,
+reconstrói e recria o container**. O `Deploy` escuta a conclusão do CI e tem uma guarda explícita
+(`workflow_run` dispara mesmo quando o CI falha), então teste vermelho não vira publicação.
+
+Para republicar sem commit novo: aba Actions → Deploy → *Run workflow*.
+
+### A chave de deploy
+
+O GitHub entra na VPS com uma chave dedicada, e ela **só consegue rodar um comando**. No
+`authorized_keys` do servidor:
+
+```
+command="/opt/pokeidle/deploy.sh",no-port-forwarding,no-agent-forwarding,no-X11-forwarding,no-pty,no-user-rc ssh-ed25519 AAAA...
+```
+
+O que o workflow pede é ignorado: a chave sempre executa `/opt/pokeidle/deploy.sh`. Vazada, ela
+não dá shell, não lê arquivo e não abre túnel — publica o Pokeidle, e nada mais. Numa máquina que
+hospeda outros projetos, essa diferença é o que separa um incidente de uma catástrofe.
+
+O script pega um `flock` antes de agir (dois deploys ao mesmo tempo disputariam a mesma imagem) e
+só devolve sucesso depois que o `/health` responde: container de pé não é aplicação no ar.
+
+Segredos do repositório: `VPS_SSH_KEY`, `VPS_HOST` e `VPS_KNOWN_HOSTS` — este último fixa a
+identidade do servidor, sem o que um DNS sequestrado receberia a chave privada.
+
 ## Trocar de host
 
 A imagem é um `Dockerfile` comum, sem nada do Fly. Em Render, Railway ou qualquer runner de

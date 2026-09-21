@@ -13,7 +13,8 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-const TOKENS = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'src', 'styles', 'tokens.css')
+const ESTILOS = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'src', 'styles')
+const TOKENS = join(ESTILOS, 'tokens.css')
 
 /** WCAG 2.2: texto normal 4,5:1; texto grande e limite de componente 3:1. */
 const TEXTO_NORMAL = 4.5
@@ -49,32 +50,30 @@ async function paleta(): Promise<ReadonlyMap<string, Rgb>> {
 
 /** frente sobre fundo, e o mínimo que o papel daquele texto exige. */
 const PARES: readonly { readonly frente: string; readonly fundo: string; readonly minimo: number; readonly onde: string }[] = [
-  { frente: 'tinta', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'corpo sobre o painel' },
-  { frente: 'tinta', fundo: 'painel-alto', minimo: TEXTO_NORMAL, onde: 'corpo sobre o botão' },
-  { frente: 'tinta', fundo: 'cava', minimo: TEXTO_NORMAL, onde: 'corpo sobre a fenda' },
-  { frente: 'tinta', fundo: 'fora', minimo: TEXTO_NORMAL, onde: 'corpo sobre o fundo da página' },
-  { frente: 'tinta-fraca', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no painel' },
-  { frente: 'tinta-fraca', fundo: 'painel-alto', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no botão' },
-  { frente: 'tinta-fraca', fundo: 'cava', minimo: TEXTO_NORMAL, onde: 'rótulo discreto na fenda' },
+  { frente: 'texto', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'corpo sobre o painel' },
+  { frente: 'texto', fundo: 'painel-alto', minimo: TEXTO_NORMAL, onde: 'corpo sobre o botão' },
+  { frente: 'texto', fundo: 'cava', minimo: TEXTO_NORMAL, onde: 'corpo sobre a fenda' },
+  { frente: 'texto', fundo: 'fundo', minimo: TEXTO_NORMAL, onde: 'corpo sobre o fundo da página' },
+  { frente: 'texto-fraco', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no painel' },
+  { frente: 'texto-fraco', fundo: 'painel-alto', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no botão' },
+  { frente: 'texto-fraco', fundo: 'cava', minimo: TEXTO_NORMAL, onde: 'rótulo discreto na fenda' },
   { frente: 'ouro', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'valor em moeda' },
   { frente: 'ouro', fundo: 'painel-alto', minimo: TEXTO_NORMAL, onde: 'moeda no cabeçalho' },
   { frente: 'perigo', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'mensagem de erro' },
   { frente: 'perigo', fundo: 'painel-alto', minimo: TEXTO_NORMAL, onde: 'erro em botão' },
   { frente: 'ok', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'confirmação' },
   { frente: 'xp', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'rótulo de experiência' },
-  { frente: 'marca', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'rótulo da ação primária' },
-  // O grifo é CLARO num mundo escuro: quem escreve em cima dele escreve com a tinta do fundo da
-  // página, não com a do corpo. Foi o que a troca para o escuro inverteu — no mundo de papel o
-  // grifo era a superfície mais clara e o texto continuava escuro; aqui ele é a única ilha clara.
-  { frente: 'fora', fundo: 'marca', minimo: TEXTO_NORMAL, onde: 'texto sobre a linha grifada' },
+  // A marca e a seleção são preenchimentos, e quem escreve em cima delas usa o par declarado.
+  { frente: 'primaria-texto', fundo: 'primaria', minimo: TEXTO_NORMAL, onde: 'texto da ação primária' },
+  { frente: 'selecao-texto', fundo: 'selecao', minimo: TEXTO_NORMAL, onde: 'texto da linha selecionada' },
   // Limites de componente e preenchimento de medidor: 3:1 basta, não são texto.
-  { frente: 'madeira-luz', fundo: 'painel', minimo: TEXTO_GRANDE, onde: 'anel de foco sobre o painel' },
-  { frente: 'madeira-luz', fundo: 'fora', minimo: TEXTO_GRANDE, onde: 'anel de foco sobre o fundo' },
-  { frente: 'madeira', fundo: 'painel', minimo: TEXTO_GRANDE, onde: 'madeira da moldura sobre o miolo' },
+  { frente: 'borda-forte', fundo: 'painel', minimo: TEXTO_GRANDE, onde: 'fio que identifica um controle' },
+  { frente: 'borda-forte', fundo: 'fundo', minimo: TEXTO_GRANDE, onde: 'fio de controle sobre o fundo' },
+  { frente: 'primaria', fundo: 'painel', minimo: TEXTO_GRANDE, onde: 'a ação primária contra a superfície' },
+  { frente: 'selecao', fundo: 'painel', minimo: TEXTO_GRANDE, onde: 'a seleção contra a superfície' },
   { frente: 'hp', fundo: 'cava', minimo: TEXTO_GRANDE, onde: 'barra de vida no trilho' },
   { frente: 'xp-cheio', fundo: 'cava', minimo: TEXTO_GRANDE, onde: 'barra de experiência no trilho' },
   { frente: 'ouro-cheio', fundo: 'cava', minimo: TEXTO_GRANDE, onde: 'preenchimento de moeda' },
-  { frente: 'marca-borda', fundo: 'painel', minimo: TEXTO_GRANDE, onde: 'borda do grifo' },
 ]
 
 describe('a paleta passa no contraste que a WCAG exige', () => {
@@ -91,6 +90,31 @@ describe('a paleta passa no contraste que a WCAG exige', () => {
         ? []
         : [`${onde}: --${frente} sobre --${fundo} mede ${medido.toFixed(2)}:1, precisa de ${minimo}:1`]
     })
+    expect(reprovados).toEqual([])
+  })
+
+  it('o rótulo de cada um dos dezoito tipos se lê sobre o seu matiz', async () => {
+    // O selo de tipo é o elemento mais repetido da interface e o mais fácil de errar: são
+    // dezoito cores, treze delas claras demais para texto branco. A primeira tentativa listou
+    // como "claros" um conjunto quase invertido, e nada na tela denunciava — o selo continuava
+    // bonito e o rótulo dentro dele, ilegível.
+    const cores = await paleta()
+    const folha = await readFile(join(ESTILOS, 'layout.css'), 'utf8')
+    // Quem leva tinta clara está declarado numa regra só; o resto herda a escura.
+    const regra = /\.type-[^{]*\{\s*color: var\(--tipo-claro\)/.exec(folha)?.[0] ?? ''
+    const comBranco = new Set([...regra.matchAll(/\.type-([a-z]+)/g)].map((m) => m[1]!))
+
+    const reprovados = [...cores.keys()]
+      .filter((n) => n.startsWith('type-'))
+      .flatMap((token) => {
+        const tipo = token.slice('type-'.length)
+        const matiz = cores.get(token)!
+        const tinta = cores.get(comBranco.has(tipo) ? 'tipo-claro' : 'tipo-escuro')!
+        const medido = razao(tinta, matiz)
+        return medido >= TEXTO_NORMAL
+          ? []
+          : [`${tipo}: o rótulo mede ${medido.toFixed(2)}:1 sobre o matiz, precisa de ${TEXTO_NORMAL}:1`]
+      })
     expect(reprovados).toEqual([])
   })
 

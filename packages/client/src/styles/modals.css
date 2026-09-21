@@ -5,24 +5,24 @@
  */
 /* Atrás dele o véu é o próprio fundo da página com transparência, não um preto novo: o mundo
    visual tem uma penumbra só, e um segundo preto não pertenceria a ela. */
-.modal-backdrop { position: fixed; inset: 0; background: color-mix(in srgb, var(--fora) 70%, transparent); display: grid; place-items: center; z-index: 30; }
+.modal-backdrop { position: fixed; inset: 0; background: color-mix(in srgb, var(--fundo) 70%, transparent); display: grid; place-items: center; z-index: 30; }
 /* Cabeçalho preso e corpo rolante. Com a rolagem no modal inteiro, uma ficha longa levava o
  * botão de fechar para fora da tela junto com o resto. */
 /* O modal do mapa é largo: ele carrega um mapa e uma tabela lado a lado, e em 560 px os dois
  * ficariam estreitos demais para servir a qualquer um dos dois. */
 .modal:has(.mapa-modal) { width: min(1180px, 96vw); }
 .modal {
+  border-radius: var(--raio);
   width: min(560px, 92vw); max-height: 86vh;
   display: flex; flex-direction: column; min-height: 0;
-  background: var(--painel-alto); border: var(--border-w) solid var(--madeira-escura);
-  box-shadow: 0 2px 0 var(--madeira), 0 8px 20px rgb(51 38 31 / 38%);
+  background: var(--painel-alto); border: var(--border-w) solid var(--borda);
+  box-shadow: 0 2px 0 var(--borda), 0 8px 20px rgb(51 38 31 / 38%);
 }
-.modal-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border-bottom: var(--border-w) solid var(--madeira-escura); }
-/* Fechar é ação de moldura fina: com os 12 px do botão comum, a caixa de conteúdo some. */
-.modal-close { --moldura-w: 6px; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; flex-shrink: 0; }
+.modal-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border-bottom: var(--border-w) solid var(--borda); }
+.modal-close { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; flex-shrink: 0; }
 .modal-body { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); overflow-y: auto; min-height: 0; }
 /* Linha de lista não é objeto: só o fio de madeira que a separa da seguinte, sem moldura e sem fundo. */
-.bag-item, .team-row, .shop-item { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-1) 0; border-bottom: 1px solid var(--madeira); }
+.bag-item, .team-row, .shop-item { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-1) 0; border-bottom: 1px solid var(--borda); }
 .bag-item button, .team-row button, .shop-item button { margin-left: auto; }
 .shop-item button { margin-left: 0; }
 .shop-item input { width: 64px; margin-left: auto; }
@@ -33,8 +33,8 @@
 .pokedex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--space-2); }
 /* Célula de grade: um fio de 1 px e nada mais — o registro de uma espécie é uma marca na página,
    não uma peça levantada. O nome fica na face de leitura, porque neste corpo a bitmap embola. */
-.dex-cell { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); padding: var(--space-1); border: 1px solid var(--madeira); font-size: var(--t-s); }
+.dex-cell { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); padding: var(--space-1); border: 1px solid var(--borda); font-size: var(--t-s); }
 /* Capturado é notável, não urgente nem selecionado: ouro na borda, que a varredura da grade pega
    de relance sem confundir com o grifo da linha aberta. */
-.dex-cell.unknown { color: var(--tinta-fraca); } .dex-cell.caught { border-color: var(--ouro); }
+.dex-cell.unknown { color: var(--texto-fraco); } .dex-cell.caught { border-color: var(--ouro); }
 .dex-sprite { width: 32px; height: 32px; }

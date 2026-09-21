@@ -1,16 +1,20 @@
 /*
- * O mundo visual: a interface de um MMO de Pokémon.
+ * O mundo visual: ardósia fria com o vermelho da Poké Ball.
  *
- * TESE: o chrome é MADEIRA E FERRO sobre penumbra, e o mundo pixelado é a única coisa saturada
- * da tela. A moldura é ARTE — peça do Kenney (CC0) repintada na paleta do nosso atlas — e não
- * `box-shadow`. Foi a queixa que derrubou as duas versões anteriores: bisel de CSS tem teto, e
- * por mais certo que esteja o contraste, lê como página web tematizada.
+ * TESE: o design system do Pokémon são os SELOS DE TIPO — saturados, arredondados, branco sobre
+ * cor cheia. A casca existe para hospedar isso, não para competir com isso. O fundo é frio de
+ * propósito: o mundo do jogo é verde e terra, e complementar faz o jogo saltar da tela.
  *
- * A COR NÃO FOI INVENTADA. A madeira da moldura é a TERRA BATIDA da trilha (#a97c5c), medida no
- * próprio atlas por `pnpm cores`; a barra de vida é o CAMPO, a de experiência é a ÁGUA. Quem
- * olha a tela e o mapa vê o mesmo mundo, porque é o mesmo mundo.
+ * O QUE VEIO ANTES, e por que caiu. A versão anterior era madeira sobre penumbra, com moldura
+ * 9-slice de 12 px em tudo. Dois erros, e o segundo é o grave:
  *
- * As molduras saem de `pnpm ui` (`tools/assets/scripts/ui-moldura.ts`) para `styles/ui/`.
+ *  1. Borda grossa demais. Doze pixels de moldura em cada painel e cada botão comem o espaço e
+ *     pesam a tela inteira. Agora é fio de 1 px e elevação por sombra.
+ *  2. Era um mundo de RPG de FANTASIA, não de Pokémon. Marrom sobre marrom é Zelda, é Stardew.
+ *     Pokémon é vermelho e branco, azul, saturado e limpo — e nada disso é marrom.
+ *
+ * CANTO ARREDONDADO, e não reto. A regra anterior ("o mundo é de canto reto") veio da madeira.
+ * Os selos oficiais de tipo são pílulas: canto macio é a linguagem da franquia.
  */
 
 /* ── As duas vozes ───────────────────────────────────────────────────────────────────────────
@@ -53,37 +57,44 @@
   --fonte-hud: 'Pixelify Sans', 'Courier New', monospace;
   --fonte-texto: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
 
-  /* ── Superfícies: penumbra, e a madeira em cima dela ──
-   * Os miolos batem com os das molduras geradas em `ui-moldura.ts`. Se um mudar, o outro muda
-   * junto, senão a superfície pintada pelo CSS deixa de casar com a pintada no PNG. */
-  --fora: #15110e;         /* fora de tudo; o mundo é a coisa mais clara da tela, não o chrome */
-  --painel: #2b231c;       /* o miolo do painel */
-  --painel-alto: #3a3026;  /* o miolo do botão levantado */
-  --cava: #12100d;         /* o miolo da fenda: trilho, lista, campo */
+  /* ── Superfícies, do fundo para a frente ── */
+  --fundo: #161b2b;        /* fora de tudo, e a tarja em volta do mundo */
+  --painel: #222a40;       /* a superfície */
+  --painel-alto: #2c3650;  /* a mesma, um degrau à frente: botão, linha em destaque */
+  --cava: #11151f;         /* o que afunda: trilho de medidor, campo, lista */
 
-  /* ── Madeira: as três cores da moldura, da trilha do atlas ── */
-  --madeira-luz: #c9a173;
-  --madeira: #a97c5c;
-  --madeira-escura: #5d4438;
+  /* ── Traço ──
+   * `--borda` só SEPARA e pode ser discreta. `--borda-forte` delimita CONTROLE e precisa dos
+   * 3:1 sobre o painel que a WCAG 1.4.11 exige de quem identifica um botão.
+   */
+  --borda: #3a4560;
+  --borda-forte: #6b7aa3;
 
   /* ── Texto ── */
-  --tinta: #f2e7d6;
-  /* Puxada do próprio marrom da madeira, nunca cinza: 4,9:1 sobre `--painel-alto`, o pior fundo. */
-  --tinta-fraca: #b0a08c;
+  --texto: #eef1f8;
+  --texto-fraco: #9aa6c4;
+
+  /* ── Marca e seleção ──
+   * O vermelho é o da Poké Ball, e é o único lugar onde a marca aparece: ação primária. A
+   * seleção é índigo, e não amarelo — num fundo frio o grifo amarelo grita.
+   */
+  --primaria: #e91515;
+  --primaria-alta: #ff2d2d;
+  --primaria-texto: #ffffff;
+  /* A seleção é um preenchimento CLARO com tinta escura em cima, e não o contrário. Escuro sobre
+   * escuro não se vê contra o painel; claro com texto branco não alcança 4,5:1. Com tinta escura
+   * os dois lados passam com folga: 4,4:1 contra o painel e 5,6:1 no texto. */
+  --selecao: #6f8ae6;
+  --selecao-texto: #11151f;
 
   /* ── Papéis semânticos. A cor aqui é informação; decoração não ganha nenhuma. ── */
-  --marca: #f7d979;        /* marca-texto: o grifo da linha ativa */
-  --marca-borda: #c9a227;
-  /* Duas cores por material, e não uma, porque os dois papéis pedem contrastes opostos: o valor
-   * em texto vive sobre superfície escura; o preenchimento vive dentro da fenda, mais escura
-   * ainda. Um token só reprovaria num dos dois. */
-  --ouro: #e8b53c;
-  --ouro-cheio: #d9a521;
-  --xp: #6ec6ef;
-  --xp-cheio: #56c4f1;
-  --perigo: #f07368;
-  --ok: #6ecb78;
-  --hp: #4fb35d;           /* campo, clareado para ler sobre a fenda */
+  --ouro: #ffcb05;         /* o amarelo do logotipo da franquia */
+  --ouro-cheio: #ffcb05;
+  --xp: #58a6f0;
+  --xp-cheio: #58a6f0;
+  --hp: #4ade80;
+  --perigo: #ff7a7a;
+  --ok: #4ade80;
 
   /* ── Escala de texto: fixa em rem, razão ~1,2. Interface de tarefa não usa tipo fluido. ── */
   --t-xs: 0.6875rem;  /* 11px — só em rótulo caixa-alta com entreletra, nunca em leitura */
@@ -100,15 +111,26 @@
   --space-4: 32px;
   --space-5: 48px;
 
-  /* ── Traço ── */
-  --border-w: 2px;
+  /* ── Forma ── */
+  --raio: 8px;        /* painel, botão, modal */
+  --raio-p: 4px;      /* chip, selo, medidor */
+  --border-w: 1px;
   /* Alvo mínimo de toque (WCAG 2.2 SC 2.5.8). Sai daqui para não virar número solto. */
   --alvo: 24px;
+
+  /* ── Elevação. Deslocamento E desfoque: sombra sem desfoque é enfeite, não profundidade. ── */
+  --sombra-1: 0 1px 2px rgb(0 0 0 / 30%);
+  --sombra-2: 0 8px 24px rgb(0 0 0 / 45%);
 
   /* ── Tempo: interface de tarefa reage, não coreografa ── */
   --rapido: 120ms;
   --normal: 200ms;
   --saida: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Tinta do selo de tipo. Treze dos dezoito matizes são claros demais para texto branco: o
+   * padrão é a tinta escura, e só cinco levam branco. Medido, não estimado — ver o teste. */
+  --tipo-escuro: #11151f;
+  --tipo-claro: #ffffff;
 
   /* ── Tipos: os dezoito matizes canônicos, identidade da espécie ── */
   --type-fire: #f08030;
@@ -137,8 +159,8 @@ html, body {
 
 body {
   margin: 0;
-  background: var(--fora);
-  color: var(--tinta);
+  background: var(--fundo);
+  color: var(--texto);
   font-family: var(--fonte-texto);
   font-size: var(--t-m);
   line-height: 1.45;
@@ -149,15 +171,17 @@ body {
  * As superfícies que o navegador desenha e que nenhum sistema de design costuma reclamar. Deixá-
  * las no padrão é o jeito mais barato de a tela denunciar que foi montada, não desenhada.
  */
-::selection { background: var(--marca); color: var(--fora); }
-:root { accent-color: var(--madeira); caret-color: var(--tinta); scrollbar-color: var(--madeira) var(--cava); }
+::selection { background: var(--selecao); color: var(--selecao-texto); }
+:root { accent-color: var(--primaria); caret-color: var(--texto); scrollbar-color: var(--borda-forte) var(--cava); }
 
-:where(a) { color: var(--madeira-luz); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+:where(a) { color: var(--xp); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
 
-/* Foco visível em qualquer coisa focável: a madeira clara é o que contrasta sobre a penumbra. */
+/* Anel de foco em dois traços: o fio claro garante o contraste sobre qualquer superfície, e o
+ * halo índigo diz de qual sistema ele é. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: var(--border-w) solid var(--madeira-luz);
+  outline: var(--border-w) solid var(--texto);
   outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgb(85 112 219 / 60%);
 }
 
 canvas {

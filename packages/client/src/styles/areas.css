@@ -5,7 +5,7 @@
  * têm largura fixa e idêntica em todas as linhas, em vez de se ajustarem ao conteúdo de cada uma.
  *
  * Dois pesos de traço: fio de 1 px em `--madeira` no que só separa — régua, linha de tabela,
- * célula — e a moldura desenhada no que é objeto apertável. Uma ficha desta
+ * célula — e o fio de controle no que é objeto apertável. Uma ficha desta
  * densidade com a mesma ênfase em tudo não se lê, se encara.
  */
 
@@ -14,7 +14,7 @@
 /* "nível 5" quebrando no meio deixa a barra com duas alturas no celular. */
 .trainer-bar > span { white-space: nowrap; }
 .area-head-right { display: flex; align-items: baseline; gap: var(--space-3); }
-.area-count { margin: 0; color: var(--tinta-fraca); font-variant-numeric: tabular-nums; }
+.area-count { margin: 0; color: var(--texto-fraco); font-variant-numeric: tabular-nums; }
 
 /* --- filtros --- */
 .area-filters {
@@ -26,7 +26,7 @@
 .filter-group { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); }
 .filter-group legend {
   float: left; width: 100%; padding: 0 0 var(--space-1);
-  color: var(--tinta-fraca); font-size: var(--t-xs); letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--texto-fraco); font-size: var(--t-xs); letter-spacing: 0.08em; text-transform: uppercase;
 }
 .filter-types { display: flex; flex-wrap: wrap; gap: var(--space-1); }
 .filter-type {
@@ -37,17 +37,17 @@
 /* Sobre a penumbra, escurecer é apagar: o realce do hover vem de clarear a madeira da borda. */
 .filter-type:hover { filter: brightness(0.92); }
 /* `--t` é o matiz do tipo, definido uma vez em layout.css para todo o sistema. */
-.filter-type { color: var(--tinta); border-color: var(--t); display: inline-flex; align-items: center; gap: 0.35em; }
+.filter-type { color: var(--texto); border-color: var(--t); display: inline-flex; align-items: center; gap: 0.35em; }
 .filter-type::before { content: ''; width: 0.55em; height: 0.55em; background: var(--t); }
 .filter-type[aria-pressed='true'] { background: color-mix(in srgb, var(--t) 28%, var(--painel)); border-width: 2px; }
 .filter-type[aria-pressed='true']::before { background: var(--t); box-shadow: 0 0 0 2px color-mix(in srgb, var(--t) 45%, transparent); }
 
 .filter-level-field { display: inline-flex; align-items: center; gap: var(--space-1); }
-.filter-level-field label { color: var(--tinta-fraca); }
+.filter-level-field label { color: var(--texto-fraco); }
 .filter-level { width: 5ch; padding: var(--space-1) var(--space-2); text-align: center; }
 .filter-toggle { padding: var(--space-1) var(--space-2); }
 /* Filtro ligado é o mesmo grifo da aba atual: marca-texto, e o rótulo segue em tinta. */
-.filter-toggle[aria-pressed='true'] { background: var(--marca); border-color: var(--marca-borda); color: var(--fora); }
+.filter-toggle[aria-pressed='true'] { background: var(--selecao); border-color: var(--selecao); color: var(--selecao-texto); }
 /* Vive no cabeçalho, ao lado da contagem que ele muda. Dentro do painel de filtros ele abria
    uma faixa morta sob os grupos curtos. */
 .filter-clear { padding: var(--space-1) var(--space-2); font-size: var(--t-s); }
@@ -57,11 +57,11 @@
 .area-region {
   display: flex; align-items: baseline; gap: var(--space-2);
   padding: var(--space-3) 0 var(--space-1);
-  border-bottom: 1px solid var(--madeira);
+  border-bottom: 1px solid var(--borda);
 }
 .area-region:first-child { padding-top: 0; }
 .area-region h2 { font-size: var(--t-l); letter-spacing: 0.06em; text-transform: uppercase; }
-.area-region-locked h2 { color: var(--tinta-fraca); }
+.area-region-locked h2 { color: var(--texto-fraco); }
 .area-region .area-gate { margin-left: auto; }
 
 .area-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
@@ -70,21 +70,22 @@
      todas as colunas de dados para um x diferente em cada linha, que é justamente o que esta
      ficha existe para não fazer. */
   display: grid; grid-template-columns: 1fr 7rem; align-items: stretch; gap: var(--space-3);
-  background: var(--painel); border: var(--border-w) solid var(--madeira-escura);
+  background: var(--painel); border: var(--border-w) solid var(--borda);
+  border-radius: var(--raio);
   padding-right: var(--space-3);
   /* Só a borda muda no hover: a linha não se mexe, então a coluna não pisca ao passar o mouse. */
   transition: border-color 120ms ease-out;
 }
 /* Hover é tinta; aberto é grifo. Separar os dois registros evita que passar o mouse pareça ter
    selecionado alguma coisa — e o marca-texto fica reservado para onde se está de fato. */
-.area-row:hover { border-color: var(--tinta); }
-.area-row-open { background: var(--marca); border-color: var(--marca-borda); color: var(--fora); }
+.area-row:hover { border-color: var(--texto); }
+.area-row-open { background: var(--selecao); border-color: var(--selecao); color: var(--selecao-texto); }
 /* O que dá para caçar agora é a folha levantada; o que ainda não abriu recua para a folha
    afundada. A separação é o plano, não a opacidade: os números da área bloqueada continuam em
    contraste cheio, porque é por eles que se decide o que perseguir. */
-.area-row-locked { background: var(--cava); border-color: color-mix(in srgb, var(--madeira-escura) 60%, var(--cava)); }
-.area-row-locked:hover { border-color: var(--tinta); }
-.area-row-locked .area-title { color: var(--tinta-fraca); }
+.area-row-locked { background: var(--cava); border-color: color-mix(in srgb, var(--borda) 60%, var(--cava)); }
+.area-row-locked:hover { border-color: var(--texto); }
+.area-row-locked .area-title { color: var(--texto-fraco); }
 
 /* As larguras são fixas de propósito: é o alinhamento entre linhas que torna a ficha comparável. */
 .area-main {
@@ -112,7 +113,7 @@
    rende" que a linha responde. */
 .area-rarity { color: var(--ouro); }
 .drops { white-space: normal; }
-.drop + .drop::before { content: ' · '; color: var(--tinta-fraca); }
+.drop + .drop::before { content: ' · '; color: var(--texto-fraco); }
 /* As três métricas são células próprias do grid: ficam na mesma coluna em todas as linhas. */
 .area-metrics { display: contents; }
 
@@ -131,7 +132,7 @@
 }
 
 /* O portão é informação, não enfeite: ouro, como o `.hunt-gate` do resto do sistema. Um
-   tingimento de fundo basta — marca sobre a superfície não ganha moldura nem sombra. O número fica na face
+   tingimento de fundo basta — marca sobre a superfície não ganha borda nem sombra. O número fica na face
    de leitura: neste corpo a bitmap troca dígito por dígito, e é o número que se vem ler aqui. */
 .area-gate {
   align-self: center; justify-self: center;
@@ -143,7 +144,7 @@
 
 .matchup-good strong { color: var(--ok); }
 .matchup-bad strong { color: var(--perigo); }
-.matchup-none strong { color: var(--tinta-fraca); }
+.matchup-none strong { color: var(--texto-fraco); }
 
 /* --- analisador --- */
 .area-detail { margin-top: calc(var(--space-2) * -1); }
@@ -151,7 +152,7 @@
    é o único fundo em que ela continua legível. A borda repete a do grifo da linha que a abriu,
    para as duas peças lerem como um objeto só. */
 .area-analyzer {
-  border: var(--border-w) solid var(--marca-borda); border-top: 0;
+  border: var(--border-w) solid var(--selecao); border-top: 0;
   background: var(--cava); padding: var(--space-3);
   /* A abertura é o único movimento da tela: a gaveta nasce da própria linha, de cima para baixo. */
   animation: analyzer-open 160ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -170,12 +171,12 @@
 /* Tabela densa fica inteira na voz de leitura, inclusive o cabeçalho: a bitmap neste tamanho
    perde a grade de pixels e vira borrão justamente onde há mais texto por centímetro. */
 .analyzer-table thead th {
-  color: var(--tinta-fraca); font-weight: 400; font-size: var(--t-xs);
+  color: var(--texto-fraco); font-weight: 400; font-size: var(--t-xs);
   letter-spacing: 0.06em; text-transform: uppercase;
-  border-bottom: 1px solid var(--madeira);
+  border-bottom: 1px solid var(--borda);
 }
 .analyzer-table .num { text-align: right; }
-.analyzer-table tbody tr + tr th, .analyzer-table tbody tr + tr td { border-top: 1px solid var(--madeira); }
+.analyzer-table tbody tr + tr th, .analyzer-table tbody tr + tr td { border-top: 1px solid var(--borda); }
 .analyzer-table tbody th { font-weight: 400; }
 .especie-nome { display: inline-flex; align-items: center; gap: var(--space-1); margin-right: var(--space-1); }
 .analyzer-note { margin: var(--space-3) 0 0; font-size: var(--t-s); }
@@ -183,7 +184,7 @@
 .area-empty { padding: var(--space-3); }
 /* Botão que se faz passar por link: usa a tinta de link do sistema, para não inventar uma
    terceira cor de "coisa clicável" na mesma tela. */
-.link { background: none; border: 0; padding: 0; color: var(--madeira-escura); text-decoration: underline; cursor: pointer; }
+.link { background: none; border: 0; padding: 0; color: var(--borda); text-decoration: underline; cursor: pointer; }
 
 @media (max-width: 960px) {
   .area-filters { grid-template-columns: 1fr; }
@@ -226,19 +227,15 @@
 
 /* Os controles flutuam sobre o canto do mapa, como na referência. */
 .mapa-controles { position: absolute; right: var(--space-2); bottom: var(--space-2); display: flex; gap: var(--space-1); }
-/* Moldura fina e caixa de 36 px: com os 12 px de moldura do botão comum, um alvo de 24 px fica
- * com caixa de conteúdo ZERO e o ícone simplesmente não aparece — foi o que aconteceu. */
-.mapa-zoom { --moldura-w: 6px; width: 36px; height: 36px; padding: 0; }
+.mapa-zoom { width: 36px; height: 36px; padding: 0; }
 
-/* O mapa é embutido na superfície: a mesma fenda dos outros lugares onde se LÊ. Aqui a moldura
-   desenhada de 12 px comeria a beirada do mapa, então a fenda é a borda fina com sombra. */
+/* O mapa é embutido na superfície: a mesma fenda dos outros lugares onde se LÊ. */
 .mapa-imagem {
   display: block; width: 100%; height: auto;
   image-rendering: pixelated;
-  border: var(--border-w) solid var(--madeira-escura);
+  border: var(--border-w) solid var(--borda);
   box-shadow:
-    inset 2px 2px 0 rgb(0 0 0 / 55%),
-    inset -2px -2px 0 var(--madeira-escura);
+    inset 0 1px 3px rgb(0 0 0 / 45%);
 }
 /* A camada de marcadores não intercepta o clique; só os botões dentro dela interceptam. */
 .mapa-marcadores { position: absolute; inset: 0; pointer-events: none; }
@@ -255,24 +252,24 @@
   width: 46px; height: 46px; padding: 0;
   pointer-events: auto;
   border-radius: 50%;
-  background: var(--fora);
-  border: var(--border-w) solid var(--madeira);
-  border-image-source: none;
-  box-shadow: 0 2px 6px rgb(0 0 0 / 55%);
+  background: var(--fundo);
+  border: 2px solid var(--borda-forte);
+  box-shadow: var(--sombra-1);
 }
-.mapa-marcador:hover { border-color: var(--madeira-luz); }
+.mapa-marcador:hover { border-color: var(--texto); }
 .mapa-medalha { display: grid; place-items: center; line-height: 0; }
 /* A faixa de nível sai para fora do disco: dentro ela cobriria o sprite, que é o conteúdo. */
 .mapa-nivel {
   position: absolute; bottom: -9px;
   padding: 0 var(--space-1);
   font-size: var(--t-xs); font-weight: 700; font-variant-numeric: tabular-nums;
-  background: var(--painel); border: 1px solid var(--madeira-escura); color: var(--tinta);
+  background: var(--painel); border: 1px solid var(--borda); color: var(--texto);
+  border-radius: var(--raio-p);
   white-space: nowrap;
 }
 /* O medalhão aberto é o único grifado: o marca-texto diz onde se está, não onde dá para ir. */
-.mapa-marcador-ativo { border-color: var(--marca-borda); box-shadow: 0 0 0 3px var(--marca); }
-.mapa-marcador-ativo .mapa-nivel { background: var(--marca); color: var(--fora); border-color: var(--marca-borda); }
+.mapa-marcador-ativo { border-color: var(--selecao); box-shadow: 0 0 0 3px var(--selecao); }
+.mapa-marcador-ativo .mapa-nivel { background: var(--selecao); color: var(--selecao-texto); border-color: var(--selecao); }
 /* Travado apaga o sprite e mantém o número aceso: é pelo número que se decide o que perseguir.
    O cadeado entra ANTES do número, não no lugar dele — o ícone diz "fechado" e o número diz
    "fechado até quando", que é a metade que decide se vale perseguir. */
@@ -293,8 +290,10 @@
 .mapa-modal { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
 .mapa-abas { display: flex; flex-wrap: wrap; gap: var(--space-1); }
 .mapa-aba { display: flex; align-items: baseline; gap: var(--space-2); }
-.mapa-aba-nivel { font-size: var(--t-xs); color: var(--tinta-fraca); font-variant-numeric: tabular-nums; }
-.mapa-aba.tab-active .mapa-aba-nivel { color: var(--marca); }
+.mapa-aba-nivel { font-size: var(--t-xs); color: var(--texto-fraco); font-variant-numeric: tabular-nums; }
+/* Sobre o preenchimento da seleção, o nível usa a tinta da seleção — não a cor dela, que seria
+ * a mesma do fundo e sumiria. Foi o que aconteceu: "Kanto nv 1" virou "Kanto". */
+.mapa-aba.tab-active .mapa-aba-nivel { color: var(--selecao-texto); opacity: 0.75; }
 
 /* O mapa manda na largura e o analisador fica com o que sobra, com piso: abaixo de 260 px a
    tabela de drops quebra em duas linhas por item e deixa de ser tabela. */

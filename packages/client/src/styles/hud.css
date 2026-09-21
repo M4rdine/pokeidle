@@ -2,7 +2,7 @@
  * HUD da tela de jogo — o painel de instrumento do DESIGN.md.
  *
  * A cena é o centro e cada painel rola por dentro; a janela não rola. A proporção é a decisão
- * principal daqui: antes a moldura comia 40 % da altura (barra de 107 px quebrada em duas linhas
+ * principal daqui: antes o cabeçalho comia 40 % da altura (barra de 107 px quebrada em duas linhas
  * mais 180 px fixos de log), e o log, a superfície menos ligada a decisão, era o maior painel do
  * quadro. Agora a barra cabe numa linha e o log encolhe com a janela.
  */
@@ -14,7 +14,7 @@
  *
  * O menu de funções fica no ALTO DO CENTRO, não numa barra que atravessa a tela: em barra ele
  * disputava a faixa com a identidade e com os botões de sessão, e numa tela estreita quebrava em
- * três linhas de moldura comendo a altura do mundo.
+ * três linhas comendo a altura do mundo.
  */
 .game-grid {
   display: grid;
@@ -33,7 +33,7 @@
 .grid-menu { grid-area: menu; }
 /* A tarja que sobra quando o mundo é menor que o painel mostra o fundo da página; o mesmo valor
  * é lido do token pelo renderizador, em `scene/app.ts`, para os dois não poderem divergir. */
-.grid-center { grid-area: center; position: relative; overflow: hidden; background: var(--fora); min-width: 0; min-height: 0; }
+.grid-center { grid-area: center; position: relative; overflow: hidden; background: var(--fundo); min-width: 0; min-height: 0; }
 .grid-right { grid-area: right; min-height: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 .grid-bottom { grid-area: bottom; min-height: 0; }
 
@@ -67,7 +67,7 @@
 .leitura { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
 .leitura > span:first-child {
   font-size: var(--t-xs); font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-fraca);
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--texto-fraco);
 }
 .leitura > :last-child { font-size: var(--t-m); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* O ouro é o número que o jogador veio ver; é recompensa, e recompensa acende. */
@@ -91,9 +91,9 @@
 .active-corpo { display: flex; flex-direction: column; gap: var(--space-2); }
 .medidor { display: flex; flex-direction: column; gap: 2px; }
 .medidor-topo { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.75em; }
-.medidor-topo > :first-child { font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-fraca); }
+.medidor-topo > :first-child { font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--texto-fraco); }
 .active-card progress { height: 8px; }
-.active-vazio { color: var(--tinta-fraca); padding: var(--space-2) 0; }
+.active-vazio { color: var(--texto-fraco); padding: var(--space-2) 0; }
 
 /* ── Golpes ───────────────────────────────────────────────────────────────────
  * Quatro colunas de largura fixa, iguais em todas as linhas: nome, tipo, poder e recarga. É a
@@ -108,7 +108,7 @@
 .move-poder { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
 /* A recarga é uma fenda: fundo de penumbra, preenchimento de latão. Pronto fica VERDE e cheio — e o
  * "cheio" importa tanto quanto a cor, porque quem não distingue verde de âmbar lê o comprimento. */
-.move-cd { height: 6px; background: var(--fora); position: relative; overflow: hidden; }
+.move-cd { height: 6px; background: var(--fundo); position: relative; overflow: hidden; }
 .move-cd::after { content: ""; position: absolute; inset: 0; background: var(--ouro-cheio); transform: scaleX(var(--cd, 0)); transform-origin: left; }
 .move-cd[data-cd="0"] { background: var(--hp); }
 
@@ -118,8 +118,8 @@
 /* Combate é o estado NORMAL de um idle: ele acontece o tempo todo. Acender o que está sempre
  * aceso é ruído, não ênfase — então o combate vem em tinta cheia e os estados de pausa é que
  * recuam. Antes daqui, o acento ficava ligado praticamente sem parar. */
-.situacao-texto[data-situacao="em combate"] { color: var(--tinta); font-weight: 700; }
-.situacao-texto[data-situacao="curando"], .situacao-texto[data-situacao="voltando ao Centro"] { color: var(--tinta-fraca); }
+.situacao-texto[data-situacao="em combate"] { color: var(--texto); font-weight: 700; }
+.situacao-texto[data-situacao="curando"], .situacao-texto[data-situacao="voltando ao Centro"] { color: var(--texto-fraco); }
 .situacao-alvo { display: flex; flex-direction: column; gap: 2px; }
 .situacao { min-height: 0; }
 .alvo-linha { display: flex; align-items: baseline; gap: var(--space-2); font-size: 0.85em; }
@@ -130,7 +130,6 @@
 .team-strip { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-2); width: 100%; overflow-y: auto; }
 .team-strip .slot { flex-shrink: 0; }
 .slot {
-  --moldura-w: 6px;
   display: flex; align-items: center; gap: var(--space-2);
   min-height: 0; padding: var(--space-1) var(--space-2); overflow: hidden; text-align: left;
 }
@@ -144,18 +143,18 @@
 .slot progress { height: 6px; }
 /* O marca-texto tem um trabalho só no sistema inteiro: dizer qual linha é a de agora. Gastá-lo
  * também no log e na situação o transformaria em decoração, e aí ele não marcaria mais nada. */
-.slot-active { background: var(--marca); border-color: var(--marca-borda); color: var(--fora); }
+.slot-active { background: var(--selecao); border-color: var(--selecao); color: var(--selecao-texto); }
 /* Vaga vazia e vaga travada são lugares onde ainda não há nada: afundam, em vez de se levantar
  * como as ocupadas. Mesma regra do resto do sistema — o que se lê afunda, o que se age levanta. */
 /* Vaga vazia é ausência, e ausência não ocupa o mesmo espaço que presença: ela encolhe para uma
  * linha. Com a altura das ocupadas, três vagas vazias tomavam um terço da coluna do time para
  * não dizer nada. */
 .slot-empty, .slot-locked {
-  --moldura-w: 6px; --moldura: url('./ui/cava.png');
-  justify-content: center; color: var(--tinta-fraca); font-size: var(--t-xs);
+  background: var(--cava); border-color: var(--borda);
+  justify-content: center; color: var(--texto-fraco); font-size: var(--t-xs);
   letter-spacing: 0.08em; min-height: var(--alvo); padding: 2px var(--space-2);
   background: var(--cava);
-  border: var(--border-w) solid var(--madeira-escura);
+  border: var(--border-w) solid var(--borda);
   box-shadow: none;
 }
 /* O slot travado diz o nível que o destrava: é informação, e substitui o cadeado em emoji que
@@ -166,9 +165,9 @@
 .log { height: 100%; display: flex; flex-direction: column; min-height: 0; }
 .log-header {
   display: flex; gap: var(--space-2); align-items: center;
-  padding: var(--space-1) var(--space-3); border-bottom: var(--border-w) solid var(--madeira-escura);
+  padding: var(--space-1) var(--space-3); border-bottom: var(--border-w) solid var(--borda);
   font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--tinta-fraca);
+  text-transform: uppercase; color: var(--texto-fraco);
 }
 .log-header label { display: flex; align-items: center; gap: var(--space-1); cursor: pointer; }
 .log-filtro { margin-left: auto; }
@@ -179,11 +178,11 @@
 .log-line { padding: 1px 0; }
 /* A hierarquia do registro em três degraus: o combate é o fundo, a recompensa de rotina se lê
  * sem gritar, e o marco — captura, evolução, nível — é o único que acende. */
-.log-combat { color: var(--tinta-fraca); }
-.log-reward { color: var(--tinta); }
+.log-combat { color: var(--texto-fraco); }
+.log-reward { color: var(--texto); }
 .log-marco { color: var(--ouro); font-weight: 700; }
-.log-info { color: var(--tinta-fraca); } .log-alert { color: var(--perigo); }
-.log-vazio { color: var(--tinta-fraca); padding: var(--space-2) var(--space-3); }
+.log-info { color: var(--texto-fraco); } .log-alert { color: var(--perigo); }
+.log-vazio { color: var(--texto-fraco); padding: var(--space-2) var(--space-3); }
 
 .scene-error { color: var(--perigo); padding: var(--space-3); }
 .catchup, .stopped { display: flex; flex-direction: column; gap: var(--space-2); align-items: center; padding: var(--space-4); }

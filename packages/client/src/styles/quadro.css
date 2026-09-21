@@ -1,87 +1,74 @@
 /*
  * O material da interface, e o vocabulário que nasce dele.
  *
- * A MOLDURA É ARTE, NÃO CSS. Cada superfície usa `border-image` sobre uma peça de 32×32 do pack
- * do Kenney (CC0), repintada na paleta do nosso atlas por `pnpm ui`. As versões anteriores
- * desenhavam moldura com duas `box-shadow` internas, e é essa a diferença que as derrubou:
- * box-shadow não tem canto desenhado, não tem textura e não tem estado apertado. Acertar
- * contraste e espaçamento em cima de box-shadow ainda entrega uma página web tematizada.
+ * UM FIO E UMA SOMBRA. Superfície é um retângulo de canto macio com 1 px de borda e, quando
+ * precisa se destacar, uma sombra com deslocamento e desfoque. Só isso.
  *
- * COMO O RECORTE FUNCIONA: a peça tem 32 px e a madeira ocupa 6 px de cada lado. `slice: 6` corta
- * os nove pedaços; `border-width: 12px` desenha a moldura em dobro, e `repeat` faz as laterais
- * ladrilharem em vez de esticarem — é o que mantém o pixel quadrado em qualquer tamanho de
- * painel. O miolo vem do próprio PNG (`fill`), então a cor da superfície e a da moldura não
- * podem divergir.
+ * A versão anterior desenhava moldura de madeira com `border-image` 9-slice de 12 px em cada
+ * painel e cada botão. Era arte de verdade — e estava errada assim mesmo por duas razões: doze
+ * pixels de moldura por objeto pesam a tela e comem o espaço que era do conteúdo, e madeira é o
+ * idioma de RPG de fantasia, não o do Pokémon.
+ *
+ * A profundidade tem dois degraus, e cada um diz uma coisa:
+ *   `--sombra-1`  está apoiado na superfície  — painel, botão
+ *   `--sombra-2`  está POR CIMA de tudo       — modal, toast
  */
 
-/** Onde a moldura entra. `--moldura` é trocada por quem usa; o resto é igual em todas. */
-.quadro, .quadro-alto, .quadro-fundo, .quadro-flutua, .panel {
-  border-style: solid;
-  border-width: var(--moldura-w, 12px);
-  border-image-source: var(--moldura, url('./ui/painel.png'));
-  border-image-slice: 6 fill;
-  border-image-repeat: repeat;
-  /* Sem isto o navegador interpola a madeira ao dobrar de tamanho e o pixel vira borrão. */
-  image-rendering: pixelated;
-  background: none;
+/** Superfície que se levanta: painel, seção. Não é para chip nem para linha de lista. */
+.quadro, .panel {
+  background: var(--painel);
+  border: var(--border-w) solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-1);
 }
 
-/** Superfície que se levanta: painel, moldura de seção. Não é para chip nem para dado. */
-.quadro, .panel { --moldura: url('./ui/painel.png'); }
-
 /** A mesma superfície, um degrau à frente. */
-.quadro-alto { --moldura: url('./ui/botao.png'); }
+.quadro-alto { background: var(--painel-alto); }
 
 /**
  * A fenda: é onde se LÊ — lista, campo, área de rolagem. O miolo quase preto é o que deixa a
  * barra de vida e a de experiência atingirem contraste sobre ela.
  */
-.quadro-fundo { --moldura: url('./ui/cava.png'); }
-
-/**
- * Flutua acima de tudo: modal e toast. A moldura é a mesma; o que diz "está por cima" é a sombra
- * projetada, com deslocamento e desfoque de verdade. É o segundo registro de profundidade, e o
- * único lugar onde ele é gasto.
- */
-.quadro-flutua {
-  --moldura: url('./ui/painel.png');
-  box-shadow: 0 6px 24px rgb(0 0 0 / 55%);
+.quadro-fundo {
+  background: var(--cava);
+  border: var(--border-w) solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: none;
 }
 
-/*
- * O GRIFO. Marca a linha de agora, e tem um trabalho só no sistema inteiro — gastá-lo em mais de
- * um lugar por tela o transforma em decoração, e aí ele não marca mais nada.
- *
- * Num mundo escuro ele é a ÚNICA ilha clara, então quem escreve em cima dele escreve com a tinta
- * do fundo da página. Esta regra existe para o texto não ficar claro sobre claro: a inversão foi
- * exatamente o que a troca do mundo claro para o escuro quebrou em sete lugares de uma vez.
- * Cada uso declara `color: var(--fora)` junto do fundo, e o teste de contraste cobre o par.
- */
+/** Flutua acima de tudo: modal e toast. É o único lugar onde a sombra grande é gasta. */
+.quadro-flutua {
+  background: var(--painel);
+  border: var(--border-w) solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-2);
+}
 
 /** Cabeçalho de seção: caixa alta espacejada, no menor degrau da escala. Não compete com o dado. */
 .cabeca {
   display: flex; align-items: baseline; gap: var(--space-2);
   font-size: var(--t-xs); font-weight: 700;
-  letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-fraca);
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--texto-fraco);
 }
-.cabeca-conta { color: var(--tinta); font-weight: 400; }
+.cabeca-conta { color: var(--texto); font-weight: 400; }
 
 /**
- * Chip: um atributo curto e repetível. SEM moldura de propósito — chip não é objeto separado, é
- * uma marca sobre a superfície. A cor identifica a família do dado, nunca o valor; é a repetição
- * em coluna que deixa comparar Pokémon com Pokémon de relance.
+ * Chip: um atributo curto e repetível. Sem sombra — chip não é objeto separado, é uma marca
+ * sobre a superfície. A cor identifica a família do dado, nunca o valor; é a repetição em coluna
+ * que deixa comparar Pokémon com Pokémon de relance.
  */
 .chip {
   display: inline-flex; align-items: center;
-  padding: 1px var(--space-1);
+  padding: 1px var(--space-2);
+  border-radius: 999px;
   /* Declara a face em vez de herdar: chip quase sempre carrega NÚMERO, e ele aparece dentro de
    * títulos que falam na voz de HUD. Herdando, o "nv 65" do cartão do ativo saía "nv 68". */
   font-family: var(--fonte-texto); font-size: var(--t-xs); font-weight: 700;
-  background: var(--cava); border: 1px solid var(--madeira-escura); color: var(--tinta);
+  background: var(--cava); border: var(--border-w) solid var(--borda); color: var(--texto);
   white-space: nowrap;
 }
 .chip-nivel { background: color-mix(in srgb, var(--xp) 22%, var(--cava)); }
-.chip-poder { background: color-mix(in srgb, var(--ouro-cheio) 26%, var(--cava)); }
+.chip-poder { background: color-mix(in srgb, var(--ouro) 22%, var(--cava)); }
 
 /** Moeda: o número em coluna tabular, para somar de olho. */
 .moeda { display: inline-flex; align-items: center; gap: var(--space-1); font-variant-numeric: tabular-nums; }
@@ -89,29 +76,31 @@
 .moeda-ouro .moeda-valor { color: var(--ouro); }
 
 /*
- * ÍCONE. Sempre um ELEMENTO, nunca o `background` de quem o contém: a moldura usa `border-image`
- * com `fill`, e o `fill` pinta o miolo da peça por cima de qualquer `background` — um ícone posto
- * como fundo de botão simplesmente não aparece. Custou uma rodada descobrir.
+ * ÍCONE. Sempre um ELEMENTO, nunca o `background` de quem o contém: assim ele pode receber
+ * estado próprio, e a regra sobreviveu a duas trocas de mundo visual.
  *
- * As peças vêm do pack do VerzatileDev (CC0), repintadas na nossa paleta por `pnpm icones`.
+ * Os de assunto são SPRITE OFICIAL do acervo da PokeAPI — Poké Ball, mapa, bolsa, caixa de
+ * moedas. Nada de símbolo desenhado por nós quando existe o do próprio jogo: a fidelidade sai
+ * de graça, e nenhum desenho meu chega perto. Foi o que a rodada anterior provou, desenhando
+ * seis ícones à mão que agora estão substituídos.
  */
 .icone {
-  display: block; width: 16px; height: 16px; flex-shrink: 0;
+  display: block; width: 22px; height: 22px; flex-shrink: 0;
   background-repeat: no-repeat; background-position: center; background-size: contain;
   image-rendering: pixelated;
 }
-.icone[data-icone="mais"] { background-image: url('./ui/icone-mais.png'); }
-.icone[data-icone="menos"] { background-image: url('./ui/icone-menos.png'); }
-.icone[data-icone="parar"] { background-image: url('./ui/icone-parar.png'); }
-.icone[data-icone="cadeado"] { background-image: url('./ui/icone-cadeado.png'); }
-.icone[data-icone="time"] { background-image: url('./ui/icone-time.png'); }
-.icone[data-icone="fechar"] { background-image: url('./ui/icone-fechar.png'); }
-/* Os seis do menu de funções, desenhados à mão em `ui-icones-menu.ts`. */
 .icone[data-icone="mapa"] { background-image: url('./ui/icone-mapa.png'); }
+.icone[data-icone="time"] { background-image: url('./ui/icone-time.png'); }
 .icone[data-icone="mochila"] { background-image: url('./ui/icone-mochila.png'); }
 .icone[data-icone="pokedex"] { background-image: url('./ui/icone-pokedex.png'); }
 .icone[data-icone="loja"] { background-image: url('./ui/icone-loja.png'); }
 .icone[data-icone="configuracoes"] { background-image: url('./ui/icone-configuracoes.png'); }
+/* Os de controle não existem como item do jogo: vêm do pack do VerzatileDev (CC0), repintados. */
+.icone[data-icone="mais"] { background-image: url('./ui/icone-mais.png'); }
+.icone[data-icone="menos"] { background-image: url('./ui/icone-menos.png'); }
+.icone[data-icone="parar"] { background-image: url('./ui/icone-parar.png'); }
+.icone[data-icone="cadeado"] { background-image: url('./ui/icone-cadeado.png'); }
+.icone[data-icone="fechar"] { background-image: url('./ui/icone-fechar.png'); }
 
 /** Botão só de ícone, quadrado, no piso de alvo de toque. */
 .botao-icone {
@@ -127,24 +116,23 @@
 .medidor { display: flex; flex-direction: column; gap: 2px; }
 .medidor-topo { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--t-xs); }
 .medidor-topo > :first-child {
-  font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-fraca);
+  font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--texto-fraco);
 }
 
-/* A barra é fina demais para levar a moldura de 12 px: aqui a fenda continua sendo desenhada com
- * borda e uma sombra interna, que no tamanho de 10 px lê igual e não come a altura inteira. */
 progress {
   appearance: none; display: block; width: 100%; height: 10px;
   background: var(--cava);
-  border: 1px solid var(--madeira-escura);
-  box-shadow: inset 1px 1px 0 rgb(0 0 0 / 55%);
+  border: var(--border-w) solid var(--borda);
+  border-radius: 999px;
+  overflow: hidden;
 }
 progress::-webkit-progress-bar { background: var(--cava); }
-progress::-webkit-progress-value { background: var(--medidor-cor, var(--ouro-cheio)); transition: width var(--rapido) linear; }
-progress::-moz-progress-bar { background: var(--medidor-cor, var(--ouro-cheio)); }
+progress::-webkit-progress-value { background: var(--medidor-cor, var(--ouro)); transition: width var(--rapido) linear; }
+progress::-moz-progress-bar { background: var(--medidor-cor, var(--ouro)); }
 
 .hp-bar { --medidor-cor: var(--hp); }
 /* Ferido e crítico não mudam só de cor: mudar a cor sozinha deixa de fora quem não a distingue.
  * A largura da barra já é o sinal principal, e o texto ao lado dá o número. */
-[data-hp-state="ferido"] { --medidor-cor: var(--ouro-cheio); }
+[data-hp-state="ferido"] { --medidor-cor: var(--ouro); }
 [data-hp-state="critico"] { --medidor-cor: var(--perigo); }
-.xp-bar { --medidor-cor: var(--xp-cheio); }
+.xp-bar { --medidor-cor: var(--xp); }

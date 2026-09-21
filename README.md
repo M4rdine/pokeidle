@@ -5,6 +5,40 @@ progresso continua com a aba fechada. A simulação inteira acontece no servidor
 
 [![CI](https://github.com/M4rdine/pokeidle/actions/workflows/ci.yml/badge.svg)](https://github.com/M4rdine/pokeidle/actions/workflows/ci.yml)
 
+![Campo Inicial: a trilha liga a partida ao Centro Pokémon e as manchas escuras de grama alta marcam onde os selvagens aparecem](docs/imagens/campo-inicial.png)
+
+O cenário acima é gerado pelo pipeline deste repositório — terreno, props e o prédio saem de
+conjuntos próprios, e o mapa é composto por código a partir de uma lista de biomas.
+
+## Como as peças se encaixam
+
+```mermaid
+flowchart LR
+  C["Cliente (PixiJS)<br/>desenha e manda intenção"]
+
+  subgraph servidor["Servidor (Fastify)"]
+    WS["WebSocket"]
+    AG["Agendador<br/>5 ticks por segundo"]
+    MO["Motor puro<br/>combate · captura · caminho"]
+    ME["/metrics"]
+  end
+
+  PG[("Postgres")]
+
+  C -->|"intenção: caçar, trocar, usar item"| WS
+  WS --> AG
+  AG -->|"estado + tick"| MO
+  MO -->|"novo estado + eventos"| AG
+  AG -->|"snapshot e eventos"| WS
+  WS -->|"estado para desenhar"| C
+  AG -->|"grava em fatias"| PG
+  AG -.->|"tick, caçadas, erros"| ME
+```
+
+O motor é uma função: recebe o estado e o tique, devolve o estado seguinte e os eventos. Não lê
+relógio, não sorteia fora da semente e não toca no banco — é isso que deixa 3000 tiques rodarem
+num teste e dar sempre o mesmo resultado.
+
 ## O que tem de interessante aqui
 
 - **Motor determinístico e puro.** O combate, a captura, a progressão e o caminho são funções sem

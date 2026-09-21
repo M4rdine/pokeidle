@@ -51,11 +51,30 @@ describe('reduzir a escala para caber numa tela', () => {
     expect(pixel(menor, 1, 1)).toEqual([0, 0, 0])
   })
 
-  it('média de verdade, e não amostragem do primeiro pixel', () => {
+  it('a cor mais frequente vence, e nenhuma cor nova é inventada', () => {
     const img = chapada(2, 2, [0, 0, 0])
     img.data[0] = 100; img.data[1] = 100; img.data[2] = 100
-    // Um pixel de 100 e três de 0: a média é 25, não 100 nem 0.
-    expect(pixel(downsample(img, 2), 0, 0)).toEqual([25, 25, 25])
+    // Um pixel de 100 e três de 0. A média daria 25 — uma cor que não existe em pixel nenhum do
+    // bloco, e é assim que o mapa reduzido saía com 5.358 cores a partir de uma arte de 722.
+    expect(pixel(downsample(img, 2), 0, 0)).toEqual([0, 0, 0])
+  })
+
+  it('reduzir não aumenta a paleta: toda cor da saída já estava na entrada', () => {
+    // É a propriedade que importa, e a que a média violava. Ela é o que deixa o PNG do mapa
+    // caber em 150 KB em vez de 798 KB, e o que mantém o contorno das árvores.
+    const img = chapada(8, 8, [10, 20, 30])
+    const paleta: (readonly [number, number, number])[] = [[10, 20, 30], [200, 40, 60], [0, 120, 90]]
+    for (let i = 0; i < 64; i++) {
+      const cor = paleta[i % paleta.length]!
+      img.data[i * 4] = cor[0]; img.data[i * 4 + 1] = cor[1]; img.data[i * 4 + 2] = cor[2]
+    }
+    const menor = downsample(img, 2)
+    const conhecidas = new Set(paleta.map((c) => c.join(',')))
+    for (let y = 0; y < menor.height; y++) {
+      for (let x = 0; x < menor.width; x++) {
+        expect(conhecidas.has(pixel(menor, x, y).join(',')), `(${x},${y})`).toBe(true)
+      }
+    }
   })
 
   it('fator que não divide o tamanho é recusado: sobra de pixel vira borda suja', () => {

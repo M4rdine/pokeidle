@@ -70,7 +70,7 @@
      todas as colunas de dados para um x diferente em cada linha, que é justamente o que esta
      ficha existe para não fazer. */
   display: grid; grid-template-columns: 1fr 7rem; align-items: stretch; gap: var(--space-3);
-  background: var(--face-painel); border: var(--border-w) solid var(--borda);
+  background: var(--face-painel); border: 0;
   border-radius: var(--raio);
   box-shadow: var(--relevo-1);
   padding-right: var(--space-3);
@@ -82,9 +82,8 @@
 .area-row:hover { border-color: var(--texto); }
 .area-row-open {
   background: linear-gradient(180deg, color-mix(in srgb, var(--selecao) 82%, white), var(--selecao));
-  border-color: color-mix(in srgb, var(--selecao) 62%, black);
   color: var(--selecao-texto);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 38%), 0 2px 8px rgb(0 0 0 / 35%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 45%), var(--brilho-selecao);
 }
 /* O que dá para caçar agora é a folha levantada; o que ainda não abriu recua para a folha
    afundada. A separação é o plano, não a opacidade: os números da área bloqueada continuam em
@@ -259,7 +258,7 @@
   pointer-events: auto;
   border-radius: 50%;
   background: var(--face-painel);
-  border: 2px solid var(--borda-forte);
+  border: 0;
   box-shadow: var(--relevo-2);
 }
 .mapa-marcador:hover { border-color: var(--texto); }

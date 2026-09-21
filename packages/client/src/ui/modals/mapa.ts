@@ -100,7 +100,7 @@ export function openMapa(ctx: AppContext): Modal {
   const analisador = (area: AreaNoMapa | undefined): HTMLElement => {
     if (!area) {
       return el('aside', { class: 'mapa-analise panel' },
-        el('p', { class: 'cabeca' }, 'Analisador'),
+        el('p', { class: 'cabeca cabeca-barra' }, 'Analisador'),
         el('p', { class: 'muted' }, 'Escolha uma área no mapa para ver o que ela rende.'))
     }
     // O rótulo conta o que vai acontecer de verdade: trocar de área encerra a caçada atual, e

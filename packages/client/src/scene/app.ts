@@ -38,13 +38,25 @@ const px = (tile: number): number => tile * TILE_SIZE + TILE_SIZE / 2
 // applyView, então o body novo ainda não existe quando o evento 'evolved' chega).
 const PENDING_EVOLVE_FLASH_MS = 1000
 
-/** Cor de fundo da página, lida do token. `--fora` como está em `tokens.css`, para o caso de o
- * CSS não ter chegado (teste com DOM falso, folha ainda carregando): a tarja some do mesmo jeito. */
-const FORA_PADRAO = 0x15110e
+/**
+ * Cor de fundo da página, lida do token, com o mesmo valor repetido aqui para o caso de o CSS não
+ * ter chegado (teste com DOM falso, folha ainda carregando): a tarja some do mesmo jeito.
+ *
+ * O NOME DO TOKEN É `--fundo`. Estava `--fora`, que nunca existiu em `tokens.css`, então
+ * `getComputedStyle` devolvia string vazia e a função caía SEMPRE no padrão — que era `0x15110e`,
+ * um MARROM da paleta de madeira aposentada duas trocas de mundo atrás. O comentário em cima dele
+ * dizia, com todas as letras, que a cor saía do token justamente para isso não acontecer.
+ *
+ * Ninguém veria: as duas cores são escuras, a tarja só aparece quando o mundo é menor que o
+ * painel, e tarja escura continua parecendo tarja escura. É por isso que existe o teste que
+ * confere se o token que este arquivo lê está declarado.
+ */
+const FUNDO_PADRAO = 0x141a29
+export const TOKEN_DO_FUNDO = '--fundo'
 function corDaMesa(parent: HTMLElement): number {
-  const declarado = getComputedStyle(parent).getPropertyValue('--fora').trim()
+  const declarado = getComputedStyle(parent).getPropertyValue(TOKEN_DO_FUNDO).trim()
   const hex = /^#([0-9a-f]{6})$/i.exec(declarado)
-  return hex === null ? FORA_PADRAO : Number.parseInt(hex[1]!, 16)
+  return hex === null ? FUNDO_PADRAO : Number.parseInt(hex[1]!, 16)
 }
 
 /** Cria a cena PixiJS: mapa numa textura, sprites do atlas, tween por tick, câmera e efeitos. Só a Task 9 chama isto. */

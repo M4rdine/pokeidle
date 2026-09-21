@@ -52,6 +52,22 @@ async function paleta(): Promise<ReadonlyMap<string, Rgb>> {
 const PARES: readonly { readonly frente: string; readonly fundo: string; readonly minimo: number; readonly onde: string }[] = [
   { frente: 'texto', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'corpo sobre o painel' },
   { frente: 'texto', fundo: 'painel-alto', minimo: TEXTO_NORMAL, onde: 'corpo sobre o botão' },
+  /*
+   * As PONTAS DOS GRADIENTES. Desde que as superfícies deixaram de ser chapadas, o texto não cai
+   * mais sobre `--painel`: ele cai sobre a faixa entre `--painel-topo` e `--painel-pe`. Medir só
+   * o tom médio passaria a ser uma medição de uma cor que a tela não pinta em lugar nenhum —
+   * exatamente o tipo de teste que vira enfeite. O topo é sempre o mais claro, e por isso o mais
+   * apertado para tinta clara: é ele que define o mínimo.
+   */
+  { frente: 'texto', fundo: 'painel-topo', minimo: TEXTO_NORMAL, onde: 'corpo no alto do painel' },
+  { frente: 'texto-fraco', fundo: 'painel-topo', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no alto do painel' },
+  { frente: 'texto', fundo: 'painel-alto-topo', minimo: TEXTO_NORMAL, onde: 'rótulo do botão, no alto dele' },
+  { frente: 'texto-fraco', fundo: 'painel-alto-topo', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no alto do botão' },
+  { frente: 'texto', fundo: 'cava-pe', minimo: TEXTO_NORMAL, onde: 'corpo no pé da fenda' },
+  { frente: 'texto-fraco', fundo: 'cava-pe', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no pé da fenda' },
+  { frente: 'ouro', fundo: 'painel-topo', minimo: TEXTO_NORMAL, onde: 'moeda no alto do painel' },
+  { frente: 'perigo', fundo: 'painel-topo', minimo: TEXTO_NORMAL, onde: 'erro no alto do painel' },
+  { frente: 'borda-forte', fundo: 'painel-topo', minimo: TEXTO_GRANDE, onde: 'fio de controle no alto do painel' },
   { frente: 'texto', fundo: 'cava', minimo: TEXTO_NORMAL, onde: 'corpo sobre a fenda' },
   { frente: 'texto', fundo: 'fundo', minimo: TEXTO_NORMAL, onde: 'corpo sobre o fundo da página' },
   { frente: 'texto-fraco', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no painel' },

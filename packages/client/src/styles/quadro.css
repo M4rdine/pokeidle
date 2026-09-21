@@ -1,0 +1,88 @@
+/*
+ * A moldura e o vocabulário que nasce dela.
+ *
+ * O bisel é feito de duas sombras internas SEM desfoque: clara em cima à esquerda, escura embaixo
+ * à direita. É o que dá volume numa interface de pixel, e em CSS ele fica nítido em qualquer
+ * tamanho e muda de cor por token — coisa que um 9-slice em PNG não faz.
+ */
+
+/** Superfície que se levanta: todo painel, todo card, todo botão. */
+.quadro {
+  background: var(--painel);
+  border: var(--border-w) solid var(--moldura-sombra);
+  box-shadow:
+    inset var(--bisel) var(--bisel) 0 var(--moldura-luz),
+    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--moldura-sombra);
+}
+
+/** A mesma superfície, um degrau à frente: usada dentro de um `.quadro`. */
+.quadro-alto { background: var(--painel-alto); }
+
+/**
+ * Superfície que afunda: o bisel inverte. É onde se lê — trilho de medidor, lista, campo de
+ * entrada. Inverter a luz é o que separa "aqui se age" de "aqui se lê" sem precisar de cor nova.
+ */
+.quadro-fundo {
+  background: var(--cava);
+  border: var(--border-w) solid var(--moldura-sombra);
+  box-shadow:
+    inset var(--bisel) var(--bisel) 0 rgb(0 0 0 / 45%),
+    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--moldura-luz);
+}
+
+/** Cabeçalho de seção: caixa alta, espacejada, discreta. O título não compete com o dado. */
+.cabeca {
+  display: flex; align-items: baseline; gap: var(--space-2);
+  font-size: 0.72em; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+}
+.cabeca-conta { color: var(--text); font-weight: 400; }
+
+/**
+ * Chip: um atributo curto e repetível. A cor identifica a família do dado, nunca o valor — é a
+ * repetição em coluna que deixa comparar Pokémon com Pokémon de relance.
+ */
+.chip {
+  display: inline-flex; align-items: center;
+  padding: 1px var(--space-1);
+  font-size: 0.72em; font-weight: 700; letter-spacing: 0.02em;
+  background: var(--cava); border: 1px solid var(--moldura-sombra); color: var(--text);
+  white-space: nowrap;
+}
+.chip-nivel { background: color-mix(in srgb, var(--xp) 28%, var(--cava)); }
+.chip-poder { background: color-mix(in srgb, var(--accent) 24%, var(--cava)); }
+
+/** Moeda: ícone e número, com o número em coluna tabular para somar de olho. */
+.moeda { display: inline-flex; align-items: center; gap: var(--space-1); font-variant-numeric: tabular-nums; }
+.moeda-valor { font-weight: 700; }
+.moeda-ouro .moeda-valor { color: var(--ouro); }
+
+/** Botão só de ícone, quadrado. */
+.botao-icone {
+  display: grid; place-items: center;
+  width: 32px; height: 32px; padding: 0; flex-shrink: 0;
+}
+
+/**
+ * Medidor. Veste o `<progress>` nativo em vez de trocá-lo por uma div: mantém a semântica e o
+ * leitor de tela. O trilho afunda, o preenchimento é chapado — sem gradiente e sem brilho, porque
+ * o que informa é o comprimento, e decoração em cima disso só atrapalha a leitura.
+ */
+.medidor { display: flex; flex-direction: column; gap: 2px; }
+.medidor-topo { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.72em; }
+.medidor-topo > :first-child { letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+progress {
+  appearance: none; display: block; width: 100%; height: 10px;
+  background: var(--cava);
+  border: 1px solid var(--moldura-sombra);
+  box-shadow: inset 1px 1px 0 rgb(0 0 0 / 50%);
+}
+progress::-webkit-progress-bar { background: var(--cava); }
+progress::-webkit-progress-value { background: var(--medidor-cor, var(--accent)); transition: width 120ms linear; }
+progress::-moz-progress-bar { background: var(--medidor-cor, var(--accent)); }
+
+.hp-bar { --medidor-cor: var(--ok); }
+[data-hp-state="ferido"] { --medidor-cor: var(--accent); }
+[data-hp-state="critico"] { --medidor-cor: var(--danger); }
+.xp-bar { --medidor-cor: var(--xp); }

@@ -3,6 +3,7 @@ import type { AppContext } from '../../app-context.js'
 import { createScene, type Scene } from '../../scene/app.js'
 import { mountActivePokemon } from '../hud/active-pokemon.js'
 import { mountLog } from '../hud/log.js'
+import { mountSituacao } from '../hud/situacao.js'
 import { mountMoves } from '../hud/moves.js'
 import { mountOverlays } from '../hud/overlays.js'
 import { mountTeamStrip } from '../hud/team-strip.js'
@@ -18,7 +19,8 @@ export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
   const bottom = el('div', { class: 'grid-bottom' })
   mount(root, el('section', { class: 'screen screen-game game-grid' }, top, left, center, right, bottom))
 
-  const offs = [mountTopBar(top, ctx), mountActivePokemon(left, ctx), mountMoves(left, ctx), mountTeamStrip(right, ctx), mountLog(bottom, ctx), mountOverlays(center, ctx)]
+  const offs = [mountTopBar(top, ctx), mountActivePokemon(left, ctx), mountMoves(left, ctx),
+    mountSituacao(left, ctx), mountTeamStrip(right, ctx), mountLog(bottom, ctx), mountOverlays(center, ctx)]
   let scene: Scene | null = null
   let offScene: (() => void) | null = null
   let offEvents: (() => void) | null = null

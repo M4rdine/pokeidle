@@ -1,23 +1,56 @@
 * { box-sizing: border-box; }
+/* `display` de classe vence `[hidden]`, que só define `display: none` como padrão do agente.
+ * Sem isto, todo painel escondido que tenha `display: flex` continua aparecendo. */
+[hidden] { display: none !important; }
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--noite);
   color: var(--text);
   font: 14px/1.4 system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
 }
 canvas { image-rendering: pixelated; }
-.panel { background: var(--panel); border: var(--border-w) solid var(--border); border-radius: 0; }
+/* `.panel` continua existindo para não reescrever toda tela de uma vez; ele agora é um `.quadro`. */
+.panel {
+  background: var(--painel);
+  border: var(--border-w) solid var(--moldura-sombra);
+  box-shadow:
+    inset var(--bisel) var(--bisel) 0 var(--moldura-luz),
+    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--moldura-sombra);
+}
 .muted { color: var(--muted); }
 .screen { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
 /* Só as telas de formulário são estreitas: a do jogo ocupa a janela inteira (grade em hud.css). */
 .screen-auth { max-width: 420px; margin: var(--space-4) auto; }
 h1, h2 { margin: 0; font-size: 1.2rem; letter-spacing: 0.02em; }
-button { font: inherit; color: var(--text); background: var(--panel); border: var(--border-w) solid var(--border); padding: var(--space-2) var(--space-3); cursor: pointer; }
-button:hover:not([disabled]) { border-color: var(--accent); }
+/* Botão é superfície que se levanta, e afunda um pixel quando pressionado: o gênero inteiro
+ * comunica clique assim, e é mais barato que animação. */
+button {
+  font: inherit; font-weight: 600; color: var(--text); cursor: pointer;
+  background: var(--painel-alto);
+  border: var(--border-w) solid var(--moldura-sombra);
+  padding: var(--space-2) var(--space-3);
+  box-shadow:
+    inset var(--bisel) var(--bisel) 0 var(--moldura-luz),
+    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--moldura-sombra);
+}
+button:hover:not([disabled]) { background: color-mix(in srgb, var(--painel-alto) 80%, var(--moldura-luz)); }
+button:active:not([disabled]) {
+  box-shadow:
+    inset var(--bisel) var(--bisel) 0 var(--moldura-sombra),
+    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--moldura-luz);
+}
+
 button[disabled] { opacity: 0.5; cursor: default; }
-button.primary { border-color: var(--accent); }
-input { font: inherit; color: var(--text); background: var(--bg); border: var(--border-w) solid var(--border); padding: var(--space-2); width: 100%; }
+button.primary { border-color: var(--accent); color: var(--accent); }
+/* Campo é superfície que afunda: é onde se escreve, não onde se aperta. */
+input {
+  font: inherit; color: var(--text); width: 100%;
+  background: var(--cava);
+  border: var(--border-w) solid var(--moldura-sombra);
+  box-shadow: inset var(--bisel) var(--bisel) 0 rgb(0 0 0 / 45%);
+  padding: var(--space-2);
+}
 .field { display: flex; flex-direction: column; gap: var(--space-1); margin: 0 0 var(--space-3); }
 .tabs { display: flex; gap: var(--space-2); }
 .tab-active { border-color: var(--accent); }
@@ -38,8 +71,13 @@ input { font: inherit; color: var(--text); background: var(--bg); border: var(--
 .type-bug { --t: var(--type-bug); } .type-rock { --t: var(--type-rock); } .type-ghost { --t: var(--type-ghost); }
 .type-ice { --t: var(--type-ice); } .type-dragon { --t: var(--type-dragon); } .type-fighting { --t: var(--type-fighting); }
 .type-dark { --t: var(--type-dark); } .type-steel { --t: var(--type-steel); } .type-fairy { --t: var(--type-fairy); }
-.sprite { background-repeat: no-repeat; transform: scale(2); transform-origin: top left; margin-bottom: var(--space-3); }
-.sprite-unknown { width: 32px; height: 32px; background: var(--border); }
+/* O sprite vive sempre dentro de uma caixa de tamanho fixo, que recorta e escala. A versão
+ * solta com `scale(2)` mantinha a caixa do tamanho do frame e invadia o vizinho — era o mesmo
+ * defeito no cartão do ativo, na Pokédex e na tela do inicial. */
+.sprite { background-repeat: no-repeat; }
+.sprite-thumb { display: inline-block; overflow: hidden; flex-shrink: 0; }
+.sprite-thumb > * { display: block; transform-origin: top left; }
+.sprite-unknown { width: 32px; height: 32px; background: var(--moldura-sombra); }
 .starter-grid, .hunt-grid { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .starter-card, .hunt-card { padding: var(--space-3); min-width: 180px; display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; }
 .hunt-locked { opacity: 0.6; }
@@ -48,30 +86,30 @@ input { font: inherit; color: var(--text); background: var(--bg); border: var(--
 .trainer-bar { display: flex; gap: var(--space-3); align-items: baseline; padding: var(--space-2) var(--space-3); }
 .shortcuts { display: flex; gap: var(--space-2); flex-wrap: wrap; }
 .toasts { position: fixed; right: var(--space-3); bottom: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); z-index: 20; }
-.toast { background: var(--panel); border: var(--border-w) solid var(--border); padding: var(--space-2) var(--space-3); max-width: 360px; }
+.toast { background: var(--painel); border: var(--border-w) solid var(--moldura-sombra); padding: var(--space-2) var(--space-3); max-width: 360px; }
 .toast-error { border-color: var(--danger); }
 .toast-big { border-color: var(--accent); font-size: 1.1em; }
-.overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(15 15 20 / 82%); text-align: center; }
+.overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(13 17 28 / 88%); text-align: center; }
 
 /*
  * Superfícies que o navegador desenha por conta própria. Elas chegam no padrão do sistema por
  * cima de um mundo visual inteiro — e são o sinal mais barato de que a tela foi construída e não
  * montada. O DESIGN.md manda: borda reta, dois planos de fundo e um acento só.
  */
-::selection { background: var(--accent); color: var(--bg); }
+::selection { background: var(--accent); color: var(--noite); }
 :focus-visible { outline: var(--border-w) solid var(--accent); outline-offset: 1px; }
 /* O anel só aparece no foco por teclado; o clique já se explica sozinho. */
 :focus:not(:focus-visible) { outline: none; }
 
-* { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+* { scrollbar-width: thin; scrollbar-color: var(--moldura-sombra) transparent; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb { background: var(--moldura-sombra); border: 3px solid transparent; background-clip: content-box; }
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); background-clip: content-box; }
 
 input[type="checkbox"] {
   appearance: none; width: 14px; height: 14px; margin: 0; padding: 0;
-  background: var(--bg); border: var(--border-w) solid var(--border); cursor: pointer;
+  background: var(--noite); border: var(--border-w) solid var(--moldura-sombra); cursor: pointer;
   display: inline-grid; place-content: center;
 }
 input[type="checkbox"]:hover { border-color: var(--muted); }
@@ -79,15 +117,3 @@ input[type="checkbox"]:checked { border-color: var(--accent); }
 /* O "aceso" é um quadrado, não um tique: o sistema não tem ícone nenhum, e um glifo aqui seria o primeiro. */
 input[type="checkbox"]:checked::after { content: ""; width: 6px; height: 6px; background: var(--accent); }
 
-/*
- * Medidor. O `<progress>` nativo chega em azul de navegador, que não existe na paleta. Vestir o
- * elemento em vez de trocá-lo por uma div mantém a semântica e o leitor de tela.
- */
-progress { appearance: none; border: none; background: var(--border); display: block; }
-progress::-webkit-progress-bar { background: var(--border); }
-progress::-webkit-progress-value { background: var(--medidor, var(--accent)); transition: width 120ms linear; }
-progress::-moz-progress-bar { background: var(--medidor, var(--accent)); }
-/* HP é leitura de instrumento: a cor diz o estado antes de o número ser lido. */
-[data-hp-state="ok"] { --medidor: var(--ok); }
-[data-hp-state="ferido"] { --medidor: var(--accent); }
-[data-hp-state="critico"] { --medidor: var(--danger); }

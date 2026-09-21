@@ -21,7 +21,7 @@
 .ficha-areas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .ficha-area {
   display: grid; grid-template-columns: 1fr auto auto auto; gap: var(--space-3);
-  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--panel);
+  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--painel);
 }
 .area-nome { font-weight: 600; }
 .area-faixa, .area-porta { font-variant-numeric: tabular-nums; }
@@ -35,7 +35,7 @@
 .stat-rotulo { color: var(--muted); font-size: 0.85em; }
 .stat-valor { text-align: right; font-variant-numeric: tabular-nums; }
 /* Mesma escala nas seis barras: é a comparação entre elas que mostra o formato da espécie. */
-.stat-barra { height: 8px; background: var(--border); position: relative; }
+.stat-barra { height: 8px; background: var(--cava); position: relative; }
 .stat-barra::after {
   content: ""; position: absolute; inset: 0;
   background: var(--accent); transform: scaleX(var(--fracao, 0)); transform-origin: left;
@@ -45,7 +45,7 @@
 .ficha-evo { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
 .evo-estagio {
   display: flex; align-items: center; gap: var(--space-2);
-  padding: var(--space-1) var(--space-2); border: var(--border-w) solid var(--border); background: var(--panel);
+  padding: var(--space-1) var(--space-2); border: var(--border-w) solid var(--moldura-sombra); background: var(--painel);
 }
 /* O estágio aberto é o único aceso: a linha é contexto, e o acento marca onde se está. */
 .evo-atual { border-color: var(--accent); }
@@ -55,7 +55,7 @@
 .ficha-learnset { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .learn-linha {
   display: grid; grid-template-columns: 4rem 1fr auto auto; gap: var(--space-2);
-  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--panel);
+  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--painel);
 }
 .learn-nivel, .learn-poder { font-variant-numeric: tabular-nums; }
 

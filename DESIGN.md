@@ -1,33 +1,21 @@
 ---
 name: Pokeidle
-description: Terminal de campo escuro para um MMO idle de Pokémon — painel de borda reta, número tabular e um único acento amarelo.
+description: Interface de RPG 16-bit para um MMO idle de Pokémon — moldura com bisel, superfícies aninhadas e um único acento amarelo.
 colors:
-  bg: "#0f0f14"
-  panel: "#1a1a22"
-  border: "#2e2e3a"
+  noite: "#131826"
+  cava: "#0d111c"
+  painel: "#2a3145"
+  painel-alto: "#343c54"
+  moldura: "#7a5c3a"
+  moldura-luz: "#a8814f"
+  moldura-sombra: "#46331f"
   text: "#f0f0f5"
-  muted: "#8a8a9a"
+  muted: "#9aa0b4"
   accent: "#f8d030"
-  danger: "#e03030"
-  ok: "#50c878"
-  type-normal: "#a8a878"
-  type-fire: "#f08030"
-  type-water: "#6890f0"
-  type-electric: "#f8d030"
-  type-grass: "#78c850"
-  type-ice: "#98d8d8"
-  type-fighting: "#c03028"
-  type-poison: "#a040a0"
-  type-ground: "#e0c068"
-  type-flying: "#a890f0"
-  type-psychic: "#f85888"
-  type-bug: "#a8b820"
-  type-rock: "#b8a038"
-  type-ghost: "#705898"
-  type-dragon: "#7038f8"
-  type-dark: "#705848"
-  type-steel: "#b8b8d0"
-  type-fairy: "#ee99ac"
+  ouro: "#f0c040"
+  xp: "#58a6f0"
+  danger: "#e04848"
+  ok: "#52c46a"
 typography:
   title:
     fontFamily: "system-ui, sans-serif"
@@ -151,36 +139,36 @@ components:
 
 ## Overview
 
-**Creative North Star: "O Terminal de Campo"**
+**Creative North Star: "A Moldura"**
 
-Pokeidle não é uma vitrine, é um posto de leitura. O servidor caça sozinho e o jogador chega para
-conferir e decidir: onde farmar, quem está ativo, quando parar. A interface é o painel de um
-instrumento apontado para essa decisão — fundo quase preto, superfícies retangulares de borda reta,
-números alinhados em coluna, e um único amarelo que só acende quando algo está ativo, destravado ou
-valendo dinheiro. A arte pixelada é a única coisa colorida por prazer; o resto do quadro se apaga
-para deixá-la acesa.
+Pokeidle é um jogo, não um painel. A primeira versão desta interface foi desenhada como terminal
+de campo — escura, chapada, borda reta de 2 px, raio zero — e estava tecnicamente correta e
+errada para o produto: lia como dashboard. Um clone de Pokémon pede a linguagem do gênero, e a
+linguagem do gênero é a interface de RPG 16-bit.
 
-O mundo é construído por subtração. Não há raio de canto em lugar nenhum: `border-radius: 0` está
-escrito à mão no painel e no filtro, e nenhuma outra regra do projeto contradiz. Não há sombra de
-elevação: a profundidade vem de dois tons de fundo (`#0f0f14` para a página, `#1a1a22` para a
-superfície) e de uma borda de 2 px que muda de cor. Não há família tipográfica carregada: o corpo
-inteiro roda em `system-ui` a 14 px, e tudo que hierarquiza é peso, caixa alta, espacejamento e
-opacidade de cor. A escala de espaço tem quatro degraus (4, 8, 16, 32) e quase tudo cai em 8 ou 16.
+O mundo é construído por **relevo**. Toda superfície tem bisel: duas sombras internas sem
+desfoque, clara em cima à esquerda e escura embaixo à direita. É isso que dá volume numa
+interface de pixel, e é uma regra só que responde a pergunta de projeto mais frequente da tela —
+**o que se levanta e o que afunda**. O que é ação se levanta: painel, botão, card, slot ocupado.
+O que é leitura afunda: trilho de medidor, campo de entrada, lista, vaga vazia, vaga travada.
+Inverter a luz separa os dois sem gastar cor nova.
 
-O que dá caráter é a disciplina do número. `font-variant-numeric: tabular-nums` está no `body` e é
-reafirmado em toda superfície que compara: a ficha de áreas, a tabela do analisador, os medidores do
-HUD. Colunas de largura fixa, dígitos de largura fixa, mesma coluna em todas as linhas. Onde outros
-jogos idle põem uma grade de cartões iguais, este põe uma ficha — porque cartão lado a lado não
-deixa ler a mesma coluna de cima a baixo.
+O bisel é CSS, não asset. Duas `box-shadow` internas ficam nítidas em qualquer tamanho e mudam de
+cor por token — coisa que um 9-slice em PNG não faz. Asset fica para o que só asset resolve.
+
+O que dá caráter é a **densidade**. A versão anterior tinha 52 classes, 11 controles e 37 % de uma
+coluna vazia. A régua agora é a repetição: o mesmo chip de nível, o mesmo selo de tipo e o mesmo
+medidor aparecem na mesma ordem em seis slots, e é essa repetição que deixa comparar Pokémon com
+Pokémon de relance.
 
 **Key Characteristics:**
-- Fundo escuro em dois planos, sem gradiente e sem textura
-- Borda reta de 2 px como elemento estrutural único; raio zero em todo o sistema
-- Um só acento (amarelo `#f8d030`) para estado ativo, ação primária e recompensa
+- Fundo azul-noite em três planos, moldura em bronze, sem gradiente e sem textura
+- Bisel de 2 px sem desfoque como único recurso de profundidade; levanta o que age, afunda o que se lê
+- Um só acento (amarelo `{colors.accent}`) para estado ativo, ação primária, recompensa e foco
 - Dezoito cores canônicas de tipo, usadas como identidade e nunca como texto sozinho
-- Números tabulares e colunas de largura fixa sempre que houver comparação
+- Números tabulares e chips repetidos em coluna sempre que houver comparação
 - Tipografia de sistema sem fonte de display; hierarquia por peso, caixa e cor
-- Movimento quase ausente: 120 ms de borda, 160 ms de gaveta, e nada mais
+- Movimento quase ausente: 120 ms no preenchimento de medidor, e nada mais
 
 ## Colors
 
@@ -292,26 +280,35 @@ tabela do analisador passa a rolar na horizontal em vez de quebrar.
 
 ## Elevation & Depth
 
-**Este sistema não usa sombra para elevar.** Há exatamente um `box-shadow` no projeto inteiro, e ele
-é um anel de 2 px em volta do ponto marcador de um filtro ligado — uma marcação de estado, não uma
-projeção. Profundidade é **plano e borda**: o que está levantado tem fundo `{colors.panel}`; o que
-está rente ao chão tem fundo `{colors.bg}`; a borda de 2 px é o que separa os dois. A gaveta do
-analisador desce um plano (fundo `{colors.bg}`) mesmo estando dentro da linha, e a linha de área
-bloqueada desce com ela.
+**A profundidade é o bisel.** Duas `box-shadow` internas sem desfoque, clara em cima à esquerda e
+escura embaixo à direita, e nada mais — sem projeção, sem borrão, sem camada de sombra solta.
+É um recurso só, e ele responde à pergunta de projeto mais frequente da tela.
+
+| Estado | Como se lê | Quem usa |
+|---|---|---|
+| **Levantado** | luz em cima à esquerda, sombra embaixo à direita | painel, card, botão, slot ocupado |
+| **Afundado** | a luz inverte: sombra em cima à esquerda | trilho de medidor, campo, lista, vaga vazia ou travada |
+| **Pressionado** | o levantado inverte enquanto o dedo está lá | botão em `:active` |
+
+Os três planos de fundo sustentam o bisel: `{colors.noite}` fora de tudo, `{colors.painel}` no que
+se levanta, `{colors.cava}` no que afunda. A cor sozinha não basta — é a direção da luz que diz se
+ali se age ou se lê.
 
 Existem duas cortinas, e elas são cortina e não sombra: o `.modal-backdrop` em preto a 60 %, e o
-`.overlay` da cena em `rgb(15 15 20 / 82%)` — a cor da própria página, não um preto genérico.
+`.overlay` da cena em `rgb(13 17 28 / 88%)` — a cor da própria página, não um preto genérico.
 
 ### Named Rules
 
-**A Regra do Plano, Não da Opacidade.** O indisponível recua de plano, não de legibilidade. A linha
-de área bloqueada cai para o fundo da página e ganha uma borda mais apagada
-(`color-mix(in srgb, var(--border) 60%, var(--bg))`), mas os números continuam em contraste cheio —
-é por eles que se decide o que perseguir. O portão de nível é informação, e informação não se
-esmaece.
+**A Regra da Luz.** Não se inventa um terceiro estado de profundidade. Se algo precisa se destacar
+e não é "levantado" nem "afundado", então não precisa de profundidade — precisa de posição, de
+peso ou do acento.
 
-**A Regra da Borda que Responde.** O estado vive na borda. `hover` e `focus` levam a borda para
-`{colors.accent}`; o ativo e o aberto também. O fundo quase nunca muda, então nada salta nem empurra
+**A Regra do Plano, Não da Opacidade.** O indisponível recua de plano, não de legibilidade. A linha
+de área bloqueada cai para o fundo da página, mas os números continuam em contraste cheio — é por
+eles que se decide o que perseguir. O portão de nível é informação, e informação não se esmaece.
+
+**A Regra da Borda que Responde.** O estado vive na borda e no acento. `hover`, `focus`, ativo e
+aberto levam a borda para `{colors.accent}`. O fundo quase nunca muda, então nada salta nem empurra
 o vizinho.
 
 ## Shapes

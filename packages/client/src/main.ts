@@ -1,5 +1,6 @@
 import './styles/tokens.css'
 import './styles/layout.css'
+import './styles/quadro.css'
 import './styles/hud.css'
 import './styles/areas.css'
 import './styles/modals.css'

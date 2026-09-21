@@ -2,12 +2,15 @@ import type { AppContext } from '../../app-context.js'
 import { StarterResponseSchema } from '../../api/dto.js'
 import { displayName } from '../../state/log.js'
 import { el, mount, typeBadge } from '../dom.js'
-import { applySpriteStyle } from '../sprite-css.js'
+import { spriteThumb } from '../sprite-css.js'
 
 export const STARTERS = ['charmander', 'bulbasaur', 'squirtle'] as const
 const STARTER_LEVEL = 10
 
 /** Três cartões com sprite, tipos e nível; escolher é irreversível (o servidor recusa a segunda). */
+/** Lado do sprite do inicial, em pixels: ele é o assunto da tela. */
+const LADO_INICIAL = 64
+
 export function mountStarter(root: HTMLElement, ctx: AppContext): () => void {
   const error = el('p', { class: 'form-error', role: 'alert' })
   const choose = (species: string, button: HTMLElement): void => {
@@ -21,8 +24,7 @@ export function mountStarter(root: HTMLElement, ctx: AppContext): () => void {
       })
   }
   const card = (species: string): HTMLElement => {
-    const sprite = el('div', { class: 'starter-sprite' })
-    applySpriteStyle(sprite, ctx.atlas, species)
+    const sprite = el('div', { class: 'starter-sprite' }, spriteThumb(ctx.atlas, species, LADO_INICIAL))
     const button = el('button', { class: 'primary', type: 'button' }, 'Escolher')
     button.addEventListener('click', () => choose(species, button))
     const types = ctx.registry.species.get(species)?.types ?? []

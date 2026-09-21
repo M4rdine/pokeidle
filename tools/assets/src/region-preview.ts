@@ -49,8 +49,15 @@ export function composeRegion(grade: GradeDaRegiao, pedacos: readonly PedacoDaRe
 }
 
 /**
- * Reduz por média de bloco. Amostrar um pixel por bloco seria mais rápido e devolveria um mapa
- * cheio de ruído: numa arte de pixel, o vizinho de um tufo de grama é terra.
+ * Reduz cada bloco à sua cor MAIS FREQUENTE, não à média.
+ *
+ * A média parecia a escolha segura e era a errada por dois motivos, os dois medidos. Primeiro, ela
+ * INVENTA cor: a arte tem 722 cores e o mapa reduzido saía com 5.358, porque toda mistura de
+ * grama com terra vira um tom que não existe em lugar nenhum do atlas. Isso inchava o PNG de
+ * 150 KB para 798 KB — o arquivo que estava em produção. Segundo, misturar borra: árvore e Centro
+ * Pokémon perdiam o contorno e o mapa virava uma miniatura desfocada em vez de arte de pixel.
+ *
+ * A moda resolve os dois de uma vez, porque ela só devolve cor que já estava lá.
  */
 export function downsample(img: RgbaImage, fator: number): RgbaImage {
   if (fator < 1 || !Number.isInteger(fator)) throw new RangeError(`fator inválido: ${fator}`)
@@ -60,19 +67,31 @@ export function downsample(img: RgbaImage, fator: number): RgbaImage {
   const width = img.width / fator
   const height = img.height / fator
   const alvo: RgbaImage = { width, height, data: new Uint8Array(width * height * BYTES) }
-  const area = fator * fator
+  const contagem = new Map<number, number>()
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      const soma = [0, 0, 0, 0]
+      contagem.clear()
+      let vencedora = 0
+      let melhor = 0
       for (let dy = 0; dy < fator; dy++) {
         for (let dx = 0; dx < fator; dx++) {
           const i = ((y * fator + dy) * img.width + x * fator + dx) * BYTES
-          for (let c = 0; c < BYTES; c++) soma[c] = (soma[c] ?? 0) + (img.data[i + c] ?? 0)
+          // A cor inteira numa chave só: empacotar evita alocar por pixel num laço que roda
+          // milhões de vezes. `>>> 0` porque o deslocamento de 24 bits estoura para negativo.
+          const chave = (((img.data[i]! << 24) | (img.data[i + 1]! << 16) | (img.data[i + 2]! << 8) | img.data[i + 3]!) >>> 0)
+          const n = (contagem.get(chave) ?? 0) + 1
+          contagem.set(chave, n)
+          // Empate fica com a primeira que chegou: a varredura é determinística, então o mapa
+          // gerado duas vezes é byte a byte o mesmo.
+          if (n > melhor) { melhor = n; vencedora = chave }
         }
       }
       const d = (y * width + x) * BYTES
-      for (let c = 0; c < BYTES; c++) alvo.data[d + c] = Math.round((soma[c] ?? 0) / area)
+      alvo.data[d] = (vencedora >>> 24) & 255
+      alvo.data[d + 1] = (vencedora >>> 16) & 255
+      alvo.data[d + 2] = (vencedora >>> 8) & 255
+      alvo.data[d + 3] = vencedora & 255
     }
   }
   return alvo

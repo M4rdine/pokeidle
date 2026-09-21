@@ -47,6 +47,33 @@ a caçada. O nome do Pokémon virou botão — é a porta para a ficha — e é 
 consultar a ficha durante a caçada é justamente quando ela mais serve. O teste passou a distinguir
 os dois, marcando as ações que mudam o time com `data-acao`.
 
+## Fechamento de portfólio
+
+O README ganhou o diagrama de como as peças se encaixam, a prévia de mapa gerada pelo pipeline e
+três capturas: a tela de jogo, a ficha e o painel de operação. O dono decidiu que capturas com os
+sprites do pack de fã podem entrar — os arquivos de arte continuam fora do git.
+
+O deploy depende de credencial e ficou com o dono. O que dava para verificar aqui foi verificado
+construindo e **rodando** a imagem de produção contra o Postgres local:
+
+- a imagem constrói (471 MB) e o container sobe;
+- as migrações rodam no boot e `/health` responde;
+- o atlas está dentro da imagem (`/assets/atlas/tiles.json` → 200), que é o ponto do
+  `fly deploy --local-only`;
+- a guarda do `/metrics` se comporta como documentado: sem `METRICS_TOKEN` responde 404 a quem não
+  é loopback; com o token, 401 sem cabeçalho e sem o Bearer certo, 200 com ele.
+
+### Um defeito que só aparece rodando
+
+O log do container mostrou o corepack **baixando o pnpm da npm a cada start**. A causa: o
+`Dockerfile` fazia `corepack enable` e o install como root, que cacheia em `/root`, e depois
+trocava para `USER node` — cujo home não tem esse cache. Todo start pagava um download antes de a
+aplicação começar, e um boot que depende da rede é frágil onde mais importa: o Fly reinicia a
+máquina sozinho.
+
+A correção move o cache para `COREPACK_HOME=/opt/corepack`, pré-ativa a versão fixada em
+`packageManager` e deixa a pasta legível para todos.
+
 ## Testes
 
 - `areasOfSpecies`: acha todas as áreas, vem em ordem de porta, e devolve vazio para inicial;

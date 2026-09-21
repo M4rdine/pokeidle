@@ -19,7 +19,11 @@ RUN pnpm --filter @pokeidle/client build
 FROM node:22-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
-RUN corepack enable
+# O cache do corepack fora do home do root: o processo roda como `node`, e sem isto o corepack
+# não achava o pnpm já baixado e ia buscá-lo na npm a cada start do container — cold start mais
+# lento e, pior, um boot que depende da rede para começar.
+ENV COREPACK_HOME=/opt/corepack
+RUN corepack enable && corepack prepare pnpm@9.12.0 --activate && chmod -R a+rX /opt/corepack
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages/shared/package.json packages/shared/
 COPY packages/server/package.json packages/server/

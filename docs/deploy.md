@@ -94,6 +94,32 @@ Se isso passa, o deploy só pode falhar por credencial, variável ou banco — n
 `fly deploy --local-only`. As migrações rodam no boot; se uma falhar, o processo sai e o Fly mantém a máquina
 antiga no ar.
 
+## Como está publicado hoje
+
+Numa VPS Ubuntu que já hospedava outros projetos, então o Pokeidle foi encaixado sem encostar em
+nada do que estava no ar:
+
+- **Postgres próprio, em container.** A máquina tem um Postgres compartilhado; dar um banco
+  isolado ao jogo mantém backup, upgrade e raio de estrago separados dos outros projetos.
+- **Aplicação publicada só no loopback** (`127.0.0.1:3200`). Quem fala com o mundo é o nginx, que
+  termina o TLS. O servidor escuta em `0.0.0.0` dentro do container, então publicar na interface
+  pública o exporia sem proxy e sem TLS.
+- **Domínio gratuito via sslip.io**, que resolve o IP a partir do próprio nome e dispensa DNS.
+- **Certificado pelo certbot**, com renovação automática já agendada.
+- **`restart: unless-stopped`** nos dois containers, com o Docker habilitado no boot: reiniciar a
+  máquina traz o jogo de volta sozinho.
+
+A pilha vive em `/opt/pokeidle`, e os segredos em `/opt/pokeidle/.env` com permissão só do root —
+gerados na própria máquina, nunca versionados.
+
+Para atualizar:
+
+```bash
+cd /opt/pokeidle/src && git pull
+# o atlas não vem do git; copie o seu para packages/server/public/atlas/ antes de construir
+docker build -t pokeidle:vps . && cd /opt/pokeidle && docker compose up -d --force-recreate app
+```
+
 ## Trocar de host
 
 A imagem é um `Dockerfile` comum, sem nada do Fly. Em Render, Railway ou qualquer runner de

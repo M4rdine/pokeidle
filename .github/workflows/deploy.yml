@@ -1,0 +1,46 @@
+# Deploy automático para a VPS. Roda só depois que o CI fecha verde na main: publicar antes de
+# os testes passarem transformaria o ambiente público em ambiente de teste.
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  # Para republicar sem precisar de um commit novo.
+  workflow_dispatch:
+
+# Um deploy por vez, e sem cancelar o que já começou: interromper no meio deixaria a VPS
+# com a imagem construída e o container antigo.
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    # `workflow_run` dispara mesmo quando o CI falha; esta guarda é o que segura o deploy ruim.
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment:
+      name: producao
+      url: https://pokeidle.187-77-37-92.sslip.io
+    steps:
+      - name: Preparar a chave de deploy
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          # Host fixado: sem isto, um DNS sequestrado receberia a chave privada.
+          printf '%s\n' "${{ secrets.VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Publicar
+        run: |
+          # A chave é restrita a um comando só no servidor (`command=` no authorized_keys),
+          # então o que se pede aqui é ignorado: ela sempre roda /opt/pokeidle/deploy.sh.
+          ssh -o IdentitiesOnly=yes -o BatchMode=yes \
+            -i ~/.ssh/id_ed25519 root@${{ secrets.VPS_HOST }} deploy
+
+      - name: Conferir que o jogo responde de fora
+        run: |
+          curl -fsS --max-time 20 https://pokeidle.187-77-37-92.sslip.io/health

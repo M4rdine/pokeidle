@@ -6,6 +6,7 @@
     "minTrainerLevel": 1,
     "width": 96,
     "height": 72,
+    "townMap": "kanto",
     "areas": [
       {
         "id": "campo-inicial",
@@ -19,6 +20,11 @@
         "anchor": {
           "x": 12,
           "y": 18
+        },
+        "noMapa": {
+          "x": 22.7,
+          "y": 62.0,
+          "local": "Rota 1"
         },
         "species": [
           "zubat",
@@ -47,6 +53,11 @@
           "x": 36,
           "y": 18
         },
+        "noMapa": {
+          "x": 22.7,
+          "y": 46.9,
+          "local": "Mata de Viridian"
+        },
         "species": [
           "bellsprout",
           "butterfree",
@@ -73,6 +84,11 @@
           "x": 60,
           "y": 18
         },
+        "noMapa": {
+          "x": 43.5,
+          "y": 30.2,
+          "local": "Rota 3, sopé do Monte Lua"
+        },
         "species": [
           "diglett",
           "growlithe",
@@ -97,6 +113,11 @@
         "anchor": {
           "x": 84,
           "y": 18
+        },
+        "noMapa": {
+          "x": 64.3,
+          "y": 30.2,
+          "local": "Cerulean"
         },
         "species": [
           "horsea",
@@ -123,6 +144,11 @@
           "x": 12,
           "y": 54
         },
+        "noMapa": {
+          "x": 22.7,
+          "y": 74.7,
+          "local": "Pallet"
+        },
         "species": [
           "squirtle",
           "staryu",
@@ -147,6 +173,11 @@
         "anchor": {
           "x": 36,
           "y": 54
+        },
+        "noMapa": {
+          "x": 68.5,
+          "y": 63.5,
+          "local": "Caverna do Diglett"
         },
         "species": [
           "zubat",
@@ -173,6 +204,11 @@
           "x": 60,
           "y": 54
         },
+        "noMapa": {
+          "x": 82.0,
+          "y": 48.3,
+          "local": "Lavender"
+        },
         "species": [
           "golbat",
           "haunter"
@@ -197,6 +233,11 @@
           "x": 84,
           "y": 54
         },
+        "noMapa": {
+          "x": 22.7,
+          "y": 35.8,
+          "local": "Pewter"
+        },
         "species": [
           "rhydon",
           "arcanine"
@@ -217,6 +258,7 @@
     "minTrainerLevel": 34,
     "width": 96,
     "height": 72,
+    "townMap": "kanto",
     "areas": [
       {
         "id": "gruta-umida",
@@ -230,6 +272,11 @@
         "anchor": {
           "x": 12,
           "y": 18
+        },
+        "noMapa": {
+          "x": 23.7,
+          "y": 92.7,
+          "local": "Mansão de Cinnabar"
         },
         "species": [
           "arbok",
@@ -255,6 +302,11 @@
           "x": 36,
           "y": 18
         },
+        "noMapa": {
+          "x": 81.0,
+          "y": 30.2,
+          "local": "Túnel Rocha"
+        },
         "species": [
           "kabutops",
           "beedrill"
@@ -278,6 +330,11 @@
         "anchor": {
           "x": 60,
           "y": 18
+        },
+        "noMapa": {
+          "x": 57.0,
+          "y": 81.6,
+          "local": "Zona Safári"
         },
         "species": [
           "exeggutor",
@@ -303,6 +360,11 @@
           "x": 84,
           "y": 18
         },
+        "noMapa": {
+          "x": 82.0,
+          "y": 48.3,
+          "local": "Usina, na Rota 10"
+        },
         "species": [
           "raichu",
           "magmar"
@@ -326,6 +388,11 @@
         "anchor": {
           "x": 12,
           "y": 54
+        },
+        "noMapa": {
+          "x": 39.3,
+          "y": 91.3,
+          "local": "Ilhas Espuma"
         },
         "species": [
           "kabutops",
@@ -351,6 +418,11 @@
           "x": 36,
           "y": 54
         },
+        "noMapa": {
+          "x": 51.8,
+          "y": 46.9,
+          "local": "Celadon"
+        },
         "species": [
           "exeggutor",
           "pidgeot"
@@ -375,6 +447,11 @@
           "x": 60,
           "y": 54
         },
+        "noMapa": {
+          "x": 14.3,
+          "y": 35.8,
+          "local": "Estrada da Vitória"
+        },
         "species": [
           "pidgeot",
           "wigglytuff"
@@ -398,6 +475,11 @@
         "anchor": {
           "x": 84,
           "y": 54
+        },
+        "noMapa": {
+          "x": 14.3,
+          "y": 30.2,
+          "local": "Planalto Índigo"
         },
         "species": [
           "nidoking",

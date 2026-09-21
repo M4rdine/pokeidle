@@ -1,175 +1,144 @@
 /*
- * Navegador de áreas. Herda o mundo do jogo: madeira sobre penumbra, canto reto, grifo no que está
- * aberto e números tabulares. A composição é uma ficha de linhas, não uma grade de cartões — a
- * tarefa é comparar áreas, e comparar é ler a mesma coluna de cima a baixo. Por isso as colunas
- * têm largura fixa e idêntica em todas as linhas, em vez de se ajustarem ao conteúdo de cada uma.
+ * Escolher onde caçar. Uma composição só, servindo a tela e o modal: abas de região em cima,
+ * o mapa mandando na largura, e o analisador num painel fixo à direita.
  *
- * Dois pesos de traço: fio de 1 px em `--madeira` no que só separa — régua, linha de tabela,
- * célula — e o fio de controle no que é objeto apertável. Uma ficha desta
- * densidade com a mesma ênfase em tudo não se lê, se encara.
+ * O QUE CAIU. Esta folha desenhava uma ficha de campo densa: barra de filtros por tipo e
+ * confronto, contagem "X de Y", e dezesseis LINHAS de tabela com colunas de largura fixa, cada
+ * uma abrindo o detalhe como SANFONA dentro da própria lista. Era um desenho defensável para
+ * "comparar áreas coluna por coluna", e estava errado para a pergunta que a tela realmente
+ * recebe: *para onde eu vou agora*. Essa se responde no mapa, de relance — e a lista empurrava o
+ * mapa para fora da primeira dobra. A sanfona era a pior parte: abrir uma área empurrava as de
+ * baixo, então comparar duas exigia fechar uma.
+ *
+ * O cabeçalho antigo desta folha ainda dizia "madeira sobre penumbra, canto reto" — duas trocas
+ * de mundo visual depois de a madeira ter caído.
  */
 
-.screen-areas { max-width: 1100px; width: 100%; margin: 0 auto; }
+.screen-areas { max-width: 1180px; width: 100%; margin: 0 auto; }
 .area-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
-/* "nível 5" quebrando no meio deixa a barra com duas alturas no celular. */
-.trainer-bar > span { white-space: nowrap; }
-.area-head-right { display: flex; align-items: baseline; gap: var(--space-3); }
-.area-count { margin: 0; color: var(--texto-fraco); font-variant-numeric: tabular-nums; }
 
-/* --- filtros --- */
-.area-filters {
-  display: grid;
-  grid-template-columns: minmax(23rem, 2fr) auto auto auto;
-  align-items: start; gap: var(--space-3);
-  padding: var(--space-3);
-}
-.filter-group { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); }
-.filter-group legend {
-  float: left; width: 100%; padding: 0 0 var(--space-1);
-  color: var(--texto-fraco); font-size: var(--t-xs); letter-spacing: 0.08em; text-transform: uppercase;
-}
-.filter-types { display: flex; flex-wrap: wrap; gap: var(--space-1); }
-.filter-type {
-  padding: 0 var(--space-1); background: transparent;
-  border: 1px solid; border-radius: 0; cursor: pointer;
-  font-size: var(--t-xs); text-transform: lowercase;
-}
-/* Sobre a penumbra, escurecer é apagar: o realce do hover vem de clarear a madeira da borda. */
-.filter-type:hover { filter: brightness(0.92); }
-/* `--t` é o matiz do tipo, definido uma vez em layout.css para todo o sistema. */
-.filter-type { color: var(--texto); border-color: var(--t); display: inline-flex; align-items: center; gap: 0.35em; }
-.filter-type::before { content: ''; width: 0.55em; height: 0.55em; background: var(--t); }
-.filter-type[aria-pressed='true'] { background: color-mix(in srgb, var(--t) 28%, var(--painel)); border-width: 2px; }
-.filter-type[aria-pressed='true']::before { background: var(--t); box-shadow: 0 0 0 2px color-mix(in srgb, var(--t) 45%, transparent); }
+/* ── A composição ────────────────────────────────────────────────────────────
+ * O mapa manda na largura e o analisador fica com o que sobra, com piso: abaixo de 300 px a
+ * tabela de espécies quebra em duas linhas por item e deixa de ser tabela.
+ */
+.mapa-corpo, .mapa-modal { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+/* `stretch`, e não `start`: o analisador acompanha a altura do mapa. Com a altura do conteúdo,
+ * a mensagem de uma linha deixava uma caixa baixinha ao lado de um mapa alto, e a composição
+ * lia como um painel que sobrou. */
+.mapa-palco { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); gap: var(--space-3); align-items: stretch; }
 
-.filter-level-field { display: inline-flex; align-items: center; gap: var(--space-1); }
-.filter-level-field label { color: var(--texto-fraco); }
-.filter-level { width: 5ch; padding: var(--space-1) var(--space-2); text-align: center; }
-.filter-toggle { padding: var(--space-1) var(--space-2); }
-/* Filtro ligado é o mesmo grifo da aba atual: marca-texto, e o rótulo segue em tinta. */
-.filter-toggle[aria-pressed='true'] { background: var(--selecao); border-color: var(--selecao); color: var(--selecao-texto); }
-/* Vive no cabeçalho, ao lado da contagem que ele muda. Dentro do painel de filtros ele abria
-   uma faixa morta sob os grupos curtos. */
-.filter-clear { padding: var(--space-1) var(--space-2); font-size: var(--t-s); }
+.mapa-abas { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.mapa-aba { display: flex; align-items: baseline; gap: var(--space-2); }
+.mapa-aba-nivel { font-size: var(--t-xs); color: var(--texto-fraco); font-variant-numeric: tabular-nums; }
+/* Sobre o preenchimento da seleção, o nível usa a TINTA da seleção — não a cor dela, que seria
+ * a mesma do fundo e sumiria. Foi o que aconteceu: "Kanto nv 1" virou "Kanto". */
+.mapa-aba.tab-active .mapa-aba-nivel { color: var(--selecao-texto); opacity: 0.8; }
 
-/* --- ficha --- */
-/* Cabeçalho de região: a régua entre "onde estou" e "o que vem depois". */
-.area-region {
-  display: flex; align-items: baseline; gap: var(--space-2);
-  padding: var(--space-3) 0 var(--space-1);
-  border-bottom: 1px solid var(--borda);
-}
-.area-region:first-child { padding-top: 0; }
-.area-region h2 { font-size: var(--t-l); letter-spacing: 0.06em; text-transform: uppercase; }
-.area-region-locked h2 { color: var(--texto-fraco); }
-.area-region .area-gate { margin-left: auto; }
-
-.area-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
-.area-row {
-  /* A coluna da ação é fixa: com `auto` ela media pelo texto ("Caçar" ou "nível 23") e empurrava
-     todas as colunas de dados para um x diferente em cada linha, que é justamente o que esta
-     ficha existe para não fazer. */
-  display: grid; grid-template-columns: 1fr 7rem; align-items: stretch; gap: var(--space-3);
-  background: var(--face-painel); border: 0;
-  border-radius: var(--raio);
+/* ── O mapa ──────────────────────────────────────────────────────────────────
+ * O fundo é o Town Map oficial, 192×144 px de pixel art. Ele cabe inteiro em qualquer largura de
+ * modal, e por isso não há zoom nem arraste: os dois existiam para um render de tileset cheio de
+ * detalhe que não cabia, e sobre este mapa seriam dois controles sem para onde ir.
+ */
+.mapa { position: relative; line-height: 0; }
+.mapa-mundo {
+  position: relative;
+  border-radius: var(--raio-g);
+  /* A moldura vem do mesmo relevo do resto do sistema: o mapa é uma peça apoiada, não uma
+   * imagem solta na página. */
   box-shadow: var(--relevo-1);
-  padding-right: var(--space-3);
-  /* Só a borda muda no hover: a linha não se mexe, então a coluna não pisca ao passar o mouse. */
-  transition: border-color 120ms ease-out;
 }
-/* Hover é tinta; aberto é grifo. Separar os dois registros evita que passar o mouse pareça ter
-   selecionado alguma coisa — e o marca-texto fica reservado para onde se está de fato. */
-.area-row:hover { border-color: var(--texto); }
-.area-row-open {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--selecao) 82%, white), var(--selecao));
-  color: var(--selecao-texto);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 45%), var(--brilho-selecao);
+.mapa-imagem {
+  display: block; width: 100%; height: auto;
+  border-radius: var(--raio-g);
+  /* Pixel art sobe em degrau, nunca interpolada — 192 px de largura viram ~700 na tela. */
+  image-rendering: pixelated;
 }
-/* O que dá para caçar agora é a folha levantada; o que ainda não abriu recua para a folha
-   afundada. A separação é o plano, não a opacidade: os números da área bloqueada continuam em
-   contraste cheio, porque é por eles que se decide o que perseguir. */
-.area-row-locked { background: var(--face-cava); box-shadow: var(--relevo-cava); }
-.area-row-locked:hover { border-color: var(--texto); }
-.area-row-locked .area-title { color: var(--texto-fraco); }
+.mapa-marcadores { position: absolute; inset: 0; }
 
-/* As larguras são fixas de propósito: é o alinhamento entre linhas que torna a ficha comparável. */
-.area-main {
-  display: grid;
-  grid-template-columns: minmax(9rem, 1fr) 4.5rem 10rem 4.5rem 4.5rem 7rem;
-  align-items: center; gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  background: none; border: 0; text-align: left; color: inherit; font: inherit; cursor: pointer;
-  /* Sem regra de foco própria: o anel de `tokens.css` já atende a linha inteira, e uma segunda
-     regra aqui era só mais um lugar para o contorno ficar desatualizado. */
-}
-.area-row-locked .area-main { cursor: pointer; }
-
-.area-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.area-title { font-size: var(--t-m); font-weight: 600; letter-spacing: 0.02em; }
-/* O que falta capturar é notável, não urgente: ouro, e não a cor de perigo. */
-.area-missing { color: var(--ouro); font-size: var(--t-s); }
-.area-levels, .area-metric { display: flex; flex-direction: column; line-height: 1.15; }
-.area-metric { align-items: flex-end; text-align: right; }
-/* Valor e legenda se separam por peso e por tamanho, não por voz: a face de HUD tem piso de
-   --t-l, e um número em bitmap neste corpo é exatamente onde 95 se lê 98. */
-.area-levels strong, .area-metric strong { font-variant-numeric: tabular-nums; }
-.area-levels > span, .area-metric > span { font-size: var(--t-xs); letter-spacing: 0.04em; }
-/* O degrau de raridade fica junto da faixa de nível: é a outra metade de "quanto custa e quanto
-   rende" que a linha responde. */
-.area-rarity { color: var(--ouro); }
-.drops { white-space: normal; }
-.drop + .drop::before { content: ' · '; color: var(--texto-fraco); }
-/* As três métricas são células próprias do grid: ficam na mesma coluna em todas as linhas. */
-.area-metrics { display: contents; }
-
-.area-species { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
-.area-sprites { display: flex; align-items: center; gap: var(--space-1); min-height: 32px; }
-.area-more { font-size: var(--t-s); }
-.area-types { display: flex; flex-wrap: wrap; gap: 2px; }
-.area-types .type { margin: 0; }
-/* Caixa de tamanho fixo: o frame do atlas tem 32 ou 64 px e o sprite é escalado para caber.
-   O filho é posicionado, não item de grid, senão o grid o encolhe para 32 px e corta o quadro. */
-.sprite-thumb { position: relative; display: inline-block; overflow: hidden; flex: none; }
-.sprite-thumb > span {
-  position: absolute; top: 50%; left: 50%;
-  background-repeat: no-repeat; transform-origin: center;
+/* ── O marcador ──────────────────────────────────────────────────────────────
+ * Um disco pequeno com o sprite de quem mora ali, centrado no marco do mapa oficial. Sem rótulo
+ * aceso: dezesseis etiquetas ao mesmo tempo eram o que transformava o mapa em mural de números, e
+ * o nível de uma área que ninguém está olhando não decide nada. O nome e a faixa aparecem ao
+ * passar o ponteiro, ao focar pelo teclado e na área escolhida.
+ */
+.mapa-marcador {
+  position: absolute;
   translate: -50% -50%;
+  width: 38px; height: 38px; padding: 0;
+  display: grid; place-items: center;
+  border: 0; border-radius: 50%;
+  background: linear-gradient(180deg, var(--painel-alto-topo), var(--painel-pe));
+  box-shadow: var(--relevo-2);
+  cursor: pointer;
+  transition: translate var(--rapido) ease-out, box-shadow var(--rapido) ease-out;
+}
+.mapa-marcador:hover, .mapa-marcador:focus-visible { translate: -50% -62%; }
+.mapa-medalha { display: grid; place-items: center; line-height: 0; }
+
+/* O escolhido ACENDE e sobe, e é o único que fica com a etiqueta presa. */
+.mapa-marcador-ativo {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--selecao) 80%, white), var(--selecao));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 45%), var(--brilho-selecao);
+  translate: -50% -62%;
 }
 
-/* O portão é informação, não enfeite: ouro, como o `.hunt-gate` do resto do sistema. Um
-   tingimento de fundo basta — marca sobre a superfície não ganha borda nem sombra. O número fica na face
-   de leitura: neste corpo a bitmap troca dígito por dígito, e é o número que se vem ler aqui. */
-.area-gate {
-  align-self: center; justify-self: center;
-  color: var(--ouro); font-size: var(--t-s); white-space: nowrap;
-  padding: 2px var(--space-2);
-  background: color-mix(in srgb, var(--ouro-cheio) 22%, transparent);
-}
-.area-start { align-self: center; white-space: nowrap; }
+/* Travado recua no PLANO, não na cor: o sprite esmaece e o disco afunda. Os números continuam
+ * legíveis na etiqueta, porque é por eles que se decide o que perseguir. */
+.mapa-marcador-travado { background: var(--face-cava); box-shadow: var(--relevo-cava); }
+.mapa-marcador-travado .mapa-medalha { opacity: 0.35; filter: grayscale(1); }
 
-.matchup-good strong { color: var(--ok); }
-.matchup-bad strong { color: var(--perigo); }
-.matchup-none strong { color: var(--texto-fraco); }
-
-/* --- analisador --- */
-.area-detail { margin-top: calc(var(--space-2) * -1); }
-/* A gaveta é fenda: aqui se LÊ uma tabela inteira, e tinta clara sobre a fenda escura
-   é o único fundo em que ela continua legível. A borda repete a do grifo da linha que a abriu,
-   para as duas peças lerem como um objeto só. */
-.area-analyzer {
-  border: var(--border-w) solid var(--selecao); border-top: 0;
-  background: var(--cava); padding: var(--space-3);
-  /* A abertura é o único movimento da tela: a gaveta nasce da própria linha, de cima para baixo. */
-  animation: analyzer-open 160ms cubic-bezier(0.16, 1, 0.3, 1);
+/* ── A etiqueta do marcador ──────────────────────────────────────────────── */
+.mapa-etiqueta {
+  position: absolute; top: calc(100% + 6px); left: 50%; translate: -50% 0;
+  display: flex; flex-direction: column; align-items: center; line-height: 1.2;
+  padding: 3px var(--space-2);
+  border-radius: var(--raio-p);
+  background: linear-gradient(180deg, var(--painel-topo), var(--cava));
+  box-shadow: var(--relevo-2);
+  white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity var(--rapido) ease-out;
+  z-index: 2;
 }
-@keyframes analyzer-open { from { opacity: 0; transform: translateY(-4px); } }
+.mapa-marcador:hover .mapa-etiqueta,
+.mapa-marcador:focus-visible .mapa-etiqueta,
+.mapa-marcador-ativo .mapa-etiqueta { opacity: 1; }
+.mapa-etiqueta-nome { font-size: var(--t-xs); font-weight: 700; color: var(--texto); }
+.mapa-etiqueta-nivel { font-size: var(--t-xs); color: var(--texto-fraco); font-variant-numeric: tabular-nums; }
+.mapa-marcador-travado .mapa-etiqueta-nivel { color: var(--ouro); }
+
 @media (prefers-reduced-motion: reduce) {
-  .area-analyzer { animation: none; }
-  .area-row { transition: none; }
+  .mapa-marcador, .mapa-etiqueta { transition: none; }
+  .mapa-marcador:hover, .mapa-marcador:focus-visible, .mapa-marcador-ativo { translate: -50% -50%; }
+}
+
+/* ── O analisador ────────────────────────────────────────────────────────────
+ * Painel fixo ao lado do mapa. Não empurra nada e não muda de lugar conforme a área — era a
+ * sanfona que fazia as duas coisas.
+ */
+.mapa-analise { padding: 0 0 var(--space-3); display: flex; flex-direction: column; min-width: 0; }
+.mapa-analise-topo { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
+.mapa-analise h3 { margin: 0; font-family: var(--fonte-hud); font-size: var(--t-l); }
+.mapa-analise-corpo {
+  padding: var(--space-3) var(--space-3) 0;
+  display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start;
+}
+/* Sem área escolhida, o convite fica no meio da coluna: é o único conteúdo dela, e encostado no
+ * topo parecia um painel esperando carregar. */
+.mapa-analise-vazio { margin: auto; padding: var(--space-3); text-align: center; max-width: 24ch; }
+.hunt-gate { margin: 0; color: var(--ouro); font-size: var(--t-s); font-weight: 700; }
+.area-missing { color: var(--ouro); font-size: var(--t-s); }
+
+/* A tabela é onde se LÊ, então ela é fenda. Rola no PRÓPRIO container quando não couber — a
+ * página nunca rola de lado, e a coluna de confronto já saiu cortada na borda por isso. */
+.area-analyzer {
+  width: 100%;
+  background: var(--face-cava); border-radius: var(--raio);
+  box-shadow: var(--relevo-cava);
+  padding: var(--space-2);
 }
 .analyzer-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-/* A primeira coluna fica com toda a sobra: sem isso, tirar a coluna "Nível" deixou uma faixa
-   morta entre os nomes e os números, e as colunas numéricas amontoadas no meio. */
+/* A primeira coluna fica com toda a sobra: sem isso há uma faixa morta entre os nomes e os
+   números, e as colunas numéricas amontoadas no meio. */
 .analyzer-table th:first-child { width: 100%; }
 .analyzer-table .num, .analyzer-table td:last-child { white-space: nowrap; }
 .analyzer-table th, .analyzer-table td { padding: var(--space-1) var(--space-2); text-align: left; }
@@ -178,139 +147,44 @@
 .analyzer-table thead th {
   color: var(--texto-fraco); font-weight: 400; font-size: var(--t-xs);
   letter-spacing: 0.06em; text-transform: uppercase;
-  border-bottom: 1px solid var(--borda);
+  border-bottom: 1px solid var(--borda-clara);
 }
 .analyzer-table .num { text-align: right; }
-.analyzer-table tbody tr + tr th, .analyzer-table tbody tr + tr td { border-top: 1px solid var(--borda); }
+.analyzer-table tbody tr + tr th, .analyzer-table tbody tr + tr td { border-top: 1px solid var(--borda-clara); }
 .analyzer-table tbody th { font-weight: 400; }
-.especie-nome { display: inline-flex; align-items: center; gap: var(--space-1); margin-right: var(--space-1); }
-.analyzer-note { margin: var(--space-3) 0 0; font-size: var(--t-s); }
-
-.area-empty { padding: var(--space-3); }
-/* Botão que se faz passar por link: usa a tinta de link do sistema, para não inventar uma
-   terceira cor de "coisa clicável" na mesma tela. */
-.link { background: none; border: 0; padding: 0; color: var(--borda); text-decoration: underline; cursor: pointer; }
-
-@media (max-width: 960px) {
-  .area-filters { grid-template-columns: 1fr; }
-  /* O nome ocupa a linha inteira: espremido ao lado da faixa de nível, "Entrada da Caverna"
-     quebrava em duas e deixava a faixa pendurada ao lado da primeira palavra. */
-  .area-row { grid-template-columns: 1fr 5rem; }
-  .area-main {
-    grid-template-columns: 1fr auto auto;
-    grid-template-areas: 'nome nome nome' 'faixa metrica-xp metrica-ouro' 'especies especies especies' 'confronto confronto confronto';
-    gap: var(--space-2);
-    padding: var(--space-2);
-  }
-  .area-name { grid-area: nome; }
-  .area-levels { grid-area: faixa; flex-direction: row; gap: var(--space-1); align-items: baseline; }
-  .area-species { grid-area: especies; }
-  /* Largura fixa também aqui: sem ela o número de dígitos move a borda direita de linha para
-     linha, e a comparação entre áreas, que é o ponto da tela, não sobrevive ao celular. */
-  .area-metric:nth-of-type(1) { grid-area: metrica-xp; min-width: 4.5rem; }
-  .area-metric:nth-of-type(2) { grid-area: metrica-ouro; min-width: 4.5rem; }
-  .area-metric:nth-of-type(3) { grid-area: confronto; flex-direction: row; gap: var(--space-1); align-items: baseline; }
-  .analyzer-table { display: block; overflow-x: auto; white-space: nowrap; }
+/* A célula da espécie é um flex com respiro: nome, tipos, "falta" e o confronto. Sem o `gap`,
+ * a quebra de linha colava os dois últimos e saía "faltaDESVANTAGEM". */
+.analyzer-table tbody th {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 2px var(--space-2);
 }
+.especie-nome { display: inline-flex; align-items: center; gap: var(--space-1); }
+.analyzer-note { margin: 0; font-size: var(--t-s); color: var(--texto-fraco); }
 
-/* ── Mapa da região ──────────────────────────────────────────────────────────
- * A imagem sai do mesmo pipeline que gera as áreas que o servidor simula, então o que se vê
- * aqui é o mapa de verdade — não uma ilustração que pode divergir do jogo.
- */
-.area-mapa { list-style: none; margin: var(--space-2) 0 var(--space-3); }
-.mapa { position: relative; line-height: 0; }
+/* O confronto é a única cor semântica da tabela: verde sai bem, vermelho apanha. */
+.matchup-good strong { color: var(--ok); }
+.matchup-bad strong { color: var(--perigo); }
+.matchup-none strong { color: var(--texto-fraco); }
 
-/*
- * A janela recorta; o mundo cresce dentro dela. O zoom muda a LARGURA do mundo em vez de aplicar
- * `transform: scale`, e a diferença importa: com `scale` os medalhões cresceriam junto e a três
- * vezes um deles tomaria meia tela. Mudando a largura, a imagem cresce, os marcadores continuam
- * ancorados em porcentagem — então acompanham o lugar certo — e o tamanho deles não muda.
- */
-.mapa-janela { overflow: auto; cursor: grab; max-height: 62vh; }
-.mapa-arrastando { cursor: grabbing; }
-.mapa-mundo { position: relative; width: calc(100% * var(--zoom, 1)); }
-
-/* Os controles flutuam sobre o canto do mapa, como na referência. */
-.mapa-controles { position: absolute; right: var(--space-2); bottom: var(--space-2); display: flex; gap: var(--space-1); }
-.mapa-zoom { width: 36px; height: 36px; padding: 0; }
-
-/* O mapa é embutido na superfície: a mesma fenda dos outros lugares onde se LÊ. */
-.mapa-imagem {
-  display: block; width: 100%; height: auto;
-  image-rendering: pixelated;
-  border: var(--border-w) solid var(--borda);
-  box-shadow:
-    inset 0 1px 3px rgb(0 0 0 / 45%);
+/* O confronto como etiqueta, junto do nome: é atributo da espécie, não valor a comparar em
+ * coluna. Fica em caixa alta miúda para não competir com o nome que ele qualifica. */
+.matchup {
+  font-size: var(--t-xs); font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--texto-fraco);
 }
-/* A camada de marcadores não intercepta o clique; só os botões dentro dela interceptam. */
-.mapa-marcadores { position: absolute; inset: 0; pointer-events: none; }
+.matchup.matchup-good { color: var(--ok); }
+.matchup.matchup-bad { color: var(--perigo); }
+.matchup.matchup-none { color: var(--perigo); }
 
-/*
- * O marcador é um MEDALHÃO: um disco escuro com o sprite da primeira espécie e a faixa de nível
- * pendurada embaixo. Antes era uma plaqueta com o nome da área, e nome não responde a pergunta
- * que se faz olhando um mapa — "o que mora ali". Um Butterfree responde na hora; "Bosque Denso"
- * manda o jogador abrir a ficha para descobrir.
- */
-.mapa-marcador {
-  position: absolute; transform: translate(-50%, -50%);
-  display: grid; place-items: center;
-  width: 46px; height: 46px; padding: 0;
-  pointer-events: auto;
-  border-radius: 50%;
-  background: var(--face-painel);
-  border: 0;
-  box-shadow: var(--relevo-2);
+/* Os drops da área inteira, numa linha: são poucos e repetidos entre espécies, e em coluna eram
+ * a célula mais larga a serviço do dado menos decisivo. */
+.drops { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-2); margin: 0; }
+.drops-rotulo {
+  font-size: var(--t-xs); font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--texto-fraco);
 }
-.mapa-marcador:hover { border-color: var(--texto); }
-.mapa-medalha { display: grid; place-items: center; line-height: 0; }
-/* A faixa de nível sai para fora do disco: dentro ela cobriria o sprite, que é o conteúdo. */
-.mapa-nivel {
-  position: absolute; bottom: -9px;
-  padding: 0 var(--space-1);
-  font-size: var(--t-xs); font-weight: 700; font-variant-numeric: tabular-nums;
-  background: var(--painel); border: 1px solid var(--borda); color: var(--texto);
-  border-radius: var(--raio-p);
-  white-space: nowrap;
-}
-/* O medalhão aberto é o único grifado: o marca-texto diz onde se está, não onde dá para ir. */
-.mapa-marcador-ativo { border-color: var(--selecao); box-shadow: 0 0 0 3px var(--selecao); }
-.mapa-marcador-ativo .mapa-nivel { background: var(--selecao); color: var(--selecao-texto); border-color: var(--selecao); }
-/* Travado apaga o sprite e mantém o número aceso: é pelo número que se decide o que perseguir.
-   O cadeado entra ANTES do número, não no lugar dele — o ícone diz "fechado" e o número diz
-   "fechado até quando", que é a metade que decide se vale perseguir. */
-.mapa-marcador-travado .mapa-medalha { opacity: 0.3; }
-.mapa-marcador-travado .mapa-nivel { color: var(--ouro); padding-left: 14px; }
-.mapa-marcador-travado .mapa-nivel::before {
-  content: ""; position: absolute; left: 2px; top: 50%; transform: translateY(-50%);
-  width: 11px; height: 11px;
-  background: url('./ui/icone-cadeado.png') center / contain no-repeat;
-  image-rendering: pixelated;
-}
-.mapa-marcador-travado .mapa-nivel { position: relative; }
-
-/* ── O mapa como modal ───────────────────────────────────────────────────────
- * Abas de região em cima, mapa à esquerda e analisador à direita. O modal existe para trocar de
- * área SEM sair da caçada: numa tela, sair é parar de caçar.
- */
-.mapa-modal { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
-.mapa-abas { display: flex; flex-wrap: wrap; gap: var(--space-1); }
-.mapa-aba { display: flex; align-items: baseline; gap: var(--space-2); }
-.mapa-aba-nivel { font-size: var(--t-xs); color: var(--texto-fraco); font-variant-numeric: tabular-nums; }
-/* Sobre o preenchimento da seleção, o nível usa a tinta da seleção — não a cor dela, que seria
- * a mesma do fundo e sumiria. Foi o que aconteceu: "Kanto nv 1" virou "Kanto". */
-.mapa-aba.tab-active .mapa-aba-nivel { color: var(--selecao-texto); opacity: 0.75; }
-
-/* O mapa manda na largura e o analisador fica com o que sobra, com piso: abaixo de 260 px a
-   tabela de drops quebra em duas linhas por item e deixa de ser tabela. */
-.mapa-palco { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 420px); gap: var(--space-3); align-items: start; }
-.mapa-analise { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
-/* A tabela do analisador foi desenhada para a tela de áreas, que é larga; num painel lateral ela
- * não cabe e as colunas de captura e confronto saíam cortadas na borda. Ela rola no PRÓPRIO
- * container — a página nunca rola de lado —, que é o tratamento certo para tabela densa. */
-.mapa-analise .area-analyzer { overflow-x: auto; max-width: 100%; }
-.mapa-analise .analyzer-table { min-width: 360px; }
-.mapa-analise-topo { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
-.mapa-analise h3 { margin: 0; font-family: var(--fonte-hud); font-size: var(--t-l); }
+.drop { font-size: var(--t-s); }
 
 @media (max-width: 900px) {
   /* O analisador desce para baixo do mapa: lado a lado, os dois ficam estreitos demais para

@@ -529,6 +529,53 @@ arte o cartão sobe para `--sombra-2`: um fio de 1 px não descola nada de um mu
 O prompt literal, as duas saídas e as contas de compressão estão em
 `packages/client/src/styles/arte/LEIAME.md`.
 
+## Escolher destino: o mapa é a interface
+
+Clicar em **Mapa** abre o Town Map oficial da região com um marcador por área e o analisador ao
+lado. Abas em cima trocam de região. É uma composição só, em `escolher-destino.ts`, servindo o
+modal e a tela de áreas — antes eram dois desenhos diferentes da mesma decisão.
+
+**O que caiu, e por quê.** A tela de áreas era uma ficha de campo densa: barra de filtros por tipo
+e confronto, contagem "X de Y", o mapa, e abaixo dele dezesseis LINHAS de tabela com o detalhe
+abrindo como **sanfona** dentro da lista. Três formas de ver a mesma área na mesma tela. Errado
+por três razões:
+
+1. **O mapa decidia e a lista o empurrava para fora da primeira dobra.** Quem chega ali pergunta
+   *para onde vou agora*, e o mapa responde de relance o que a tabela só responde linha por linha.
+2. **A sanfona empurrava o conteúdo.** Abrir uma área deslocava as de baixo, então comparar duas
+   exigia fechar uma. O analisador agora é painel fixo: não empurra nada e não muda de lugar.
+3. **Filtrar dezesseis áreas resolve um problema que não existe**, e custava o maior bloco da tela.
+
+**O fundo é o Town Map oficial de FireRed/LeafGreen**, 192×144 px de pixel art, 2 KB. Antes era o
+PNG que o nosso pipeline gera do tileset: fiel ao mapa jogável, e ilegível como mapa de região —
+manchas de verde e cinza sem marco nenhum. **Mapa de região não serve para mostrar o terreno,
+serve para a pessoa se LOCALIZAR**, e para isso ele precisa ter os lugares que ela já conhece.
+
+**As coordenadas foram detectadas na arte, não estimadas.** Os 25 marcadores oficiais (Poké Ball
+vermelha para cidade, quadrado azul para local) foram achados por varredura de cor e agrupamento
+por conectividade; o centroide de cada um virou a coordenada em `regions.json`. Num mapa que todo
+mundo conhece, um marcador alguns pixels fora do Monte Lua apareceria.
+
+**O marcador é um disco com o sprite de quem mora ali** — "Bosque Denso" não diz nada, um
+Butterfree diz na hora. O nome e a faixa de nível só aparecem no hover, no foco e no escolhido:
+dezesseis etiquetas acesas transformavam o mapa em mural de números.
+
+**Sem zoom e sem arraste.** Os dois existiam para um render de tileset que não cabia na janela.
+Sobre um mapa de 192×144 que cabe inteiro, seriam dois controles sem para onde ir.
+
+### O analisador tem quatro colunas, e tinha sete
+
+Espécie, XP, Ouro, Tempo, Captura, Confronto e Drops, num painel de 400 px — **o confronto e os
+drops saíam cortados na borda**, e ninguém lê o que não vê.
+
+| saiu | para onde | por quê |
+|---|---|---|
+| Tempo | nada | dentro de uma área é o mesmo número em toda linha: "1,6s / 1,6s / 1,6s" não separa nada |
+| Confronto | etiqueta ao lado do nome | é atributo da espécie, não valor a comparar em coluna |
+| Drops | uma linha abaixo da tabela | poucos e repetidos entre espécies; era a célula mais larga a serviço do dado menos decisivo |
+
+Sobrou o que decide: quanto rende, quanto paga, e a chance de capturar.
+
 ## Créditos de arte
 
 - Ícones de assunto: acervo de sprites da [PokeAPI](https://github.com/PokeAPI/sprites). O
@@ -540,6 +587,8 @@ O prompt literal, as duas saídas e as contas de compressão estão em
   ela precisa viajar junto.
 - Fontes: **Pixelify Sans** (OFL) e **Atkinson Hyperlegible** (OFL). Ver
   `packages/client/src/styles/fontes/LEIAME.md`.
+- Town Map de Kanto: captura do mapa de **Pokémon FireRed/LeafGreen**, recortada. Arte da The
+  Pokémon Company; procedência e recorte em `packages/client/src/styles/arte/mapas/LEIAME.md`.
 - Arte-chave da entrada: pixel art gerada no **Retro Diffusion** (`rd_pro__default`), que cede os
   direitos da saída a quem gera. Prompt, contas de compressão e o porquê de ser pixel art em
   `packages/client/src/styles/arte/LEIAME.md`.

@@ -1,4 +1,14 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+/**
+ * A tela de escolher onde caçar, depois que o mapa virou a interface.
+ *
+ * O que estes casos protegem é o que a versão anterior errava: o mapa precisa aparecer com um
+ * marcador POR ÁREA, a escolha precisa abrir o analisador SEM empurrar nada, e a área travada
+ * precisa dizer o que falta em vez de simplesmente não oferecer o botão.
+ *
+ * Os casos de filtro por tipo, contagem "X de Y" e sanfona saíram junto com as features. Não
+ * eram testes ruins — testavam uma tela que decidiu deixar de existir.
+ */
+import { describe, expect, it, vi } from 'vitest'
 import { createContext } from '../../../src/app-context.js'
 import type { Me } from '../../../src/api/dto.js'
 import { initialSession, withMe } from '../../../src/state/session.js'
@@ -39,165 +49,88 @@ const montar = (over: Record<string, unknown> = {}, hunts?: readonly Resumo[]) =
   return root
 }
 
-const idsVisiveis = (root: HTMLElement) => [...root.querySelectorAll('.area-row')].map((r) => r.getAttribute('data-area'))
-/** A barra de filtros é recriada a cada render: guardar o nó antigo lê o estado de antes. */
-const tipo = (root: HTMLElement, nome: string) => root.querySelector<HTMLButtonElement>(`.filter-type.type-${nome}`)!
-const tipoOpcional = (root: HTMLElement, nome: string) => root.querySelector<HTMLButtonElement>(`.filter-type.type-${nome}`)
+const marcador = (root: HTMLElement, id: string) => root.querySelector<HTMLButtonElement>(`.mapa-marcador[data-area="${id}"]`)!
+const marcadores = (root: HTMLElement) => [...root.querySelectorAll('.mapa-marcador')].map((m) => m.getAttribute('data-area'))
 
-// A tela escreve os filtros na URL, e o happy-dom compartilha `location` entre os casos do
-// arquivo: sem limpar, um filtro vaza para o teste seguinte.
-beforeEach(() => { history.replaceState(null, '', location.pathname) })
-
-describe('navegador de áreas', () => {
-  it('lista as áreas com faixa de nível, espécies e a contagem total', () => {
+describe('escolher onde caçar', () => {
+  it('o mapa é a tela: um marcador por área, e nenhuma linha de lista', () => {
     const root = montar()
     expect(root.querySelector('h1')?.textContent).toBe('Onde caçar')
-    expect(root.querySelector('.area-count')?.textContent).toBe('3 áreas')
-    expect(idsVisiveis(root)).toEqual(['campo-inicial', 'margem-do-lago', 'pico-rochoso'])
-    const linha = root.querySelector('.area-row[data-area=campo-inicial]')!
-    expect(linha.textContent).toContain('Campo Inicial')
-    expect(linha.textContent).toContain('2–6')
-    expect(linha.querySelectorAll('.sprite-thumb').length).toBeGreaterThan(0)
+    expect(root.querySelector('.mapa-imagem')).not.toBeNull()
+    expect(marcadores(root)).toEqual(['campo-inicial', 'margem-do-lago', 'pico-rochoso'])
+    // A ficha de linhas e a sanfona saíram; se voltarem, este caso avisa.
+    expect(root.querySelector('.area-row')).toBeNull()
+    expect(root.querySelector('.area-detail')).toBeNull()
   })
 
-  it('área bloqueada mostra o nível que a abre e não oferece o botão de caçar', () => {
+  it('cada marcador leva o sprite de quem mora ali e a etiqueta com nome e faixa', () => {
     const root = montar()
-    const bloqueada = root.querySelector('.area-row[data-area=pico-rochoso]')!
-    expect(bloqueada.classList.contains('area-row-locked')).toBe(true)
-    expect(bloqueada.textContent).toContain('nível 23')
-    // O corpo da linha continua sendo botão (abre o detalhe); o que some é o botão de caçar.
-    expect(bloqueada.querySelector('.area-start')).toBeNull()
+    const m = marcador(root, 'campo-inicial')
+    expect(m.querySelectorAll('.sprite-thumb').length).toBeGreaterThan(0)
+    expect(m.textContent).toContain('Campo Inicial')
+    expect(m.textContent).toContain('2–6')
+    // Quem não vê a tela recebe nome, marco e faixa numa frase só.
+    expect(m.getAttribute('aria-label')).toContain('Campo Inicial')
+    expect(m.getAttribute('aria-label')).toContain('níveis 2 a 6')
   })
 
-  it('agrupa por região, na ordem em que o jogo as abre, com o portão da fechada', () => {
-    const grutaUmida: Resumo = { id: 'gruta-umida', name: 'Gruta Úmida', width: 24, height: 36, minLevel: 36, maxLevel: 44, minTrainerLevel: 34, locked: true }
-    const root = montar({}, [grutaUmida, campo])
-    const cabecalhos = [...root.querySelectorAll('.area-region')]
-    expect(cabecalhos.map((c) => c.querySelector('h2')?.textContent)).toEqual(['Kanto', 'Terras Altas'])
-    // A região inteira bloqueada mostra o nível que a abre; a liberada não mostra portão nenhum.
-    expect(cabecalhos[0]!.querySelector('.area-gate')).toBeNull()
-    expect(cabecalhos[1]!.querySelector('.area-gate')?.textContent).toBe('abre no nível 34')
-    // A ordem das linhas segue a das regiões, não a ordem em que o servidor mandou.
-    expect(idsVisiveis(root)).toEqual(['campo-inicial', 'gruta-umida'])
-  })
-
-  it('dentro da região, as liberadas vêm antes das bloqueadas, em ordem de nível', () => {
-    const root = montar({}, [pico, lago, campo])
-    expect(idsVisiveis(root)).toEqual(['campo-inicial', 'margem-do-lago', 'pico-rochoso'])
-  })
-
-  it('filtrar por tipo estreita a lista e a contagem passa a dizer quantas de quantas', () => {
+  it('escolher uma área abre o analisador ao lado, e escolher de novo fecha', () => {
     const root = montar()
-    tipo(root, 'water').click()
-    expect(tipo(root, 'water').getAttribute('aria-pressed')).toBe('true')
-    expect(idsVisiveis(root)).toContain('margem-do-lago')
-    expect(idsVisiveis(root)).not.toContain('pico-rochoso')
-    expect(root.querySelector('.area-count')?.textContent).toMatch(/^\d+ de 3 áreas$/)
+    expect(root.querySelector('.mapa-analise-vazio')).not.toBeNull()
+
+    marcador(root, 'margem-do-lago').click()
+    expect(root.querySelector('.mapa-analise h3')?.textContent).toBe('Margem do Lago')
+    expect(marcador(root, 'margem-do-lago').getAttribute('aria-pressed')).toBe('true')
+
+    marcador(root, 'margem-do-lago').click()
+    expect(root.querySelector('.mapa-analise-vazio')).not.toBeNull()
   })
 
-  it('só aparecem os tipos que alguma área tem: nada de filtro que só leva ao vazio', () => {
+  it('a área travada diz o nível que a abre, e não oferece o botão de caçar', () => {
     const root = montar()
-    // As três áreas do fixture cobrem água, pedra, fogo, terra, planta, veneno, voador, fantasma
-    // e dragão (o dratini da Margem do Lago).
-    expect(tipoOpcional(root, 'water')).not.toBeNull()
-    expect(tipoOpcional(root, 'rock')).not.toBeNull()
-    // Nenhuma tem gelo ou aço, então esses botões não existem.
-    expect(tipoOpcional(root, 'ice')).toBeNull()
-    expect(tipoOpcional(root, 'steel')).toBeNull()
+    expect(marcador(root, 'pico-rochoso').classList.contains('mapa-marcador-travado')).toBe(true)
+
+    marcador(root, 'pico-rochoso').click()
+    const analise = root.querySelector('.mapa-analise')!
+    expect(analise.querySelector('.hunt-gate')?.textContent).toContain('nível 23')
+    expect(analise.querySelector('button.primary')).toBeNull()
   })
 
-  it('filtro sem resultado explica o que fazer, em vez de deixar a tela vazia', () => {
+  it('a área liberada oferece caçar, e o clique chama o servidor uma vez só', () => {
     const root = montar()
-    // Pedra só existe no Pico Rochoso, que é de nível 25 a 35: com a faixa 2–6 não sobra nada.
-    tipo(root, 'rock').click()
-    root.querySelector<HTMLInputElement>('#filtro-maxLevel')!.value = '6'
-    root.querySelector<HTMLInputElement>('#filtro-maxLevel')!.dispatchEvent(new Event('input', { bubbles: true }))
-    expect(idsVisiveis(root)).toEqual([])
-    const vazio = root.querySelector('.area-empty')!
-    expect(vazio.textContent).toContain('Nenhuma área')
-    // O atalho solta tipo e confronto, e a lista volta a ter o que mostrar.
-    vazio.querySelector<HTMLButtonElement>('button')!.click()
-    expect(idsVisiveis(root).length).toBeGreaterThan(0)
+    marcador(root, 'campo-inicial').click()
+    const botao = root.querySelector<HTMLButtonElement>('.mapa-analise button.primary')!
+    expect(botao.textContent).toBe('Caçar aqui')
+
+    semRede.post.mockClear()
+    botao.click()
+    botao.click() // o botão se desabilita no primeiro clique
+    expect(semRede.post).toHaveBeenCalledTimes(1)
+    expect(String(semRede.post.mock.calls[0])).toContain('/hunts/campo-inicial/start')
   })
 
-  it('limpar filtros volta ao estado inicial e o botão desliga sozinho quando não há o que limpar', () => {
+  it('as abas cobrem as regiões, e só uma fica ativa', () => {
     const root = montar()
-    const limpar = () => root.querySelector<HTMLButtonElement>('.filter-clear')!
-    expect(limpar().hasAttribute('disabled')).toBe(true)
-    tipo(root, 'water').click()
-    expect(limpar().hasAttribute('disabled')).toBe(false)
-    limpar().click()
-    expect(idsVisiveis(root).length).toBe(3)
-    expect(limpar().hasAttribute('disabled')).toBe(true)
+    const abas = [...root.querySelectorAll('.mapa-aba')]
+    expect(abas.length).toBeGreaterThanOrEqual(2)
+    expect(abas.filter((a) => a.getAttribute('aria-selected') === 'true')).toHaveLength(1)
+    expect(abas[0]?.textContent).toContain('Kanto')
   })
 
-  it('o degrau de raridade só aparece onde informa algo, e o detalhe lista os drops', () => {
+  it('trocar de região limpa a área escolhida', () => {
+    // Um analisador de Kanto ao lado do mapa das Terras Altas seria um número certo apontando
+    // para o lugar errado.
     const root = montar()
-    // Campo Inicial é o degrau 1, o padrão: mostrar "drops ×1" seria ruído.
-    expect(root.querySelector('.area-row[data-area=campo-inicial] .area-rarity')).toBeNull()
-    const pico = root.querySelector('.area-row[data-area=pico-rochoso] .area-rarity')!
-    expect(pico.textContent).toBe('drops ×8')
+    marcador(root, 'campo-inicial').click()
+    expect(root.querySelector('.mapa-analise h3')).not.toBeNull()
 
-    root.querySelector<HTMLButtonElement>('.area-row[data-area=campo-inicial] .area-main')!.click()
-    const cabecalho = root.querySelector('.analyzer-table thead')!
-    expect(cabecalho.textContent).toContain('Drops')
-    // O item aparece pelo nome, não pelo id, e com a chance em porcentagem.
-    const primeiraLinha = root.querySelector('.analyzer-table tbody tr .drops')!
-    expect(primeiraLinha.textContent).toMatch(/Poção|Bola/)
-    expect(primeiraLinha.textContent).toMatch(/\d+%/)
+    root.querySelectorAll<HTMLButtonElement>('.mapa-aba')[1]!.click()
+    expect(root.querySelector('.mapa-analise-vazio')).not.toBeNull()
   })
 
-  it('abrir uma área mostra a tabela por espécie; abrir de novo fecha', () => {
-    const root = montar()
-    const corpo = () => root.querySelector<HTMLButtonElement>('.area-row[data-area=campo-inicial] .area-main')!
-    corpo().click()
-    expect(root.querySelector('.area-analyzer')).not.toBeNull()
-    expect(corpo().getAttribute('aria-expanded')).toBe('true')
-    const linhasDaTabela = root.querySelectorAll('.analyzer-table tbody tr')
-    expect(linhasDaTabela.length).toBeGreaterThan(0)
-    expect(root.querySelector('.analyzer-table thead')?.textContent).toContain('Captura')
-    corpo().click()
-    expect(root.querySelector('.area-analyzer')).toBeNull()
-  })
-
-  it('o corpo da linha é um botão de verdade, com rótulo próprio para leitor de tela', () => {
-    const root = montar()
-    const corpo = root.querySelector('.area-row[data-area=campo-inicial] .area-main')!
-    // Botão nativo: Enter e Espaço já funcionam sem handler de teclado nosso.
-    expect(corpo.tagName).toBe('BUTTON')
-    expect(corpo.getAttribute('aria-label')).toContain('Campo Inicial')
-    expect(corpo.getAttribute('aria-label')).toContain('Ver detalhes')
-    // E o botão de caçar não fica dentro dele, porque botão dentro de botão não existe em HTML.
-    expect(corpo.querySelector('button')).toBeNull()
-  })
-
-  it('caçar manda POST /hunts/:id/start e vai para o jogo, sem abrir o analisador junto', async () => {
-    const go = vi.fn(async () => {})
-    const root = montar({ go })
-    root.querySelector<HTMLButtonElement>('.area-row[data-area=campo-inicial] .area-start')!
-      .dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    for (let i = 0; i < 5; i++) await Promise.resolve()
-    expect(semRede.post).toHaveBeenCalledWith('/hunts/campo-inicial/start', {}, expect.anything())
-    expect(go).toHaveBeenCalled()
-    expect(root.querySelector('.area-analyzer')).toBeNull()
-  })
-
-  it('antes do time chegar, a tela diz que está calculando em vez de dar um veredito falso', () => {
-    const root = montar()
-    const metricas = root.querySelector('.area-row[data-area=campo-inicial] .area-metrics')!
-    expect(metricas.getAttribute('aria-busy')).toBe('true')
-    expect(metricas.textContent).toContain('calculando')
-    // Com o time vazio a estimativa daria "não fere" em tudo; isso não pode aparecer como fato.
-    expect(metricas.textContent).not.toContain('não fere')
-    // Nem a contagem da Pokédex, que marcaria todas as espécies como faltando.
-    expect(root.querySelector('.area-row[data-area=campo-inicial] .area-missing')).toBeNull()
-  })
-
-  it('sem o time carregado a ficha continua de pé, com aviso em vez de número inventado', async () => {
-    const root = montar()
-    for (let i = 0; i < 5; i++) await Promise.resolve()
-    expect(idsVisiveis(root).length).toBe(3)
-    expect(root.querySelector('.form-error')?.textContent).toContain('time')
-    expect(root.querySelector('.area-row[data-area=campo-inicial] .area-metrics')?.textContent).toContain('—')
+  it('região sem área liberada pelo servidor não desenha mapa vazio: diz o que houve', () => {
+    const root = montar({}, [])
+    expect(root.querySelector('.mapa-imagem')).toBeNull()
+    expect(root.textContent).toContain('ainda não tem áreas liberadas')
   })
 })

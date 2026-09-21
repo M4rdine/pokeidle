@@ -1,19 +1,44 @@
+/*
+ * Tokens do mundo visual. Interface de RPG 16-bit: moldura com bisel, luz em cima à esquerda e
+ * sombra embaixo à direita, superfícies aninhadas. O que é leitura afunda; o que é ação se levanta.
+ *
+ * A gramática vem do gênero; a cor é nossa. Azul-noite de fundo, bronze na moldura, e o amarelo
+ * elétrico que o projeto já usava continua sendo o único acento.
+ */
 :root {
-  --bg: #0f0f14;
-  --panel: #1a1a22;
-  --border: #2e2e3a;
-  --text: #f0f0f5;
-  --muted: #8a8a9a;
-  --accent: #f8d030;
-  --danger: #e03030;
-  --ok: #50c878;
+  /* ── Superfícies, do fundo para a frente ── */
+  --noite: #131826;        /* fora de tudo */
+  --cava: #0d111c;         /* o que afunda: trilho de medidor, campo, lista */
+  --painel: #2a3145;       /* a superfície que se levanta */
+  --painel-alto: #343c54;  /* a mesma, um degrau à frente */
 
+  /* ── Moldura: três tons fazem o bisel ── */
+  --moldura: #7a5c3a;
+  --moldura-luz: #a8814f;
+  --moldura-sombra: #46331f;
+
+  /* ── Texto ── */
+  --text: #f0f0f5;
+  --muted: #9aa0b4;
+
+  /* ── Papéis ── */
+  --accent: #f8d030;       /* ativo, ação primária, recompensa, foco */
+  --ouro: #f0c040;
+  --danger: #e04848;
+  --ok: #52c46a;
+  --xp: #58a6f0;
+
+  /* ── Espaço, em degraus de 4 ── */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 16px;
   --space-4: 32px;
+
+  /* ── Bisel ── */
+  --bisel: 2px;
   --border-w: 2px;
 
+  /* ── Tipos: os dezoito matizes canônicos, identidade da espécie ── */
   --type-fire: #f08030;
   --type-water: #6890f0;
   --type-grass: #78c850;

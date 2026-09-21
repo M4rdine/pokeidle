@@ -15,14 +15,6 @@ export function spriteStyle(atlas: AtlasData, species: string): SpriteStyle | nu
   }
 }
 
-/** Aplica pelo CSSOM: a CSP bloqueia o atributo `style`, mas não a API de estilo do elemento. */
-export function applySpriteStyle(node: HTMLElement, atlas: AtlasData, species: string): void {
-  const style = spriteStyle(atlas, species)
-  if (!style) { node.classList.add('sprite-unknown'); return }
-  node.classList.add('sprite')
-  for (const [property, value] of Object.entries(style)) node.style.setProperty(property, value)
-}
-
 /**
  * Miniatura de tamanho fixo. Os frames do atlas têm 32 ou 64 px conforme a espécie, e o estilo
  * do sprite grava a largura do frame direto no elemento: sem uma caixa que recorte e escale, um

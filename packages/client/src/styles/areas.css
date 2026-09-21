@@ -34,7 +34,7 @@
 /* `--t` é o matiz do tipo, definido uma vez em layout.css para todo o sistema. */
 .filter-type { color: var(--text); border-color: var(--t); display: inline-flex; align-items: center; gap: 0.35em; }
 .filter-type::before { content: ''; width: 0.55em; height: 0.55em; background: var(--t); }
-.filter-type[aria-pressed='true'] { background: color-mix(in srgb, var(--t) 28%, var(--panel)); border-width: 2px; }
+.filter-type[aria-pressed='true'] { background: color-mix(in srgb, var(--t) 28%, var(--painel)); border-width: 2px; }
 .filter-type[aria-pressed='true']::before { background: var(--t); box-shadow: 0 0 0 2px color-mix(in srgb, var(--t) 45%, transparent); }
 
 .filter-level-field { display: inline-flex; align-items: center; gap: var(--space-1); }
@@ -51,7 +51,7 @@
 .area-region {
   display: flex; align-items: baseline; gap: var(--space-2);
   padding: var(--space-3) 0 var(--space-1);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--moldura-sombra);
 }
 .area-region:first-child { padding-top: 0; }
 .area-region h2 { font-size: 1rem; letter-spacing: 0.06em; text-transform: uppercase; }
@@ -64,7 +64,7 @@
      todas as colunas de dados para um x diferente em cada linha, que é justamente o que esta
      ficha existe para não fazer. */
   display: grid; grid-template-columns: 1fr 7rem; align-items: stretch; gap: var(--space-3);
-  background: var(--panel); border: var(--border-w) solid var(--border);
+  background: var(--painel); border: var(--border-w) solid var(--moldura-sombra);
   padding-right: var(--space-3);
   /* Só a borda muda no hover: a linha não se mexe, então a coluna não pisca ao passar o mouse. */
   transition: border-color 120ms ease-out;
@@ -74,7 +74,7 @@
 /* O que dá para caçar agora é painel levantado; o que ainda não abriu fica rente ao fundo da
    página. A separação é o plano, não a opacidade: os números da área bloqueada continuam em
    contraste cheio, porque é por eles que se decide o que perseguir. */
-.area-row-locked { background: var(--bg); border-color: color-mix(in srgb, var(--border) 60%, var(--bg)); }
+.area-row-locked { background: var(--noite); border-color: color-mix(in srgb, var(--moldura-sombra) 60%, var(--noite)); }
 .area-row-locked:hover { border-color: var(--accent); }
 .area-row-locked .area-title { color: var(--muted); }
 
@@ -134,7 +134,7 @@
 .area-detail { margin-top: calc(var(--space-2) * -1); }
 .area-analyzer {
   border: var(--border-w) solid var(--accent); border-top: 0;
-  background: var(--bg); padding: var(--space-3);
+  background: var(--noite); padding: var(--space-3);
   /* A abertura é o único movimento da tela: a gaveta nasce da própria linha, de cima para baixo. */
   animation: analyzer-open 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -152,10 +152,10 @@
 .analyzer-table thead th {
   color: var(--muted); font-weight: 400; font-size: 0.8em;
   letter-spacing: 0.06em; text-transform: uppercase;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--moldura-sombra);
 }
 .analyzer-table .num { text-align: right; }
-.analyzer-table tbody tr + tr th, .analyzer-table tbody tr + tr td { border-top: 1px solid var(--border); }
+.analyzer-table tbody tr + tr th, .analyzer-table tbody tr + tr td { border-top: 1px solid var(--moldura-sombra); }
 .analyzer-table tbody th { font-weight: 400; }
 .especie-nome { display: inline-flex; align-items: center; gap: var(--space-1); margin-right: var(--space-1); }
 .analyzer-note { margin: var(--space-3) 0 0; font-size: 0.85em; }

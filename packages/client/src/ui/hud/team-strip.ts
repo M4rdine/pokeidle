@@ -24,12 +24,22 @@ export function mountTeamStrip(root: HTMLElement, ctx: AppContext): () => void {
         // Mesma caixa das outras telas: o frame do atlas tem 32 ou 64 px conforme a espécie, e
         // sem caixa um Rhydon sai do slot.
         const sprite = spriteThumb(ctx.atlas, member.speciesName, LADO_SLOT)
+        const especie = ctx.registry.species.get(member.speciesName)
+        const tipos = (especie?.types ?? []).map((t) => el('span', { class: `chip type type-${t}` }, t))
+        const hp = el('progress', { class: 'hp-bar', max: String(member.hpMax), value: String(member.hp) })
+        hp.setAttribute('data-hp-state', member.hp / member.hpMax > 0.5 ? 'ok' : member.hp / member.hpMax > 0.2 ? 'ferido' : 'critico')
         const slot = el('button', {
           type: 'button',
           class: index === activeIndex ? 'slot slot-active' : 'slot',
           'data-pokemon': member.id,
           title: `${displayName(member.speciesName)} L${member.level}`,
-        }, sprite, el('span', { class: 'slot-hp' }, `${member.hp}/${member.hpMax}`))
+        }, sprite, el('div', { class: 'slot-dados' },
+            el('div', { class: 'slot-linha' },
+              el('span', { class: 'slot-nome' }, displayName(member.speciesName)),
+              el('span', { class: 'chip chip-nivel' }, `nv ${member.level}`)),
+            el('div', { class: 'slot-linha slot-tipos' }, ...tipos),
+            hp,
+            el('span', { class: 'slot-hp muted' }, `${member.hp}/${member.hpMax}`)))
         slot.addEventListener('click', () => ctx.sendIntent?.({ t: 'team.setActive', pokemonId: member.id }))
         return slot
       }

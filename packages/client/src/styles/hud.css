@@ -9,7 +9,7 @@
 .screen.game-grid { max-width: none; margin: 0; padding: var(--space-2); }
 .game-grid {
   display: grid;
-  grid-template-columns: 280px 1fr 200px;
+  grid-template-columns: 280px 1fr 260px;
   /* O log encolhe com a janela em vez de tomar 180 px fixos de qualquer tela. */
   grid-template-rows: auto 1fr clamp(88px, 13vh, 150px);
   grid-template-areas: "top top top" "left center right" "bottom bottom bottom";
@@ -21,7 +21,7 @@
 .grid-left { grid-area: left; display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; }
 /* A tarja que sobra quando o mundo é menor que o painel usa o preto da página, não `#000`: o
  * DESIGN.md tem dois planos de fundo, e um terceiro preto não pertence a nenhum deles. */
-.grid-center { grid-area: center; position: relative; overflow: hidden; background: var(--bg); min-width: 0; min-height: 0; }
+.grid-center { grid-area: center; position: relative; overflow: hidden; background: var(--noite); min-width: 0; min-height: 0; }
 .grid-right { grid-area: right; min-height: 0; display: flex; }
 .grid-bottom { grid-area: bottom; min-height: 0; }
 
@@ -57,7 +57,7 @@
 .tb-acoes button[data-open] { padding: var(--space-1) var(--space-2); font-size: 0.9em; color: var(--muted); }
 .tb-acoes button[data-open]:hover:not([disabled]) { color: var(--text); }
 /* O par que sai da hunt fica separado do resto por um divisor, não por distância. */
-.tb-saida { display: flex; gap: var(--space-1); padding-left: var(--space-2); margin-left: var(--space-1); border-left: 1px solid var(--border); flex-shrink: 0; }
+.tb-saida { display: flex; gap: var(--space-1); padding-left: var(--space-2); margin-left: var(--space-1); border-left: 1px solid var(--moldura-sombra); flex-shrink: 0; }
 
 .tb-status { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; flex-shrink: 0; font-size: 0.75em; }
 .conn { display: flex; align-items: center; gap: var(--space-1); }
@@ -83,19 +83,47 @@
 /* ── Golpes ─────────────────────────────────────────────────────────────────── */
 .moves { list-style: none; margin: 0; padding: var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); overflow-y: auto; min-height: 0; }
 .move { display: flex; gap: var(--space-2); align-items: baseline; }
-.move-cd { margin-left: auto; width: 40px; height: 6px; background: var(--border); position: relative; overflow: hidden; flex-shrink: 0; }
+.move-cd { margin-left: auto; width: 40px; height: 6px; background: var(--cava); position: relative; overflow: hidden; flex-shrink: 0; }
 .move-cd::after { content: ""; position: absolute; inset: 0; background: var(--accent); transform: scaleX(var(--cd, 0)); transform-origin: left; }
 .move-cd[data-cd="0"] { background: var(--ok); }
 
+/* ── Situação ───────────────────────────────────────────────────────────────── */
+.situacao { padding: var(--space-2) var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
+.situacao-texto { font-size: 1rem; }
+/* O combate é o único estado que pede atenção agora; o acento marca isso e nada mais. */
+.situacao-texto[data-situacao="em combate"] { color: var(--accent); }
+.situacao-texto[data-situacao="curando"], .situacao-texto[data-situacao="voltando ao Centro"] { color: var(--muted); }
+.situacao-alvo { display: flex; flex-direction: column; gap: 2px; }
+.situacao { min-height: 0; }
+.alvo-linha { display: flex; align-items: baseline; gap: var(--space-2); font-size: 0.85em; }
+.alvo-nome { font-weight: 600; }
+.alvo-hp-texto { margin-left: auto; }
+
 /* ── Time ───────────────────────────────────────────────────────────────────── */
-.team-strip { display: grid; grid-template-rows: repeat(6, 1fr); gap: var(--space-1); padding: var(--space-2); width: 100%; }
+.team-strip { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-2); width: 100%; overflow-y: auto; }
+.team-strip .slot { flex-shrink: 0; }
 .slot {
-  display: flex; align-items: center; justify-content: center; gap: var(--space-2);
-  min-height: 0; padding: var(--space-1); overflow: hidden;
+  display: flex; align-items: center; gap: var(--space-2);
+  min-height: 0; padding: var(--space-1) var(--space-2); overflow: hidden; text-align: left;
 }
-.slot-hp { font-size: 0.8em; }
+/* O dado do slot é uma coluna estreita: nome e nível na primeira linha, tipos na segunda,
+ * medidor na terceira. Repetir a mesma ordem em seis slots é o que deixa comparar de relance. */
+.slot-dados { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.slot-linha { display: flex; align-items: center; gap: var(--space-1); min-width: 0; }
+.slot-nome { font-weight: 600; font-size: 0.85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot-tipos .chip { font-size: 0.62em; }
+.slot-hp { font-size: 0.7em; }
+.slot progress { height: 6px; }
 .slot-active { border-color: var(--accent); }
-.slot-empty, .slot-locked { color: var(--muted); border: var(--border-w) dashed var(--border); font-size: 0.8em; }
+/* Vaga vazia e vaga travada são lugares onde ainda não há nada: afundam, em vez de se levantar
+ * como as ocupadas. Mesma regra do resto do sistema — o que se lê afunda, o que se age levanta. */
+.slot-empty, .slot-locked {
+  justify-content: center; color: var(--muted); font-size: 0.78em;
+  letter-spacing: 0.06em; min-height: 34px;
+  background: var(--cava);
+  border: var(--border-w) solid var(--moldura-sombra);
+  box-shadow: inset var(--bisel) var(--bisel) 0 rgb(0 0 0 / 45%);
+}
 /* O slot travado diz o nível que o destrava: é informação, e substitui o cadeado em emoji que
  * estava fazendo papel de ícone num sistema que não tem ícone nenhum. */
 .slot-locked { letter-spacing: 0.04em; }
@@ -104,7 +132,7 @@
 .log { height: 100%; display: flex; flex-direction: column; min-height: 0; }
 .log-header {
   display: flex; gap: var(--space-2); align-items: center;
-  padding: var(--space-1) var(--space-3); border-bottom: var(--border-w) solid var(--border);
+  padding: var(--space-1) var(--space-3); border-bottom: var(--border-w) solid var(--moldura-sombra);
   font-size: 0.75em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
 }
 .log-header label { display: flex; align-items: center; gap: var(--space-1); cursor: pointer; }

@@ -294,7 +294,7 @@
 .mapa-abas { display: flex; flex-wrap: wrap; gap: var(--space-1); }
 .mapa-aba { display: flex; align-items: baseline; gap: var(--space-2); }
 .mapa-aba-nivel { font-size: var(--t-xs); color: var(--tinta-fraca); font-variant-numeric: tabular-nums; }
-.mapa-aba.tab-active .mapa-aba-nivel { color: var(--fora); }
+.mapa-aba.tab-active .mapa-aba-nivel { color: var(--marca); }
 
 /* O mapa manda na largura e o analisador fica com o que sobra, com piso: abaixo de 260 px a
    tabela de drops quebra em duas linhas por item e deixa de ser tabela. */

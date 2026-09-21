@@ -8,8 +8,9 @@ export const STARTERS = ['charmander', 'bulbasaur', 'squirtle'] as const
 const STARTER_LEVEL = 10
 
 /** Três cartões com sprite, tipos e nível; escolher é irreversível (o servidor recusa a segunda). */
-/** Lado do sprite do inicial, em pixels: ele é o assunto da tela. */
-const LADO_INICIAL = 64
+/** Lado do sprite do inicial, em pixels: ele é o assunto da tela, e 64 px o deixavam do tamanho
+ * de um ícone de lista. Múltiplo inteiro de 32 para o pixel não borrar. */
+const LADO_INICIAL = 96
 
 export function mountStarter(root: HTMLElement, ctx: AppContext): () => void {
   const error = el('p', { class: 'form-error', role: 'alert' })

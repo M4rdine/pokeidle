@@ -26,7 +26,7 @@ button, [role="button"], label:has(> input[type="checkbox"]) { min-height: var(-
  * aparecendo só na margem. A tela do jogo é o caso oposto e fica de fora: lá cada painel tem a
  * sua moldura, e a penumbra entre eles é o que os separa.
  */
-.screen:not(.game-grid) {
+.screen:not(.game-grid):not(.screen-auth):not(.screen-starter) {
   --moldura: url('./ui/painel.png');
   border-style: solid; border-width: 12px;
   border-image-source: var(--moldura); border-image-slice: 6 fill; border-image-repeat: repeat;
@@ -36,8 +36,37 @@ button, [role="button"], label:has(> input[type="checkbox"]) { min-height: var(-
   max-width: 1280px;
   width: calc(100% - var(--space-4));
 }
-/* Só as telas de formulário são estreitas: a do jogo ocupa a janela inteira (grade em hud.css). */
-.screen-auth { max-width: 420px; margin: var(--space-5) auto; }
+/*
+ * A ENTRADA. É a primeira tela que alguém vê do jogo, e ela tem que dizer "jogo" antes de pedir
+ * um e-mail. O palco ocupa a janela e traz o mapa de Kanto ao fundo, escurecido — é a nossa
+ * própria arte, já baixada e em cache, e custa 74 KB que o jogo ia carregar de qualquer jeito.
+ *
+ * Antes daqui o `main` era o próprio cartão e herdava a largura da folha: a tela de login abria
+ * com 1280 px de moldura e dois campos de texto do tamanho da janela.
+ */
+.screen-auth {
+  /* `100vh` e não `100%`: o `#app` não recebe altura, então `100%` resolvia pela altura do
+   * cartão e o mundo ao fundo parava no meio da janela, com uma faixa escura embaixo. */
+  min-height: 100vh;
+  display: grid; place-items: center;
+  padding: var(--space-4);
+  gap: 0;
+  background-image:
+    linear-gradient(rgb(21 17 14 / 86%), rgb(21 17 14 / 86%)),
+    url('/assets/maps/kanto.png');
+  background-size: cover;
+  background-position: center;
+  image-rendering: pixelated;
+}
+.auth-cartao {
+  width: min(400px, 100%);
+  padding: var(--space-4);
+  display: flex; flex-direction: column; gap: var(--space-3);
+}
+.auth-cartao h1 { font-size: var(--t-2xl); }
+.auth-lema { margin: calc(var(--space-3) * -1) 0 0; color: var(--tinta-fraca); font-size: var(--t-s); }
+.auth-form { display: flex; flex-direction: column; gap: var(--space-2); }
+.auth-form .field { margin: 0; }
 
 /*
  * Títulos na voz de HUD. O salto de tamanho entre h1 e h2 é pequeno de propósito: interface de
@@ -97,12 +126,12 @@ select option { background: var(--painel); color: var(--tinta); }
  * cima dele vira escuro, porque num mundo escuro o grifo é a única ilha clara.
  */
 .tabs { display: flex; gap: var(--space-2); }
-/* `border-image-source: none` é obrigatório aqui: com a moldura desenhada, o `fill` do recorte
- * pinta o miolo da peça POR CIMA do `background`, e o grifo simplesmente não aparecia. */
-.tab-active {
-  border-image-source: none; border-width: var(--border-w);
-  background: var(--marca); border-color: var(--marca-borda); color: var(--fora);
-}
+/*
+ * A aba ativa afunda: troca a peça da moldura pela APERTADA e acende o rótulo no marca-texto.
+ * A primeira versão pintava um retângulo amarelo chapado — e um bloco sem moldura ao lado de
+ * botões emoldurados lê como elemento de outro sistema, não como o mesmo botão selecionado.
+ */
+.tab-active { --moldura: url('./ui/botao-apertado.png'); color: var(--marca); }
 
 .form-error { color: var(--perigo); min-height: 1.2em; margin: var(--space-2) 0 0; font-weight: 700; }
 
@@ -133,8 +162,43 @@ select option { background: var(--painel); color: var(--tinta); }
 .sprite-thumb > * { display: block; transform-origin: top left; }
 .sprite-unknown { width: 32px; height: 32px; background: var(--cava); }
 
-.starter-grid, .hunt-grid { display: flex; flex-wrap: wrap; gap: var(--space-3); }
-.starter-card, .hunt-card { padding: var(--space-3); min-width: 180px; display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; }
+/*
+ * A ESCOLHA DO INICIAL. É o segundo lugar onde alguém chega, e é o momento em que a pessoa
+ * escolhe o primeiro Pokémon — tem que ser um momento, não uma lista. Mesmo palco da entrada:
+ * o mundo ao fundo, o conteúdo centralizado, e o sprite grande, porque ele é o assunto.
+ *
+ * Antes daqui os três cartões ficavam espremidos no canto esquerdo de um painel de 1280 px,
+ * com dois terços da tela vazios ao lado.
+ */
+.screen-starter {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background-image:
+    linear-gradient(rgb(21 17 14 / 86%), rgb(21 17 14 / 86%)),
+    url('/assets/maps/kanto.png');
+  background-size: cover;
+  background-position: center;
+  image-rendering: pixelated;
+}
+.screen-starter h1 { font-size: var(--t-2xl); text-align: center; }
+
+.starter-grid { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center; }
+/* Os três com a MESMA largura e o mesmo empilhamento: é a igualdade entre eles que deixa a
+ * escolha ser sobre o Pokémon, e não sobre qual cartão chama mais atenção. */
+.starter-card {
+  width: 210px; padding: var(--space-3);
+  display: flex; flex-direction: column; gap: var(--space-2); align-items: center; text-align: center;
+}
+.starter-sprite { display: grid; place-items: center; min-height: 104px; }
+.starter-card h2 { font-size: var(--t-l); }
+.starter-card .level { color: var(--tinta-fraca); font-size: var(--t-s); margin: 0; }
+.starter-card .types { margin: 0; }
+.starter-card button { width: 100%; }
+
+.hunt-grid { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.hunt-card { padding: var(--space-3); min-width: 180px; display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; }
 .hunt-locked { opacity: 0.6; }
 /* O portão é informação, não decoração: fica legível mesmo com o cartão esmaecido. */
 .hunt-gate { color: var(--ouro); font-weight: 700; }

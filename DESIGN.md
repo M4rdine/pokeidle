@@ -1,25 +1,29 @@
 ---
 name: Pokeidle
-description: Interface de MMO de Pokémon — moldura de madeira desenhada sobre penumbra, e o mundo pixelado como a única coisa saturada da tela.
+description: Interface de MMO de Pokémon — ardósia fria, o vermelho da Poké Ball, e os dezoito matizes de tipo fazendo o trabalho pesado.
 colors:
-  fora: "#15110e"
-  painel: "#2b231c"
-  painel-alto: "#3a3026"
-  cava: "#12100d"
-  madeira-luz: "#c9a173"
-  madeira: "#a97c5c"
-  madeira-escura: "#5d4438"
-  tinta: "#f2e7d6"
-  tinta-fraca: "#b0a08c"
-  marca: "#f7d979"
-  marca-borda: "#c9a227"
-  ouro: "#e8b53c"
-  ouro-cheio: "#d9a521"
-  xp: "#6ec6ef"
-  xp-cheio: "#56c4f1"
-  perigo: "#f07368"
-  ok: "#6ecb78"
-  hp: "#4fb35d"
+  fundo: "#161b2b"
+  painel: "#222a40"
+  painel-alto: "#2c3650"
+  cava: "#11151f"
+  borda: "#3a4560"
+  borda-forte: "#6b7aa3"
+  texto: "#eef1f8"
+  texto-fraco: "#9aa6c4"
+  primaria: "#e91515"
+  primaria-alta: "#ff2d2d"
+  primaria-texto: "#ffffff"
+  selecao: "#6f8ae6"
+  selecao-texto: "#11151f"
+  ouro: "#ffcb05"
+  ouro-cheio: "#ffcb05"
+  xp: "#58a6f0"
+  xp-cheio: "#58a6f0"
+  hp: "#4ade80"
+  perigo: "#ff7a7a"
+  ok: "#4ade80"
+  tipo-escuro: "#11151f"
+  tipo-claro: "#ffffff"
   type-fire: "#f08030"
   type-water: "#6890f0"
   type-grass: "#78c850"
@@ -82,70 +86,56 @@ spacing:
 components:
   button:
     backgroundColor: "{colors.painel-alto}"
-    textColor: "{colors.tinta}"
-    rounded: "{rounded.none}"
-    padding: "2px 4px"
+    textColor: "{colors.texto}"
+    rounded: "8px"
+    padding: "8px 16px"
     typography: "{typography.data}"
-  button-hover:
-    backgroundColor: "{colors.painel-alto}"
-    textColor: "{colors.marca}"
   button-primary:
-    backgroundColor: "{colors.painel-alto}"
-    textColor: "{colors.marca}"
-    rounded: "{rounded.none}"
-    padding: "2px 4px"
-  button-pressed:
-    backgroundColor: "{colors.cava}"
-    textColor: "{colors.tinta}"
+    backgroundColor: "{colors.primaria}"
+    textColor: "{colors.primaria-texto}"
+    rounded: "8px"
+    padding: "8px 16px"
   button-disabled:
     backgroundColor: "{colors.painel-alto}"
-    textColor: "{colors.tinta-fraca}"
-  button-nav:
-    backgroundColor: "transparent"
-    textColor: "{colors.tinta-fraca}"
-    rounded: "{rounded.none}"
-    padding: "4px 8px"
+    textColor: "{colors.texto-fraco}"
   input:
     backgroundColor: "{colors.cava}"
-    textColor: "{colors.tinta}"
-    rounded: "{rounded.none}"
-    padding: "2px 4px"
+    textColor: "{colors.texto}"
+    rounded: "8px"
+    padding: "8px 16px"
     width: "100%"
   panel:
     backgroundColor: "{colors.painel}"
-    textColor: "{colors.tinta}"
-    rounded: "{rounded.none}"
+    textColor: "{colors.texto}"
+    rounded: "8px"
   panel-sunken:
     backgroundColor: "{colors.cava}"
-    textColor: "{colors.tinta}"
-    rounded: "{rounded.none}"
+    textColor: "{colors.texto}"
+    rounded: "8px"
   panel-floating:
     backgroundColor: "{colors.painel}"
-    textColor: "{colors.tinta}"
-    rounded: "{rounded.none}"
-  meter-track:
-    backgroundColor: "{colors.cava}"
-    rounded: "{rounded.none}"
+    textColor: "{colors.texto}"
+    rounded: "8px"
   chip:
     backgroundColor: "{colors.cava}"
-    textColor: "{colors.tinta}"
-    rounded: "{rounded.none}"
-    padding: "1px 4px"
+    textColor: "{colors.texto}"
+    rounded: "999px"
+    padding: "1px 8px"
     typography: "{typography.label}"
   row-selected:
-    backgroundColor: "{colors.marca}"
-    textColor: "{colors.fora}"
-    rounded: "{rounded.none}"
+    backgroundColor: "{colors.selecao}"
+    textColor: "{colors.selecao-texto}"
+    rounded: "8px"
   type-badge:
-    backgroundColor: "{colors.painel-alto}"
-    textColor: "{colors.tinta}"
-    rounded: "{rounded.none}"
-    padding: "0 4px"
+    backgroundColor: "{colors.type-fire}"
+    textColor: "{colors.tipo-escuro}"
+    rounded: "999px"
+    padding: "1px 8px"
     typography: "{typography.label}"
   toast:
     backgroundColor: "{colors.painel}"
-    textColor: "{colors.tinta}"
-    rounded: "{rounded.none}"
+    textColor: "{colors.texto}"
+    rounded: "8px"
     padding: "8px 16px"
     width: "360px"
 ---
@@ -154,116 +144,94 @@ components:
 
 ## Overview
 
-**Creative North Star: "Madeira sobre penumbra"**
+**Creative North Star: "Os selos de tipo"**
 
-A interface é o HUD de um MMO de Pokémon: moldura de madeira, painéis escuros, e o mundo pixelado
-como a única coisa saturada da tela. O chrome **emoldura** o jogo em vez de competir com ele.
+O design system do Pokémon já existe e está nos **selos de tipo**: pílulas saturadas, de canto
+redondo, com o rótulo em alto contraste sobre cor cheia. A casca existe para HOSPEDAR isso, não
+para competir com isso.
 
-### A moldura é arte, não CSS
+### O que veio antes, e por que caiu
 
-Esta é a decisão central, e as três versões anteriores caíram por não tê-la. A primeira foi
-desenhada como terminal de campo e lia como dashboard. A segunda trocou o terminal por moldura
-com bisel — duas `box-shadow` internas — e a terceira trocou a cor por papel e couro. Todas as
-três continuaram desenhando moldura com CSS, e o veredito do usuário foi o mesmo nas três:
-**parece página web, não jogo**.
+Quatro versões. As três primeiras erraram na mesma direção e a terceira errou feio:
 
-O veredito estava certo, e o teto é estrutural. `box-shadow` não tem canto desenhado, não tem
-textura e não tem estado apertado. Dá para acertar contraste, hierarquia e espaçamento em cima
-dela e ainda entregar um site tematizado.
+1. **Terminal de campo** — escuro e chapado. Lia como dashboard.
+2. **Moldura com bisel** — resolveu a gramática, manteve azul-noite com bronze: o padrão de
+   fábrica de todo idle de navegador.
+3. **Caderneta de campo** — papel e couro. Claro e quente, e não tinha nada a ver com Pokémon.
+4. **Madeira sobre penumbra** — moldura 9-slice de 12 px, arte de verdade. Caiu por dois motivos,
+   e o segundo é o que importa: **borda grossa demais** (doze pixels por objeto pesam a tela e
+   comem o espaço do conteúdo) e, principalmente, **era um mundo de RPG de fantasia**. Marrom
+   sobre marrom é Zelda, é Stardew. Pokémon é vermelho e branco, azul, saturado e limpo.
 
-Agora cada superfície usa `border-image` sobre uma peça de 32×32 do **UI Pack Pixel Adventure do
-Kenney** (CC0), repintada na paleta do nosso atlas por `pnpm ui`
-(`tools/assets/scripts/ui-moldura.ts`). Painel, botão, fenda e botão apertado saem do **mesmo**
-tile de origem, com a moldura idêntica e só o miolo mudando de profundidade — arte nova não é
-preciso, e a família fica óbvia na tela.
+O padrão do erro foi sempre o mesmo: escolher um idioma visual pela sua coerência interna, em vez
+de pelo que o produto é.
 
-O recorte: a peça tem 32 px e a madeira ocupa 6 px de cada lado. `border-image-slice: 6 fill`
-corta os nove pedaços, `border-width` é sempre um **múltiplo inteiro** de 6 (12 px em painel e
-botão, 6 px em linha de lista), e `border-image-repeat: repeat` faz as laterais ladrilharem em
-vez de esticarem. É o que mantém o pixel quadrado em qualquer tamanho de painel.
+### O que este mundo é
 
-### A cor não foi inventada
-
-A madeira da moldura é a **terra batida da trilha** do nosso próprio mapa, medida no PNG do atlas
-por `pnpm cores` (`tools/assets/scripts/cores-do-mundo.ts`):
-
-| material do mundo | medido | vira |
-|---|---|---|
-| terra batida da trilha | `#a97c5c` | `{colors.madeira}`, a moldura |
-| rocha de caverna | `#614846` | `{colors.madeira-escura}` |
-| campo | `#3a8f45` | `{colors.hp}` |
-| água | `#57c4f1` | `{colors.xp-cheio}` |
-
-Quem olha a tela e o mapa vê o mesmo mundo porque **é** o mesmo mundo. Quando o tileset mudar,
-`pnpm cores` remede, `pnpm ui` repinta, e a casca acompanha; sem isso, a próxima geração de
-terreno faria a interface e o mapa deixarem de combinar em silêncio.
+- **Ardósia fria** de fundo. Fria de propósito: o mundo do jogo é verde e terra, e complementar
+  faz o jogo saltar da tela. O marrom competia com ele.
+- **Vermelho da Poké Ball** como única cor de marca, e só na ação primária.
+- **Os dezoito matizes de tipo** carregando o resto — eles são a identidade, não decoração.
+- **Um fio de 1 px e uma sombra.** Sem moldura, sem bisel, sem textura.
+- **Canto arredondado.** A regra anterior ("o mundo é de canto reto") veio da madeira; os selos
+  oficiais são pílulas.
 
 **Key Characteristics:**
-- Moldura desenhada em `border-image`, nunca em `box-shadow`; largura sempre múltipla de 6 px
-- Penumbra em quatro planos, madeira na moldura; o mundo é a coisa saturada da tela
-- Nenhuma "cor de acento": a ênfase é o grifo, e a cor fica livre para significar
-- Um marca-texto, com um trabalho só no sistema inteiro: qual linha é a de agora
+- Superfície é retângulo de canto macio com 1 px de borda; profundidade em dois degraus de sombra
+- Nenhuma cor decorativa: marca é a ação primária, seleção é a linha de agora, o resto é dado
+- Ícone de assunto é SPRITE OFICIAL do acervo da PokeAPI, nunca desenho nosso
 - Duas faces auto-hospedadas — bitmap para nome e título, Atkinson para todo o resto
-- Dezoito matizes canônicos de tipo, como identidade, nunca como texto sozinho
 - Movimento quase ausente: 120 ms no medidor, 200 ms no que troca de estado, e nada mais
 
 ## Colors
 
-Dezoito papéis, contra dezoito matizes canônicos de tipo que entram só onde identificam uma
-espécie. Todo par que a interface pinta é medido em
-`packages/client/test/styles/contraste.test.ts` — a paleta não passa por aprovação de olho.
+Vinte papéis, contra dezoito matizes de tipo. Todo par que a interface pinta é medido em
+`packages/client/test/styles/contraste.test.ts` — a paleta não passa por aprovação de olho, e o
+teste já pegou cinco cores escolhidas a olho nesta rodada.
 
 ### Primary
-Não existe cor primária de marca, e a ausência é a decisão. A ação primária é a mesma moldura de
-madeira com o rótulo em `{colors.marca}`. Uma cor de acento a mais aqui seria uma cor a menos
-disponível para dizer o que é moeda, o que é vida e o que é perigo.
+**Vermelho da Poké Ball** (`{colors.primaria}`, texto `{colors.primaria-texto}`). É a única cor de
+marca do sistema e aparece só na ação primária. Tudo que não for "o botão que faz a coisa
+acontecer" usa posição e peso, não matiz.
 
 ### Secondary
-- **Marca-texto** (`{colors.marca}`, borda `{colors.marca-borda}`): o amarelo elétrico que o projeto
-  usava como acento sobrevive no único trabalho que comporta — grifo. Marca **a linha de agora** e
-  nada mais: o slot do Pokémon em campo, a aba atual, a linha aberta na ficha.
-- **Ouro** (`{colors.ouro}` em texto, `{colors.ouro-cheio}` em preenchimento): moeda, recompensa,
-  portão de nível, marco no log, recarga de golpe.
-- **Verde Saudável** (`{colors.ok}`): confirmado — conexão aberta, confronto vantajoso.
-- **Vermelho de Alerta** (`{colors.perigo}`): erro, alerta, conexão caída, HP crítico. Nunca decorativo.
-- **Vida e experiência** (`{colors.hp}`, `{colors.xp}` em texto, `{colors.xp-cheio}` em barra).
+- **Seleção** (`{colors.selecao}`, texto `{colors.selecao-texto}`): a linha de agora — slot do
+  Pokémon em campo, aba atual, linha aberta na ficha, marcador escolhido no mapa. **Um trabalho
+  só.** É um preenchimento CLARO com tinta escura, e não o contrário: escuro sobre escuro não se
+  vê contra o painel, e claro com texto branco não alcança 4,5:1.
+- **Ouro** (`{colors.ouro}`): moeda, recompensa, portão de nível, marco no log.
+- **Verde e vermelho de estado** (`{colors.ok}`, `{colors.perigo}`): confirmado e alerta.
+- **Vida e experiência** (`{colors.hp}`, `{colors.xp}`).
 
 ### Tertiary
-**As dezoito cores de tipo** (`{colors.type-normal}` … `{colors.type-fairy}`): os matizes canônicos
-da série. Identificam espécie e filtro; entram em borda e em fundo por `color-mix`, e chegam ao
-texto só depois de misturados com a tinta do tema. Não existe fonte canônica publicada para eles —
-a Pokémon Company nunca divulgou hex, e a PokéAPI não traz cor de tipo.
+**Os dezoito matizes de tipo** (`{colors.type-normal}` … `{colors.type-fairy}`), como **pílula
+saturada com rótulo em alto contraste**, que é como o jogo oficial os desenha.
+
+A tinta do rótulo é **escura por padrão**: medindo os dezoito contra branco, só CINCO passam em
+4,5:1 — `dark`, `dragon`, `fighting`, `ghost` e `poison`. O palpite inicial tinha a lista quase
+invertida, e nada na tela denunciava: o selo continuava bonito e o rótulo dentro dele, ilegível.
+O teste percorre os dezoito.
 
 ### Neutral
-- **Fora** (`{colors.fora}`): fora de tudo, e a tarja em volta do mundo. É o valor que
-  `scene/app.ts` lê do token para pintar o fundo do renderizador, para os dois não divergirem.
-- **Painel** (`{colors.painel}`): o miolo do painel. `{colors.painel-alto}` é o do botão levantado,
-  `{colors.cava}` o da fenda. Os três batem com os miolos pintados nos PNGs das molduras; se um
-  mudar, o outro muda junto.
-- **Madeira** (`{colors.madeira}`, luz `{colors.madeira-luz}`, escura `{colors.madeira-escura}`): as
-  três cores da moldura, o fio que separa listas, e o anel de foco.
-- **Tinta** (`{colors.tinta}`) e **tinta fraca** (`{colors.tinta-fraca}`): texto corrente e rótulo.
-  A secundária é puxada do próprio marrom da madeira, nunca cinza.
+- **Fundo** (`{colors.fundo}`): fora de tudo, e a tarja em volta do mundo. É o valor que
+  `scene/app.ts` lê do token para pintar o fundo do renderizador.
+- **Painel** (`{colors.painel}`), **um degrau à frente** (`{colors.painel-alto}`) e **fenda**
+  (`{colors.cava}`), que é onde se lê.
+- **Traço**: `{colors.borda}` só SEPARA e pode ser discreta; `{colors.borda-forte}` delimita
+  CONTROLE e precisa dos 3:1 que a WCAG 1.4.11 exige de quem identifica um botão.
+- **Texto** (`{colors.texto}`) e **rótulo** (`{colors.texto-fraco}`).
 
 ### Named Rules
 
-**A Regra da Cor Que Significa.** Cor não decora. Se um elemento precisa de destaque e não é moeda,
-perigo, vida, experiência ou a linha de agora, ele precisa de **posição ou peso**, não de matiz.
+**A Regra da Cor Que Significa.** Cor não decora. Se um elemento precisa de destaque e não é
+marca, seleção, moeda, estado, vida ou experiência, ele precisa de posição ou peso.
 
-**A Regra do Material Duplo.** Um material que aparece em texto e em preenchimento tem **dois**
-tokens, porque os dois papéis pedem contrastes opostos: o valor em texto vive sobre o painel; o
-preenchimento vive dentro da fenda, mais escura ainda. Um token só reprovaria num dos dois.
+**A Regra do Par Declarado.** Todo preenchimento colorido tem a sua tinta declarada junto
+(`primaria`/`primaria-texto`, `selecao`/`selecao-texto`, matiz de tipo/`tipo-escuro`), e o par
+está no teste. A troca de mundo claro para escuro quebrou isso em sete lugares de uma vez.
 
-**A Regra do Grifo Invertido.** Num mundo escuro o grifo é a **única** ilha clara, então quem
-escreve em cima dele escreve com `{colors.fora}`. Foi exatamente isto que a troca do mundo claro
-para o escuro quebrou em sete lugares de uma vez.
-
-**A Regra do Tipo na Borda.** A cor de tipo identifica; ela não lê. Os dezoito matizes foram
-desenhados como preenchimento sobre fundo claro, então sobre a penumbra entram clareados, em fundo
-tingido e borda.
-
-**A Regra da Cor Nunca Sozinha.** Nenhum estado é comunicado só por cor. HP ferido muda de cor **e**
-de comprimento; o confronto diz "arrasa" por escrito; a recarga pronta fica verde **e** cheia.
+**A Regra da Cor Nunca Sozinha.** Nenhum estado é comunicado só por cor. HP ferido muda de cor
+**e** de comprimento; o confronto diz "arrasa" por escrito.
 
 ## Typography
 
@@ -315,20 +283,23 @@ do mesmo jeito.
 
 ## Depth
 
-Dois registros, e cada um diz uma coisa diferente.
+**Um fio e uma sombra.** Superfície é um retângulo de canto macio com 1 px de borda e, quando
+precisa se destacar, uma sombra com deslocamento e desfoque. A profundidade tem dois degraus, e
+cada um diz uma coisa:
 
-**A moldura desenhada** diz *"isto é um objeto"*: painel, botão, campo, fenda. Ela vem do PNG, e o
-estado apertado é **outra peça**, trocada no `:active` — não uma simulação com sombra.
+| degrau | diz | onde |
+|---|---|---|
+| `--sombra-1` | está apoiado na superfície | painel, botão |
+| `--sombra-2` | está POR CIMA de tudo | modal, toast |
 
-**A sombra projetada** — com deslocamento e desfoque de verdade — diz *"isto está por cima de
-tudo"*. Vale para modal e toast, e para mais nada.
+**Nem um nem outro**: chip, selo de tipo, célula de lista, linha de tabela. Eles recebem no
+máximo um fio de 1 px em `{colors.borda}` ou um tingimento de fundo, porque não são objetos
+separados.
 
-**Nem um nem outro**: chip, selo de tipo, célula de lista, linha de tabela. Eles recebem no máximo
-um fio de 1px em `{colors.madeira}` ou um tingimento de fundo, porque não são objetos separados.
-
-A luz separa função sem gastar cor: **o que age se levanta, o que se lê afunda**. A fenda
-(`{colors.cava}`) é onde se lê, e o miolo quase preto dela é o que deixa a barra de vida e a de
-experiência atingirem contraste.
+O que existia antes aqui era uma moldura 9-slice de 12 px desenhada em PNG, com a peça trocada no
+`:active`. Era arte de verdade e ainda assim estava errada: doze pixels de moldura por objeto
+pesam a tela, comem o espaço do conteúdo, e o material era o de outro gênero. O botão apertado
+agora é uma linha de CSS — afunda, perde a sombra e escurece — em vez de um segundo arquivo.
 
 ## Layout
 
@@ -336,8 +307,8 @@ Três larguras, uma por modo de uso.
 
 **Formulário** (`.screen-auth`): 420 px, centrado — registro e login não têm nada a comparar.
 
-**Folha** (qualquer `.screen` que não seja a do jogo): até 1280 px, centrada, com a moldura de
-painel em volta do conteúdo e a penumbra aparecendo só na margem.
+**Folha** (qualquer `.screen` que não seja a do jogo): até 1280 px, centrada, sobre uma
+superfície de painel, com o fundo da página aparecendo só na margem.
 
 **Janela inteira** (`.game-grid`): a tela do jogo não rola. Ocupa `100vh` numa grade de
 `300px 1fr 260px` por `auto 1fr clamp(76px, 12vh, 140px)`, com áreas nomeadas
@@ -379,8 +350,8 @@ quando a curva importa. Não existe entrada animada de seção, nem sequência d
   medidor). O teste tem âncora própria: preto sobre branco tem que dar 21:1, senão a régua está
   quebrada e todos os pares "passariam".
 - **Alvo de 24 px** (WCAG 2.2 SC 2.5.8) em todo botão, `[role=button]` e rótulo de caixa de marcar.
-- **Foco visível** em anel de 2 px de `{colors.madeira-luz}` com 2 px de folga, global, só no foco
-  por teclado.
+- **Foco visível** em dois traços: fio claro de `{colors.texto}` com 2 px de folga, que garante
+  contraste sobre qualquer superfície, mais um halo índigo que diz de qual sistema ele é.
 - **As superfícies do navegador são tematizadas**: seleção de texto, cursor, barra de rolagem,
   `accent-color` e deslocamento de sublinhado.
 - **Cor nunca sozinha** (ver *Named Rules* em Colors).
@@ -407,33 +378,30 @@ parar de caçar. O modal abre por cima, o jogo continua rodando atrás, e trocar
 
 ## Ícones
 
-Existem, e são **elementos**, nunca `background` de quem os contém. A moldura usa `border-image`
-com `fill`, e o `fill` pinta o miolo da peça por cima de qualquer `background` — um ícone posto
-como fundo de botão simplesmente não aparece. A mesma armadilha derruba o grifo da aba ativa, que
-por isso declara `border-image-source: none`.
+Sempre um **elemento**, nunca o `background` de quem o contém: assim ele pode receber estado
+próprio, e a regra sobreviveu a três trocas de mundo visual.
 
-O conjunto tem duas origens, e a divisão não é arbitrária.
+**Assunto** — mapa, time, mochila, Pokédex, loja, configurações: **sprite oficial** do acervo da
+PokeAPI. Nada de símbolo desenhado por nós quando existe o do próprio jogo: a fidelidade sai de
+graça e nenhum desenho nosso chega perto.
 
-**Controle** (mais, menos, parar, cadeado, fechar): peças do pack do VerzatileDev (CC0),
-repintadas por `pnpm icones`. A repintura é por **luminância**, e não por troca exata de cor como
-nas molduras: a folha de origem é sombreada, um ícone usa oito tons de azul, e uma tabela de-para
-quebraria no primeiro que tivesse um tom a mais.
+Duas rodadas foram gastas antes de chegar aqui, e as duas ensinaram:
 
-**Assunto** (mapa, time, mochila, pokedex, loja, configurações): **desenhados à mão**, pixel a
-pixel, em `ui-icones-menu.ts`, como grades de 16×16 em texto.
+1. **Gerador não faz símbolo.** Três estilos do Retro Diffusion — `tile_object`, `mc_item` e
+   `1_bit` — falharam pelo mesmo motivo: um gerador produz ILUSTRAÇÃO, e um ícone é SÍMBOLO. O
+   `1_bit` desenhou um livro limpo a 64 px cujo contorno some inteiro ao reduzir para 16.
+   Custou US$ 0,23 descobrir.
+2. **Desenhar à mão dá só "aceitável".** Os seis foram desenhados pixel a pixel e três reprovaram
+   na folha de contato: a moeda lia-se roda, a engrenagem lia-se olho, o livro lia-se duas barras.
+   Ficaram passáveis — e a arte oficial, que já existia, é incomparavelmente melhor.
 
-### Por que os de assunto são desenhados
+**Controle** — mais, menos, parar, cadeado, fechar: não existem como item do jogo, então vêm do
+pack do VerzatileDev (CC0) e são repintados na nossa paleta por **luminância**. A folha é
+sombreada, um ícone usa oito tons de azul, e uma tabela de-para quebraria no primeiro com um tom
+a mais.
 
-Foram tentados três estilos do Retro Diffusion — `tile_object`, `mc_item` e `1_bit` — e os três
-falharam pelo mesmo motivo, que não é o prompt. **Um gerador produz ilustração; um ícone é
-símbolo.** O `tile_object` encheu o quadro de textura de pergaminho; o `mc_item` devolveu papel
-amassado bonito e ilegível; o `1_bit` desenhou um livro limpo a 64 px cujo contorno some inteiro
-ao ser reduzido a 16. Símbolo de 16 px precisa de cada pixel decidido, e essa decisão não é
-delegável. Custou US$ 0,23 descobrir isso; desenhar custa zero e sai coerente de verdade, porque
-os seis dividem peso de traço, caixa e paleta — o que nenhum sorteio garante.
-
-Nenhum pack de ícone de assunto foi encontrado com licença livre: o do VerzatileDev, que a
-pesquisa apontou, é inteiramente de controle.
+`configuracoes` é o único de assunto sem correspondente honesto: não há engrenagem no acervo,
+porque engrenagem é convenção de interface e não item de Pokémon. `machine-part` é o mais próximo.
 
 ### Regras
 
@@ -441,40 +409,41 @@ pesquisa apontou, é inteiramente de controle.
 do menu é onde o jogador procura por nome. A exceção é o par de zoom do mapa, onde `+` e `−` são
 universais e o espaço é do mapa.
 
-**Nada de emoji e nada de glifo Unicode** fazendo as vezes de ícone. O primeiro glifo seria o
-primeiro ícone de uma biblioteca herdada de uma família qualquer, com peso e tamanho que não são
-os do resto do mundo.
+**Nada de emoji e nada de glifo Unicode** fazendo as vezes de ícone.
 
-**Ao desenhar um novo:** amplie a 8× e olhe a 2× antes de aceitar. Três dos seis passaram na
-primeira versão e reprovaram na folha de contato — a moeda lia-se roda, a engrenagem lia-se olho,
-e o livro lia-se duas barras.
+## O que falta
 
-## Créditos de arte## Créditos de arte
+**Arte-chave da tela de entrada.** O fundo da tela de login e da escolha do inicial é sólido, e
+isso é uma pendência declarada, não uma escolha. A versão anterior esticava ali o PNG do mapa da
+região, o que é preguiça: mapa reduzido não é arte-chave. O lugar espera uma ilustração de verdade.
 
-- Moldura: **UI Pack Pixel Adventure**, de [Kenney](https://kenney.nl/assets/ui-pack-pixel-adventure)
-  — CC0 1.0. A peça de origem está em `tools/assets/ui/kenney/` com a licença; o repintado é nosso.
-- Ícones: **Pixel UI Icons**, de [VerzatileDev](https://verzatiledev.itch.io/pixel-ui-icons) —
-  CC0 1.0. A folha de origem está em `tools/assets/ui/verzatile/` com a licença transcrita: o
-  `.zip` distribuído não traz arquivo de licença nenhum, e num repositório aberto que redistribui
-  a arte ela precisa viajar junto.
-- Fontes: **Pixelify Sans** (OFL, The Pixelify Sans Project Authors) e **Atkinson Hyperlegible**
-  (OFL, Braille Institute of America). Ver `packages/client/src/styles/fontes/LEIAME.md`.
+## Créditos de arte
+
+- Ícones de assunto: acervo de sprites da [PokeAPI](https://github.com/PokeAPI/sprites). O
+  repositório é CC0 e a arte é copyright da The Pokémon Company — os dois enunciados convivem, e
+  o que isso significa para nós está escrito em `tools/assets/ui/pokeapi/LICENSE.md`.
+- Ícones de controle: **Pixel UI Icons**, de [VerzatileDev](https://verzatiledev.itch.io/pixel-ui-icons)
+  — CC0 1.0. A folha está em `tools/assets/ui/verzatile/` com a licença transcrita: o `.zip`
+  distribuído não traz arquivo de licença nenhum, e num repositório aberto que redistribui a arte
+  ela precisa viajar junto.
+- Fontes: **Pixelify Sans** (OFL) e **Atkinson Hyperlegible** (OFL). Ver
+  `packages/client/src/styles/fontes/LEIAME.md`.
 
 ## Do's and Don'ts
 
 **Do**
-- Desenhe moldura nova repintando uma peça do pack; `pnpm ui` é o caminho.
-- Use largura de moldura múltipla de 6 px, senão o pixel deixa de ser quadrado.
-- Tire cor nova do atlas, com `pnpm cores`, antes de inventar uma.
-- Dê ao número a face de leitura, sempre, em qualquer tamanho.
-- Ponha o par novo de cores no teste de contraste junto com a regra que o usa.
+- Deixe os selos de tipo carregarem a cor. Eles são a identidade da franquia.
+- Use sprite oficial para ícone de assunto; desenhar só quando o jogo não tiver o objeto.
+- Declare a tinta junto do preenchimento, e ponha o par no teste de contraste.
+- Meça o contraste antes de aceitar uma cor. Nesta rodada o teste pegou cinco escolhidas a olho.
 
 **Don't**
-- Não desenhe moldura com `box-shadow`. É o erro que derrubou três versões seguidas.
-- Não invente um acento. Se precisa de destaque, use posição, peso ou o grifo.
-- Não use o grifo em mais de um papel por tela, nem escreva claro em cima dele.
+- Não engrosse a borda. Um fio de 1 px e uma sombra bastam; 12 px de moldura pesam a tela e
+  comem o espaço do conteúdo.
+- Não escolha um idioma visual pela coerência interna dele. Madeira sobre penumbra era coerente
+  e era de outro jogo — foi o erro que derrubou a versão anterior.
+- Não invente uma segunda cor de marca. Se precisa de destaque, use posição ou peso.
+- Não use o preenchimento de seleção em mais de um lugar por tela.
 - Não ponha a face de HUD abaixo de 18 px nem em cima de um dígito.
-- Não use emoji ou glifo Unicode como ícone: o sistema não tem biblioteca de ícones, e o primeiro
-  glifo seria o primeiro ícone dela.
-- Não arredonde canto: o mundo é de canto reto.
+- Não use emoji ou glifo Unicode como ícone.
 - Não escreva cor literal em folha de estilo. Se falta um valor, falta um token.

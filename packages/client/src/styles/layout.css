@@ -15,34 +15,34 @@
  * dedo — vale para o filtro de tipo, o fechar do modal e o rótulo do log. */
 button, [role="button"], label:has(> input[type="checkbox"]) { min-height: var(--alvo); }
 
-/* `.panel` é o `.quadro` de `quadro.css`, que já o inclui na regra de moldura; existe para não
- * reescrever toda tela de uma vez. */
-.muted { color: var(--tinta-fraca); }
+/* `.panel` é o `.quadro` de `quadro.css`, que já o inclui na regra de superfície; existe para
+ * não reescrever toda tela de uma vez. */
+.muted { color: var(--texto-fraco); }
 
 .screen { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
 
 /*
- * Toda tela que não é a do jogo ganha a moldura de painel em volta do conteúdo, com a penumbra
- * aparecendo só na margem. A tela do jogo é o caso oposto e fica de fora: lá cada painel tem a
- * sua moldura, e a penumbra entre eles é o que os separa.
+ * Toda tela que não é a do jogo é uma superfície de painel com o conteúdo dentro, e o fundo da
+ * página aparecendo só na margem. A tela do jogo é o caso oposto: lá cada painel é uma
+ * superfície, e o fundo entre eles é o que os separa.
  */
 .screen:not(.game-grid):not(.screen-auth):not(.screen-starter) {
-  --moldura: url('./ui/painel.png');
-  border-style: solid; border-width: 12px;
-  border-image-source: var(--moldura); border-image-slice: 6 fill; border-image-repeat: repeat;
-  image-rendering: pixelated; background: none;
+  background: var(--painel);
+  border: var(--border-w) solid var(--borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-1);
   margin: var(--space-3) auto;
   /* Largura máxima mesmo numa tela larga: ficha de comparação com 2000 px perde a coluna de vista. */
   max-width: 1280px;
   width: calc(100% - var(--space-4));
 }
 /*
- * A ENTRADA. É a primeira tela que alguém vê do jogo, e ela tem que dizer "jogo" antes de pedir
- * um e-mail. O palco ocupa a janela e traz o mapa de Kanto ao fundo, escurecido — é a nossa
- * própria arte, já baixada e em cache, e custa 74 KB que o jogo ia carregar de qualquer jeito.
+ * A ENTRADA. É a primeira tela que alguém vê do jogo. O palco ocupa a janela e o cartão fica
+ * no meio dela.
  *
- * Antes daqui o `main` era o próprio cartão e herdava a largura da folha: a tela de login abria
- * com 1280 px de moldura e dois campos de texto do tamanho da janela.
+ * O fundo é SÓLIDO por enquanto, e isso é uma pendência declarada, não uma escolha: a versão
+ * anterior esticava o PNG do mapa da região aqui, o que é preguiça — mapa reduzido não é
+ * arte-chave. O lugar espera uma ilustração de verdade.
  */
 .screen-auth {
   /* `100vh` e não `100%`: o `#app` não recebe altura, então `100%` resolvia pela altura do
@@ -51,12 +51,7 @@ button, [role="button"], label:has(> input[type="checkbox"]) { min-height: var(-
   display: grid; place-items: center;
   padding: var(--space-4);
   gap: 0;
-  background-image:
-    linear-gradient(rgb(21 17 14 / 86%), rgb(21 17 14 / 86%)),
-    url('/assets/maps/kanto.png');
-  background-size: cover;
-  background-position: center;
-  image-rendering: pixelated;
+  background: var(--fundo);
 }
 .auth-cartao {
   width: min(400px, 100%);
@@ -64,7 +59,7 @@ button, [role="button"], label:has(> input[type="checkbox"]) { min-height: var(-
   display: flex; flex-direction: column; gap: var(--space-3);
 }
 .auth-cartao h1 { font-size: var(--t-2xl); }
-.auth-lema { margin: calc(var(--space-3) * -1) 0 0; color: var(--tinta-fraca); font-size: var(--t-s); }
+.auth-lema { margin: calc(var(--space-3) * -1) 0 0; color: var(--texto-fraco); font-size: var(--t-s); }
 .auth-form { display: flex; flex-direction: column; gap: var(--space-2); }
 .auth-form .field { margin: 0; }
 
@@ -77,47 +72,58 @@ h1 { font-size: var(--t-xl); }
 h2 { font-size: var(--t-l); }
 
 /*
- * Botão: a mesma madeira dos painéis, um degrau mais claro no miolo, e a peça APERTADA trocada
- * no `:active`. O gênero inteiro comunica clique assim; trocar a arte é mais honesto que simular
- * o afundamento com sombra, e é exatamente o que uma moldura desenhada dá de graça.
+ * Botão: superfície de um degrau, fio de 1 px, canto macio. Nada de moldura de 12 px — ela
+ * comia o espaço do rótulo e pesava a fileira inteira.
  */
 button {
   font-size: var(--t-s); font-weight: 700;
-  color: var(--tinta); cursor: pointer;
-  --moldura: url('./ui/botao.png');
-  /* `--moldura-w` em vez de um número fixo: a peça tem 6 px de madeira, então só múltiplos
-   * inteiros dela mantêm o pixel quadrado. 12 px é a moldura de painel e de botão; 6 px é a de
-   * linha de lista, onde a de 12 comeria a altura inteira da linha. */
-  border-style: solid; border-width: var(--moldura-w, 12px);
-  border-image-source: var(--moldura); border-image-slice: 6 fill; border-image-repeat: repeat;
-  image-rendering: pixelated; background: none;
-  padding: 2px var(--space-1);
-  min-width: var(--alvo);
+  color: var(--texto); cursor: pointer;
+  background: var(--painel-alto);
+  border: var(--border-w) solid var(--borda-forte);
+  border-radius: var(--raio);
+  padding: var(--space-2) var(--space-3);
+  min-height: var(--alvo);
+  box-shadow: var(--sombra-1);
+  transition: background var(--rapido) ease-out, border-color var(--rapido) ease-out;
 }
-button:hover:not([disabled]) { color: var(--marca); }
-button:active:not([disabled]) { --moldura: url('./ui/botao-apertado.png'); }
-button[disabled] { opacity: 0.5; cursor: default; }
+button:hover:not([disabled]) { background: color-mix(in srgb, var(--painel-alto) 80%, var(--texto)); }
+/* Apertado afunda: perde a sombra e escurece. É o que substitui a peça de arte trocada no
+ * `:active` da versão de madeira, e custa uma linha em vez de um PNG. */
+button:active:not([disabled]) { background: var(--cava); box-shadow: none; transform: translateY(1px); }
+button[disabled] { opacity: 0.45; cursor: default; box-shadow: none; }
 
 /*
- * Ação primária: a mesma moldura, com o rótulo em marca-texto. Não existe "cor de acento" neste
- * sistema — a ênfase vem do grifo, e a cor fica livre para dizer o que é moeda, perigo e vida.
+ * Ação primária: o vermelho da Poké Ball, cheio, com texto branco. É a ÚNICA cor de marca do
+ * sistema e aparece só aqui — o resto da cor é informação.
  */
-button.primary { color: var(--marca); }
+button.primary {
+  background: var(--primaria); color: var(--primaria-texto); border-color: var(--primaria);
+}
+button.primary:hover:not([disabled]) { background: var(--primaria-alta); border-color: var(--primaria-alta); }
 
 /*
  * Campo é fenda: é onde se escreve, não onde se aperta. O `select` entra junto — sem regra, ele
  * saía no padrão do navegador, o único elemento sem mundo na tela inteira.
  */
 input, select {
-  font: inherit; color: var(--tinta); width: 100%;
-  --moldura: url('./ui/cava.png');
-  border-style: solid; border-width: 12px;
-  border-image-source: var(--moldura); border-image-slice: 6 fill; border-image-repeat: repeat;
-  image-rendering: pixelated; background: none;
-  padding: 2px var(--space-1);
+  font: inherit; color: var(--texto); width: 100%;
+  background: var(--cava);
+  border: var(--border-w) solid var(--borda-forte);
+  border-radius: var(--raio);
+  padding: var(--space-2) var(--space-3);
 }
 select { appearance: none; cursor: pointer; }
-select option { background: var(--painel); color: var(--tinta); }
+select option { background: var(--painel); color: var(--texto); }
+.field { margin: 0; }
+
+/*
+ * Títulos na voz de HUD. O salto de tamanho entre h1 e h2 é pequeno de propósito: interface de
+ * tarefa tem muito mais elemento de texto que página de marca, e contraste exagerado vira ruído.
+ */
+h1, h2 { margin: 0; font-family: var(--fonte-hud); font-weight: 700; letter-spacing: 0.01em; }
+h1 { font-size: var(--t-xl); }
+h2 { font-size: var(--t-l); }
+
 .field { display: flex; flex-direction: column; gap: var(--space-1); margin: 0 0 var(--space-3); }
 
 /*
@@ -127,26 +133,37 @@ select option { background: var(--painel); color: var(--tinta); }
  */
 .tabs { display: flex; gap: var(--space-2); }
 /*
- * A aba ativa afunda: troca a peça da moldura pela APERTADA e acende o rótulo no marca-texto.
- * A primeira versão pintava um retângulo amarelo chapado — e um bloco sem moldura ao lado de
- * botões emoldurados lê como elemento de outro sistema, não como o mesmo botão selecionado.
+ * Aba ativa: preenchida com a cor de seleção. Ela tem um trabalho só no sistema — dizer qual é
+ * a linha de agora — e é por isso que nenhum outro elemento usa esse preenchimento.
  */
-.tab-active { --moldura: url('./ui/botao-apertado.png'); color: var(--marca); }
+.tabs { display: flex; gap: var(--space-2); }
+.tab-active {
+  background: var(--selecao); color: var(--selecao-texto); border-color: var(--selecao);
+}
+.tab-active:hover:not([disabled]) { background: var(--selecao); }
 
 .form-error { color: var(--perigo); min-height: 1.2em; margin: var(--space-2) 0 0; font-weight: 700; }
 
 /*
- * O matiz do tipo identifica; o rótulo é lido numa mistura com a tinta do tema. Os dezoito
- * matizes canônicos foram desenhados como preenchimento sobre fundo claro, então sobre a
- * penumbra eles entram clareados, em fundo tingido e borda, nunca como texto puro.
+ * Selo de tipo: PÍLULA SATURADA com texto branco, que é exatamente como o jogo oficial os
+ * desenha. Antes era um fio da cor com o rótulo esmaecido — legível, e sem nenhuma da energia
+ * que faz esses dezoito matizes serem o design system da franquia.
+ *
+ * A TINTA PADRÃO É ESCURA. Medindo os dezoito contra branco, só CINCO passam em 4,5:1 —
+ * `dark`, `dragon`, `fighting`, `ghost` e `poison`. Os outros treze são claros demais, e o
+ * palpite inicial tinha a lista quase invertida. O teste de contraste percorre os dezoito.
  */
 .type {
-  display: inline-block; padding: 0 var(--space-1); margin-right: var(--space-1);
-  border: 1px solid color-mix(in srgb, var(--t, currentColor) 70%, var(--tinta));
-  background: color-mix(in srgb, var(--t, currentColor) 28%, var(--painel-alto));
-  font-size: var(--t-xs); text-transform: lowercase;
-  color: color-mix(in srgb, var(--t, currentColor) 30%, var(--tinta));
+  display: inline-flex; align-items: center;
+  padding: 1px var(--space-2); margin-right: var(--space-1);
+  border-radius: 999px;
+  background: var(--t, var(--borda));
+  color: var(--tipo-escuro);
+  font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.02em;
+  text-transform: lowercase;
 }
+/* Os cinco matizes escuros o bastante para levar texto branco. */
+.type-dark, .type-dragon, .type-fighting, .type-ghost, .type-poison { color: var(--tipo-claro); }
 .type-fire { --t: var(--type-fire); } .type-water { --t: var(--type-water); } .type-grass { --t: var(--type-grass); }
 .type-electric { --t: var(--type-electric); } .type-poison { --t: var(--type-poison); } .type-normal { --t: var(--type-normal); }
 .type-ground { --t: var(--type-ground); } .type-flying { --t: var(--type-flying); } .type-psychic { --t: var(--type-psychic); }
@@ -165,7 +182,7 @@ select option { background: var(--painel); color: var(--tinta); }
 /*
  * A ESCOLHA DO INICIAL. É o segundo lugar onde alguém chega, e é o momento em que a pessoa
  * escolhe o primeiro Pokémon — tem que ser um momento, não uma lista. Mesmo palco da entrada:
- * o mundo ao fundo, o conteúdo centralizado, e o sprite grande, porque ele é o assunto.
+ * conteúdo centralizado e o sprite grande, porque ele é o assunto.
  *
  * Antes daqui os três cartões ficavam espremidos no canto esquerdo de um painel de 1280 px,
  * com dois terços da tela vazios ao lado.
@@ -175,12 +192,7 @@ select option { background: var(--painel); color: var(--tinta); }
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: var(--space-4);
   padding: var(--space-4);
-  background-image:
-    linear-gradient(rgb(21 17 14 / 86%), rgb(21 17 14 / 86%)),
-    url('/assets/maps/kanto.png');
-  background-size: cover;
-  background-position: center;
-  image-rendering: pixelated;
+  background: var(--fundo);
 }
 .screen-starter h1 { font-size: var(--t-2xl); text-align: center; }
 
@@ -193,7 +205,7 @@ select option { background: var(--painel); color: var(--tinta); }
 }
 .starter-sprite { display: grid; place-items: center; min-height: 104px; }
 .starter-card h2 { font-size: var(--t-l); }
-.starter-card .level { color: var(--tinta-fraca); font-size: var(--t-s); margin: 0; }
+.starter-card .level { color: var(--texto-fraco); font-size: var(--t-s); margin: 0; }
 .starter-card .types { margin: 0; }
 .starter-card button { width: 100%; }
 
@@ -217,26 +229,26 @@ select option { background: var(--painel); color: var(--tinta); }
  * profundidade e o único lugar onde ele é gasto. */
 .toasts { position: fixed; right: var(--space-3); bottom: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); z-index: 20; }
 .toast {
-  background: var(--painel-alto); border: var(--border-w) solid var(--madeira-escura);
-  box-shadow: 0 2px 0 var(--madeira), 0 8px 20px rgb(51 38 31 / 38%);
+  background: var(--painel-alto); border: var(--border-w) solid var(--borda);
+  box-shadow: 0 2px 0 var(--borda), 0 8px 20px rgb(51 38 31 / 38%);
   padding: var(--space-2) var(--space-3); max-width: 360px;
 }
 .toast-error { border-color: var(--perigo); }
-.toast-big { border-color: var(--marca-borda); background: var(--marca); color: var(--fora); font-size: var(--t-l); }
+.toast-big { border-color: var(--selecao); background: var(--selecao); color: var(--selecao-texto); font-size: var(--t-l); }
 .overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(51 38 31 / 88%); color: var(--painel-alto); text-align: center; }
 
 /* A caixa de marcar não tem ícone porque o sistema não tem nenhum: o "aceso" é um quadrado
  * cheio, e um glifo Unicode aqui seria o primeiro ícone de uma biblioteca que não existe. */
 input[type="checkbox"] {
   appearance: none; width: 14px; height: 14px; margin: 0; padding: 0;
-  background: var(--cava); border: var(--border-w) solid var(--madeira-escura); cursor: pointer;
+  background: var(--cava); border: var(--border-w) solid var(--borda); cursor: pointer;
   display: inline-grid; place-content: center; box-shadow: none;
 }
-input[type="checkbox"]:hover { border-color: var(--tinta); }
-input[type="checkbox"]:checked { background: var(--marca); border-color: var(--marca-borda); color: var(--fora); }
-input[type="checkbox"]:checked::after { content: ""; width: 6px; height: 6px; background: var(--tinta); }
+input[type="checkbox"]:hover { border-color: var(--texto); }
+input[type="checkbox"]:checked { background: var(--selecao); border-color: var(--selecao); color: var(--selecao-texto); }
+input[type="checkbox"]:checked::after { content: ""; width: 6px; height: 6px; background: var(--texto); }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--cava); }
-::-webkit-scrollbar-thumb { background: var(--madeira); border: 3px solid transparent; background-clip: content-box; }
-::-webkit-scrollbar-thumb:hover { background: var(--madeira-escura); background-clip: content-box; }
+::-webkit-scrollbar-thumb { background: var(--borda); border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--borda); background-clip: content-box; }

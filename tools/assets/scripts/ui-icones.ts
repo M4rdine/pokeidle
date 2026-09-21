@@ -1,18 +1,22 @@
 /**
- * Recorta e repinta os ícones de controle da interface, da folha do VerzatileDev (CC0).
+ * Os ícones da interface, em duas origens.
  *
- * POR QUE POR LUMINÂNCIA, e não por troca exata de cor como nas molduras: a folha de origem é
- * SOMBREADA — um ícone usa oito tons de azul, com meio-tom nas bordas. Uma tabela de-para
- * precisaria das oito entradas e quebraria no primeiro ícone com um tom a mais. Mapear o brilho
- * de cada pixel sobre a nossa rampa preserva o desenho e a sombra, e joga tudo dentro da nossa
- * paleta de uma vez.
+ * ASSUNTO — mapa, time, mochila, Pokédex, loja, configurações: **sprite oficial** do acervo da
+ * PokeAPI (`PokeAPI/sprites`, CC0). Nada de símbolo desenhado por nós quando existe o do próprio
+ * jogo: a fidelidade sai de graça e nenhum desenho nosso chega perto. Uma rodada inteira foi
+ * gasta antes disto — três estilos do Retro Diffusion falharam porque gerador produz ilustração
+ * e ícone é símbolo, e depois seis símbolos desenhados à mão ficaram só aceitáveis. A resposta
+ * era usar a arte que o jogo já tem.
  *
- * O QUE ESTE PACK NÃO RESOLVE: ícone de assunto. Não há livro, mapa, mochila, loja nem
- * engrenagem — só controle. Os seis do menu de funções são desenhados à mão, em
- * `ui-icones-menu.ts`, e o porquê está lá.
+ * CONTROLE — mais, menos, parar, cadeado, fechar: não existem como item do jogo, então vêm do
+ * pack do VerzatileDev (CC0) e são repintados na nossa paleta. A repintura é por LUMINÂNCIA: a
+ * folha é sombreada, um ícone usa oito tons de azul, e uma tabela de-para quebraria no primeiro
+ * que tivesse um tom a mais.
+ *
+ * Os sprites oficiais NÃO são repintados: a cor deles é o ponto.
  *
  * Uso: `pnpm icones` na raiz. As PNGs geradas são versionadas, então o build normal não depende
- * deste passo.
+ * deste passo nem da rede.
  */
 import { readFile, mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
@@ -21,30 +25,44 @@ import { decodePng, encodePng } from '../src/png.js'
 import type { RgbaImage } from '../src/compose.js'
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-const FOLHA = join(RAIZ, 'tools', 'assets', 'ui', 'verzatile', 'icones-32.png')
+const FOLHA_CONTROLE = join(RAIZ, 'tools', 'assets', 'ui', 'verzatile', 'icones-32.png')
+const OFICIAIS = join(RAIZ, 'tools', 'assets', 'ui', 'pokeapi')
 const SAIDA = join(RAIZ, 'packages', 'client', 'src', 'styles', 'ui')
 
-/** A folha é uma grade de 8×8 de 32 px, sem respiro entre as células. */
+/** A folha de controle é uma grade de 8×8 de 32 px, sem respiro entre as células. */
 const LADO = 32
 const COLUNAS = 8
 
-/** Extremos da rampa: o escuro é a sombra da madeira, o claro é a tinta do texto. */
-const SOMBRA = [0x5d, 0x44, 0x38] as const
-const TINTA = [0xf2, 0xe7, 0xd6] as const
+/** Extremos da rampa de repintura: a borda de controle e o texto do tema. */
+const SOMBRA = [0x3a, 0x45, 0x60] as const
+const CLARO = [0xee, 0xf1, 0xf8] as const
 
 /**
- * Os ícones que a interface REALMENTE usa. A folha tem 64; trazer os 64 encheria o repositório
- * de arte que ninguém desenha na tela, e cada um deles seria um convite a inventar um uso.
+ * O item oficial que responde por cada função. A escolha é por LEITURA a 22 px, não por nome:
+ * `medal-box` é um fichário e lê como registro de espécies melhor que o `poke-radar`, que a
+ * esse tamanho vira dois objetos sobrepostos.
+ *
+ * `configuracoes` é o único sem correspondente honesto — não existe engrenagem no acervo, porque
+ * engrenagem é convenção de interface e não item de Pokémon. `machine-part` é o mais próximo.
  */
-const ICONES: readonly { readonly nome: string; readonly tile: number; readonly onde: string }[] = [
-  { nome: 'mais', tile: 33, onde: 'aproximar o mapa' },
-  { nome: 'menos', tile: 34, onde: 'afastar o mapa' },
-  { nome: 'parar', tile: 3, onde: 'encerrar a caçada' },
-  { nome: 'cadeado', tile: 50, onde: 'área que ainda não abriu' },
-  { nome: 'fechar', tile: 35, onde: 'fechar um modal' },
+const DE_ASSUNTO: readonly { readonly nome: string; readonly item: string }[] = [
+  { nome: 'mapa', item: 'town-map' },
+  { nome: 'time', item: 'poke-ball' },
+  { nome: 'mochila', item: 'berry-pouch' },
+  { nome: 'pokedex', item: 'medal-box' },
+  { nome: 'loja', item: 'coin-case' },
+  { nome: 'configuracoes', item: 'machine-part' },
 ]
 
-/** Recorta um tile da folha pelo índice. */
+const DE_CONTROLE: readonly { readonly nome: string; readonly tile: number }[] = [
+  { nome: 'mais', tile: 33 },
+  { nome: 'menos', tile: 34 },
+  { nome: 'parar', tile: 3 },
+  { nome: 'cadeado', tile: 50 },
+  { nome: 'fechar', tile: 35 },
+]
+
+/** Recorta um tile da folha de controle pelo índice. */
 function recortar(folha: RgbaImage, indice: number): RgbaImage {
   const cx = (indice % COLUNAS) * LADO
   const cy = Math.floor(indice / COLUNAS) * LADO
@@ -65,7 +83,7 @@ const brilho = (r: number, g: number, b: number): number => (0.2126 * r + 0.7152
  * Estica o contraste antes de mapear. Sem isto a folha, que é toda de azul claro, cairia na
  * metade de cima da rampa e sairia um ícone chapado, sem a sombra que dá forma a ele.
  */
-function normalizar(img: RgbaImage): { readonly min: number; readonly vao: number } {
+function repintar(img: RgbaImage): RgbaImage {
   let min = 1
   let max = 0
   for (let i = 0; i < img.data.length; i += 4) {
@@ -74,28 +92,36 @@ function normalizar(img: RgbaImage): { readonly min: number; readonly vao: numbe
     if (l < min) min = l
     if (l > max) max = l
   }
-  // Ícone de um tom só: sem vão, tudo vai para o claro da rampa em vez de dividir por zero.
-  return { min, vao: max - min || 1 }
-}
-
-function repintar(img: RgbaImage): RgbaImage {
-  const { min, vao } = normalizar(img)
+  const vao = max - min || 1
   const data = new Uint8Array(img.data)
   for (let i = 0; i < data.length; i += 4) {
     if (data[i + 3]! === 0) continue
     const t = Math.min(1, Math.max(0, (brilho(data[i]!, data[i + 1]!, data[i + 2]!) - min) / vao))
-    for (let c = 0; c < 3; c++) data[i + c] = Math.round(SOMBRA[c]! + (TINTA[c]! - SOMBRA[c]!) * t)
+    for (let c = 0; c < 3; c++) data[i + c] = Math.round(SOMBRA[c]! + (CLARO[c]! - SOMBRA[c]!) * t)
   }
   return { width: img.width, height: img.height, data }
 }
 
 async function main(): Promise<void> {
-  const folha = decodePng(await readFile(FOLHA))
   await mkdir(SAIDA, { recursive: true })
-  for (const icone of ICONES) {
-    const alvo = join(SAIDA, `icone-${icone.nome}.png`)
-    await writeFile(alvo, encodePng(repintar(recortar(folha, icone.tile))))
-    process.stdout.write(`${icone.nome.padEnd(10)} tile ${String(icone.tile).padStart(2)}  ${icone.onde}\n`)
+
+  for (const { nome, item } of DE_ASSUNTO) {
+    const origem = join(OFICIAIS, `${item}.png`)
+    let bruto
+    try {
+      bruto = await readFile(origem)
+    } catch {
+      throw new Error(`falta o sprite oficial em ${origem}. Rode "pnpm icones-baixar" para trazer o acervo.`)
+    }
+    // Sem repintura: a cor do item oficial é o ponto, e é ela que faz o ícone ser do jogo.
+    await writeFile(join(SAIDA, `icone-${nome}.png`), encodePng(decodePng(bruto)))
+    process.stdout.write(`${nome.padEnd(16)} oficial  ${item}\n`)
+  }
+
+  const folha = decodePng(await readFile(FOLHA_CONTROLE))
+  for (const { nome, tile } of DE_CONTROLE) {
+    await writeFile(join(SAIDA, `icone-${nome}.png`), encodePng(repintar(recortar(folha, tile))))
+    process.stdout.write(`${nome.padEnd(16)} controle tile ${tile}\n`)
   }
 }
 

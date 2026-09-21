@@ -1,47 +1,55 @@
 /*
  * O material da interface, e o vocabulário que nasce dele.
  *
- * UM FIO E UMA SOMBRA. Superfície é um retângulo de canto macio com 1 px de borda e, quando
- * precisa se destacar, uma sombra com deslocamento e desfoque. Só isso.
+ * FACE, COSTURA E RELEVO. Uma superfície é um gradiente que escurece para baixo (a face), uma
+ * costura escura que some no olhar (a borda) e um par de sombras que diz a que distância ela
+ * está (o relevo). A luz vem de cima, sempre — quem se levanta clareia no topo, quem afunda faz
+ * o contrário.
  *
- * A versão anterior desenhava moldura de madeira com `border-image` 9-slice de 12 px em cada
- * painel e cada botão. Era arte de verdade — e estava errada assim mesmo por duas razões: doze
- * pixels de moldura por objeto pesam a tela e comem o espaço que era do conteúdo, e madeira é o
- * idioma de RPG de fantasia, não o do Pokémon.
+ * Isto substituiu "um fio e uma sombra", que era chapado demais: todo elemento era um retângulo
+ * de cor sólida com um fio CLARO em volta, dezenas de vezes na mesma tela. O fio claro contorna,
+ * e o que se contorna vira recorte de papel — foi isso que se leu como "borda grossa" numa borda
+ * de 1 px. E a sombra que o nome prometia era gasta em um lugar só.
  *
- * A profundidade tem dois degraus, e cada um diz uma coisa:
- *   `--sombra-1`  está apoiado na superfície  — painel, botão
- *   `--sombra-2`  está POR CIMA de tudo       — modal, toast
+ * Antes disso havia moldura de madeira `border-image` de 12 px, que caiu por comer o espaço do
+ * conteúdo e por ser o idioma errado. O relevo faz o mesmo trabalho e custa zero byte de imagem.
+ *
+ * A profundidade agora tem quatro degraus, e cada um diz uma coisa:
+ *   `--relevo-cava`  afunda: trilho, campo, lista
+ *   `--relevo-1`     apoiado na superfície: painel, seção
+ *   `--relevo-2`     levantado e agarrável: botão, cartão clicável
+ *   `--relevo-3`     por cima de tudo: modal, toast
  */
 
 /** Superfície que se levanta: painel, seção. Não é para chip nem para linha de lista. */
 .quadro, .panel {
-  background: var(--painel);
+  background: var(--face-painel);
   border: var(--border-w) solid var(--borda);
-  border-radius: var(--raio);
-  box-shadow: var(--sombra-1);
+  border-radius: var(--raio-g);
+  box-shadow: var(--relevo-1);
 }
 
 /** A mesma superfície, um degrau à frente. */
-.quadro-alto { background: var(--painel-alto); }
+.quadro-alto { background: var(--face-alta); box-shadow: var(--relevo-2); }
 
 /**
  * A fenda: é onde se LÊ — lista, campo, área de rolagem. O miolo quase preto é o que deixa a
- * barra de vida e a de experiência atingirem contraste sobre ela.
+ * barra de vida e a de experiência atingirem contraste sobre ela, e a sombra interna no topo é o
+ * que faz a fenda parecer cavada em vez de pintada.
  */
 .quadro-fundo {
-  background: var(--cava);
+  background: var(--face-cava);
   border: var(--border-w) solid var(--borda);
   border-radius: var(--raio);
-  box-shadow: none;
+  box-shadow: var(--relevo-cava);
 }
 
-/** Flutua acima de tudo: modal e toast. É o único lugar onde a sombra grande é gasta. */
+/** Flutua acima de tudo: modal e toast. É o único lugar onde o terceiro degrau é gasto. */
 .quadro-flutua {
-  background: var(--painel);
+  background: var(--face-painel);
   border: var(--border-w) solid var(--borda);
-  border-radius: var(--raio);
-  box-shadow: var(--sombra-2);
+  border-radius: var(--raio-gg);
+  box-shadow: var(--relevo-3);
 }
 
 /** Cabeçalho de seção: caixa alta espacejada, no menor degrau da escala. Não compete com o dado. */
@@ -64,7 +72,8 @@
   /* Declara a face em vez de herdar: chip quase sempre carrega NÚMERO, e ele aparece dentro de
    * títulos que falam na voz de HUD. Herdando, o "nv 65" do cartão do ativo saía "nv 68". */
   font-family: var(--fonte-texto); font-size: var(--t-xs); font-weight: 700;
-  background: var(--cava); border: var(--border-w) solid var(--borda); color: var(--texto);
+  background: var(--face-cava); border: var(--border-w) solid var(--borda); color: var(--texto);
+  box-shadow: var(--relevo-cava);
   white-space: nowrap;
 }
 .chip-nivel { background: color-mix(in srgb, var(--xp) 22%, var(--cava)); }
@@ -121,14 +130,27 @@
 
 progress {
   appearance: none; display: block; width: 100%; height: 10px;
-  background: var(--cava);
+  background: var(--face-cava);
   border: var(--border-w) solid var(--borda);
   border-radius: 999px;
+  /* Trilho cavado e preenchimento com brilho no topo: é o mesmo par de luz e sombra do resto do
+   * sistema, aplicado à peça que mais se repete na tela. Com o trilho chapado, a barra de vida
+   * era duas faixas de cor encostadas — nada dizia qual delas era o buraco. */
+  box-shadow: var(--relevo-cava);
   overflow: hidden;
 }
-progress::-webkit-progress-bar { background: var(--cava); }
-progress::-webkit-progress-value { background: var(--medidor-cor, var(--ouro)); transition: width var(--rapido) linear; }
-progress::-moz-progress-bar { background: var(--medidor-cor, var(--ouro)); }
+progress::-webkit-progress-bar { background: transparent; }
+progress::-webkit-progress-value {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--medidor-cor, var(--ouro)) 82%, white), var(--medidor-cor, var(--ouro)));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%);
+  border-radius: 999px;
+  transition: width var(--rapido) linear;
+}
+progress::-moz-progress-bar {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--medidor-cor, var(--ouro)) 82%, white), var(--medidor-cor, var(--ouro)));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%);
+  border-radius: 999px;
+}
 
 .hp-bar { --medidor-cor: var(--hp); }
 /* Ferido e crítico não mudam só de cor: mudar a cor sozinha deixa de fora quem não a distingue.

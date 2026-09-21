@@ -27,10 +27,10 @@ button, [role="button"], label:has(> input[type="checkbox"]) { min-height: var(-
  * superfície, e o fundo entre eles é o que os separa.
  */
 .screen:not(.game-grid):not(.screen-auth):not(.screen-starter) {
-  background: var(--painel);
+  background: var(--face-painel);
   border: var(--border-w) solid var(--borda);
-  border-radius: var(--raio);
-  box-shadow: var(--sombra-1);
+  border-radius: var(--raio-g);
+  box-shadow: var(--relevo-1);
   margin: var(--space-3) auto;
   /* Largura máxima mesmo numa tela larga: ficha de comparação com 2000 px perde a coluna de vista. */
   max-width: 1280px;
@@ -83,8 +83,11 @@ button, [role="button"], label:has(> input[type="checkbox"]) { min-height: var(-
   width: min(400px, 100%);
   padding: var(--space-4);
   display: flex; flex-direction: column; gap: var(--space-3);
-  background: color-mix(in srgb, var(--painel) 92%, transparent);
-  box-shadow: var(--sombra-2);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--painel-topo) 92%, transparent),
+    color-mix(in srgb, var(--painel-pe) 94%, transparent));
+  border-radius: var(--raio-gg);
+  box-shadow: var(--relevo-3);
 }
 .auth-cartao h1 { font-size: var(--t-2xl); display: flex; align-items: center; gap: var(--space-2); }
 /* A marca: a Poké Ball oficial, no tamanho da caixa alta do nome. `pixelated` porque o sprite
@@ -113,28 +116,46 @@ h2 { font-size: var(--t-l); }
 button {
   font-size: var(--t-s); font-weight: 700;
   color: var(--texto); cursor: pointer;
-  background: var(--painel-alto);
-  border: var(--border-w) solid var(--borda-forte);
+  background: var(--face-alta);
+  border: var(--border-w) solid var(--borda);
   border-radius: var(--raio);
   padding: var(--space-2) var(--space-3);
   min-height: var(--alvo);
-  box-shadow: var(--sombra-1);
-  transition: background var(--rapido) ease-out, border-color var(--rapido) ease-out;
+  /* Relevo de peça agarrável: fio de luz no topo, sombra curta embaixo. O botão era um retângulo
+   * chapado com um fio CLARO em volta — o fio contornava, e contorno não é o mesmo que volume. */
+  box-shadow: var(--relevo-2);
+  transition: background var(--rapido) ease-out, box-shadow var(--rapido) ease-out, transform var(--rapido) ease-out;
 }
-button:hover:not([disabled]) { background: color-mix(in srgb, var(--painel-alto) 80%, var(--texto)); }
-/* Apertado afunda: perde a sombra e escurece. É o que substitui a peça de arte trocada no
- * `:active` da versão de madeira, e custa uma linha em vez de um PNG. */
-button:active:not([disabled]) { background: var(--cava); box-shadow: none; transform: translateY(1px); }
-button[disabled] { opacity: 0.45; cursor: default; box-shadow: none; }
+button:hover:not([disabled]) {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--painel-alto-topo) 84%, var(--texto)), var(--painel-alto));
+}
+/* Apertado AFUNDA de verdade: a sombra externa some, a interna aparece, e a peça desce 1 px. É o
+ * que substitui a arte trocada no `:active` da versão de madeira, e custa três linhas. */
+button:active:not([disabled]) {
+  background: var(--face-cava);
+  box-shadow: var(--relevo-apertado);
+  transform: translateY(1px);
+}
+button[disabled] { opacity: 0.45; cursor: default; box-shadow: var(--relevo-1); }
 
 /*
  * Ação primária: o vermelho da Poké Ball, cheio, com texto branco. É a ÚNICA cor de marca do
- * sistema e aparece só aqui — o resto da cor é informação.
+ * sistema e aparece só aqui — o resto da cor é informação. O gradiente é o mesmo da Poké Ball
+ * vista de frente: a luz pega a metade de cima.
  */
 button.primary {
-  background: var(--primaria); color: var(--primaria-texto); border-color: var(--primaria);
+  background: linear-gradient(180deg, var(--primaria-alta), var(--primaria) 55%, color-mix(in srgb, var(--primaria) 82%, black));
+  color: var(--primaria-texto);
+  border-color: color-mix(in srgb, var(--primaria) 60%, black);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 28%), 0 1px 1px rgb(0 0 0 / 30%), 0 3px 8px rgb(233 21 21 / 28%);
 }
-button.primary:hover:not([disabled]) { background: var(--primaria-alta); border-color: var(--primaria-alta); }
+button.primary:hover:not([disabled]) {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--primaria-alta) 80%, white), var(--primaria-alta) 55%, var(--primaria));
+}
+button.primary:active:not([disabled]) {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--primaria) 80%, black), var(--primaria));
+  box-shadow: inset 0 2px 5px rgb(0 0 0 / 45%);
+}
 
 /*
  * Campo é fenda: é onde se escreve, não onde se aperta. O `select` entra junto — sem regra, ele
@@ -142,11 +163,15 @@ button.primary:hover:not([disabled]) { background: var(--primaria-alta); border-
  */
 input, select {
   font: inherit; color: var(--texto); width: 100%;
-  background: var(--cava);
-  border: var(--border-w) solid var(--borda-forte);
+  background: var(--face-cava);
+  border: var(--border-w) solid var(--borda);
   border-radius: var(--raio);
   padding: var(--space-2) var(--space-3);
+  /* Campo é fenda, e a fenda tem a luz invertida: sombra no topo, fio claro no pé. É isso que
+   * diferencia "escrevo aqui" de "aperto aqui" sem depender de ler o rótulo. */
+  box-shadow: var(--relevo-cava);
 }
+input:focus-visible, select:focus-visible { border-color: var(--borda-forte); }
 select { appearance: none; cursor: pointer; }
 select option { background: var(--painel); color: var(--texto); }
 .field { margin: 0; }
@@ -167,9 +192,14 @@ h2 { font-size: var(--t-l); }
  */
 .tabs { display: flex; gap: var(--space-2); }
 .tab-active {
-  background: var(--selecao); color: var(--selecao-texto); border-color: var(--selecao);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--selecao) 84%, white), var(--selecao));
+  color: var(--selecao-texto);
+  border-color: color-mix(in srgb, var(--selecao) 65%, black);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 35%), 0 1px 2px rgb(0 0 0 / 35%);
 }
-.tab-active:hover:not([disabled]) { background: var(--selecao); }
+.tab-active:hover:not([disabled]) {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--selecao) 70%, white), var(--selecao));
+}
 
 .form-error { color: var(--perigo); min-height: 1.2em; margin: var(--space-2) 0 0; font-weight: 700; }
 

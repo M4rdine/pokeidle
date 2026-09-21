@@ -132,6 +132,26 @@ describe('a face de HUD respeita o piso de tamanho', () => {
 })
 
 /**
+ * Token que o TypeScript lê em tempo de execução é o mais fácil de quebrar do sistema inteiro:
+ * `getComputedStyle` de um nome que não existe devolve string vazia, sem erro e sem aviso, e o
+ * código cai no valor de reserva para sempre.
+ *
+ * Foi o que aconteceu: a cena pedia `--fora`, que nunca existiu, e por isso pintava a tarja em
+ * volta do mundo com um MARROM sobrevivente da paleta de madeira. Duas trocas de mundo visual
+ * inteiras, e ninguém viu — tarja escura continua parecendo tarja escura.
+ */
+describe('todo token lido em tempo de execução existe no CSS', () => {
+  it('o token do fundo que a cena lê está declarado em tokens.css', async () => {
+    const cena = await readFile(join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'src', 'scene', 'app.ts'), 'utf8')
+    const lido = /getPropertyValue\(([A-Z_]+|'--[a-z-]+')\)/.exec(cena)
+    expect(lido, 'a cena deixou de ler um token — confira se esta regra ainda faz sentido').not.toBeNull()
+    const nome = /export const TOKEN_DO_FUNDO = '(--[a-z-]+)'/.exec(cena)?.[1]
+    expect(nome, 'TOKEN_DO_FUNDO sumiu de scene/app.ts').toBeDefined()
+    expect([...(await cores())]).toContain(nome!.slice(2))
+  })
+})
+
+/**
  * O `DESIGN.md` é a descrição do sistema; `tokens.css` é o sistema. Quando os dois divergem, a
  * descrição vira mentira — e mentira documentada é pior que documentação nenhuma. Aconteceu duas
  * vezes na troca do mundo visual: o sidecar ficou apontando para cores removidas, e a paleta de

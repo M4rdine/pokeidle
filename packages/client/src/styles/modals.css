@@ -12,17 +12,21 @@
  * ficariam estreitos demais para servir a qualquer um dos dois. */
 .modal:has(.mapa-modal) { width: min(1180px, 96vw); }
 .modal {
-  border-radius: var(--raio);
+  border-radius: var(--raio-gg);
   width: min(560px, 92vw); max-height: 86vh;
   display: flex; flex-direction: column; min-height: 0;
-  background: var(--painel-alto); border: var(--border-w) solid var(--borda);
-  box-shadow: 0 2px 0 var(--borda), 0 8px 20px rgb(51 38 31 / 38%);
+  background: var(--face-painel); border: var(--border-w) solid var(--borda);
+  /* O terceiro degrau de relevo, e o único lugar que o gasta. A sombra daqui ainda era MARROM —
+   * `rgb(51 38 31)`, sobrevivente da paleta de madeira que caiu duas trocas de mundo atrás. Num
+   * mundo ardósia ela punha um halo quente em volta de todo modal, e ninguém veria isso olhando. */
+  box-shadow: var(--relevo-3);
 }
-.modal-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border-bottom: var(--border-w) solid var(--borda); }
+.modal-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border-bottom: var(--border-w) solid var(--borda-clara); }
 .modal-close { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; flex-shrink: 0; }
 .modal-body { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); overflow-y: auto; min-height: 0; }
-/* Linha de lista não é objeto: só o fio de madeira que a separa da seguinte, sem moldura e sem fundo. */
-.bag-item, .team-row, .shop-item { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-1) 0; border-bottom: 1px solid var(--borda); }
+/* Linha de lista não é objeto: só o fio que a separa da seguinte, sem moldura e sem fundo. O fio
+ * aqui é `--borda-clara`, e não a costura: divisória DENTRO de um painel precisa ser vista. */
+.bag-item, .team-row, .shop-item { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-2) 0; border-bottom: 1px solid var(--borda-clara); }
 .bag-item button, .team-row button, .shop-item button { margin-left: auto; }
 .shop-item button { margin-left: 0; }
 .shop-item input { width: 64px; margin-left: auto; }
@@ -36,7 +40,7 @@
 .settings-conta {
   display: flex; flex-direction: column; gap: var(--space-1);
   margin-top: var(--space-3); padding-top: var(--space-3);
-  border-top: var(--border-w) solid var(--borda);
+  border-top: var(--border-w) solid var(--borda-clara);
 }
 .settings-sair { align-self: flex-start; }
 .settings-sair:hover:not([disabled]) { color: var(--perigo); }
@@ -45,7 +49,12 @@
 .pokedex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--space-2); }
 /* Célula de grade: um fio de 1 px e nada mais — o registro de uma espécie é uma marca na página,
    não uma peça levantada. O nome fica na face de leitura, porque neste corpo a bitmap embola. */
-.dex-cell { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); padding: var(--space-1); border: 1px solid var(--borda); font-size: var(--t-s); }
+.dex-cell {
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-1);
+  padding: var(--space-1); font-size: var(--t-s);
+  background: var(--face-cava); border: 1px solid var(--borda); border-radius: var(--raio-p);
+  box-shadow: var(--relevo-cava);
+}
 /* Capturado é notável, não urgente nem selecionado: ouro na borda, que a varredura da grade pega
    de relance sem confundir com o grifo da linha aberta. */
 .dex-cell.unknown { color: var(--texto-fraco); } .dex-cell.caught { border-color: var(--ouro); }

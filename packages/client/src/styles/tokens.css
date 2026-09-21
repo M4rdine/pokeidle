@@ -57,17 +57,48 @@
   --fonte-hud: 'Pixelify Sans', 'Courier New', monospace;
   --fonte-texto: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
 
-  /* ── Superfícies, do fundo para a frente ── */
-  --fundo: #161b2b;        /* fora de tudo, e a tarja em volta do mundo */
+  /*
+   * ── Superfícies, do fundo para a frente ──
+   *
+   * Cada superfície tem TRÊS valores: o tom médio, que é o do contrato de contraste e o nome
+   * curto que o resto do CSS usa, e as duas pontas do gradiente que a desenha. A superfície
+   * chapada era o que deixava a tela inteira parecer papel recortado: um retângulo de cor sólida
+   * com um fio em volta, dezenas de vezes, e nada indicando o que está na frente do quê.
+   *
+   * A LUZ VEM DE CIMA, e é uma só para a tela inteira. Quem se LEVANTA clareia no topo e escurece
+   * no pé; quem AFUNDA faz o contrário. É essa inversão — não o fio — que diz se um retângulo é
+   * um botão ou uma fenda, e ela funciona mesmo para quem não distingue as cores.
+   */
+  --fundo: #141a29;        /* fora de tudo, e a tarja em volta do mundo */
+
   --painel: #222a40;       /* a superfície */
+  --painel-topo: #28314b;
+  --painel-pe: #1d2437;
+
   --painel-alto: #2c3650;  /* a mesma, um degrau à frente: botão, linha em destaque */
+  /* O topo do botão parou aqui por MEDIÇÃO, não por gosto: a primeira tentativa foi `#364161`, e
+   * nela o rótulo discreto media 4,14:1 — reprovado em texto normal, e bonito na tela. O teste de
+   * contraste pegou. Quem for clarear este tom de novo vai precisar clarear `--texto-fraco` junto. */
+  --painel-alto-topo: #2f3853;
+  --painel-alto-pe: #242c42;
+
   --cava: #11151f;         /* o que afunda: trilho de medidor, campo, lista */
+  --cava-topo: #0c0f18;
+  --cava-pe: #161c29;
+
+  /* As faces prontas. Quem monta uma superfície usa a face, não as pontas. */
+  --face-painel: linear-gradient(180deg, var(--painel-topo), var(--painel-pe));
+  --face-alta: linear-gradient(180deg, var(--painel-alto-topo), var(--painel-alto-pe));
+  --face-cava: linear-gradient(180deg, var(--cava-topo), var(--cava-pe));
 
   /* ── Traço ──
-   * `--borda` só SEPARA e pode ser discreta. `--borda-forte` delimita CONTROLE e precisa dos
-   * 3:1 sobre o painel que a WCAG 1.4.11 exige de quem identifica um botão.
+   * `--borda` é COSTURA, não moldura: fica mais escura que a superfície e some no olhar, deixando
+   * o relevo dizer onde a peça começa. Ela era mais clara que o painel, e por isso cada elemento
+   * da tela aparecia contornado — o que se lia como "borda grossa" mesmo tendo 1 px.
+   * `--borda-forte` delimita CONTROLE e precisa dos 3:1 sobre o painel que a WCAG 1.4.11 exige.
    */
-  --borda: #3a4560;
+  --borda: #171d2c;
+  --borda-clara: #3a4560;  /* onde o fio ainda precisa ser visto: divisória dentro de um painel */
   --borda-forte: #6b7aa3;
 
   /* ── Texto ── */
@@ -111,16 +142,47 @@
   --space-4: 32px;
   --space-5: 48px;
 
-  /* ── Forma ── */
-  --raio: 8px;        /* painel, botão, modal */
-  --raio-p: 4px;      /* chip, selo, medidor */
+  /* ── Forma ──
+   * O raio cresce com o TAMANHO da peça, e não é um valor só. Um raio único em tudo é a assinatura
+   * de interface montada em vez de desenhada: o chip de 16 px de altura e o modal de 600 px
+   * ficavam com o mesmo canto, e nenhum dos dois com o canto certo.
+   */
+  --raio-p: 6px;      /* medidor, selo, célula miúda */
+  --raio: 10px;       /* botão, campo, linha de lista */
+  --raio-g: 14px;     /* painel */
+  --raio-gg: 18px;    /* modal, cartão de entrada */
   --border-w: 1px;
   /* Alvo mínimo de toque (WCAG 2.2 SC 2.5.8). Sai daqui para não virar número solto. */
   --alvo: 24px;
 
-  /* ── Elevação. Deslocamento E desfoque: sombra sem desfoque é enfeite, não profundidade. ── */
+  /*
+   * ── Relevo ──
+   *
+   * Sombra EXTERNA diz a que distância a peça está da superfície de trás. Sombra INTERNA diz de
+   * que lado a luz bate, e é ela que faz a peça ter espessura em vez de ser um decalque. As duas
+   * juntas são o que substituiu a moldura de madeira de 12 px — e custam zero byte de imagem.
+   *
+   * `--luz` é o fio de cima de quem se levanta: uma linha de 1 px de branco a 10%, que lida em
+   * cima de um gradiente que escurece para baixo dá a borda chanfrada inteira. É o truque mais
+   * barato que existe em interface de jogo, e o mais antigo.
+   */
+  --luz: rgb(255 255 255 / 10%);
+  --luz-forte: rgb(255 255 255 / 16%);
+
   --sombra-1: 0 1px 2px rgb(0 0 0 / 30%);
   --sombra-2: 0 8px 24px rgb(0 0 0 / 45%);
+
+  /* Apoiado na superfície: painel, linha de lista. */
+  --relevo-1: inset 0 1px 0 var(--luz), 0 1px 2px rgb(0 0 0 / 45%);
+  /* Levantado e agarrável: botão, cartão clicável. O segundo degrau de sombra é o que separa
+   * "isto é uma superfície" de "isto é uma peça em cima dela". */
+  --relevo-2: inset 0 1px 0 var(--luz-forte), 0 1px 1px rgb(0 0 0 / 30%), 0 3px 6px rgb(0 0 0 / 35%);
+  /* Por cima de tudo: modal, toast. */
+  --relevo-3: inset 0 1px 0 var(--luz), 0 2px 6px rgb(0 0 0 / 40%), 0 18px 44px rgb(0 0 0 / 55%);
+  /* Afundado: trilho, campo, lista. A luz inverte — sombra em cima, fio claro no pé. */
+  --relevo-cava: inset 0 2px 4px rgb(0 0 0 / 60%), inset 0 -1px 0 rgb(255 255 255 / 5%);
+  /* Apertado: some a sombra externa e a interna vira a de fenda. É a peça descendo. */
+  --relevo-apertado: inset 0 2px 5px rgb(0 0 0 / 55%);
 
   /* ── Tempo: interface de tarefa reage, não coreografa ── */
   --rapido: 120ms;

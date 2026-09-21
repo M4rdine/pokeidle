@@ -2,11 +2,18 @@
 name: Pokeidle
 description: Interface de MMO de Pokémon — ardósia fria, o vermelho da Poké Ball, e os dezoito matizes de tipo fazendo o trabalho pesado.
 colors:
-  fundo: "#161b2b"
+  fundo: "#141a29"
   painel: "#222a40"
+  painel-topo: "#28314b"
+  painel-pe: "#1d2437"
   painel-alto: "#2c3650"
+  painel-alto-topo: "#2f3853"
+  painel-alto-pe: "#242c42"
   cava: "#11151f"
-  borda: "#3a4560"
+  cava-topo: "#0c0f18"
+  cava-pe: "#161c29"
+  borda: "#171d2c"
+  borda-clara: "#3a4560"
   borda-forte: "#6b7aa3"
   texto: "#eef1f8"
   texto-fraco: "#9aa6c4"
@@ -341,6 +348,72 @@ Abaixo de 900 px a grade empilha na ordem `menu / mundo / combate / perfil / reg
 antes do perfil, porque uma coluna de identidade inteira empurraria o mundo para fora da primeira
 tela. A rolagem aninhada some junto: numa página que já rola, painel que rola por dentro esconde
 conteúdo sem nenhum sinal de que ele existe.
+
+## Material: face, costura e relevo
+
+Uma superfície tem três partes, e nenhuma delas é o contorno:
+
+| parte | o que é | por quê |
+|---|---|---|
+| **face** | um gradiente que escurece para baixo | a luz vem de cima, e uma cor chapada não tem lado de cima |
+| **costura** | 1 px MAIS ESCURO que a superfície | separa sem emoldurar; borda mais clara contorna, e o que se contorna vira recorte de papel |
+| **relevo** | sombra interna no topo + sombra externa embaixo | diz a que distância a peça está e de que lado a luz bate |
+
+A luz vem de cima, e é **uma só para a tela inteira**. Quem se LEVANTA clareia no topo e escurece
+no pé; quem AFUNDA faz o contrário. É essa inversão — não o fio — que diz se um retângulo é um
+botão ou uma fenda, e ela funciona para quem não distingue as cores.
+
+Quatro degraus de relevo, e cada um diz uma coisa:
+
+| token | quem usa |
+|---|---|
+| `--relevo-cava` | trilho de medidor, campo, lista, vaga vazia, chip |
+| `--relevo-1` | painel, seção, linha de área |
+| `--relevo-2` | botão, cartão clicável, medalhão do mapa |
+| `--relevo-3` | modal, cartão da entrada |
+
+**Isto substituiu "um fio e uma sombra"**, que era a regra anterior e era chapada demais: cada
+elemento da tela era um retângulo de cor sólida com um fio CLARO em volta, dezenas de vezes na
+mesma tela, e a sombra que o nome prometia era gasta em um lugar só. O resultado se lia como
+"borda grossa" numa borda de **1 px** — porque o problema nunca foi a espessura, foi o contorno
+ser a única ferramenta em uso.
+
+**O raio cresce com o tamanho da peça**, e não é um valor só: `--raio-p` 6 px para medidor e selo,
+`--raio` 10 px para botão e linha, `--raio-g` 14 px para painel, `--raio-gg` 18 px para modal. Um
+raio único em tudo é assinatura de interface montada em vez de desenhada — o chip de 16 px de
+altura e o modal de 600 px ficavam com o mesmo canto, e nenhum dos dois com o canto certo.
+
+**Nada disso é imagem.** É o mesmo trabalho que a moldura `border-image` de 12 px fazia, sem os
+12 px de layout que ela cobrava, sem asset para versionar e sem licença para respeitar. Ver a
+seção seguinte para por que um pack de moldura continua fora.
+
+## Por que não usamos pack de UI
+
+A pergunta volta, então fica registrada. A resposta tem duas metades, e **cada uma sozinha já
+decide**.
+
+**Pixel art 9-slice e conteúdo HTML que cresce são tecnologias em conflito.** Em CSS, 9-slice é
+`border-image`, e `border-image` exige `border-width` — que participa do layout, por definição.
+Não é defeito do pack de madeira que caiu aqui: é o modelo. Um pack de origem 16×16 renderizado a
+2–3×, como pixel art pede, devolve exatamente os 12 px que já foram rejeitados. E a keyword `fill`
+pinta o miolo por cima do `background` porque é o que ela existe para fazer.
+
+**E o idioma continua errado.** Os packs disponíveis chamam-se "Fantasy UI Borders", "Fantasy
+Minimal", "UI Pack RPG Expansion" — madeira e marrom. É o erro nº 2 desta casa, o mesmo que
+derrubou a versão de madeira e o mesmo que derrubou a arte-chave fotorrealista: **trocar o idioma
+visual do produto pelo do gênero vizinho**.
+
+Especificamente sobre o **LimeZu Modern User Interface** (US$ 6), que foi avaliado: a licença diz
+*"You CAN'T: resell or distribute the asset to others"*. Commitar os PNGs num repositório público
+**é** distribuir. Projetos que usam os packs dele mantêm os assets no `.gitignore` com script de
+download à parte — build quebrado para quem clona. Num repositório que é portfólio, é o oposto do
+que ele existe para fazer.
+
+**Onde pack É a resposta: no que NÃO estica.** Ícone, medalhão, ornamento solto, cursor. É o que
+já se faz aqui com os sprites da PokeAPI e com o pack do VerzatileDev, e é o padrão a estender.
+Se algum dia fizer falta mais matéria-prima, o **Kenney Pixel UI Pack** é CC0 — a única opção que
+dá para versionar sem nota de rodapé, sem crédito obrigatório e sem risco de a fonte sumir do
+itch.io (já aconteceu com dois candidatos durante esta própria avaliação).
 
 O ritmo tem cinco degraus: 4 px para o que se cola, 8 px para o que se agrupa, 16 px para o que se
 separa, 32 px para o que respira, 48 px para margem de página.

@@ -70,8 +70,9 @@
      todas as colunas de dados para um x diferente em cada linha, que é justamente o que esta
      ficha existe para não fazer. */
   display: grid; grid-template-columns: 1fr 7rem; align-items: stretch; gap: var(--space-3);
-  background: var(--painel); border: var(--border-w) solid var(--borda);
+  background: var(--face-painel); border: var(--border-w) solid var(--borda);
   border-radius: var(--raio);
+  box-shadow: var(--relevo-1);
   padding-right: var(--space-3);
   /* Só a borda muda no hover: a linha não se mexe, então a coluna não pisca ao passar o mouse. */
   transition: border-color 120ms ease-out;
@@ -79,11 +80,16 @@
 /* Hover é tinta; aberto é grifo. Separar os dois registros evita que passar o mouse pareça ter
    selecionado alguma coisa — e o marca-texto fica reservado para onde se está de fato. */
 .area-row:hover { border-color: var(--texto); }
-.area-row-open { background: var(--selecao); border-color: var(--selecao); color: var(--selecao-texto); }
+.area-row-open {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--selecao) 82%, white), var(--selecao));
+  border-color: color-mix(in srgb, var(--selecao) 62%, black);
+  color: var(--selecao-texto);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 38%), 0 2px 8px rgb(0 0 0 / 35%);
+}
 /* O que dá para caçar agora é a folha levantada; o que ainda não abriu recua para a folha
    afundada. A separação é o plano, não a opacidade: os números da área bloqueada continuam em
    contraste cheio, porque é por eles que se decide o que perseguir. */
-.area-row-locked { background: var(--cava); border-color: color-mix(in srgb, var(--borda) 60%, var(--cava)); }
+.area-row-locked { background: var(--face-cava); box-shadow: var(--relevo-cava); }
 .area-row-locked:hover { border-color: var(--texto); }
 .area-row-locked .area-title { color: var(--texto-fraco); }
 
@@ -252,9 +258,9 @@
   width: 46px; height: 46px; padding: 0;
   pointer-events: auto;
   border-radius: 50%;
-  background: var(--fundo);
+  background: var(--face-painel);
   border: 2px solid var(--borda-forte);
-  box-shadow: var(--sombra-1);
+  box-shadow: var(--relevo-2);
 }
 .mapa-marcador:hover { border-color: var(--texto); }
 .mapa-medalha { display: grid; place-items: center; line-height: 0; }

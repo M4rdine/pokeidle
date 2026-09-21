@@ -18,19 +18,8 @@
   box-shadow: 0 2px 0 var(--madeira), 0 8px 20px rgb(51 38 31 / 38%);
 }
 .modal-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border-bottom: var(--border-w) solid var(--madeira-escura); }
-/*
- * O X é desenhado, não escrito: duas barras de 2 px cruzadas, do mesmo traço reto do resto do
- * mundo. Um "×" de fonte seria o único ícone de um sistema que não tem biblioteca de ícones.
- */
-.modal-close { position: relative; width: var(--space-4); height: var(--space-4); padding: 0; flex-shrink: 0; }
-.modal-close::before, .modal-close::after {
-  content: ""; position: absolute; left: 50%; top: 50%;
-  width: 14px; height: var(--border-w); margin: calc(var(--border-w) / -2) 0 0 -7px;
-  background: var(--tinta);
-}
-.modal-close::before { transform: rotate(45deg); }
-.modal-close::after { transform: rotate(-45deg); }
-.modal-close:hover::before, .modal-close:hover::after { background: var(--perigo); }
+/* Fechar é ação de moldura fina: com os 12 px do botão comum, a caixa de conteúdo some. */
+.modal-close { --moldura-w: 6px; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; flex-shrink: 0; }
 .modal-body { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); overflow-y: auto; min-height: 0; }
 /* Linha de lista não é objeto: só o fio de madeira que a separa da seguinte, sem moldura e sem fundo. */
 .bag-item, .team-row, .shop-item { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-1) 0; border-bottom: 1px solid var(--madeira); }

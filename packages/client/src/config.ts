@@ -11,4 +11,7 @@ export const TIP_PREFIX = 'pokeidle.tip.'
 /* A ordem é a de uso: o Mapa primeiro, porque trocar de área é a decisão mais frequente de um
  * idle, e Configurações por último, porque é a mais rara. */
 export const MODAL_LABELS = { mapa: 'Mapa', team: 'Time', bag: 'Mochila', pokedex: 'Pokédex', shop: 'Loja', settings: 'Configurações' } as const
+/* O ícone acompanha o rótulo, nunca o substitui: símbolo sozinho vira adivinhação, e a fileira
+ * do menu é justamente onde o jogador procura por nome. */
+export const MODAL_ICONS = { mapa: 'mapa', team: 'time', bag: 'mochila', pokedex: 'pokedex', shop: 'loja', settings: 'configuracoes' } as const
 export const MAX_TEAM_SLOTS = 6

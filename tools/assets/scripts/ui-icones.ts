@@ -8,8 +8,8 @@
  * paleta de uma vez.
  *
  * O QUE ESTE PACK NÃO RESOLVE: ícone de assunto. Não há livro, mapa, mochila, loja nem
- * engrenagem — só controle. Os seis itens do menu de funções continuam sem ícone, e a decisão de
- * desenhá-los está registrada em DESIGN.md.
+ * engrenagem — só controle. Os seis do menu de funções são desenhados à mão, em
+ * `ui-icones-menu.ts`, e o porquê está lá.
  *
  * Uso: `pnpm icones` na raiz. As PNGs geradas são versionadas, então o build normal não depende
  * deste passo.
@@ -41,7 +41,6 @@ const ICONES: readonly { readonly nome: string; readonly tile: number; readonly 
   { nome: 'menos', tile: 34, onde: 'afastar o mapa' },
   { nome: 'parar', tile: 3, onde: 'encerrar a caçada' },
   { nome: 'cadeado', tile: 50, onde: 'área que ainda não abriu' },
-  { nome: 'time', tile: 37, onde: 'o menu do time' },
   { nome: 'fechar', tile: 35, onde: 'fechar um modal' },
 ]
 

@@ -106,6 +106,12 @@
 .icone[data-icone="cadeado"] { background-image: url('./ui/icone-cadeado.png'); }
 .icone[data-icone="time"] { background-image: url('./ui/icone-time.png'); }
 .icone[data-icone="fechar"] { background-image: url('./ui/icone-fechar.png'); }
+/* Os seis do menu de funções, desenhados à mão em `ui-icones-menu.ts`. */
+.icone[data-icone="mapa"] { background-image: url('./ui/icone-mapa.png'); }
+.icone[data-icone="mochila"] { background-image: url('./ui/icone-mochila.png'); }
+.icone[data-icone="pokedex"] { background-image: url('./ui/icone-pokedex.png'); }
+.icone[data-icone="loja"] { background-image: url('./ui/icone-loja.png'); }
+.icone[data-icone="configuracoes"] { background-image: url('./ui/icone-configuracoes.png'); }
 
 /** Botão só de ícone, quadrado, no piso de alvo de toque. */
 .botao-icone {

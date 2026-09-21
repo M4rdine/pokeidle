@@ -213,6 +213,23 @@
  */
 .area-mapa { list-style: none; margin: var(--space-2) 0 var(--space-3); }
 .mapa { position: relative; line-height: 0; }
+
+/*
+ * A janela recorta; o mundo cresce dentro dela. O zoom muda a LARGURA do mundo em vez de aplicar
+ * `transform: scale`, e a diferença importa: com `scale` os medalhões cresceriam junto e a três
+ * vezes um deles tomaria meia tela. Mudando a largura, a imagem cresce, os marcadores continuam
+ * ancorados em porcentagem — então acompanham o lugar certo — e o tamanho deles não muda.
+ */
+.mapa-janela { overflow: auto; cursor: grab; max-height: 62vh; }
+.mapa-arrastando { cursor: grabbing; }
+.mapa-mundo { position: relative; width: calc(100% * var(--zoom, 1)); }
+
+/* Os controles flutuam sobre o canto do mapa, como na referência. */
+.mapa-controles { position: absolute; right: var(--space-2); bottom: var(--space-2); display: flex; gap: var(--space-1); }
+/* Moldura fina e caixa de 36 px: com os 12 px de moldura do botão comum, um alvo de 24 px fica
+ * com caixa de conteúdo ZERO e o ícone simplesmente não aparece — foi o que aconteceu. */
+.mapa-zoom { --moldura-w: 6px; width: 36px; height: 36px; padding: 0; }
+
 /* O mapa é embutido na superfície: a mesma fenda dos outros lugares onde se LÊ. Aqui a moldura
    desenhada de 12 px comeria a beirada do mapa, então a fenda é a borda fina com sombra. */
 .mapa-imagem {
@@ -256,9 +273,18 @@
 /* O medalhão aberto é o único grifado: o marca-texto diz onde se está, não onde dá para ir. */
 .mapa-marcador-ativo { border-color: var(--marca-borda); box-shadow: 0 0 0 3px var(--marca); }
 .mapa-marcador-ativo .mapa-nivel { background: var(--marca); color: var(--fora); border-color: var(--marca-borda); }
-/* Travado apaga o sprite e mantém o número aceso: é pelo número que se decide o que perseguir. */
-.mapa-marcador-travado .mapa-medalha { opacity: 0.35; }
-.mapa-marcador-travado .mapa-nivel { color: var(--ouro); }
+/* Travado apaga o sprite e mantém o número aceso: é pelo número que se decide o que perseguir.
+   O cadeado entra ANTES do número, não no lugar dele — o ícone diz "fechado" e o número diz
+   "fechado até quando", que é a metade que decide se vale perseguir. */
+.mapa-marcador-travado .mapa-medalha { opacity: 0.3; }
+.mapa-marcador-travado .mapa-nivel { color: var(--ouro); padding-left: 14px; }
+.mapa-marcador-travado .mapa-nivel::before {
+  content: ""; position: absolute; left: 2px; top: 50%; transform: translateY(-50%);
+  width: 11px; height: 11px;
+  background: url('./ui/icone-cadeado.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+.mapa-marcador-travado .mapa-nivel { position: relative; }
 
 /* ── O mapa como modal ───────────────────────────────────────────────────────
  * Abas de região em cima, mapa à esquerda e analisador à direita. O modal existe para trocar de

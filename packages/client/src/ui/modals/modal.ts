@@ -17,10 +17,10 @@ export function openModal(root: Element, title: string, content: HTMLElement, on
     ? document.activeElement
     : null
   current?.close()
-  // Sem glifo: o X é DESENHADO em CSS, com duas barras retas. O sistema não tem biblioteca de
-  // ícones, e um "×" de fonte aqui seria o primeiro ícone dela — herdado de uma família qualquer,
-  // com peso e tamanho que não são os do resto do mundo.
-  const closeButton = el('button', { class: 'modal-close', type: 'button', 'aria-label': 'Fechar' })
+  // O X é um ícone do conjunto, não um glifo de fonte nem duas barras de CSS: desde que existe
+  // uma biblioteca de ícones no projeto, desenhar este à mão seria manter dois vocabulários.
+  const closeButton = el('button', { class: 'modal-close', type: 'button', 'aria-label': 'Fechar' },
+    el('span', { class: 'icone', 'data-icone': 'fechar' }))
   const dialog = el('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
     el('header', { class: 'modal-header' }, el('h2', {}, title), closeButton),
     el('div', { class: 'modal-body' }, content))

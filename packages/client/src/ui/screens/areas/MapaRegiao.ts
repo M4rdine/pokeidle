@@ -28,6 +28,14 @@ interface Props {
 /** Lado do sprite dentro do medalhão, em pixels. */
 const LADO_MEDALHAO = 32
 
+/**
+ * Degraus de zoom. Inteiros de propósito: o mapa é arte de pixel, e ampliar por 1,5 borraria a
+ * grade mesmo com `image-rendering: pixelated` — meio pixel não existe.
+ */
+const ZOOM = [1, 2, 3] as const
+/** Quanto o ponteiro pode andar antes de um clique virar arraste, em pixels. */
+const FOLGA_ARRASTE = 4
+
 /** Rótulo curto do marcador: o nível é o que decide se dá para ir agora. */
 const rotuloDoMarcador = (area: AreaNoMapa): string =>
   area.locked ? `nv ${area.minTrainerLevel}` : `${area.minLevel}–${area.maxLevel}`
@@ -77,7 +85,76 @@ export function mapaRegiao(props: Props): HTMLElement {
     return botao
   })
 
+  /*
+   * O zoom muda a LARGURA do mundo, não a escala dele. Com `transform: scale` os marcadores
+   * cresceriam junto e a três vezes um medalhão tomaria meia tela; mudando a largura, a imagem
+   * cresce, os marcadores continuam ancorados em porcentagem — então acompanham o lugar certo —
+   * e o tamanho deles em pixels não muda. É o que a referência faz.
+   */
+  const mundo = el('div', { class: 'mapa-mundo' }, imagem, el('div', { class: 'mapa-marcadores' }, ...marcadores))
+  const janela = el('div', { class: 'mapa-janela' }, mundo)
+  let nivel = 0
+  const aplicarZoom = (): void => {
+    mundo.style.setProperty('--zoom', String(ZOOM[nivel]))
+    menos.disabled = nivel === 0
+    mais.disabled = nivel === ZOOM.length - 1
+  }
+  /** Aproxima mantendo no lugar o ponto do mapa que está no centro da janela. */
+  const trocarZoom = (passo: number): void => {
+    const antes = ZOOM[nivel]!
+    const proximo = Math.min(ZOOM.length - 1, Math.max(0, nivel + passo))
+    if (proximo === nivel) return
+    const cx = (janela.scrollLeft + janela.clientWidth / 2) / antes
+    const cy = (janela.scrollTop + janela.clientHeight / 2) / antes
+    nivel = proximo
+    aplicarZoom()
+    const depois = ZOOM[nivel]!
+    janela.scrollLeft = cx * depois - janela.clientWidth / 2
+    janela.scrollTop = cy * depois - janela.clientHeight / 2
+  }
+  // O ícone é FILHO, não fundo do botão: a moldura usa `border-image` com `fill`, e o `fill`
+  // pinta o miolo da peça por cima de qualquer `background` — o ícone sumia atrás da madeira.
+  const menos = el('button', { type: 'button', class: 'botao-icone mapa-zoom', 'aria-label': 'Afastar o mapa' },
+    el('span', { class: 'icone', 'data-icone': 'menos' })) as HTMLButtonElement
+  const mais = el('button', { type: 'button', class: 'botao-icone mapa-zoom', 'aria-label': 'Aproximar o mapa' },
+    el('span', { class: 'icone', 'data-icone': 'mais' })) as HTMLButtonElement
+  menos.addEventListener('click', () => trocarZoom(-1))
+  mais.addEventListener('click', () => trocarZoom(1))
+
+  /*
+   * Arrastar para mover. O clique no marcador continua funcionando porque só depois de a folga
+   * ser vencida o gesto vira arraste — sem isso, qualquer tremida do dedo em cima de um medalhão
+   * cancelaria a escolha.
+   */
+  let arrastando = false
+  let mexeu = false
+  let de = { x: 0, y: 0, sx: 0, sy: 0 }
+  janela.addEventListener('pointerdown', (ev) => {
+    if (ev.button !== 0) return
+    arrastando = true
+    mexeu = false
+    de = { x: ev.clientX, y: ev.clientY, sx: janela.scrollLeft, sy: janela.scrollTop }
+  })
+  janela.addEventListener('pointermove', (ev) => {
+    if (!arrastando) return
+    const dx = ev.clientX - de.x
+    const dy = ev.clientY - de.y
+    if (!mexeu && Math.hypot(dx, dy) < FOLGA_ARRASTE) return
+    mexeu = true
+    janela.classList.add('mapa-arrastando')
+    janela.scrollLeft = de.sx - dx
+    janela.scrollTop = de.sy - dy
+  })
+  const soltar = (): void => { arrastando = false; janela.classList.remove('mapa-arrastando') }
+  janela.addEventListener('pointerup', soltar)
+  janela.addEventListener('pointercancel', soltar)
+  janela.addEventListener('pointerleave', soltar)
+  // Um arraste que termina em cima de um marcador não pode contar como escolha dele.
+  janela.addEventListener('click', (ev) => { if (mexeu) { ev.stopPropagation(); ev.preventDefault() } }, true)
+
+  aplicarZoom()
+
   return el('div', { class: 'mapa', 'data-regiao': regiaoId },
-    imagem,
-    el('div', { class: 'mapa-marcadores' }, ...marcadores))
+    janela,
+    el('div', { class: 'mapa-controles' }, menos, mais))
 }

@@ -405,19 +405,41 @@ parar de caçar. O modal abre por cima, o jogo continua rodando atrás, e trocar
   sessão precisa ser fechada e o progresso gravado. Esconder isso atrás de "Caçar aqui" seria
   mentir sobre uma ação que grava progresso.
 
+## Ícones
+
+Existem, e são **elementos**, nunca `background` de quem os contém. A moldura usa `border-image`
+com `fill`, e o `fill` pinta o miolo da peça por cima de qualquer `background` — um ícone posto
+como fundo de botão simplesmente não aparece. A mesma armadilha derruba o grifo da aba ativa, que
+por isso declara `border-image-source: none`.
+
+As peças vêm do **Pixel UI Icons do VerzatileDev** (CC0), repintadas na nossa paleta por
+`pnpm icones`. A repintura é por **luminância**, e não por troca exata de cor como nas molduras:
+a folha de origem é sombreada, um ícone usa oito tons de azul, e uma tabela de-para quebraria no
+primeiro que tivesse um tom a mais. Mapear o brilho sobre a nossa rampa preserva o desenho e joga
+tudo dentro da paleta de uma vez.
+
+Trazemos só os seis que a interface realmente desenha na tela. A folha tem 64; importar os 64
+encheria o repositório de arte que ninguém usa, e cada um seria um convite a inventar um uso.
+
 ## O que falta
 
-**Ícones.** O sistema não tem nenhum, e o pack do Kenney não resolve: as peças pequenas dele são
-formas de interface (caixa de marcar, botãozinho, controle deslizante), não ícones de assunto —
-não há livro, mapa, mochila nem engrenagem. Enquanto não houver um conjunto desenhado, nada de
-emoji e nada de glifo Unicode fazendo as vezes de ícone: o primeiro glifo seria o primeiro ícone
-de uma biblioteca que não existe, herdado de uma família qualquer, com peso e tamanho que não são
-os do resto do mundo. Candidato levantado na pesquisa: **Pixel UI Icons** do VerzatileDev (CC0).
+**Os ícones do menu de funções.** O pack do VerzatileDev é um conjunto de CONTROLE — reprodução,
+setas, mais/menos, cadeado, lista, gráfico. Ele **não tem ícone de assunto**: não há livro, mapa,
+mochila, loja nem engrenagem. Dos seis itens do nosso menu ele cobre um (Time ≈ o ícone de
+pessoas), e pôr ícone em um só seria pior que em nenhum — a fileira perderia o alinhamento de
+peso que hoje ela tem.
 
-## Créditos de arte
+Até existirem os seis, o menu fica só com rótulo. E continua valendo: nada de emoji e nada de
+glifo Unicode fazendo as vezes de ícone.
+
+## Créditos de arte## Créditos de arte
 
 - Moldura: **UI Pack Pixel Adventure**, de [Kenney](https://kenney.nl/assets/ui-pack-pixel-adventure)
   — CC0 1.0. A peça de origem está em `tools/assets/ui/kenney/` com a licença; o repintado é nosso.
+- Ícones: **Pixel UI Icons**, de [VerzatileDev](https://verzatiledev.itch.io/pixel-ui-icons) —
+  CC0 1.0. A folha de origem está em `tools/assets/ui/verzatile/` com a licença transcrita: o
+  `.zip` distribuído não traz arquivo de licença nenhum, e num repositório aberto que redistribui
+  a arte ela precisa viajar junto.
 - Fontes: **Pixelify Sans** (OFL, The Pixelify Sans Project Authors) e **Atkinson Hyperlegible**
   (OFL, Braille Institute of America). Ver `packages/client/src/styles/fontes/LEIAME.md`.
 

@@ -88,6 +88,25 @@
 .moeda-valor { font-weight: 700; }
 .moeda-ouro .moeda-valor { color: var(--ouro); }
 
+/*
+ * ÍCONE. Sempre um ELEMENTO, nunca o `background` de quem o contém: a moldura usa `border-image`
+ * com `fill`, e o `fill` pinta o miolo da peça por cima de qualquer `background` — um ícone posto
+ * como fundo de botão simplesmente não aparece. Custou uma rodada descobrir.
+ *
+ * As peças vêm do pack do VerzatileDev (CC0), repintadas na nossa paleta por `pnpm icones`.
+ */
+.icone {
+  display: block; width: 16px; height: 16px; flex-shrink: 0;
+  background-repeat: no-repeat; background-position: center; background-size: contain;
+  image-rendering: pixelated;
+}
+.icone[data-icone="mais"] { background-image: url('./ui/icone-mais.png'); }
+.icone[data-icone="menos"] { background-image: url('./ui/icone-menos.png'); }
+.icone[data-icone="parar"] { background-image: url('./ui/icone-parar.png'); }
+.icone[data-icone="cadeado"] { background-image: url('./ui/icone-cadeado.png'); }
+.icone[data-icone="time"] { background-image: url('./ui/icone-time.png'); }
+.icone[data-icone="fechar"] { background-image: url('./ui/icone-fechar.png'); }
+
 /** Botão só de ícone, quadrado, no piso de alvo de toque. */
 .botao-icone {
   display: grid; place-items: center;

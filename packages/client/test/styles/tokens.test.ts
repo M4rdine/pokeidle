@@ -29,6 +29,7 @@ async function cores(): Promise<Set<string>> {
 const EM_TEMPO_DE_EXECUCAO: readonly string[] = [
   '--cd',      // fração de recarga de cada golpe, em hud/moves.ts
   '--fracao',  // altura da barra de atributo-base, em ui/species/stats.ts
+  '--zoom',    // degrau de zoom do mapa da região, em screens/areas/MapaRegiao.ts
 ]
 
 /** Variáveis usadas via `var(--x)`, exceto as declaradas em qualquer folha. */

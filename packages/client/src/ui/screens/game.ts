@@ -17,7 +17,8 @@ export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
   const center = el('div', { class: 'grid-center', id: 'scene' })
   const right = el('div', { class: 'grid-right' })
   const bottom = el('div', { class: 'grid-bottom' })
-  mount(root, el('section', { class: 'screen screen-game game-grid' }, top, left, center, right, bottom))
+  const titulo = el('h1', { class: 'so-leitor' }, 'Caçada em andamento')
+  mount(root, el('main', { class: 'screen screen-game game-grid' }, titulo, top, left, center, right, bottom))
 
   const offs = [mountTopBar(top, ctx), mountActivePokemon(left, ctx), mountMoves(left, ctx),
     mountSituacao(left, ctx), mountTeamStrip(right, ctx), mountLog(bottom, ctx), mountOverlays(center, ctx)]

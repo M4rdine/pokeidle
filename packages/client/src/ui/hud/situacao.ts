@@ -16,7 +16,7 @@ export function mountSituacao(root: HTMLElement, ctx: AppContext): () => void {
     el('div', { class: 'alvo-linha' }, alvoNome, alvoNivel, alvoHpTexto),
     alvoHp)
 
-  root.append(el('section', { class: 'situacao panel' },
+  root.append(el('section', { class: 'situacao panel', 'aria-live': 'polite' },
     el('div', { class: 'cabeca' }, el('span', {}, 'situação')),
     texto,
     alvo))

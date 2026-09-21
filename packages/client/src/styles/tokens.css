@@ -19,12 +19,17 @@
 
   /* ── Texto ── */
   --text: #f0f0f5;
-  --muted: #9aa0b4;
+  /* 4,83:1 no pior fundo (`--painel-alto`). O tom anterior dava 4,2:1 e reprovava em texto
+   * normal — e é justamente o rótulo discreto que mais aparece na tela. */
+  --muted: #a6acbe;
 
   /* ── Papéis ── */
   --accent: #f8d030;       /* ativo, ação primária, recompensa, foco */
   --ouro: #f0c040;
   --danger: #e04848;
+  /* O vermelho puro sobre `--painel` mede 3,20:1 e reprova em texto normal. Esta é a versão para
+   * ler sobre painel: 5,1:1. A má notícia não pode ser mais difícil de ler que a boa. */
+  --danger-texto: #ff8a8a;
   --ok: #52c46a;
   --xp: #58a6f0;
 

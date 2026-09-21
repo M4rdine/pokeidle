@@ -64,7 +64,7 @@
 .conn::before { content: ""; width: 6px; height: 6px; background: currentColor; flex-shrink: 0; }
 .conn[data-conn="open"] { color: var(--ok); }
 .conn[data-conn="reconnecting"], .conn[data-conn="connecting"], .conn[data-conn="catching-up"] { color: var(--accent); }
-.conn[data-conn="closed"] { color: var(--danger); }
+.conn[data-conn="closed"] { color: var(--danger-texto); }
 
 /* ── Ficha do ativo ─────────────────────────────────────────────────────────── */
 .active-card { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); }
@@ -112,7 +112,7 @@
 .slot-linha { display: flex; align-items: center; gap: var(--space-1); min-width: 0; }
 .slot-nome { font-weight: 600; font-size: 0.85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .slot-tipos .chip { font-size: 0.62em; }
-.slot-hp { font-size: 0.7em; }
+.slot-hp { font-size: 0.78em; }
 .slot progress { height: 6px; }
 .slot-active { border-color: var(--accent); }
 /* Vaga vazia e vaga travada são lugares onde ainda não há nada: afundam, em vez de se levantar
@@ -137,14 +137,20 @@
 }
 .log-header label { display: flex; align-items: center; gap: var(--space-1); cursor: pointer; }
 .log-filtro { margin-left: auto; }
-.log-header input { width: auto; }
+/* Não usar `width: auto` aqui: com `appearance: none` e sem conteúdo, a caixa colapsa
+ * para a borda — media 4px de largura. */
+.log-header input[type="checkbox"] { width: 14px; flex-shrink: 0; }
 .log-lines { list-style: none; margin: 0; padding: var(--space-2) var(--space-3); overflow-y: auto; flex: 1; min-height: 0; }
 .log-line { padding: 1px 0; }
-.log-combat { color: var(--text); } .log-reward { color: var(--accent); }
-.log-info { color: var(--muted); } .log-alert { color: var(--danger); }
+/* A hierarquia do registro em três degraus: o combate é o fundo, a recompensa de rotina se lê
+ * sem gritar, e o marco — captura, evolução, nível — é o único que acende. */
+.log-combat { color: var(--muted); }
+.log-reward { color: var(--text); }
+.log-marco { color: var(--accent); font-weight: 700; }
+.log-info { color: var(--muted); } .log-alert { color: var(--danger-texto); }
 .log-vazio { color: var(--muted); padding: var(--space-2) var(--space-3); }
 
-.scene-error { color: var(--danger); padding: var(--space-3); }
+.scene-error { color: var(--danger-texto); padding: var(--space-3); }
 .catchup, .stopped { display: flex; flex-direction: column; gap: var(--space-2); align-items: center; padding: var(--space-4); }
 
 /* ── Janela estreita ────────────────────────────────────────────────────────── */
@@ -154,11 +160,14 @@
     /* Altura explícita para a cena. Com `1fr` numa grade de altura automática a linha resolve
      * pelo conteúdo, e o container da cena crescia sem limite: a página virava um corredor preto
      * de milhares de pixels com o mapa perdido no meio. */
-    grid-template-rows: auto 55vh auto auto;
-    grid-template-areas: "top" "center" "left" "bottom";
+    grid-template-rows: auto 55vh auto auto auto;
+    grid-template-areas: "top" "center" "right" "left" "bottom";
     height: auto; min-height: 100vh;
   }
-  .grid-right { display: none; }
+  /* A coluna do time vira faixa horizontal abaixo da cena, em vez de sumir. Escondê-la deixava
+   * o jogador de celular sem NENHUM caminho para trocar o Pokémon ativo: o modal de Time fica
+   * bloqueado durante a caçada, e a faixa era a única outra porta. */
+  .grid-right { display: block; overflow-x: auto; overflow-y: visible; }
   .grid-bottom { min-height: 120px; }
 
   /* Numa janela estreita tudo pode quebrar e encolher. Sem soltar o `flex-shrink` dos grupos, a

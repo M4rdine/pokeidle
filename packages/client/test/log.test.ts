@@ -47,3 +47,19 @@ describe('formatEvent', () => {
     expect(next[0]?.text).toBe('1')
   })
 })
+
+describe('hierarquia do registro', () => {
+  const kind = (e: unknown) => formatEvent(e as never, ctx)?.kind
+
+  it('captura, evolução e subida de nível são marcos, não recompensa de rotina', () => {
+    expect(kind({ type: 'captured', tick: 1, wildId: 1, speciesName: 'zubat', level: 5, toBox: false })).toBe('marco')
+    expect(kind({ type: 'evolved', tick: 1, pokemonId: 'p1', from: 'charmander', to: 'charmeleon' })).toBe('marco')
+    expect(kind({ type: 'levelUp', tick: 1, pokemonId: 'p1', level: 12 })).toBe('marco')
+  })
+
+  it('a derrota de rotina não é marco: ela acontece a cada dois segundos', () => {
+    // Quando o evento mais frequente do jogo usa a cor de destaque, o destaque deixa de existir.
+    const derrota = { type: 'wildDefeated', tick: 1, wildId: 1, speciesName: 'zubat', level: 4, xpTrainer: 28, xpPokemon: 28, gold: 7, drops: [] }
+    expect(kind(derrota)).toBe('reward')
+  })
+})

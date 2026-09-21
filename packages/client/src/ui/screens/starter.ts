@@ -35,7 +35,7 @@ export function mountStarter(root: HTMLElement, ctx: AppContext): () => void {
       el('p', { class: 'level' }, `Nível ${STARTER_LEVEL}`),
       button)
   }
-  mount(root, el('section', { class: 'screen screen-starter' },
+  mount(root, el('main', { class: 'screen screen-starter' },
     el('h1', {}, 'Escolha seu inicial'),
     el('div', { class: 'starter-grid' }, ...STARTERS.map(card)),
     error))

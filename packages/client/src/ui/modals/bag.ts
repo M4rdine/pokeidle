@@ -34,6 +34,11 @@ export function openBag(ctx: AppContext): Modal {
   }
 
   if (inHunt) render(asList(view.state!.inventory))
-  else void ctx.http.get('/trainer/inventory', InventorySchema).then((r) => render(r.items)).catch(() => render([]))
+  // Sem este ramo, falha de rede virava "Mochila vazia" — e quem lê isso acha que perdeu os itens.
+  else {
+    void ctx.http.get('/trainer/inventory', InventorySchema)
+      .then((r) => render(r.items))
+      .catch(() => body.replaceChildren(el('p', { class: 'form-error', role: 'alert' }, 'não foi possível carregar a mochila')))
+  }
   return openModal(document.body, 'Mochila', body)
 }

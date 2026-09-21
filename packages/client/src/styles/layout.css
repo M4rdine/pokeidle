@@ -2,6 +2,15 @@
 /* `display` de classe vence `[hidden]`, que só define `display: none` como padrão do agente.
  * Sem isto, todo painel escondido que tenha `display: flex` continua aparecendo. */
 [hidden] { display: none !important; }
+/* Some da tela e continua no documento: é assim que um leitor de tela recebe o título de uma
+ * tela que, visualmente, já se explica sozinha. `display: none` esconderia dos dois. */
+.so-leitor {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+/* Alvo de toque mínimo. Um botão de 17 px é acertável com mouse e não com o dedo, e a régua de
+ * 24 px é a do WCAG 2.2 — vale para o filtro de tipo, o fechar do modal e o rótulo do log. */
+button, [role="button"], label:has(> input[type="checkbox"]) { min-height: 24px; }
 body {
   margin: 0;
   background: var(--noite);
@@ -43,18 +52,22 @@ button:active:not([disabled]) {
 
 button[disabled] { opacity: 0.5; cursor: default; }
 button.primary { border-color: var(--accent); color: var(--accent); }
-/* Campo é superfície que afunda: é onde se escreve, não onde se aperta. */
-input {
+/* Campo é superfície que afunda: é onde se escreve, não onde se aperta. O `select` entra junto:
+ * sem regra, ele saía no padrão branco e arredondado do navegador — o único elemento claro de
+ * uma interface inteiramente escura. */
+input, select {
   font: inherit; color: var(--text); width: 100%;
   background: var(--cava);
   border: var(--border-w) solid var(--moldura-sombra);
   box-shadow: inset var(--bisel) var(--bisel) 0 rgb(0 0 0 / 45%);
   padding: var(--space-2);
 }
+select { appearance: none; cursor: pointer; padding-right: var(--space-3); }
+select option { background: var(--cava); color: var(--text); }
 .field { display: flex; flex-direction: column; gap: var(--space-1); margin: 0 0 var(--space-3); }
 .tabs { display: flex; gap: var(--space-2); }
 .tab-active { border-color: var(--accent); }
-.form-error { color: var(--danger); min-height: 1.2em; margin: var(--space-2) 0 0; }
+.form-error { color: var(--danger-texto); min-height: 1.2em; margin: var(--space-2) 0 0; }
 /*
  * O matiz do tipo identifica na borda; o rótulo é lido numa mistura com o texto do tema. Os
  * dezoito matizes canônicos foram feitos para fundo claro: `ghost` e `dark` como texto puro sobre

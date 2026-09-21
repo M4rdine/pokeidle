@@ -35,3 +35,57 @@ describe('openModal', () => {
     root.remove()
   })
 })
+
+describe('o foco não escapa do modal', () => {
+  const focavel = (rotulo: string) => {
+    const b = document.createElement('button')
+    b.textContent = rotulo
+    return b
+  }
+
+  it('Tab no último elemento volta para o primeiro, em vez de ir para o fundo da página', () => {
+    const atras = focavel('atrás do modal')
+    document.body.append(atras)
+    const conteudo = document.createElement('div')
+    const dentro = focavel('dentro')
+    conteudo.append(dentro)
+    openModal(document.body, 'Teste', conteudo)
+
+    dentro.focus()
+    // O conteúdo atrás do overlay continua no DOM e focável; sem laço, o Tab chegaria nele.
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }))
+    const fechar = document.querySelector<HTMLElement>('.modal-close')!
+    expect(document.activeElement).toBe(fechar)
+
+    atras.remove()
+    document.querySelector('.modal-backdrop')?.remove()
+  })
+
+  it('Shift+Tab no primeiro elemento vai para o último, e não sai por cima', () => {
+    const conteudo = document.createElement('div')
+    const dentro = focavel('dentro')
+    conteudo.append(dentro)
+    openModal(document.body, 'Teste', conteudo)
+
+    const fechar = document.querySelector<HTMLElement>('.modal-close')!
+    fechar.focus()
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true }))
+    expect(document.activeElement).toBe(dentro)
+
+    document.querySelector('.modal-backdrop')?.remove()
+  })
+
+  it('devolve o foco a quem abriu, ao fechar', () => {
+    const abridor = focavel('abrir')
+    document.body.append(abridor)
+    abridor.focus()
+
+    const modal = openModal(document.body, 'Teste', document.createElement('div'))
+    expect(document.activeElement).not.toBe(abridor)
+    modal.close()
+
+    // Sem isto o foco cai no `body` e quem navega por teclado perde o lugar na página.
+    expect(document.activeElement).toBe(abridor)
+    abridor.remove()
+  })
+})

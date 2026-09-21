@@ -5,6 +5,9 @@ progresso continua com a aba fechada. A simulação inteira acontece no servidor
 
 [![CI](https://github.com/M4rdine/pokeidle/actions/workflows/ci.yml/badge.svg)](https://github.com/M4rdine/pokeidle/actions/workflows/ci.yml)
 
+**▶ Jogue: <https://pokeidle.187-77-37-92.sslip.io>** — crie uma conta, escolha o inicial e mande
+caçar. O progresso continua com a aba fechada.
+
 ![A tela de jogo: mapa ao centro, ficha do Pokémon ativo à esquerda, time à direita e registro embaixo](docs/imagens/jogo.png)
 
 O servidor simula; o cliente desenha o que recebe e manda intenção. O cenário é gerado pelo
@@ -93,6 +96,32 @@ rode duas suítes ao mesmo tempo na mesma máquina.
 | `packages/client` | PixiJS sem framework, com espelho puro do estado |
 | `tools/assets` | extração de sprites, atlas, tileset do Tiled e importação de mapa |
 | `tools/pokedata` | ingestão de espécies e golpes a partir do PokeAPI |
+
+## Contribuir
+
+Pull request é bem-vindo, de qualquer tamanho — de correção de texto a área nova. Não há processo
+pesado: abra a PR e conversamos nela.
+
+```bash
+git clone https://github.com/M4rdine/pokeidle.git && cd pokeidle
+pnpm install
+docker compose up -d
+pnpm -r test
+```
+
+O que ajuda a PR a ser aceita rápido:
+
+- **Teste junto.** O projeto trava comportamento em teste, não em captura de tela. Se a mudança é
+  de regra, o teste é a descrição dela.
+- **`pnpm -r test` e `pnpm -r exec tsc --noEmit` verdes.** O CI roda os dois.
+- **Um assunto por PR.** Duas mudanças independentes revisam melhor separadas.
+
+Se quiser uma ideia do que fazer, as specs em `docs/superpowers/specs/` terminam com uma seção
+"fora de escopo" que registra, com o motivo, o que ficou por fazer em cada entrega.
+
+> **Sobre rodar com sprites.** Os arquivos de arte do pack de fã não estão no repositório, então
+> `pnpm assets build` precisa de um dump próprio para gerar o atlas. Sem ele o servidor sobe e o
+> mapa fica em branco. Nada que seja lógica de jogo, servidor, motor ou teste depende disso.
 
 ## Documentação
 

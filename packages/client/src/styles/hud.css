@@ -41,20 +41,13 @@
  * Grade de alvos iguais. A ordem é estável e cada função tem o mesmo peso — nenhuma delas é mais
  * "ação" que a outra, porque todas só abrem um painel.
  */
-/* Numa linha só: a grade ocupa o que sobrar e a faixa de sessão fica à direita. Em coluna, o
- * menu tomava 170 px de altura para cinco botões, e essa altura sai do mundo. */
+/* Uma faixa só, e tudo dentro dela abre painel. Em coluna, o menu tomava 170 px de altura para
+ * cinco botões, e essa altura sai do mundo. */
 .menu { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-1); }
 .menu-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: var(--space-1); flex: 1; min-width: 0; }
 /* Ícone e rótulo lado a lado, centralizados: a fileira só funciona se os seis tiverem a mesma
  * caixa, e é a igualdade entre eles que faz o conjunto parecer um conjunto. */
 .menu-item { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-1); }
-/* Parar e Sair mudam o ESTADO DA SESSÃO, e são as duas únicas coisas aqui que fazem isso: ficam
- * numa faixa própria, alinhadas à direita, longe do alvo de quem só quer abrir a Pokédex. */
-.menu-sessao { display: flex; gap: var(--space-1); flex-shrink: 0; }
-/* Ícone e rótulo lado a lado, com o ícone na frente: quem lê da esquerda encontra primeiro o
- * símbolo e confirma no texto. */
-.menu-sessao button { display: inline-flex; align-items: center; gap: var(--space-1); }
-.menu-sessao button:last-child:hover:not([disabled]) { color: var(--perigo); }
 
 /* ── Coluna de perfil ────────────────────────────────────────────────────────
  * Quem é o jogador e como ele está. Rótulo micro em caixa alta sobre o número, como mostrador de
@@ -121,6 +114,10 @@
 .situacao-texto[data-situacao="em combate"] { color: var(--texto); font-weight: 700; }
 .situacao-texto[data-situacao="curando"], .situacao-texto[data-situacao="voltando ao Centro"] { color: var(--texto-fraco); }
 .situacao-alvo { display: flex; flex-direction: column; gap: 2px; }
+/* O botão de encerrar mora aqui, encostado no que ele encerra, e some quando não há caçada.
+ * A margem em cima é a única do painel: separa "o que está acontecendo" de "o que eu faço". */
+.situacao-parar { align-self: flex-start; margin-top: var(--space-1); }
+.situacao-parar:hover:not([disabled]) { color: var(--perigo); }
 .situacao { min-height: 0; }
 .alvo-linha { display: flex; align-items: baseline; gap: var(--space-2); font-size: 0.85em; }
 .alvo-nome { font-weight: 600; }
@@ -207,7 +204,6 @@
   /* Numa tela estreita a grade do menu aperta para caber mais função por linha. */
   .menu { flex-direction: column; }
   .menu-grade { grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); }
-  .menu-sessao button { flex: 1; }
   /* A lista de golpes deixa de rolar por dentro: numa página que rola, rolagem aninhada esconde
    * conteúdo sem nenhum sinal de que ele existe. */
   .moves-caixa { overflow: visible; }

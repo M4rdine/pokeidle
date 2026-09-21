@@ -13,6 +13,7 @@ import { mountMoves } from '../../../src/ui/hud/moves.js'
 import { mountOverlays } from '../../../src/ui/hud/overlays.js'
 import { mountTeamStrip } from '../../../src/ui/hud/team-strip.js'
 import { mountMenu } from '../../../src/ui/hud/menu.js'
+import { mountSituacao } from '../../../src/ui/hud/situacao.js'
 import { mountPerfil } from '../../../src/ui/hud/perfil.js'
 import fixture from '../../fixtures/route1-300.json' with { type: 'json' }
 
@@ -42,19 +43,32 @@ describe('barra superior', () => {
     expect(r.querySelector('[data-conn]')?.getAttribute('data-conn')).toBe('open')
   })
   it('em catch-up a conexão avisa no perfil', () => {
-    // O estado da conexão mora no PERFIL e a ação de parar mora no MENU: são dois painéis
-    // diferentes desde que a tela virou três colunas, e o teste segue a separação.
+    // O estado da conexão mora no PERFIL: são painéis diferentes desde que a tela virou três
+    // colunas, e o teste segue a separação.
     const hunt = createStore({ ...view, phase: 'catching-up' as const, catchup: { remaining: 10 } })
     const r = root()
     mountPerfil(r, ctxWith({ hunt }))
     expect(r.querySelector('[data-conn]')?.getAttribute('data-conn')).toBe('catching-up')
   })
-  it('Parar manda a intenção uma vez a cada 200 ms', () => {
+  it('o menu só tem função que abre painel: nada de parar nem de sair', () => {
+    // A fileira inteira precisa ser uma coisa só. Enquanto "Parar" e "Sair" estavam ali, a ação
+    // mais cara da tela tinha o mesmo alvo e o mesmo peso de abrir a Pokédex.
+    const r = root()
+    mountMenu(r, ctxWith())
+    const rotulos = [...r.querySelectorAll('button')].map((b) => b.textContent)
+    expect(rotulos).not.toContain('Parar')
+    expect(rotulos).not.toContain('Sair')
+    expect(r.querySelectorAll('button[data-open]').length).toBe(rotulos.length)
+  })
+})
+
+describe('parar a caçada', () => {
+  it('fica no painel de situação e manda a intenção uma vez a cada 200 ms', () => {
     vi.useFakeTimers()
     const sendIntent = vi.fn()
     const hunt = createStore({ ...view, phase: 'catching-up' as const, catchup: { remaining: 10 } })
     const r = root()
-    mountMenu(r, ctxWith({ hunt, sendIntent }))
+    mountSituacao(r, ctxWith({ hunt, sendIntent }))
     const stop = [...r.querySelectorAll('button')].find((b) => b.textContent === 'Parar')!
     stop.click(); stop.click()
     expect(sendIntent).toHaveBeenCalledTimes(1)
@@ -63,6 +77,14 @@ describe('barra superior', () => {
     stop.click()
     expect(sendIntent).toHaveBeenCalledTimes(2)
     vi.useRealTimers()
+  })
+  it('sem caçada o botão some, em vez de ficar desabilitado', () => {
+    // Desabilitado promete uma ação esperando alguma condição. Aqui não há ação nenhuma: não
+    // existe caçada para encerrar, e o controle morto era o que ele era no menu antigo.
+    const r = root()
+    mountSituacao(r, ctxWith({ hunt: createStore(emptyHuntView()) }))
+    const stop = [...r.querySelectorAll('button')].find((b) => b.textContent === 'Parar')!
+    expect(stop.hidden).toBe(true)
   })
 })
 

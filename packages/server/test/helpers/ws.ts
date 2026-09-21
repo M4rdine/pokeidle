@@ -9,6 +9,21 @@ export async function listen(app: FastifyInstance): Promise<string> {
   return `ws://127.0.0.1:${address.port}`
 }
 
+/**
+ * Quanto a espera por mensagem aguenta antes de desistir.
+ *
+ * Isto NÃO é uma asserção de latência: nenhum teste afirma que a mensagem chega rápido, e nenhum
+ * espera esta promessa falhar. O prazo existe só para virar um erro legível em vez de um teste
+ * pendurado até o limite do vitest. Por isso fica logo ABAIXO do `testTimeout` de 20 s e bem
+ * acima de qualquer latência plausível.
+ *
+ * Eram 2 s, e 2 s fazia o papel contrário: o `hunt.tick` depende de persistência, o Postgres do
+ * ambiente escreve em disco virtualizado, e a suíte inteira rodando junto empurrava a escrita
+ * além disso de vez em quando. O arquivo falhava sozinho, sem nada a ver com o que testa — e uma
+ * dessas falhas chegou a pular o deploy no CI.
+ */
+const ESPERA_MS = 15_000
+
 export interface WsClient {
   readonly raw: WebSocket
   send(obj: unknown): void
@@ -42,14 +57,14 @@ export function connectWs(
         client: {
           raw,
           send: (obj) => raw.send(typeof obj === 'string' ? obj : JSON.stringify(obj)),
-          next: (timeoutMs = 2000) =>
+          next: (timeoutMs = ESPERA_MS) =>
             new Promise((res, rej) => {
               const q = queue.shift()
               if (q) return res(q)
               const timer = setTimeout(() => rej(new Error('timeout esperando mensagem')), timeoutMs)
               waiters.push((m) => { clearTimeout(timer); res(m) })
             }),
-          nextOf: async function nextOf(t, timeoutMs = 2000) {
+          nextOf: async function nextOf(t, timeoutMs = ESPERA_MS) {
             for (;;) {
               const m = await this.next(timeoutMs)
               if (m['t'] === t) return m

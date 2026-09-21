@@ -20,6 +20,7 @@ const TIPOS_DE_APP: Readonly<Record<string, string>> = {
   '.json': 'application/json; charset=utf-8',
   '.woff2': 'font/woff2',
   '.png': 'image/png',
+  '.webp': 'image/webp',
   '.svg': 'image/svg+xml',
 }
 

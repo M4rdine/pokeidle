@@ -411,11 +411,41 @@ universais e o espaço é do mapa.
 
 **Nada de emoji e nada de glifo Unicode** fazendo as vezes de ícone.
 
-## O que falta
+## O palco da entrada
 
-**Arte-chave da tela de entrada.** O fundo da tela de login e da escolha do inicial é sólido, e
-isso é uma pendência declarada, não uma escolha. A versão anterior esticava ali o PNG do mapa da
-região, o que é preguiça: mapa reduzido não é arte-chave. O lugar espera uma ilustração de verdade.
+A tela de login e a da escolha do inicial dividem um fundo só: **uma rota ensolarada em pixel
+art**, 256×144 px e 6,5 KB, em `packages/client/src/styles/arte/entrada.webp`. Antes ali estava o
+PNG do mapa da região esticado — mapa reduzido não é arte-chave — e depois um retângulo liso, que
+não é decisão nenhuma.
+
+Entre os dois houve uma terceira versão, descartada, que é a que ensina: uma **pintura
+fotorrealista de um entardecer**, gerada com IA paga. Bonita, e errada por duas razões que valem
+para qualquer arte que entre aqui depois.
+
+**Pintura atrás de um jogo pixelado são duas mãos na mesma tela.** É o mesmo erro que este
+documento já registra para os ícones — não desenhar o que o jogo já tem —, só que aplicado ao
+estilo em vez do objeto. A primeira tela do jogo tem que falar o idioma do jogo.
+
+**Pokémon é uma franquia LUMINOSA.** Céu azul, verde saturado, sol a pino. Entardecer dramático é
+idioma de RPG sombrio, e escolhê-lo "pelo clima" foi a mesma troca de idioma da madeira marrom,
+com outra roupa.
+
+**Nenhum Pokémon na arte — mas isso sozinho não faz arte nenhuma.** A regra continua: sprite de
+gerador ao lado do acervo oficial denuncia as duas mãos. O que faz uma rota parecer Pokémon não é
+a criatura, é o **vocabulário do mundo**: grama alta em tufos destacados, telhado vermelho, placa
+de rota, trilha de terra. Sem esse vocabulário, "sem criaturas" só entrega papel de parede.
+
+**O arquivo é do tamanho nativo.** Quem amplia é o `image-rendering: pixelated`, como o mundo do
+jogo. Guardar uma versão grande borraria o desenho antes de entregá-lo — e custaria dez vezes mais
+bytes para ficar pior. A pintura descartada pesava 64 KB; esta pesa 6,5.
+
+**O cartão fica a 92%, sem desfoque.** Desfoque é o reflexo moderno para descolar um cartão do
+fundo; sobre pixel art ele apaga a única coisa que a arte tem. A translucidez deixa o verde e o
+azul tingirem o painel — ele passa a estar no mesmo mundo — e o texto não perde contraste. Sobre a
+arte o cartão sobe para `--sombra-2`: um fio de 1 px não descola nada de um mundo desenhado.
+
+O prompt literal, as duas saídas e as contas de compressão estão em
+`packages/client/src/styles/arte/LEIAME.md`.
 
 ## Créditos de arte
 
@@ -428,6 +458,9 @@ região, o que é preguiça: mapa reduzido não é arte-chave. O lugar espera um
   ela precisa viajar junto.
 - Fontes: **Pixelify Sans** (OFL) e **Atkinson Hyperlegible** (OFL). Ver
   `packages/client/src/styles/fontes/LEIAME.md`.
+- Arte-chave da entrada: pixel art gerada no **Retro Diffusion** (`rd_pro__default`), que cede os
+  direitos da saída a quem gera. Prompt, contas de compressão e o porquê de ser pixel art em
+  `packages/client/src/styles/arte/LEIAME.md`.
 
 ## Do's and Don'ts
 

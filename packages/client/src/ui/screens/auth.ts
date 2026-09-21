@@ -44,7 +44,9 @@ export function mountAuth(root: HTMLElement, ctx: AppContext): () => void {
     // gigantes dentro — a primeira tela que alguém vê do jogo.
     mount(root, el('main', { class: 'screen screen-auth' },
       el('div', { class: 'auth-cartao panel' },
-        el('h1', {}, 'Pokeidle'),
+        // A Poké Ball acompanha o nome, não o substitui: é a marca do produto na primeira tela,
+        // e é o sprite oficial — o mesmo acervo dos ícones do menu, não um desenho nosso.
+        el('h1', {}, el('span', { class: 'auth-marca', 'aria-hidden': 'true' }), 'Pokeidle'),
         el('p', { class: 'auth-lema' }, 'Seu time caça sozinho. Você escolhe onde.'),
         tabs, form)))
   }

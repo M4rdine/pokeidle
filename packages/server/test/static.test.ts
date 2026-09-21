@@ -113,6 +113,23 @@ describe('arquivo com hash criado depois do boot', () => {
     await app.close()
   })
 
+  it('serve a arte-chave em .webp', async () => {
+    // A arte da entrada é o único `.webp` do build, e ela entra por CSS: se o tipo sair da lista,
+    // o navegador recebe 404 em JSON, não reclama, e a primeira tela do jogo simplesmente volta
+    // a ser um retângulo liso — a falha não aparece em lugar nenhum a não ser na tela.
+    const dist = await mkdtemp(join(tmpdir(), 'pokeidle-dist-'))
+    await mkdir(join(dist, 'app'), { recursive: true })
+    await writeFile(join(dist, 'index.html'), '<!doctype html><title>t</title>')
+    await writeFile(join(dist, 'app', 'entrada-abc123.webp'), Buffer.from('RIFF____WEBP'))
+    const app = await freshApp(t, undefined, { CLIENT_DIST: dist })
+
+    const r = await api(app).get('/app/entrada-abc123.webp')
+
+    expect(r.statusCode).toBe(200)
+    expect(r.headers['content-type']).toMatch(/image\/webp/)
+    await app.close()
+  })
+
   it('arquivo que não existe em /app continua 404, e não index.html', async () => {
     const dist = await mkdtemp(join(tmpdir(), 'pokeidle-dist-'))
     await mkdir(join(dist, 'app'), { recursive: true })

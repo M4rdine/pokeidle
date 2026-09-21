@@ -37,28 +37,63 @@ button, [role="button"], label:has(> input[type="checkbox"]) { min-height: var(-
   width: calc(100% - var(--space-4));
 }
 /*
- * A ENTRADA. É a primeira tela que alguém vê do jogo. O palco ocupa a janela e o cartão fica
- * no meio dela.
+ * O PALCO. É o fundo das duas telas de antes do jogo — a entrada e a escolha do inicial. Ocupa a
+ * janela inteira e tem um objeto só no meio.
  *
- * O fundo é SÓLIDO por enquanto, e isso é uma pendência declarada, não uma escolha: a versão
- * anterior esticava o PNG do mapa da região aqui, o que é preguiça — mapa reduzido não é
- * arte-chave. O lugar espera uma ilustração de verdade.
+ * O fundo é ARTE-CHAVE **em pixel art**, e o pixel art é a decisão, não o assunto. A versão
+ * anterior desta linha era uma pintura fotorrealista de um entardecer: bonita, e errada — o jogo
+ * é pixel art de 16 bits, e uma pintura atrás dele são duas mãos na mesma tela, o mesmo erro da
+ * madeira marrom com outra roupa. E o entardecer dramático é idioma de RPG sombrio; Pokémon é uma
+ * franquia LUMINOSA. O que faz uma rota parecer Pokémon é o vocabulário do mundo: grama alta em
+ * tufos, telhado vermelho, placa de rota, trilha de terra, sol a pino.
+ *
+ * O arquivo tem 256×144 px e 6 KB. É o TAMANHO NATIVO: quem amplia é o `image-rendering:
+ * pixelated`, do mesmo jeito que o mundo do jogo é ampliado. Guardar uma versão grande seria
+ * borrar o desenho antes de entregá-lo — e custaria dez vezes mais bytes para ficar pior.
+ *
+ * As três camadas, de cima para baixo: o véu frio, a arte, a cor de fundo. O véu é o que faz o
+ * cartão se separar — sem ele o texto branco cai em cima de céu azul claro. E `--fundo` embaixo
+ * de tudo é o que a pessoa vê enquanto os 6 KB chegam.
  */
-.screen-auth {
+.screen-auth, .screen-starter {
   /* `100vh` e não `100%`: o `#app` não recebe altura, então `100%` resolvia pela altura do
    * cartão e o mundo ao fundo parava no meio da janela, com uma faixa escura embaixo. */
   min-height: 100vh;
-  display: grid; place-items: center;
   padding: var(--space-4);
-  gap: 0;
-  background: var(--fundo);
+  background:
+    linear-gradient(to bottom, rgb(17 21 31 / 45%), rgb(17 21 31 / 35%) 45%, rgb(17 21 31 / 62%)),
+    url('./arte/entrada.webp') center / cover no-repeat,
+    var(--fundo);
+  image-rendering: pixelated;
 }
+.screen-auth {
+  display: grid; place-items: center;
+  gap: 0;
+}
+/*
+ * Sombra grande: sobre a arte, o fio de 1 px sozinho não descola o cartão do fundo. É o mesmo
+ * degrau do modal, e pela mesma razão — aqui o cartão também está POR CIMA de um mundo.
+ *
+ * E o painel fica um pouco TRANSLÚCIDO, sem desfoque. O desfoque é o reflexo moderno para este
+ * problema, e aqui seria um erro: borrar pixel art é apagar a única coisa que a arte tem. A
+ * translucidez deixa o verde e o azul tingirem o cartão de leve — ele passa a estar no mesmo
+ * mundo — e 92% ainda é opaco o bastante para o texto não perder contraste.
+ */
 .auth-cartao {
   width: min(400px, 100%);
   padding: var(--space-4);
   display: flex; flex-direction: column; gap: var(--space-3);
+  background: color-mix(in srgb, var(--painel) 92%, transparent);
+  box-shadow: var(--sombra-2);
 }
-.auth-cartao h1 { font-size: var(--t-2xl); }
+.auth-cartao h1 { font-size: var(--t-2xl); display: flex; align-items: center; gap: var(--space-2); }
+/* A marca: a Poké Ball oficial, no tamanho da caixa alta do nome. `pixelated` porque o sprite
+ * tem 30 px de lado e sobe para 32 — sem isso o navegador suaviza e ela perde o contorno. */
+.auth-marca {
+  display: block; width: 32px; height: 32px; flex-shrink: 0;
+  background: url('./ui/icone-time.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
 .auth-lema { margin: calc(var(--space-3) * -1) 0 0; color: var(--texto-fraco); font-size: var(--t-s); }
 .auth-form { display: flex; flex-direction: column; gap: var(--space-2); }
 .auth-form .field { margin: 0; }
@@ -127,12 +162,6 @@ h2 { font-size: var(--t-l); }
 .field { display: flex; flex-direction: column; gap: var(--space-1); margin: 0 0 var(--space-3); }
 
 /*
- * Aba ativa: o marca-texto. O amarelo elétrico que o projeto usava como acento sobrevive aqui,
- * no único trabalho que ele comporta — grifo. Marca a aba atual sem virar decoração, e o texto em
- * cima dele vira escuro, porque num mundo escuro o grifo é a única ilha clara.
- */
-.tabs { display: flex; gap: var(--space-2); }
-/*
  * Aba ativa: preenchida com a cor de seleção. Ela tem um trabalho só no sistema — dizer qual é
  * a linha de agora — e é por isso que nenhum outro elemento usa esse preenchimento.
  */
@@ -188,13 +217,14 @@ h2 { font-size: var(--t-l); }
  * com dois terços da tela vazios ao lado.
  */
 .screen-starter {
-  min-height: 100vh;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: var(--space-4);
-  padding: var(--space-4);
-  background: var(--fundo);
 }
-.screen-starter h1 { font-size: var(--t-2xl); text-align: center; }
+/* Sombra dura atrás do título: ele fica direto sobre a arte, sem superfície embaixo. */
+.screen-starter h1 {
+  font-size: var(--t-2xl); text-align: center;
+  text-shadow: 0 2px 8px rgb(0 0 0 / 70%);
+}
 
 .starter-grid { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center; }
 /* Os três com a MESMA largura e o mesmo empilhamento: é a igualdade entre eles que deixa a
@@ -202,6 +232,7 @@ h2 { font-size: var(--t-l); }
 .starter-card {
   width: 210px; padding: var(--space-3);
   display: flex; flex-direction: column; gap: var(--space-2); align-items: center; text-align: center;
+  box-shadow: var(--sombra-2);
 }
 .starter-sprite { display: grid; place-items: center; min-height: 104px; }
 .starter-card h2 { font-size: var(--t-l); }

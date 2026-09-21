@@ -12,6 +12,17 @@ async function definidos(): Promise<Set<string>> {
 }
 
 /**
+ * Só os tokens cujo VALOR é uma cor hexadecimal. Antes isto era uma lista de prefixos a ignorar
+ * (`space-`, `border-`, `bisel`), e a lista envelheceu no dia em que o sistema ganhou tokens de
+ * face, de escala de texto e de tempo: `--t-xs` passou a ser cobrado como se fosse uma cor.
+ * Perguntar pelo valor não envelhece.
+ */
+async function cores(): Promise<Set<string>> {
+  const texto = await readFile(join(ESTILOS, 'tokens.css'), 'utf8')
+  return new Set([...texto.matchAll(/^\s*--([a-z0-9-]+):\s*#[0-9a-f]{6};/gim)].map((m) => m[1]!))
+}
+
+/**
  * Variáveis que o JavaScript define em tempo de execução, via `style.setProperty`. Elas não
  * aparecem em folha nenhuma de propósito — o valor depende do estado do jogo.
  */
@@ -66,6 +77,60 @@ describe('todo token usado existe', () => {
 })
 
 /**
+ * A face de HUD é bitmap e tem um piso de tamanho: abaixo de `--t-l` a grade de pixels cai fora
+ * do grid de tela e a forma apodrece — "Configurações" chegou a sair renderizado como
+ * "ConAgurações", e a coluna de poder dos golpes mostrava 95, 50 e 35 lendo-se 98, 80 e 38.
+ *
+ * O teste existe porque essa regra é invisível: o CSS fica válido, a tela fica bonita, e o dado
+ * é que sai errado. Foi violada duas vezes na própria sprint que a escreveu.
+ */
+describe('a face de HUD respeita o piso de tamanho', () => {
+  const GRANDES = ['--t-l', '--t-xl', '--t-2xl']
+
+  it('nenhuma regra usa a face de HUD junto de um tamanho abaixo de --t-l', async () => {
+    const arquivos = (await readdir(ESTILOS)).filter((f) => f.endsWith('.css'))
+    const infratores: string[] = []
+    for (const arquivo of arquivos) {
+      const texto = await readFile(join(ESTILOS, arquivo), 'utf8')
+      // Um bloco por vez: `seletor { ... }`. Comentários saem antes, senão a prosa que CITA a
+      // regra (e cita, de propósito) contaria como violação dela.
+      const semComentario = texto.replace(/\/\*[\s\S]*?\*\//g, '')
+      for (const bloco of semComentario.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+        const corpo = bloco[2]!
+        if (!corpo.includes('var(--fonte-hud)')) continue
+        const tamanho = /font-size:\s*var\((--t-[a-z0-9]+)\)/.exec(corpo)
+        if (tamanho === null || GRANDES.includes(tamanho[1]!)) continue
+        infratores.push(`${arquivo}: ${bloco[1]!.trim()} usa a face de HUD a ${tamanho[1]!}`)
+      }
+    }
+    expect(infratores).toEqual([])
+  })
+
+  it('nenhuma regra põe número na face de HUD', async () => {
+    // `tabular-nums` na mesma regra é a confissão: só se alinha coluna de dígito. E dígito é
+    // justamente o que esta face erra — o 5 e o 8 têm quase a mesma silhueta.
+    const arquivos = (await readdir(ESTILOS)).filter((f) => f.endsWith('.css'))
+    const infratores: string[] = []
+    for (const arquivo of arquivos) {
+      const texto = (await readFile(join(ESTILOS, arquivo), 'utf8')).replace(/\/\*[\s\S]*?\*\//g, '')
+      for (const bloco of texto.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+        const corpo = bloco[2]!
+        if (!corpo.includes('var(--fonte-hud)') || !corpo.includes('tabular-nums')) continue
+        infratores.push(`${arquivo}: ${bloco[1]!.trim()} alinha dígito na face de HUD`)
+      }
+    }
+    expect(infratores).toEqual([])
+  })
+
+  it('o chip declara a face de leitura em vez de herdar', async () => {
+    // Chip quase sempre carrega número e vive dentro de títulos que falam na voz de HUD.
+    const texto = await readFile(join(ESTILOS, 'quadro.css'), 'utf8')
+    const bloco = /\.chip\s*\{([^}]*)\}/.exec(texto)
+    expect(bloco?.[1]).toContain('var(--fonte-texto)')
+  })
+})
+
+/**
  * O `DESIGN.md` é a descrição do sistema; `tokens.css` é o sistema. Quando os dois divergem, a
  * descrição vira mentira — e mentira documentada é pior que documentação nenhuma. Aconteceu duas
  * vezes na troca do mundo visual: o sidecar ficou apontando para cores removidas, e a paleta de
@@ -78,9 +143,7 @@ describe('a descrição do sistema bate com o sistema', () => {
     const doc = await readFile(DESIGN, 'utf8')
     const frontmatter = doc.split('---')[1] ?? ''
     const naDoc = new Set([...frontmatter.matchAll(/^ {2}([a-z0-9-]+):\s*"#/gm)].map((m) => m[1]!))
-    const noCodigo = new Set([...(await definidos())]
-      .map((t) => t.slice(2))
-      .filter((n) => !n.startsWith('space-') && !n.startsWith('border-') && n !== 'bisel'))
+    const noCodigo = await cores()
 
     expect([...naDoc].filter((c) => !noCodigo.has(c)), 'documentadas mas inexistentes').toEqual([])
     expect([...noCodigo].filter((c) => !naDoc.has(c)), 'existentes mas não documentadas').toEqual([])

@@ -1,22 +1,26 @@
 ---
 name: Pokeidle
-description: Interface de RPG 16-bit para um MMO idle de Pokémon — moldura com bisel, superfícies aninhadas e um único acento amarelo.
+description: A caderneta de campo do treinador — papel, couro e latão em volta, e o mundo pixelado no meio com a cor toda.
 colors:
-  noite: "#131826"
-  cava: "#0d111c"
-  painel: "#2a3145"
-  painel-alto: "#343c54"
-  moldura: "#7a5c3a"
-  moldura-luz: "#a8814f"
-  moldura-sombra: "#46331f"
-  text: "#f0f0f5"
-  muted: "#9aa0b4"
-  accent: "#f8d030"
-  ouro: "#f0c040"
-  xp: "#58a6f0"
-  danger: "#e04848"
-  danger-texto: "#ff8a8a"
-  ok: "#52c46a"
+  mesa: "#33261f"
+  papel-luz: "#fff8e8"
+  papel-alto: "#f5ecd6"
+  papel: "#e9ddbe"
+  papel-cava: "#d3c49f"
+  couro: "#a07556"
+  couro-luz: "#d0a684"
+  couro-sombra: "#5d4438"
+  tinta: "#2c211a"
+  tinta-fraca: "#5a4938"
+  marca: "#f7d979"
+  marca-borda: "#97791d"
+  ouro: "#6f5310"
+  ouro-cheio: "#d9a521"
+  xp: "#1a698c"
+  xp-cheio: "#56c4f1"
+  perigo: "#8f2820"
+  ok: "#2c6431"
+  hp: "#398e45"
   type-normal: "#a8a878"
   type-fire: "#f08030"
   type-water: "#6890f0"
@@ -37,36 +41,37 @@ colors:
   type-fairy: "#ee99ac"
 typography:
   title:
-    fontFamily: "system-ui, sans-serif"
-    fontSize: "1.2rem"
+    fontFamily: "'Pixelify Sans', 'Courier New', monospace"
+    fontSize: "1.5rem"
     fontWeight: 700
-    lineHeight: 1.4
-    letterSpacing: "0.02em"
-  row-title:
-    fontFamily: "system-ui, sans-serif"
-    fontSize: "1rem"
-    fontWeight: 600
-    lineHeight: 1.4
-    letterSpacing: "0.02em"
+    lineHeight: 1.2
+    letterSpacing: "0.01em"
+  name:
+    fontFamily: "'Pixelify Sans', 'Courier New', monospace"
+    fontSize: "1.125rem"
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: "0.01em"
   body:
-    fontFamily: "system-ui, sans-serif"
-    fontSize: "14px"
+    fontFamily: "'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.9375rem"
     fontWeight: 400
-    lineHeight: 1.4
+    lineHeight: 1.45
+    letterSpacing: "normal"
+    fontFeature: "tabular-nums"
+  data:
+    fontFamily: "'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.8125rem"
+    fontWeight: 400
+    lineHeight: 1.45
     letterSpacing: "normal"
     fontFeature: "tabular-nums"
   label:
-    fontFamily: "system-ui, sans-serif"
-    fontSize: "0.8em"
-    fontWeight: 400
-    lineHeight: 1.4
-    letterSpacing: "0.08em"
-  micro:
-    fontFamily: "system-ui, sans-serif"
-    fontSize: "0.75em"
-    fontWeight: 400
-    lineHeight: 1.15
-    letterSpacing: "0.04em"
+    fontFamily: "'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif"
+    fontSize: "0.6875rem"
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: "0.12em"
 rounded:
   none: "0"
 spacing:
@@ -74,81 +79,70 @@ spacing:
   "2": "8px"
   "3": "16px"
   "4": "32px"
+  "5": "48px"
 components:
   button:
-    backgroundColor: "{colors.painel}"
-    textColor: "{colors.text}"
+    backgroundColor: "{colors.papel-alto}"
+    textColor: "{colors.tinta}"
     rounded: "{rounded.none}"
     padding: "8px 16px"
-    typography: "{typography.body}"
+    typography: "{typography.data}"
   button-hover:
-    backgroundColor: "{colors.painel}"
-    textColor: "{colors.text}"
+    backgroundColor: "{colors.papel-alto}"
+    textColor: "{colors.tinta}"
   button-primary:
-    backgroundColor: "{colors.painel}"
-    textColor: "{colors.text}"
+    backgroundColor: "{colors.couro-sombra}"
+    textColor: "{colors.papel-alto}"
     rounded: "{rounded.none}"
     padding: "8px 16px"
   button-disabled:
-    backgroundColor: "{colors.painel}"
-    textColor: "{colors.muted}"
+    backgroundColor: "{colors.papel-alto}"
+    textColor: "{colors.tinta-fraca}"
+  button-nav:
+    backgroundColor: "transparent"
+    textColor: "{colors.tinta-fraca}"
+    rounded: "{rounded.none}"
+    padding: "4px 8px"
   input:
-    backgroundColor: "{colors.cava}"
-    textColor: "{colors.text}"
+    backgroundColor: "{colors.papel-cava}"
+    textColor: "{colors.tinta}"
     rounded: "{rounded.none}"
     padding: "8px"
     width: "100%"
   panel:
-    backgroundColor: "{colors.painel}"
-    textColor: "{colors.text}"
+    backgroundColor: "{colors.papel}"
+    textColor: "{colors.tinta}"
+    rounded: "{rounded.none}"
+  panel-sunken:
+    backgroundColor: "{colors.papel-cava}"
+    textColor: "{colors.tinta}"
+    rounded: "{rounded.none}"
+  panel-floating:
+    backgroundColor: "{colors.papel-alto}"
+    textColor: "{colors.tinta}"
+    rounded: "{rounded.none}"
+  meter-track:
+    backgroundColor: "{colors.mesa}"
+    rounded: "{rounded.none}"
+  chip:
+    backgroundColor: "{colors.papel-cava}"
+    textColor: "{colors.tinta}"
+    rounded: "{rounded.none}"
+    padding: "1px 4px"
+    typography: "{typography.label}"
+  row-selected:
+    backgroundColor: "{colors.marca}"
+    textColor: "{colors.tinta}"
     rounded: "{rounded.none}"
   type-badge:
-    backgroundColor: "transparent"
-    textColor: "{colors.text}"
+    backgroundColor: "{colors.papel-alto}"
+    textColor: "{colors.tinta}"
     rounded: "{rounded.none}"
     padding: "0 4px"
     typography: "{typography.label}"
-  filter-type:
-    backgroundColor: "transparent"
-    textColor: "{colors.text}"
-    rounded: "{rounded.none}"
-    padding: "0 4px"
-  filter-type-pressed:
-    textColor: "{colors.text}"
-  filter-toggle:
-    backgroundColor: "{colors.painel}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.none}"
-    padding: "4px 8px"
-  filter-toggle-pressed:
-    backgroundColor: "{colors.painel}"
-    textColor: "{colors.accent}"
-  area-row:
-    backgroundColor: "{colors.painel}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.none}"
-    padding: "8px 16px"
-  area-row-locked:
-    backgroundColor: "{colors.cava}"
-    textColor: "{colors.text}"
-  area-gate:
-    textColor: "{colors.accent}"
-    rounded: "{rounded.none}"
-    padding: "2px 8px"
-    typography: "{typography.micro}"
-  area-analyzer:
-    backgroundColor: "{colors.cava}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.none}"
-    padding: "16px"
-  modal:
-    backgroundColor: "{colors.painel}"
-    textColor: "{colors.text}"
-    rounded: "{rounded.none}"
-    width: "min(560px, 92vw)"
   toast:
-    backgroundColor: "{colors.painel}"
-    textColor: "{colors.text}"
+    backgroundColor: "{colors.papel-alto}"
+    textColor: "{colors.tinta}"
     rounded: "{rounded.none}"
     padding: "8px 16px"
     width: "360px"
@@ -158,313 +152,230 @@ components:
 
 ## Overview
 
-**Creative North Star: "A Moldura"**
+**Creative North Star: "A Caderneta de Campo"**
 
-Pokeidle é um jogo, não um painel. A primeira versão desta interface foi desenhada como terminal
-de campo — escura, chapada, borda reta de 2 px, raio zero — e estava tecnicamente correta e
-errada para o produto: lia como dashboard. Um clone de Pokémon pede a linguagem do gênero, e a
-linguagem do gênero é a interface de RPG 16-bit.
+A interface é o caderno de quem anda pelo mundo. Papel, couro e latão em volta; o mundo pixelado
+no meio, com a cor toda. O chrome **emoldura** o jogo em vez de competir com ele.
 
-O mundo é construído por **relevo**. Toda superfície tem bisel: duas sombras internas sem
-desfoque, clara em cima à esquerda e escura embaixo à direita. É isso que dá volume numa
-interface de pixel, e é uma regra só que responde a pergunta de projeto mais frequente da tela —
-**o que se levanta e o que afunda**. O que é ação se levanta: painel, botão, card, slot ocupado.
-O que é leitura afunda: trilho de medidor, campo de entrada, lista, vaga vazia, vaga travada.
-Inverter a luz separa os dois sem gastar cor nova.
+Duas versões anteriores erraram na mesma direção. A primeira foi desenhada como terminal de campo
+— escura, chapada — e lia como dashboard. A segunda trocou o terminal por moldura com bisel, o
+que resolveu a gramática mas manteve a cor: azul-noite `#131826` com bronze e um acento amarelo,
+que é a combinação de fábrica de todo idle de navegador. Ela não tinha nada a ver com o verde e a
+terra que emoldurava, e não declarava **nenhuma** `font-family` — a interface inteira rodava na
+fonte padrão do navegador enquanto o jogo dentro dela era pixel art.
 
-O bisel é CSS, não asset. Duas `box-shadow` internas ficam nítidas em qualquer tamanho e mudam de
-cor por token — coisa que um 9-slice em PNG não faz. Asset fica para o que só asset resolve.
+O que resolve as duas coisas de uma vez é a mesma decisão: **o chrome sai do mundo**.
 
-O que dá caráter é a **densidade**. A versão anterior tinha 52 classes, 11 controles e 37 % de uma
-coluna vazia. A régua agora é a repetição: o mesmo chip de nível, o mesmo selo de tipo e o mesmo
-medidor aparecem na mesma ordem em seis slots, e é essa repetição que deixa comparar Pokémon com
-Pokémon de relance.
+### A cor não foi inventada
+
+Cada superfície é um material do atlas, medido no próprio PNG por
+`tools/assets/scripts/cores-do-mundo.ts` (`pnpm cores`):
+
+| material do mundo | medido | vira |
+|---|---|---|
+| areia da praia | `#dcd2ac` | `{colors.papel}`, a folha |
+| terra batida da trilha | `#a97c5c` | `{colors.couro}`, a moldura |
+| rocha de caverna | `#614846` | `{colors.couro-sombra}` e `{colors.mesa}` |
+| campo | `#3a8f45` | `{colors.hp}` |
+| água | `#57c4f1` | `{colors.xp-cheio}` |
+
+Quem olha a tela e o mapa vê o mesmo mundo porque **é** o mesmo mundo. Quando o tileset mudar,
+`pnpm cores` remede e a paleta acompanha; sem isso, a próxima geração de terreno faria a interface
+e o mapa deixarem de combinar em silêncio.
 
 **Key Characteristics:**
-- Fundo azul-noite em três planos, moldura em bronze, sem gradiente e sem textura
-- Bisel de 2 px sem desfoque como único recurso de profundidade; levanta o que age, afunda o que se lê
-- Um só acento (amarelo `{colors.accent}`) para estado ativo, ação primária, recompensa e foco
-- Dezoito cores canônicas de tipo, usadas como identidade e nunca como texto sozinho
-- Números tabulares e chips repetidos em coluna sempre que houver comparação
-- Tipografia de sistema sem fonte de display; hierarquia por peso, caixa e cor
-- Movimento quase ausente: 120 ms no preenchimento de medidor, e nada mais
+- Superfície clara de papel em quatro planos, moldura de couro; o mundo é a coisa saturada da tela
+- Dois registros de profundidade com significados diferentes: bisel entalha, sombra projetada flutua
+- Nenhuma "cor de acento": ênfase é o couro invertido, e a cor fica livre para significar
+- Um marca-texto, com um trabalho só no sistema inteiro: qual linha é a de agora
+- Duas faces auto-hospedadas — bitmap para nome e título, Atkinson para todo o resto
+- Dezoito matizes canônicos de tipo, como identidade, nunca como texto sozinho
+- Movimento quase ausente: 120 ms no medidor, 200 ms no que troca de estado, e nada mais
 
 ## Colors
 
-Uma paleta escura de oito papéis, quase acromática, contra dezoito matizes canônicos de tipo que
-entram só onde identificam uma espécie.
+Dezenove papéis tirados do mundo, contra dezoito matizes canônicos de tipo que entram só onde
+identificam uma espécie. Todo par que a interface pinta é medido em
+`packages/client/test/styles/contraste.test.ts` — a paleta não passa por aprovação de olho.
 
 ### Primary
-- **Amarelo Elétrico** (`{colors.accent}`): o único acento do sistema. Marca o que está ativo (aba
-  atual, slot do Pokémon em campo, linha aberta na ficha), o que é ação primária (borda do botão
-  `.primary`), o que é recompensa (linha de log de XP e ouro), o que é portão de nível e o que é
-  foco de teclado. É o mesmo valor de `--type-electric`; a coincidência é do mundo Pokémon, não um
-  segundo token.
+Não existe cor primária de marca, e a ausência é a decisão. Ação primária e seleção são desenhadas
+**invertendo o couro** (`{colors.couro-sombra}` de fundo, `{colors.papel-alto}` de texto), que é o
+material da própria caderneta. Uma cor de acento a mais aqui seria uma cor a menos disponível para
+dizer o que é moeda, o que é vida e o que é perigo.
 
 ### Secondary
-- **Verde Saudável** (`{colors.ok}`): estado bom e confirmado — conexão aberta, cooldown pronto,
-  confronto vantajoso na ficha de áreas.
-- **Vermelho de Alerta** (`{colors.danger}`): erro de formulário, log de alerta, conexão caída,
-  confronto desvantajoso. Nunca decorativo.
+- **Marca-texto** (`{colors.marca}`, borda `{colors.marca-borda}`): o amarelo elétrico que o projeto
+  usava como acento sobreviveu no único papel que papel comporta — grifo. Marca **a linha de agora**
+  e nada mais: o slot do Pokémon em campo, a aba atual.
+- **Ouro** (`{colors.ouro}` em texto, `{colors.ouro-cheio}` em preenchimento): moeda, recompensa,
+  portão de nível, marco no log, recarga de golpe.
+- **Verde Saudável** (`{colors.ok}`): confirmado — conexão aberta, confronto vantajoso.
+- **Vermelho de Alerta** (`{colors.perigo}`): erro, alerta, conexão caída, HP crítico. Nunca decorativo.
+- **Vida e experiência** (`{colors.hp}`, `{colors.xp}` em texto, `{colors.xp-cheio}` em barra).
 
 ### Tertiary
-- **As dezoito cores de tipo** (`{colors.type-normal}` … `{colors.type-fairy}`): os matizes
-  canônicos da série. Identificam a espécie e o filtro; entram em borda, em ponto marcador e em
-  fundo esmaecido por `color-mix`, e só chegam ao texto depois de misturados com o claro do tema.
+**As dezoito cores de tipo** (`{colors.type-normal}` … `{colors.type-fairy}`): os matizes canônicos
+da série. Identificam espécie e filtro; entram em borda e em fundo por `color-mix`, e chegam ao
+texto só depois de escurecidos contra o papel.
 
 ### Neutral
-- **Preto de Página** (`{colors.cava}`): o fundo da janela. É também o fundo do que recuou de plano
-  (linha de área bloqueada, gaveta do analisador) e o fundo dos campos de entrada.
-- **Grafite de Painel** (`{colors.painel}`): toda superfície que se levanta — painel, botão, modal,
-  toast, linha de área disponível.
-- **Cinza de Borda** (`{colors.moldura-sombra}`): a borda de 2 px, os divisores de 1 px e o trilho vazio de
-  qualquer medidor.
-- **Branco de Leitura** (`{colors.text}`): o texto corrente.
-- **Cinza de Rótulo** (`{colors.muted}`): rótulo de unidade, legenda de filtro, cabeçalho de tabela,
-  log informativo, célula vazia. É o que sustenta a hierarquia no lugar de um segundo tamanho.
+- **Mesa** (`{colors.mesa}`): fora de tudo, e o fundo de toda fenda. A tarja que sobra em volta do
+  mundo é a mesa, não um preto avulso.
+- **Papel** (`{colors.papel}`): a folha. `{colors.papel-alto}` é o degrau que se levanta,
+  `{colors.papel-cava}` o que afunda, `{colors.papel-luz}` só o fio iluminado da quina do bisel.
+- **Couro** (`{colors.couro}`, luz `{colors.couro-luz}`, sombra `{colors.couro-sombra}`): moldura,
+  divisor, anel de foco.
+- **Tinta** (`{colors.tinta}`) e **tinta fraca** (`{colors.tinta-fraca}`): texto corrente e rótulo.
+  A secundária é tingida do próprio papel, nunca cinza.
 
 ### Named Rules
 
-**A Regra do Acento Único.** Só existe um acento. Se algo precisa de destaque e não é estado ativo,
-ação primária, recompensa ou foco, então não precisa de destaque — precisa de posição. Não se
-inventa um segundo amarelo, um azul de link ou um roxo de marca.
+**A Regra da Cor Que Significa.** Cor não decora. Se um elemento precisa de destaque e não é moeda,
+perigo, vida, experiência ou a linha de agora, ele precisa de **posição ou peso**, não de matiz.
 
-**A Regra do Tipo na Borda.** A cor de tipo identifica; ela não lê. O matiz vai para a borda, para o
-ponto marcador e para o fundo em `color-mix`; o rótulo fica no claro do tema, ou no matiz misturado
-a 45 % com `{colors.text}`. Motivo medido: `ghost` e `dark` como texto cheio sobre o painel dão
-2,6:1.
+**A Regra do Material Duplo.** Um material que aparece em texto e em preenchimento tem **dois**
+tokens, porque os dois papéis exigem contrastes opostos: o valor em texto vive sobre papel claro e
+precisa ser escuro (`{colors.ouro}`, `{colors.xp}`); o preenchimento vive dentro da fenda escura do
+medidor e precisa ser claro (`{colors.ouro-cheio}`, `{colors.xp-cheio}`). Um token só reprovaria
+num dos dois, sempre.
 
-**A Regra da Cor Nunca Sozinha.** Nenhum estado é comunicado só por cor. O confronto verde diz
-"arrasa" por escrito; o vermelho diz "desvantagem"; o cinza diz "não fere". A cor confirma a palavra,
-nunca a substitui.
+**A Regra do Grifo Único.** O marca-texto marca a linha de agora. Gastá-lo também no log, na
+situação e no estado de combate o transformaria em decoração — e aí ele não marcaria mais nada.
+
+**A Regra do Tipo na Borda.** A cor de tipo identifica; ela não lê. Os dezoito matizes foram
+desenhados como preenchimento sobre fundo claro, e `electric`, `ice` e `ground` como texto puro
+sobre papel ficam abaixo de 2:1.
+
+**A Regra da Cor Nunca Sozinha.** Nenhum estado é comunicado só por cor. HP ferido muda de cor **e**
+de comprimento; o confronto diz "arrasa" por escrito; a recarga pronta fica verde **e** cheia.
 
 ## Typography
 
-**Display Font:** nenhuma. O sistema não tem registro de display (ver *Do's and Don'ts*).
-**Body Font:** pilha do sistema (`system-ui, sans-serif`), 14 px, entrelinha 1,4.
-**Label/Mono Font:** nenhuma família separada — o papel de dado é feito por `tabular-nums` sobre a
-mesma pilha.
+**Display Font:** Pixelify Sans (bitmap, variável 400–700), auto-hospedada.
+**Body Font:** Atkinson Hyperlegible (400/700), auto-hospedada.
+**Label/Mono Font:** nenhuma terceira família — o papel de dado é `tabular-nums` sobre a Atkinson.
 
-**Character:** a voz é a da máquina que reporta: neutra, densa, sem personalidade tipográfica
-própria. A escala é curta de propósito (1,2rem no topo, 14 px no corpo, 0,75em no rodapé do dado), e
-quem faz o trabalho de hierarquia é o peso (600/700), a caixa alta com espacejamento largo nos
-rótulos, e o par `{colors.text}` / `{colors.muted}`.
+As duas são OFL e vivem em `packages/client/src/styles/fontes/`, só no subconjunto latin (35 KB no
+total). São auto-hospedadas de propósito: o jogo roda em VPS própria e não entrega o IP de quem
+joga a um CDN de terceiros para desenhar texto.
+
+### A face de HUD tem duas restrições duras
+
+As duas foram descobertas **na tela**, não no papel, e as duas são verificadas por teste em
+`packages/client/test/styles/tokens.test.ts`:
+
+1. **Só de 18 px para cima.** Abaixo disso a grade de pixels cai fora do grid de tela e a forma
+   apodrece: "Configurações" saiu renderizado como "ConAgurações".
+2. **Nunca em número.** No corpo desta face o 5 e o 8 têm quase a mesma silhueta. A coluna de poder
+   dos golpes mostrava 95, 50 e 35 e se lia 98, 80 e 38; o cartão do ativo dizia "L68" enquanto o
+   rótulo no mundo, ao lado, dizia L65.
+
+Sobra para ela exatamente o que ela faz bem: **nome próprio e título**, grandes. Todo o resto —
+número, rótulo miúdo, texto de botão, prosa — é da Atkinson.
 
 ### Hierarchy
-- **Title** (700, 1.2rem, 1.4, `letter-spacing: 0.02em`): `h1` e `h2`. Título de tela e de cartão.
-- **Row-title** (600, 1rem, `letter-spacing: 0.02em`): nome da área na ficha. O único degrau entre o
-  título e o corpo.
-- **Body** (400, 14px/1.4, `tabular-nums`): todo o resto do texto e todos os números.
-- **Label** (400, 0.8em, `letter-spacing: 0.08em`, caixa alta): legenda de `fieldset` e cabeçalho de
-  tabela do analisador (0.06em). Também a caixa baixa forçada do selo de tipo (0.8em,
-  `text-transform: lowercase`).
-- **Micro** (400, 0.75em, 1.15, `letter-spacing: 0.04em`): a unidade sob o número ("xp/h", "ouro/h",
-  "níveis", "confronto").
+- **Title** (Pixelify, 700, 1.5rem): `h1`. Título de tela.
+- **Name** (Pixelify, 700, 1.125rem): `h2`, nome do treinador, nome do Pokémon ativo, nome da área.
+- **Body** (Atkinson, 400, 0.9375rem/1.45, `tabular-nums`): prosa, mensagem, linha de log.
+- **Data** (Atkinson, 400, 0.8125rem): dado denso — ficha de áreas, faixa do time, lista de golpes.
+- **Label** (Atkinson, 700, 0.6875rem, `letter-spacing: 0.12em`, caixa alta): rótulo de unidade,
+  cabeçalho de seção, legenda de filtro.
+
+A razão entre degraus é curta (~1,2) de propósito: interface de tarefa tem muito mais elemento de
+texto que página de marca, e contraste exagerado vira ruído.
 
 ### Named Rules
 
-**A Regra do Dígito Alinhado.** `font-variant-numeric: tabular-nums` é do `body` e toda superfície
-de comparação o reafirma. Número que vai para coluna nunca usa dígito proporcional.
+**A Regra do Dígito Alinhado.** `tabular-nums` é do `body` e toda superfície de comparação o
+reafirma. Número que vai para coluna nunca usa dígito proporcional.
 
-**A Regra do Número em Cima, Unidade Embaixo.** Uma métrica é `strong` com o valor e um `span` mudo
-com a unidade, empilhados, alinhados à direita. O valor é lido; a unidade é consultada.
+**A Regra do Rótulo Uma Vez.** O rótulo de uma coluna sai no alto dela, não em cada linha. A lista
+de golpes existe para comparar oito golpes, e comparar é ler a mesma coluna de cima a baixo;
+repetir "poder" em cada linha empurra os números para posições diferentes e desfaz a coluna.
 
-**A Regra do Milhar Curto.** Na ficha, 1240 vira "1,2k". A vírgula é a decimal do português e a lista
-existe para comparar ordens de grandeza, não para somar. O valor cheio fica no detalhe.
+**A Regra do Nome Separado do Valor.** Nome é identidade, nível é valor. Eles são nós diferentes,
+com faces diferentes — e é por isso que o cartão do ativo e a faixa do time mostram o mesmo Pokémon
+do mesmo jeito.
+
+## Depth
+
+Dois registros, e cada um diz uma coisa diferente. Gastar os dois **por papel** é o ponto: antes
+havia um bisel só, carimbado em painel, botão, chip e moldura por igual, e ênfase uniforme em tudo
+é o mesmo que ênfase em nenhum.
+
+**O bisel** — duas `box-shadow` internas sem desfoque, clara em cima à esquerda e escura embaixo à
+direita. Diz *"isto é entalhado no papel"*. Vale para botão, campo, painel de seção e trilho de
+medidor. É CSS, não asset: fica nítido em qualquer tamanho e muda de cor por token, coisa que um
+9-slice em PNG não faz.
+
+**A sombra projetada** — com deslocamento **e** desfoque de verdade. Diz *"isto está por cima da
+caderneta"*. Vale para modal e toast. Papel sobre papel projeta sombra; papel entalhado, não.
+
+**Nem um nem outro** — chip, selo de tipo, célula de lista. Eles recebem no máximo um fio de 1px em
+`{colors.couro}` ou um tingimento de fundo, porque não são objetos separados: são marcas no papel.
+
+A luz inverte para separar função sem gastar cor: **o que age se levanta, o que se lê afunda**. A
+fenda (`{colors.papel-cava}` com o bisel invertido) é onde se lê; o trilho do medidor é uma fenda
+cortada **através** do papel, e o que aparece no fundo dela é `{colors.mesa}`. É esse fundo escuro
+que deixa a barra de vida e a de experiência atingirem contraste.
 
 ## Layout
 
-Três larguras, e cada uma corresponde a um modo de uso. **Formulário** (`.screen-auth`): 420 px,
-centrado, com margem vertical de 32 px — registro e login não têm nada a comparar. **Ficha**
-(`.screen-areas`): 1100 px, centrada, para o navegador de áreas e qualquer tela de leitura longa.
-**Janela inteira** (`.game-grid`): a tela do jogo não rola; ocupa `100vh` numa grade de
-`280px 1fr 200px` por `auto 1fr 180px`, com áreas nomeadas (`top / left center right / bottom`), e
-cada painel rola por dentro. A cena fica no centro com fundo `#000` e `overflow: hidden`.
+Três larguras, uma por modo de uso.
 
-O ritmo de espaço tem quatro degraus: 4 px para o que se cola (ícone e rótulo), 8 px para o que se
-agrupa (itens de uma lista, painéis do HUD), 16 px para o que se separa (padding de tela e de painel,
-colunas da ficha), 32 px para o que respira sozinho (margem do cartão de formulário, estado vazio de
-tela cheia). O HUD é mais apertado que as telas de leitura: 8 px onde elas usam 16.
+**Formulário** (`.screen-auth`): 420 px, centrado — registro e login não têm nada a comparar.
 
-A ficha de áreas é o caso denso: cada linha é uma grade de `1fr 7rem` (corpo e coluna de ação), e o
-corpo é outra grade de seis colunas de largura declarada
-(`minmax(9rem, 1fr) 4.5rem 10rem 4.5rem 4.5rem 7rem`). As larguras são fixas de propósito — com
-`auto`, o texto de cada linha moveria o x de todas as colunas, que é exatamente o que a ficha existe
-para não fazer.
+**Folha** (qualquer `.screen` que não seja a do jogo): até 1280 px, centrada, com papel por baixo
+do conteúdo inteiro e a mesa aparecendo só na margem. Sem isso, título e rótulo ficavam em tinta
+escura direto sobre a mesa escura — 1,3:1, e "Onde caçar" simplesmente não aparecia.
 
-Há um só ponto de quebra em todo o projeto: **960 px**. Abaixo dele os filtros viram uma coluna, e a
-linha da ficha reflui para áreas nomeadas (`nome / faixa + métricas / espécies / confronto`),
-mantendo `min-width: 4.5rem` nas métricas para que a borda direita não dance de linha para linha. A
-tabela do analisador passa a rolar na horizontal em vez de quebrar.
+**Janela inteira** (`.game-grid`): a tela do jogo não rola. Ocupa `100vh` numa grade de
+`280px 1fr 260px` por `auto 1fr clamp(88px, 13vh, 150px)`, com áreas nomeadas
+(`top / left center right / bottom`), e cada painel rola por dentro. Abaixo de 900 px a grade
+empilha e a coluna do time vira faixa horizontal — escondê-la deixaria quem joga no celular sem
+nenhum caminho para trocar o Pokémon ativo.
 
-## Elevation & Depth
+O ritmo tem cinco degraus: 4 px para o que se cola, 8 px para o que se agrupa, 16 px para o que se
+separa, 32 px para o que respira, 48 px para margem de página. O HUD é mais apertado que as telas
+de leitura: 8 px onde elas usam 16.
 
-**A profundidade é o bisel.** Duas `box-shadow` internas sem desfoque, clara em cima à esquerda e
-escura embaixo à direita, e nada mais — sem projeção, sem borrão, sem camada de sombra solta.
-É um recurso só, e ele responde à pergunta de projeto mais frequente da tela.
+## Motion
 
-| Estado | Como se lê | Quem usa |
-|---|---|---|
-| **Levantado** | luz em cima à esquerda, sombra embaixo à direita | painel, card, botão, slot ocupado |
-| **Afundado** | a luz inverte: sombra em cima à esquerda | trilho de medidor, campo, lista, vaga vazia ou travada |
-| **Pressionado** | o levantado inverte enquanto o dedo está lá | botão em `:active` |
+Interface de tarefa reage; não coreografa. Há dois tempos e um só formato de curva: 120 ms para o
+preenchimento de medidor, 200 ms para o que troca de estado, e `cubic-bezier(0.16, 1, 0.3, 1)`
+quando a curva importa. Não existe entrada animada de seção, nem sequência de carregamento.
+`prefers-reduced-motion` zera tudo.
 
-Os três planos de fundo sustentam o bisel: `{colors.noite}` fora de tudo, `{colors.painel}` no que
-se levanta, `{colors.cava}` no que afunda. A cor sozinha não basta — é a direção da luz que diz se
-ali se age ou se lê.
+## Accessibility
 
-Existem duas cortinas, e elas são cortina e não sombra: o `.modal-backdrop` em preto a 60 %, e o
-`.overlay` da cena em `rgb(13 17 28 / 88%)` — a cor da própria página, não um preto genérico.
-
-### Named Rules
-
-**A Regra da Luz.** Não se inventa um terceiro estado de profundidade. Se algo precisa se destacar
-e não é "levantado" nem "afundado", então não precisa de profundidade — precisa de posição, de
-peso ou do acento.
-
-**A Regra do Plano, Não da Opacidade.** O indisponível recua de plano, não de legibilidade. A linha
-de área bloqueada cai para o fundo da página, mas os números continuam em contraste cheio — é por
-eles que se decide o que perseguir. O portão de nível é informação, e informação não se esmaece.
-
-**A Regra da Borda que Responde.** O estado vive na borda e no acento. `hover`, `focus`, ativo e
-aberto levam a borda para `{colors.accent}`. O fundo quase nunca muda, então nada salta nem empurra
-o vizinho.
-
-## Shapes
-
-Retângulo, sempre. `border-radius: 0` é a única forma do sistema e está escrito explicitamente onde
-alguém poderia hesitar (`.panel`, `.filter-type`). O vocabulário de traço tem dois pesos e cada um
-tem um trabalho: **2 px** (`--border-w`) é estrutura — contorna painel, botão, campo, modal, toast,
-linha, e é também a espessura do `outline` de foco; **1 px** é divisão interna — separa linha de
-tabela, item de mochila, célula da Pokédex, e contorna o selo de tipo.
-
-A arte é pixel art e o quadro respeita isso: `image-rendering: pixelated` no `canvas`, sprites
-ampliados em múltiplos inteiros (`transform: scale(2)` no cartão de inicial e no Pokémon ativo). Na
-ficha de áreas, onde os frames do atlas variam entre 32 e 64 px, a miniatura é uma caixa de tamanho
-declarado que recorta e escala o sprite por dentro, para que um Rhydon de 64 px não invada a coluna
-vizinha.
-
-Medidores são barras retas sem raio: 10 px de altura para o `progress` de HP, 40 × 6 px para o
-cooldown de golpe, preenchidos por `transform: scaleX()` sobre trilho `{colors.moldura-sombra}`.
-
-## Components
-
-### Buttons
-- **Shape:** retângulo puro (raio 0), borda de 2 px, fundo `{colors.painel}`, padding 8 × 16 px.
-- **Primary:** idêntico ao padrão, exceto pela borda em `{colors.accent}`. A ação primária se declara
-  pela borda, não por fundo preenchido.
-- **Hover:** a borda vai para `{colors.accent}`; nada mais muda. Botão desabilitado não responde.
-- **Disabled:** `opacity: 0.5` e cursor padrão.
-- **Ghost / Link:** sem borda e sem fundo, texto em `{colors.accent}` sublinhado (`.link`); usado
-  dentro de frase corrida, como no estado vazio da ficha.
-- **Focus:** `outline: 2px solid var(--accent)` com `outline-offset: -2px` — o anel entra para dentro
-  para não empurrar o vizinho numa grade de colunas fixas.
-
-### Chips
-- **Selo de tipo:** caixa baixa, 0.8em, padding lateral de 4 px, borda de 1 px no matiz do tipo,
-  fundo transparente. O rótulo é lido no claro do tema.
-- **Filtro de tipo (`aria-pressed`):** o mesmo selo com um ponto marcador de 0.55em no matiz. Ligado,
-  ganha fundo `color-mix(in srgb, var(--t) 28%, var(--panel))`, borda de 2 px e um anel de 2 px em
-  volta do ponto. `hover` clareia o selo com `filter: brightness(1.35)`.
-- **Alternador de estado (`.filter-toggle`):** botão de texto comum; ligado, borda e texto vão para
-  `{colors.accent}`.
-
-### Cards / Containers
-- **Corner Style:** raio 0.
-- **Background:** `{colors.painel}` sobre página `{colors.cava}`.
-- **Border:** 2 px sólida em `{colors.moldura-sombra}`.
-- **Shadow Strategy:** nenhuma — ver *Elevation & Depth*.
-- **Internal Padding:** 16 px nas telas de leitura, 8 px nos painéis do HUD.
-
-### Inputs / Fields
-- **Style:** fundo `{colors.cava}` (mais escuro que o painel que o contém, então o campo afunda em vez
-  de saltar), borda de 2 px, padding de 8 px, largura total, raio 0.
-- **Campo numérico curto:** largura declarada em `ch` (`5ch` no filtro de nível) e texto centrado.
-- **Label:** empilhado acima do campo, 4 px de distância, em `{colors.muted}`.
-- **Error:** parágrafo `role="alert"` em `{colors.danger}` com `min-height: 1.2em` reservada, para
-  que a mensagem não empurre o formulário ao aparecer.
-
-### Navigation
-- **Abas (`.tabs`):** botões lado a lado com 8 px entre eles; a ativa se marca pela borda em
-  `{colors.accent}`.
-- **Barra superior do HUD:** uma faixa de painel com `flex-wrap`, 8/16 px de espaço, atalhos à
-  esquerda e a intenção de sair empurrada para a ponta direita por `margin-left: auto`.
-- **Indicador de conexão:** só texto colorido — `{colors.ok}` aberto, `{colors.accent}` reconectando
-  ou recuperando, `{colors.danger}` caído.
-
-### Modais
-- **Uso:** tarefas de resolver-e-voltar (time, mochila, loja, Pokédex, configurações).
-- **Forma:** `min(560px, 92vw)`, `max-height: 86vh`, painel com borda de 2 px, cabeçalho com divisor
-  de 2 px e fechar sem moldura.
-- **Não se usa modal para detalhe que será comparado** — ver a regra da gaveta.
-
-### Ficha de áreas (componente-assinatura)
-A recusa deliberada da grade de cartões. Cada área é uma `li` em grade de duas colunas: o corpo é um
-único `button` (o que abre o detalhe) e a ação de caçar fica **fora** dele, porque botão dentro de
-botão não existe em HTML. Dentro do corpo, seis colunas de largura declarada: nome, faixa de níveis,
-espécies (até quatro miniaturas mais "+N" e até três selos de tipo), XP/h, ouro/h, confronto. As três
-métricas usam `display: contents` para serem células próprias da grade da linha, e não um bloco
-aninhado — só assim ficam na mesma coluna em todas as linhas.
-
-Estados: disponível (painel levantado), aberta (borda em acento), bloqueada (fundo de página, título
-em `{colors.muted}`, e no lugar do botão um selo `nível N` em `{colors.accent}` sobre
-`color-mix(in srgb, var(--accent) 12%, transparent)`). Enquanto o time e a Pokédex não chegam, as
-células mostram travessão e "…calculando" com `aria-busy`, em vez de anunciar zero como se fosse
-medida.
-
-### Gaveta do analisador (componente-assinatura)
-O detalhe abre dentro da própria ficha, colado sob a linha escolhida: `margin-top` negativo de 8 px
-para encostar, borda de 2 px em `{colors.accent}` sem borda superior (ela continua a borda da linha),
-fundo `{colors.cava}`, padding de 16 px. Dentro, uma tabela de colunas colapsadas: cabeçalho em caixa
-alta e `{colors.muted}`, primeira coluna com `width: 100%` para absorver a sobra, colunas numéricas
-alinhadas à direita com `white-space: nowrap`, e divisores de 1 px só entre linhas do corpo.
+- **Contraste medido, não estimado.** Todo par que a interface pinta está em
+  `contraste.test.ts`, com o mínimo do seu papel (4,5:1 para texto, 3:1 para limite de componente
+  e preenchimento de medidor). O teste tem âncora própria: preto sobre branco tem que dar 21:1,
+  senão a régua está quebrada e todos os pares "passariam".
+- **Alvo de 24 px** (WCAG 2.2 SC 2.5.8) em todo botão, `[role=button]` e rótulo de caixa de marcar,
+  a partir do token `--alvo`.
+- **Foco visível** em anel de 2 px de `{colors.couro-sombra}` com 2 px de folga, global, só no foco
+  por teclado.
+- **As superfícies do navegador são tematizadas**: seleção de texto, cursor, barra de rolagem,
+  `accent-color` e deslocamento de sublinhado. É o sinal mais barato de que a tela foi desenhada e
+  não montada, e o que mais se esquece.
+- **Cor nunca sozinha** (ver *Named Rules* em Colors).
 
 ## Do's and Don'ts
 
-### Do:
-- **Do** usar a borda como canal de estado: 2 px em `{colors.moldura-sombra}` em repouso, `{colors.accent}` em
-  `hover`, foco, ativo e aberto.
-- **Do** declarar largura de coluna sempre que uma tela existir para comparar linhas. `auto` deixa o
-  conteúdo mover o alinhamento, e o alinhamento é a comparação.
-- **Do** escrever o estado por extenso junto da cor ("arrasa", "não fere", "faltam 2 na Pokédex").
-- **Do** distinguir "ainda não sei" de "medi e deu zero": enquanto o dado não chega, travessão e
-  `aria-busy`, nunca um zero formatado.
-- **Do** recuar de plano (fundo `{colors.cava}`) para marcar o indisponível, mantendo os números em
-  contraste cheio.
-- **Do** manter `tabular-nums` em qualquer número que entre em coluna.
-- **Do** abrir o detalhe em gaveta, dentro da lista, quando o jogador vai abrir uma, olhar, fechar e
-  abrir a vizinha. Modal só para tarefa que se resolve e se fecha.
-- **Do** escalar sprite em múltiplo inteiro e recortá-lo numa caixa de tamanho declarado quando o
-  frame do atlas variar.
-- **Do** respeitar `prefers-reduced-motion: reduce` desligando animação e transição, como faz a ficha
-  de áreas.
+**Do**
+- Tire cor nova do atlas, com `pnpm cores`, antes de inventar uma.
+- Dê ao número a face de leitura, sempre, em qualquer tamanho.
+- Gaste bisel no que se aperta e sombra no que flutua; deixe o resto sem nenhum dos dois.
+- Escreva o rótulo da coluna uma vez, no alto.
+- Ponha o par novo de cores no teste de contraste junto com a regra que o usa.
 
-### Don't:
-- **Don't** introduzir raio de canto. O sistema é de raio zero e a exceção não tem onde se apoiar.
-- **Don't** usar sombra para elevar. Profundidade aqui é plano e borda; o único `box-shadow` do
-  projeto é anel de estado.
-- **Don't** pintar texto com o matiz cru de um tipo sobre o painel. Misture com `{colors.text}` (a
-  ficha usa 45 %) ou deixe o matiz só na borda e no ponto.
-- **Don't** transformar uma comparação em grade de cartões iguais. Cartão lado a lado é legítimo para
-  escolha única e irreversível (a tela de inicial), não para ler a mesma coluna em oito linhas.
-- **Don't** animar o que muda a caixa. O movimento que existe é de borda (120 ms `ease-out`) e de
-  entrada da gaveta (160 ms `cubic-bezier(0.16, 1, 0.3, 1)`, opacidade e 4 px de `translateY`).
-- **Don't** aninhar botão dentro de botão para caber uma ação secundária na linha; a ação sai para
-  uma coluna própria.
-- **Don't** apagar informação para indicar bloqueio. `opacity` esconde o número que justifica a meta.
-- **Don't** acrescentar um segundo acento. Se dois elementos disputam destaque na mesma tela, o
-  problema é de posição, não de cor.
-
-## Estado conhecido
-
-Duas coisas são verdade no código de hoje e ficam registradas como dívida, não como regra:
-
-1. **O selo de tipo global ainda não foi corrigido.** A regra `.type` em `layout.css` pinta o matiz
-   cru como texto sobre o painel; para `ghost` e `dark` isso fica abaixo de 4,5:1 (medido em ~2,6:1).
-   A ficha de áreas já sobrepõe essa regra localmente com `color-mix`; a tela de inicial e os modais
-   ainda usam o tratamento original. A regra do sistema é a da ficha — as outras telas é que estão
-   atrasadas.
-2. **O sistema não tem registro de display.** A voz tipográfica é a pilha do sistema e a escala é
-   plana: `h1` a 1,2rem contra um corpo de 14 px, sem família própria e sem um degrau real de título.
-   Isso é uma lacuna do mundo, não uma decisão a ser herdada: uma tela nova não deve tomar
-   `system-ui` a 1,2rem como se fosse o display do projeto.
+**Don't**
+- Não invente um acento. Se precisa de destaque, use posição, peso ou a inversão do couro.
+- Não use o marca-texto em mais de um papel por tela.
+- Não ponha a face de HUD abaixo de 18 px nem em cima de um dígito.
+- Não use emoji ou glifo Unicode como ícone: o sistema não tem biblioteca de ícones, e o primeiro
+  glifo seria o primeiro ícone dela.
+- Não arredonde canto: o mundo é de canto reto.
+- Não escreva cor literal em folha de estilo. Se falta um valor, falta um token.

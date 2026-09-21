@@ -38,13 +38,24 @@ const px = (tile: number): number => tile * TILE_SIZE + TILE_SIZE / 2
 // applyView, então o body novo ainda não existe quando o evento 'evolved' chega).
 const PENDING_EVOLVE_FLASH_MS = 1000
 
+/** Cor da mesa, lida do token. `--mesa` como está em `tokens.css`, para o caso de o CSS não ter
+ * chegado (teste com DOM falso, folha ainda carregando): a tarja some do mesmo jeito. */
+const MESA_PADRAO = 0x33261f
+function corDaMesa(parent: HTMLElement): number {
+  const declarado = getComputedStyle(parent).getPropertyValue('--mesa').trim()
+  const hex = /^#([0-9a-f]{6})$/i.exec(declarado)
+  return hex === null ? MESA_PADRAO : Number.parseInt(hex[1]!, 16)
+}
+
 /** Cria a cena PixiJS: mapa numa textura, sprites do atlas, tween por tick, câmera e efeitos. Só a Task 9 chama isto. */
 export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise<Scene> {
   const isHidden = deps.isHidden ?? (() => document.hidden)
   const app = new Application()
-  // Mesmo preto de página do `--bg` do tema: a tarja que sobra quando o mundo é menor que o
-  // painel tem que sumir contra o fundo, não virar um terceiro plano.
-  await app.init({ background: 0x0f0f14, resizeTo: parent, resolution: window.devicePixelRatio || 1, autoDensity: true, antialias: false, roundPixels: true })
+  // A tarja que sobra quando o mundo é menor que o painel tem que sumir contra a mesa, não virar
+  // um terceiro plano. A cor SAI DO TOKEN em vez de ser escrita aqui: até a troca do mundo visual
+  // este número era um `0x0f0f14` fixo que citava, em comentário, um `--bg` que já não existia
+  // havia dois temas — e ninguém vê uma tarja preta ficar preta.
+  await app.init({ background: corDaMesa(parent), resizeTo: parent, resolution: window.devicePixelRatio || 1, autoDensity: true, antialias: false, roundPixels: true })
   app.canvas.style.imageRendering = 'pixelated'
   parent.appendChild(app.canvas)
 

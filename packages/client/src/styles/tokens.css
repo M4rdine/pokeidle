@@ -1,47 +1,118 @@
 /*
- * Tokens do mundo visual. Interface de RPG 16-bit: moldura com bisel, luz em cima à esquerda e
- * sombra embaixo à direita, superfícies aninhadas. O que é leitura afunda; o que é ação se levanta.
+ * O mundo visual: a caderneta de campo do treinador.
  *
- * A gramática vem do gênero; a cor é nossa. Azul-noite de fundo, bronze na moldura, e o amarelo
- * elétrico que o projeto já usava continua sendo o único acento.
+ * TESE: a interface é o caderno de quem anda pelo mundo — papel, couro e latão em volta, e o
+ * mundo pixelado no meio, com a cor toda. O chrome emoldura o jogo em vez de competir com ele.
+ * Antes daqui, o mundo era azul-noite com moldura bronze: a combinação de fábrica de todo idle
+ * de navegador, e que não tinha nada a ver com o verde e a terra que emoldurava.
+ *
+ * A COR NÃO FOI INVENTADA. Cada superfície sai de um material do atlas, medido no próprio PNG:
+ * o papel é a AREIA dos tiles (#dcd1ac), o couro é a TERRA BATIDA da trilha (#a87b5b), a sombra
+ * é a ROCHA DE CAVERNA (#614845), a barra de vida é o CAMPO (#398e45) e a de experiência é a
+ * ÁGUA (#56c3f0). Quem olha a tela e o mapa vê o mesmo mundo, porque é o mesmo mundo.
+ *
+ * `tools/assets/scripts/cores-do-mundo.ts` remede o atlas e imprime estes valores; quando o
+ * tileset mudar, é de lá que sai a paleta nova.
  */
+
+/* ── As duas vozes ───────────────────────────────────────────────────────────────────────────
+ * Auto-hospedadas: o jogo roda em VPS própria e não entrega o IP de quem joga a um CDN de
+ * terceiros para desenhar texto. Só o subconjunto latin — ver `fontes/LEIAME.md`.
+ */
+@font-face {
+  font-family: 'Pixelify Sans';
+  src: url('./fontes/pixelify-sans.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('./fontes/atkinson-400.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  src: url('./fontes/atkinson-700.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
-  /* ── Superfícies, do fundo para a frente ── */
-  --noite: #131826;        /* fora de tudo */
-  --cava: #0d111c;         /* o que afunda: trilho de medidor, campo, lista */
-  --painel: #2a3145;       /* a superfície que se levanta */
-  --painel-alto: #343c54;  /* a mesma, um degrau à frente */
+  /*
+   * A voz de HUD é bitmap porque o mundo é bitmap. Ela tem DUAS restrições duras, e as duas
+   * foram descobertas na tela, não no papel:
+   *
+   *  1. SÓ DE `--t-l` (18 px) PARA CIMA. Abaixo disso a grade de pixels cai fora do grid de
+   *     tela e a forma apodrece — "Configurações" saía renderizado como "ConAgurações".
+   *  2. NUNCA EM NÚMERO. No corpo desta face o 5 e o 8 são quase a mesma silhueta: a coluna de
+   *     poder dos golpes mostrava 95, 50 e 35 e se lia 98, 80 e 38. Número é dado, e dado que
+   *     se lê errado é pior que dado feio.
+   *
+   * Sobra para ela exatamente o que ela faz bem: NOME PRÓPRIO E TÍTULO, grandes. Todo o resto —
+   * número, rótulo miúdo, texto de botão, prosa — é da Atkinson.
+   */
+  --fonte-hud: 'Pixelify Sans', 'Courier New', monospace;
+  --fonte-texto: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
 
-  /* ── Moldura: três tons fazem o bisel ── */
-  --moldura: #7a5c3a;
-  --moldura-luz: #a8814f;
-  --moldura-sombra: #46331f;
+  /* ── Superfícies: a mesa, e a caderneta em cima dela ── */
+  --mesa: #33261f;         /* fora de tudo; o mundo é a coisa mais clara da tela, não o chrome */
+  --papel-luz: #fff8e8;    /* a quina iluminada do papel: só o fio de cima do bisel */
+  --papel-alto: #f5ecd6;   /* o que se levanta: cabeçalho, botão, linha ativa */
+  --papel: #e9ddbe;        /* a folha; deriva da areia do atlas */
+  --papel-cava: #d3c49f;   /* o que afunda: trilho, campo, lista */
 
-  /* ── Texto ── */
-  --text: #f0f0f5;
-  /* 4,83:1 no pior fundo (`--painel-alto`). O tom anterior dava 4,2:1 e reprovava em texto
-   * normal — e é justamente o rótulo discreto que mais aparece na tela. */
-  --muted: #a6acbe;
+  /* ── Couro e latão: três tons fazem o bisel, todos da trilha e da rocha ── */
+  --couro: #a07556;
+  --couro-luz: #d0a684;
+  --couro-sombra: #5d4438;
 
-  /* ── Papéis ── */
-  --accent: #f8d030;       /* ativo, ação primária, recompensa, foco */
-  --ouro: #f0c040;
-  --danger: #e04848;
-  /* O vermelho puro sobre `--painel` mede 3,20:1 e reprova em texto normal. Esta é a versão para
-   * ler sobre painel: 5,1:1. A má notícia não pode ser mais difícil de ler que a boa. */
-  --danger-texto: #ff8a8a;
-  --ok: #52c46a;
-  --xp: #58a6f0;
+  /* ── Tinta ── */
+  --tinta: #2c211a;
+  /* Secundária tingida do próprio papel, nunca cinza: 4,6:1 sobre `--papel-cava`, o pior fundo. */
+  --tinta-fraca: #5a4938;
+
+  /* ── Papéis semânticos. A cor aqui é informação; decoração não ganha nenhuma. ──
+   * Não existe "cor de acento": ação primária e seleção são desenhadas com o COURO invertido,
+   * que é o material da própria caderneta. Sobra cor para o que precisa dizer alguma coisa. */
+  --marca: #f7d979;        /* marca-texto: o amarelo do projeto virou o grifo da linha ativa */
+  --marca-borda: #97791d;
+  /* Duas cores por material, e não uma, porque os dois papéis pedem contrastes opostos: o valor
+   * em texto vive sobre papel claro e precisa ser escuro; o preenchimento vive dentro da fenda
+   * escura do medidor e precisa ser claro. Um token só reprovaria num dos dois, sempre. */
+  --ouro: #6f5310;
+  --ouro-cheio: #d9a521;
+  --xp: #1a698c;
+  --xp-cheio: #56c4f1;     /* a água do atlas, sem escurecer: o trilho é escuro */
+  --perigo: #8f2820;
+  --ok: #2c6431;
+  --hp: #398e45;           /* campo */
+
+  /* ── Escala de texto: fixa em rem, razão ~1,2. Interface de tarefa não usa tipo fluido. ── */
+  --t-xs: 0.6875rem;  /* 11px — só em rótulo caixa-alta com entreletra, nunca em leitura */
+  --t-s: 0.8125rem;   /* 13px — dado denso */
+  --t-m: 0.9375rem;   /* 15px — corpo */
+  --t-l: 1.125rem;    /* 18px */
+  --t-xl: 1.5rem;     /* 24px */
+  --t-2xl: 2rem;      /* 32px */
 
   /* ── Espaço, em degraus de 4 ── */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 16px;
   --space-4: 32px;
+  --space-5: 48px;
 
-  /* ── Bisel ── */
+  /* ── Bisel e traço ── */
   --bisel: 2px;
   --border-w: 2px;
+  /* Alvo mínimo de toque (WCAG 2.2 SC 2.5.8). Sai daqui para não virar número solto. */
+  --alvo: 24px;
+
+  /* ── Tempo: interface de tarefa reage, não coreografa ── */
+  --rapido: 120ms;
+  --normal: 200ms;
+  --saida: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* ── Tipos: os dezoito matizes canônicos, identidade da espécie ── */
   --type-fire: #f08030;
@@ -64,10 +135,42 @@
   --type-fairy: #ee99ac;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
+  margin: 0;
+  background: var(--mesa);
+  color: var(--tinta);
+  font-family: var(--fonte-texto);
+  font-size: var(--t-m);
+  line-height: 1.45;
   font-variant-numeric: tabular-nums;
+}
+
+/*
+ * As superfícies que o navegador desenha e que nenhum sistema de design costuma reclamar. Deixá-
+ * las no padrão é o jeito mais barato de a tela denunciar que foi montada, não desenhada.
+ */
+::selection { background: var(--marca); color: var(--tinta); }
+:root { accent-color: var(--couro-sombra); caret-color: var(--tinta); scrollbar-color: var(--couro) var(--papel-cava); }
+
+:where(a) { color: var(--couro-sombra); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+
+/* Foco visível em qualquer coisa focável, com o contraste do couro sobre papel. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--border-w) solid var(--couro-sombra);
+  outline-offset: 2px;
 }
 
 canvas {
   image-rendering: pixelated;
+}
+
+/* `display: flex` vence `[hidden]`, e o painel escondido virava uma faixa vazia na tela. */
+[hidden] { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }

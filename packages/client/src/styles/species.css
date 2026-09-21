@@ -1,19 +1,21 @@
 /*
- * Ficha de espécie. Segue o DESIGN.md: borda reta, dois planos de fundo, um acento só e número
- * tabular. O que hierarquiza é peso, caixa alta e cor de rótulo — não um segundo tamanho de fonte.
+ * Ficha de espécie. Segue o DESIGN.md: borda reta, dois planos de papel, nenhuma cor de acento —
+ * o grifo marca o que está aberto, o ouro marca o que é valor — e número tabular. O que
+ * hierarquiza é peso, caixa alta, voz da fonte e cor de rótulo — não um segundo tamanho de fonte.
  */
 .ficha { display: flex; flex-direction: column; gap: var(--space-4); }
 
 .ficha-topo { display: flex; align-items: center; gap: var(--space-3); }
 .ficha-id { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
-.ficha-id h2 { font-size: 1.2rem; }
+.ficha-id h2 { font-size: var(--t-l); }
 .ficha-tipos { display: flex; gap: var(--space-1); }
 
 .ficha-secao { display: flex; flex-direction: column; gap: var(--space-2); }
-/* Mais espaço acima do título do que abaixo: o título pertence ao que vem depois dele. */
+/* Mais espaço acima do título do que abaixo: o título pertence ao que vem depois dele. Neste
+   tamanho ele fica na voz de leitura: a bitmap abaixo de 12 px perde a grade e vira borrão. */
 .ficha-secao h3 {
-  margin: 0; font-size: 0.75em; font-weight: 400;
-  letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  margin: 0; font-size: var(--t-xs); font-weight: 400;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--tinta-fraca);
 }
 .ficha-vazio { margin: 0; }
 
@@ -21,41 +23,45 @@
 .ficha-areas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .ficha-area {
   display: grid; grid-template-columns: 1fr auto auto auto; gap: var(--space-3);
-  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--painel);
+  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--papel);
 }
+/* A linha inteira é dado denso e fica na face de leitura, nome incluído: a bitmap só entra a
+   partir de --t-l, e aqui não há tamanho sobrando para chegar lá. */
 .area-nome { font-weight: 600; }
 .area-faixa, .area-porta { font-variant-numeric: tabular-nums; }
 /* O portão é informação, não enfeite. Só acende quando ainda barra: apagado quer dizer que já dá. */
 .area-porta { font-variant-numeric: tabular-nums; }
-.porta-longe { color: var(--accent); }
+.porta-longe { color: var(--ouro); }
 
 /* ── Atributos ─────────────────────────────────────────────────────────────── */
 .ficha-stats { display: flex; flex-direction: column; gap: var(--space-1); }
 .stat-linha { display: grid; grid-template-columns: 5.5rem 2.5rem 1fr; gap: var(--space-2); align-items: center; }
-.stat-rotulo { color: var(--muted); font-size: 0.85em; }
+.stat-rotulo { color: var(--tinta-fraca); font-size: var(--t-s); }
 .stat-valor { text-align: right; font-variant-numeric: tabular-nums; }
-/* Mesma escala nas seis barras: é a comparação entre elas que mostra o formato da espécie. */
-.stat-barra { height: 8px; background: var(--cava); position: relative; }
+/* Mesma escala nas seis barras: é a comparação entre elas que mostra o formato da espécie.
+   O trilho é a fenda do medidor, com a mesa no fundo — é ela que deixa o preenchimento de ouro
+   atingir contraste. Sobre papel afundado, ouro sobre bege mede 1,3:1 e a barra desaparece. */
+.stat-barra { height: 8px; background: var(--mesa); position: relative; }
 .stat-barra::after {
   content: ""; position: absolute; inset: 0;
-  background: var(--accent); transform: scaleX(var(--fracao, 0)); transform-origin: left;
+  background: var(--ouro-cheio); transform: scaleX(var(--fracao, 0)); transform-origin: left;
 }
 
 /* ── Evolução ──────────────────────────────────────────────────────────────── */
 .ficha-evo { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
 .evo-estagio {
   display: flex; align-items: center; gap: var(--space-2);
-  padding: var(--space-1) var(--space-2); border: var(--border-w) solid var(--moldura-sombra); background: var(--painel);
+  padding: var(--space-1) var(--space-2); border: var(--border-w) solid var(--couro-sombra); background: var(--papel);
 }
-/* O estágio aberto é o único aceso: a linha é contexto, e o acento marca onde se está. */
-.evo-atual { border-color: var(--accent); }
+/* O estágio aberto é o único grifado: a linha é contexto, e o marca-texto diz onde se está. */
+.evo-atual { background: var(--marca); border-color: var(--marca-borda); }
 .evo-seta { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* ── Golpes ────────────────────────────────────────────────────────────────── */
 .ficha-learnset { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .learn-linha {
   display: grid; grid-template-columns: 4rem 1fr auto auto; gap: var(--space-2);
-  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--painel);
+  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--papel);
 }
 .learn-nivel, .learn-poder { font-variant-numeric: tabular-nums; }
 
@@ -64,18 +70,20 @@
   display: grid; grid-template-columns: repeat(3, auto); gap: var(--space-1) var(--space-3);
   margin: 0; justify-content: start;
 }
-.ficha-numeros dt { font-size: 0.75em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.ficha-numeros dt { font-size: var(--t-xs); letter-spacing: 0.08em; text-transform: uppercase; color: var(--tinta-fraca); }
 .ficha-numeros dd { margin: 0; font-variant-numeric: tabular-nums; }
 /* dt e dd em colunas pareadas: rótulo em cima, número embaixo, como mostrador. */
 .ficha-numeros dt { grid-row: 1; }
 .ficha-numeros dd { grid-row: 2; }
 
-/* A célula da Pokédex que abre ficha precisa parecer clicável. */
+/* A célula da Pokédex que abre ficha precisa parecer clicável. Hover é tinta: o grifo e o ouro
+   já dizem outras coisas nesta tela, e passar o mouse não pode parecer ter selecionado nada. */
 .dex-cell[role="button"] { cursor: pointer; }
-.dex-cell[role="button"]:hover { border-color: var(--accent); }
-/* O nome no Time é a porta para a ficha: botão sem moldura, sublinhado no hover. */
+.dex-cell[role="button"]:hover { border-color: var(--tinta); }
+/* O nome no Time é a porta para a ficha: botão sem moldura que, no hover, pega a tinta de link
+   do sistema — a mesma de qualquer outra coisa que leva a outro lugar. */
 .team-nome { background: none; border: none; padding: 0; text-align: left; font: inherit; color: inherit; cursor: pointer; }
-.team-nome:hover { color: var(--accent); }
+.team-nome:hover { color: var(--couro-sombra); }
 
 @media (max-width: 600px) {
   .ficha-area { grid-template-columns: 1fr auto; row-gap: var(--space-1); }

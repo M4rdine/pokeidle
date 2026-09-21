@@ -17,7 +17,10 @@ export function openModal(root: Element, title: string, content: HTMLElement, on
     ? document.activeElement
     : null
   current?.close()
-  const closeButton = el('button', { class: 'modal-close', type: 'button', 'aria-label': 'Fechar' }, '×')
+  // Sem glifo: o X é DESENHADO em CSS, com duas barras retas. O sistema não tem biblioteca de
+  // ícones, e um "×" de fonte aqui seria o primeiro ícone dela — herdado de uma família qualquer,
+  // com peso e tamanho que não são os do resto do mundo.
+  const closeButton = el('button', { class: 'modal-close', type: 'button', 'aria-label': 'Fechar' })
   const dialog = el('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
     el('header', { class: 'modal-header' }, el('h2', {}, title), closeButton),
     el('div', { class: 'modal-body' }, content))

@@ -19,9 +19,10 @@
 }
 .grid-top { grid-area: top; }
 .grid-left { grid-area: left; display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; }
-/* A tarja que sobra quando o mundo é menor que o painel usa o preto da página, não `#000`: o
- * DESIGN.md tem dois planos de fundo, e um terceiro preto não pertence a nenhum deles. */
-.grid-center { grid-area: center; position: relative; overflow: hidden; background: var(--noite); min-width: 0; min-height: 0; }
+/* A tarja que sobra quando o mundo é menor que o painel mostra a MESA: o mundo visual tem três
+ * planos de papel e uma mesa, e um preto puro não pertence a nenhum deles. O mesmo valor é lido
+ * do token pelo renderizador, em `scene/app.ts`, para os dois não poderem divergir. */
+.grid-center { grid-area: center; position: relative; overflow: hidden; background: var(--mesa); min-width: 0; min-height: 0; }
 .grid-right { grid-area: right; min-height: 0; display: flex; }
 .grid-bottom { grid-area: bottom; min-height: 0; }
 
@@ -37,62 +38,88 @@
   flex-wrap: nowrap; overflow-x: auto;
 }
 .tb-id { display: flex; align-items: baseline; gap: var(--space-2); flex-shrink: 0; }
-.tb-id strong { font-size: 1rem; letter-spacing: 0.02em; }
+.tb-id strong { font-family: var(--fonte-hud); font-size: var(--t-l); letter-spacing: 0.01em; }
 .tb-id .xp-bar { width: 88px; height: 6px; }
 
 /* Leitura: rótulo micro em caixa alta sobre o número, como mostrador de instrumento. */
 .tb-leitura { display: flex; gap: var(--space-3); flex-shrink: 0; }
 .leitura { display: flex; flex-direction: column; line-height: 1.1; }
 .leitura > span:first-child {
-  font-size: 0.7em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  font-size: var(--t-xs); font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-fraca);
 }
-.leitura > :last-child { font-size: 0.95rem; }
+.leitura > :last-child { font-size: var(--t-m); }
 /* "Hiper Poção, 6 vagas no time · nv 30" não cabe numa barra de uma linha; o título devolve o resto. */
 .tb-corta { max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* O ouro é o número que o jogador veio ver; é recompensa, e recompensa acende. */
-.leitura-ouro > :last-child { color: var(--accent); font-weight: 600; font-size: 1.1rem; }
+.leitura-ouro > :last-child { color: var(--ouro); font-weight: 700; font-size: var(--t-l); }
 
 .tb-acoes { display: flex; gap: var(--space-1); margin-left: auto; flex-shrink: 0; }
-/* Atalho de modal é navegação, não ação primária: fica mais leve que Parar e Sair. */
-.tb-acoes button[data-open] { padding: var(--space-1) var(--space-2); font-size: 0.9em; color: var(--muted); }
-.tb-acoes button[data-open]:hover:not([disabled]) { color: var(--text); }
+/*
+ * Atalho de modal é NAVEGAÇÃO, não ação. Sem moldura e sem bisel: um botão entalhado diz "isto
+ * faz alguma coisa acontecer no mundo", e abrir a Pokédex não faz. Antes eram cinco molduras
+ * idênticas em fila disputando o mesmo peso visual de Parar e de Sair, que são as duas únicas
+ * coisas ali que mudam o estado do jogo.
+ */
+.tb-acoes button[data-open] {
+  padding: var(--space-1) var(--space-2); font-size: var(--t-s); color: var(--tinta-fraca);
+  background: none; border-color: transparent; box-shadow: none;
+}
+.tb-acoes button[data-open]:hover:not([disabled]) {
+  background: none; color: var(--tinta); text-decoration: underline; text-underline-offset: 0.25em;
+}
+/* Sair tira o jogador da caçada: fica discreto até o ponteiro chegar, e aí se declara. */
+.tb-saida button:hover:not([disabled]) { background: none; color: var(--perigo); border-color: var(--perigo); }
 /* O par que sai da hunt fica separado do resto por um divisor, não por distância. */
-.tb-saida { display: flex; gap: var(--space-1); padding-left: var(--space-2); margin-left: var(--space-1); border-left: 1px solid var(--moldura-sombra); flex-shrink: 0; }
+.tb-saida { display: flex; gap: var(--space-1); padding-left: var(--space-2); margin-left: var(--space-1); border-left: 1px solid var(--couro-sombra); flex-shrink: 0; }
 
 .tb-status { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; flex-shrink: 0; font-size: 0.75em; }
 .conn { display: flex; align-items: center; gap: var(--space-1); }
 .conn::before { content: ""; width: 6px; height: 6px; background: currentColor; flex-shrink: 0; }
 .conn[data-conn="open"] { color: var(--ok); }
-.conn[data-conn="reconnecting"], .conn[data-conn="connecting"], .conn[data-conn="catching-up"] { color: var(--accent); }
-.conn[data-conn="closed"] { color: var(--danger-texto); }
+.conn[data-conn="reconnecting"], .conn[data-conn="connecting"], .conn[data-conn="catching-up"] { color: var(--ouro); }
+.conn[data-conn="closed"] { color: var(--perigo); }
 
 /* ── Ficha do ativo ─────────────────────────────────────────────────────────── */
 .active-card { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); }
 /* Cabeçalho em linha: o sprite vive numa caixa de tamanho fixo, então não invade o nome. Antes
  * `transform: scale(2)` transbordava da caixa do frame e cobria o texto de baixo. */
 .active-topo { display: flex; align-items: center; gap: var(--space-3); }
-.active-card h2 { font-size: 1.05rem; min-width: 0; overflow-wrap: anywhere; }
+.active-card h2 { font-size: var(--t-l); min-width: 0; overflow-wrap: anywhere; }
+.active-nome { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
 .active-sprite-box { flex-shrink: 0; }
 .active-corpo { display: flex; flex-direction: column; gap: var(--space-2); }
 .medidor { display: flex; flex-direction: column; gap: 2px; }
 .medidor-topo { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.75em; }
-.medidor-topo > :first-child { letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.medidor-topo > :first-child { font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-fraca); }
 .active-card progress { height: 8px; }
-.active-vazio { color: var(--muted); padding: var(--space-2) 0; }
+.active-vazio { color: var(--tinta-fraca); padding: var(--space-2) 0; }
 
-/* ── Golpes ─────────────────────────────────────────────────────────────────── */
-.moves { list-style: none; margin: 0; padding: var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); overflow-y: auto; min-height: 0; }
-.move { display: flex; gap: var(--space-2); align-items: baseline; }
-.move-cd { margin-left: auto; width: 40px; height: 6px; background: var(--cava); position: relative; overflow: hidden; flex-shrink: 0; }
-.move-cd::after { content: ""; position: absolute; inset: 0; background: var(--accent); transform: scaleX(var(--cd, 0)); transform-origin: left; }
-.move-cd[data-cd="0"] { background: var(--ok); }
+/* ── Golpes ───────────────────────────────────────────────────────────────────
+ * Quatro colunas de largura fixa, iguais em todas as linhas: nome, tipo, poder e recarga. É a
+ * coluna alinhada que deixa comparar oito golpes de relance; antes, com o rótulo "poder" dentro
+ * de cada linha, o número caía num lugar diferente conforme o tamanho do nome.
+ */
+.moves-caixa { display: flex; flex-direction: column; min-height: 0; }
+.moves-cabeca { justify-content: space-between; padding: var(--space-2) var(--space-2) var(--space-1); }
+.moves { list-style: none; margin: 0; padding: 0 var(--space-2) var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); overflow-y: auto; min-height: 0; }
+.move { display: grid; grid-template-columns: 1fr auto 3ch 40px; gap: var(--space-2); align-items: center; }
+.move-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.move-poder { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+/* A recarga é uma fenda: fundo de mesa, preenchimento de latão. Pronto fica VERDE e cheio — e o
+ * "cheio" importa tanto quanto a cor, porque quem não distingue verde de âmbar lê o comprimento. */
+.move-cd { height: 6px; background: var(--mesa); position: relative; overflow: hidden; }
+.move-cd::after { content: ""; position: absolute; inset: 0; background: var(--ouro-cheio); transform: scaleX(var(--cd, 0)); transform-origin: left; }
+.move-cd[data-cd="0"] { background: var(--hp); }
 
 /* ── Situação ───────────────────────────────────────────────────────────────── */
 .situacao { padding: var(--space-2) var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
-.situacao-texto { font-size: 1rem; }
-/* O combate é o único estado que pede atenção agora; o acento marca isso e nada mais. */
-.situacao-texto[data-situacao="em combate"] { color: var(--accent); }
-.situacao-texto[data-situacao="curando"], .situacao-texto[data-situacao="voltando ao Centro"] { color: var(--muted); }
+.situacao-texto { font-size: var(--t-m); }
+/* Combate é o estado NORMAL de um idle: ele acontece o tempo todo. Acender o que está sempre
+ * aceso é ruído, não ênfase — então o combate vem em tinta cheia e os estados de pausa é que
+ * recuam. Antes daqui, o acento ficava ligado praticamente sem parar. */
+.situacao-texto[data-situacao="em combate"] { color: var(--tinta); font-weight: 700; }
+.situacao-texto[data-situacao="curando"], .situacao-texto[data-situacao="voltando ao Centro"] { color: var(--tinta-fraca); }
 .situacao-alvo { display: flex; flex-direction: column; gap: 2px; }
 .situacao { min-height: 0; }
 .alvo-linha { display: flex; align-items: baseline; gap: var(--space-2); font-size: 0.85em; }
@@ -110,19 +137,24 @@
  * medidor na terceira. Repetir a mesma ordem em seis slots é o que deixa comparar de relance. */
 .slot-dados { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
 .slot-linha { display: flex; align-items: center; gap: var(--space-1); min-width: 0; }
-.slot-nome { font-weight: 600; font-size: 0.85em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.slot-nome { font-weight: 700; font-size: var(--t-s); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .slot-tipos .chip { font-size: 0.62em; }
 .slot-hp { font-size: 0.78em; }
 .slot progress { height: 6px; }
-.slot-active { border-color: var(--accent); }
+/* O marca-texto tem um trabalho só no sistema inteiro: dizer qual linha é a de agora. Gastá-lo
+ * também no log e na situação o transformaria em decoração, e aí ele não marcaria mais nada. */
+.slot-active { background: var(--marca); border-color: var(--marca-borda); }
 /* Vaga vazia e vaga travada são lugares onde ainda não há nada: afundam, em vez de se levantar
  * como as ocupadas. Mesma regra do resto do sistema — o que se lê afunda, o que se age levanta. */
+/* Vaga vazia é ausência, e ausência não ocupa o mesmo espaço que presença: ela encolhe para uma
+ * linha. Com a altura das ocupadas, três vagas vazias tomavam um terço da coluna do time para
+ * não dizer nada. */
 .slot-empty, .slot-locked {
-  justify-content: center; color: var(--muted); font-size: 0.78em;
-  letter-spacing: 0.06em; min-height: 34px;
-  background: var(--cava);
-  border: var(--border-w) solid var(--moldura-sombra);
-  box-shadow: inset var(--bisel) var(--bisel) 0 rgb(0 0 0 / 45%);
+  justify-content: center; color: var(--tinta-fraca); font-size: var(--t-xs);
+  letter-spacing: 0.08em; min-height: var(--alvo); padding: 2px var(--space-2);
+  background: var(--papel-cava);
+  border: var(--border-w) solid var(--couro-sombra);
+  box-shadow: inset var(--bisel) var(--bisel) 0 var(--couro-sombra);
 }
 /* O slot travado diz o nível que o destrava: é informação, e substitui o cadeado em emoji que
  * estava fazendo papel de ícone num sistema que não tem ícone nenhum. */
@@ -132,8 +164,9 @@
 .log { height: 100%; display: flex; flex-direction: column; min-height: 0; }
 .log-header {
   display: flex; gap: var(--space-2); align-items: center;
-  padding: var(--space-1) var(--space-3); border-bottom: var(--border-w) solid var(--moldura-sombra);
-  font-size: 0.75em; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  padding: var(--space-1) var(--space-3); border-bottom: var(--border-w) solid var(--couro-sombra);
+  font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--tinta-fraca);
 }
 .log-header label { display: flex; align-items: center; gap: var(--space-1); cursor: pointer; }
 .log-filtro { margin-left: auto; }
@@ -144,13 +177,13 @@
 .log-line { padding: 1px 0; }
 /* A hierarquia do registro em três degraus: o combate é o fundo, a recompensa de rotina se lê
  * sem gritar, e o marco — captura, evolução, nível — é o único que acende. */
-.log-combat { color: var(--muted); }
-.log-reward { color: var(--text); }
-.log-marco { color: var(--accent); font-weight: 700; }
-.log-info { color: var(--muted); } .log-alert { color: var(--danger-texto); }
-.log-vazio { color: var(--muted); padding: var(--space-2) var(--space-3); }
+.log-combat { color: var(--tinta-fraca); }
+.log-reward { color: var(--tinta); }
+.log-marco { color: var(--ouro); font-weight: 700; }
+.log-info { color: var(--tinta-fraca); } .log-alert { color: var(--perigo); }
+.log-vazio { color: var(--tinta-fraca); padding: var(--space-2) var(--space-3); }
 
-.scene-error { color: var(--danger-texto); padding: var(--space-3); }
+.scene-error { color: var(--perigo); padding: var(--space-3); }
 .catchup, .stopped { display: flex; flex-direction: column; gap: var(--space-2); align-items: center; padding: var(--space-4); }
 
 /* ── Janela estreita ────────────────────────────────────────────────────────── */
@@ -178,7 +211,9 @@
   .tb-leitura { flex-wrap: wrap; gap: var(--space-3); }
   /* A barra inteira encolhe: cinco linhas de moldura num telefone não sobram tela para o jogo. */
   .top-bar button { padding: var(--space-1) var(--space-2); font-size: 0.85em; }
-  .tb-saida { padding-left: var(--space-1); margin-left: 0; }
+  /* O divisor separa "sair da caçada" do resto quando os dois estão na MESMA linha. Quando a
+   * barra quebra, ele vira um traço solto no começo de uma linha nova e não separa nada. */
+  .tb-saida { padding-left: 0; margin-left: 0; border-left: none; }
   /* Estado vira uma linha só, ao lado do nome, em vez de uma quarta faixa. */
   .tb-status { flex-direction: row; align-items: baseline; gap: var(--space-2); }
   /* "Próximo destrave" é o que menos decide numa tela estreita. */

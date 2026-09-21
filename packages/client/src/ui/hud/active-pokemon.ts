@@ -28,7 +28,13 @@ export function mountActivePokemon(root: HTMLElement, ctx: AppContext): () => vo
   // O sprite vive numa caixa de tamanho fixo. Antes era `transform: scale(2)` solto, que mantinha
   // a caixa do tamanho do frame e transbordava por cima do nome — "Charizard L61" saía ilegível.
   const caixaSprite = el('div', { class: 'active-sprite-box' })
-  const title = el('h2', { 'data-name': '' }, 'sem Pokémon em campo')
+  // Nome e nível em elementos separados, como na faixa do time. O nível é VALOR, e valor não
+  // pode ir na face de HUD: ela confunde 5 com 8, e "Charizard L65" saía na tela como "L68"
+  // enquanto o rótulo do mundo, ao lado, dizia L65. Separar também alinha as duas superfícies
+  // que mostram o mesmo Pokémon.
+  const nome = el('span', { 'data-name': '' }, 'sem Pokémon em campo')
+  const nivel = el('span', { class: 'chip chip-nivel', 'data-level': '', hidden: '' })
+  const title = el('h2', { class: 'active-nome' }, nome, nivel)
   const hp = el('progress', { class: 'hp-bar', 'data-hp': '', 'data-hp-state': 'ok', max: '1', value: '0' })
   const hpText = el('span', { 'data-hp-text': '' }, '—')
   const xp = el('progress', { class: 'xp-bar', 'data-xp': '', max: '100', value: '0' })
@@ -42,7 +48,8 @@ export function mountActivePokemon(root: HTMLElement, ctx: AppContext): () => vo
     if (!active) {
       // Estado vazio com palavra, não travessão: quem chega e vê "—" não sabe se quebrou ou se
       // ainda não começou.
-      title.textContent = 'sem Pokémon em campo'
+      nome.textContent = 'sem Pokémon em campo'
+      nivel.hidden = true
       corpo.hidden = true
       caixaSprite.replaceChildren()
       species = ''
@@ -53,7 +60,9 @@ export function mountActivePokemon(root: HTMLElement, ctx: AppContext): () => vo
       species = active.speciesName
       caixaSprite.replaceChildren(spriteThumb(ctx.atlas, species, LADO_SPRITE))
     }
-    title.textContent = `${displayName(active.speciesName)} L${active.level}`
+    nome.textContent = displayName(active.speciesName)
+    nivel.textContent = `nv ${active.level}`
+    nivel.hidden = false
     hp.setAttribute('max', String(active.hpMax))
     hp.setAttribute('value', String(active.hp))
     hp.setAttribute('data-hp-state', estadoDoHp(active.hp, active.hpMax))

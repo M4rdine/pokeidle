@@ -33,13 +33,18 @@ export function mountTeamStrip(root: HTMLElement, ctx: AppContext): () => void {
           class: index === activeIndex ? 'slot slot-active' : 'slot',
           'data-pokemon': member.id,
           title: `${displayName(member.speciesName)} L${member.level}`,
-        }, sprite, el('div', { class: 'slot-dados' },
+        // O sprite mora num POÇO — uma caixa afundada, com o seu próprio contorno. É o que
+        // transforma a linha numa peça de jogo em vez de um item de lista com uma figurinha ao
+        // lado do texto: o retrato ganha moldura, e a moldura é do mesmo material das fendas.
+        }, el('span', { class: 'slot-poco' }, sprite), el('div', { class: 'slot-dados' },
             el('div', { class: 'slot-linha' },
               el('span', { class: 'slot-nome' }, displayName(member.speciesName)),
               el('span', { class: 'chip chip-nivel' }, `nv ${member.level}`)),
             el('div', { class: 'slot-linha slot-tipos' }, ...tipos),
-            hp,
-            el('span', { class: 'slot-hp muted' }, `${member.hp}/${member.hpMax}`)))
+            // O número vai DENTRO do trilho, encostado na direita. Embaixo dele, era uma terceira
+            // linha de texto miúdo por slot — seis vezes na coluna — e ninguém liga 14/14 à barra
+            // que está acima sem contar as linhas.
+            el('div', { class: 'slot-medidor' }, hp, el('span', { class: 'slot-hp' }, `${member.hp}/${member.hpMax}`))))
         slot.addEventListener('click', () => ctx.sendIntent?.({ t: 'team.setActive', pokemonId: member.id }))
         return slot
       }

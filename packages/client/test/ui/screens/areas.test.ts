@@ -128,6 +128,16 @@ describe('escolher onde caçar', () => {
     expect(root.querySelector('.mapa-analise-vazio')).not.toBeNull()
   })
 
+  it('a tela leva as funções do jogo: sem caçada ativa não há HUD, e sem elas ela é um beco', () => {
+    // Quem parou a caçada para comprar poção precisa abrir a Loja daqui. A reescrita da tela
+    // tirou esta fileira sem querer, e o caminho até a Loja sumiu do jogo inteiro.
+    const root = montar()
+    const funcoes = [...root.querySelectorAll('.menu-item')].map((b) => b.getAttribute('data-open'))
+    expect(funcoes).toContain('shop')
+    expect(funcoes).toContain('bag')
+    expect(funcoes).toContain('team')
+  })
+
   it('região sem área liberada pelo servidor não desenha mapa vazio: diz o que houve', () => {
     const root = montar({}, [])
     expect(root.querySelector('.mapa-imagem')).toBeNull()

@@ -18,8 +18,9 @@
  * A sanfona era a pior parte: abrir uma área empurrava as de baixo, então comparar duas exigia
  * fechar uma. O analisador agora é um painel fixo ao lado, que não empurra nada.
  */
-import type { AppContext } from '../../../app-context.js'
+import type { AppContext, ModalName } from '../../../app-context.js'
 import { PokedexSchema, StartHuntSchema, TeamSchema } from '../../../api/dto.js'
+import { MODAL_ICONS, MODAL_LABELS } from '../../../config.js'
 import { trainerProgress } from '../../../state/progress.js'
 import { el, mount } from '../../dom.js'
 import { escolherDestino, type DadosDoTreinador } from './escolher-destino.js'
@@ -53,6 +54,19 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
 
   const progresso = me ? trainerProgress(ctx.registry, me.trainer.xp) : null
 
+  /**
+   * As mesmas funções do menu do jogo. Sem caçada ativa não existe HUD, então SEM ISTO esta tela
+   * é um beco: o jogador que parou para comprar poção não tem por onde abrir a Loja. Foi o que
+   * aconteceu quando a tela foi reescrita — e quem pegou foi o smoke do Playwright, procurando o
+   * botão "Loja" depois de parar a caçada.
+   */
+  const funcoes = el('nav', { class: 'menu panel', 'aria-label': 'Funções do jogo' },
+    el('div', { class: 'menu-grade' },
+      ...(Object.keys(MODAL_LABELS) as ModalName[]).map((modal) =>
+        el('button', { type: 'button', class: 'menu-item', 'data-open': modal, onclick: () => ctx.openModal?.(modal) },
+          el('span', { class: 'icone', 'data-icone': MODAL_ICONS[modal] }),
+          el('span', {}, MODAL_LABELS[modal])))))
+
   function render(): void {
     if (primeira === undefined) {
       mount(root, el('main', { class: 'screen screen-areas' }, el('p', { class: 'muted' }, 'Nenhuma região carregada.')))
@@ -62,8 +76,12 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
       el('header', { class: 'area-head' },
         el('h1', {}, 'Onde caçar'),
         progresso
-          ? el('p', { class: 'muted' }, `Nível ${progresso.level} — ${progresso.next?.what ?? 'tudo destravado'}`)
+          ? el('p', { class: 'muted' },
+              `Nível ${progresso.level} · `,
+              el('span', { class: 'area-ouro' }, (me?.trainer.gold ?? 0).toLocaleString('pt-BR')),
+              ` de ouro · ${progresso.next?.what ?? 'tudo destravado'}`)
           : null),
+      funcoes,
       escolherDestino({
         ctx, regiaoId, areaId, dados, erro, acao,
         aoTrocarRegiao: (id) => { regiaoId = id; areaId = null; erro = ''; render() },

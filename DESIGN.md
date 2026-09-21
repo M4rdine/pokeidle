@@ -2,10 +2,10 @@
 name: Pokeidle
 description: Interface de MMO de Pokémon — ardósia fria, o vermelho da Poké Ball, e os dezoito matizes de tipo fazendo o trabalho pesado.
 colors:
-  fundo: "#141a29"
-  painel: "#222a40"
-  painel-topo: "#28314b"
-  painel-pe: "#1d2437"
+  fundo: "#0b0f1a"
+  painel: "#202a44"
+  painel-topo: "#2a3655"
+  painel-pe: "#1a2238"
   painel-alto: "#2c3650"
   painel-alto-topo: "#2f3853"
   painel-alto-pe: "#242c42"
@@ -14,7 +14,7 @@ colors:
   cava-pe: "#161c29"
   borda: "#171d2c"
   borda-clara: "#3a4560"
-  borda-forte: "#6b7aa3"
+  borda-forte: "#7b8db5"
   texto: "#eef1f8"
   texto-fraco: "#9aa6c4"
   primaria: "#e91515"
@@ -386,6 +386,35 @@ altura e o modal de 600 px ficavam com o mesmo canto, e nenhum dos dois com o ca
 **Nada disso é imagem.** É o mesmo trabalho que a moldura `border-image` de 12 px fazia, sem os
 12 px de layout que ela cobrava, sem asset para versionar e sem licença para respeitar. Ver a
 seção seguinte para por que um pack de moldura continua fora.
+
+### O chão é quase preto, e é isso que faz o painel existir
+
+O fundo era `#141a29`, a dois passos do painel `#222a40`. Com três azuis tão próximos empilhados,
+a tela inteira virava um degradê só: nada parecia estar na frente de nada. **Separação entre
+planos é o que interface de jogo tem de sobra e a de site não precisa** — no site o branco separa
+tudo de graça.
+
+E o fio de luz do bisel estava a 10%: existia no inspetor e não na tela. Um bisel que não se vê
+não é bisel, é uma linha de CSS. Foi para 20%, e ganhou um **anel interno claro** correndo pelos
+quatro lados — o fio de luz sozinho só marca o topo, e a peça continuava derretendo no fundo
+pelas laterais e pelo pé.
+
+### A peça: poço de retrato, número dentro do trilho, trilho de acento
+
+Três mudanças fizeram o slot de time deixar de ser "item de lista com uma figurinha ao lado":
+
+**O sprite mora num POÇO** — uma caixa afundada com contorno próprio, do mesmo material das
+fendas. O retrato ganha moldura, e é a moldura que faz a peça parecer peça. O cartão do ativo usa
+o mesmo poço no dobro do tamanho: as duas superfícies que mostram o mesmo Pokémon usam a mesma
+moldura, e é isso que faz a coluna ler como um sistema.
+
+**O número do HP vai DENTRO do trilho**, encostado na direita, sobre a barra. Embaixo dela era uma
+terceira linha de texto miúdo por slot — seis vezes na mesma coluna —, e ninguém liga "14/14" à
+barra de cima sem contar as linhas.
+
+**O ativo ganha um TRILHO de acento na borda esquerda**, e não um preenchimento lavanda inteiro. O
+preenchimento cheio fazia a linha parecer item selecionado de gerenciador de arquivos, e engolia
+os selos de tipo — que são a identidade da espécie e a única cor semântica do slot.
 
 ## Por que não usamos pack de UI
 

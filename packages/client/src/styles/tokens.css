@@ -158,31 +158,70 @@
   /*
    * ── Relevo ──
    *
-   * Sombra EXTERNA diz a que distância a peça está da superfície de trás. Sombra INTERNA diz de
-   * que lado a luz bate, e é ela que faz a peça ter espessura em vez de ser um decalque. As duas
-   * juntas são o que substituiu a moldura de madeira de 12 px — e custam zero byte de imagem.
+   * Cada degrau é composto de QUATRO camadas, e cada uma tem um trabalho:
    *
-   * `--luz` é o fio de cima de quem se levanta: uma linha de 1 px de branco a 10%, que lida em
-   * cima de um gradiente que escurece para baixo dá a borda chanfrada inteira. É o truque mais
-   * barato que existe em interface de jogo, e o mais antigo.
+   *   1. `inset 0 1px 0 branco`   o fio de luz do topo — dá espessura à peça
+   *   2. `0 0 0 1px preto`        o CONTORNO ESCURO — separa a peça de qualquer fundo
+   *   3. `0 Npx 0 preto`          a sombra DURA, sem desfoque — o degrau de altura
+   *   4. `0 Npx Npx preto`        o halo difuso — o ar embaixo da peça
+   *
+   * A camada 3 é a que faz a diferença entre interface de NAVEGADOR e interface de JOGO. Sombra
+   * só com desfoque é o reflexo do CSS de site: nuvem cinza, sem aresta. Interface de jogo
+   * desenha o degrau, com borda dura, e é por isso que ela parece uma peça física e a do site
+   * parece um retângulo pairando. O antigo `--relevo-1` era um desfoque de 2 px e nada mais.
+   *
+   * A camada 2 é o par da 1. Contorno escuro POR FORA e luz POR DENTRO é o mesmo bisel de sempre,
+   * e é o que dá a "borda com contraste": ela não é grossa, é dupla — escura de um lado da linha,
+   * clara do outro. Uma borda de cor única, por mais grossa, nunca chega nisso.
    */
   --luz: rgb(255 255 255 / 10%);
-  --luz-forte: rgb(255 255 255 / 16%);
+  --luz-forte: rgb(255 255 255 / 18%);
+  /* O contorno. É preto e não um cinza da paleta: o contorno tem que funcionar contra o painel,
+   * contra a fenda e contra o mundo pixelado do jogo, e só o preto funciona contra os três. */
+  --contorno: rgb(0 0 0 / 55%);
+  --contorno-forte: rgb(0 0 0 / 72%);
 
   --sombra-1: 0 1px 2px rgb(0 0 0 / 30%);
   --sombra-2: 0 8px 24px rgb(0 0 0 / 45%);
 
-  /* Apoiado na superfície: painel, linha de lista. */
-  --relevo-1: inset 0 1px 0 var(--luz), 0 1px 2px rgb(0 0 0 / 45%);
-  /* Levantado e agarrável: botão, cartão clicável. O segundo degrau de sombra é o que separa
-   * "isto é uma superfície" de "isto é uma peça em cima dela". */
-  --relevo-2: inset 0 1px 0 var(--luz-forte), 0 1px 1px rgb(0 0 0 / 30%), 0 3px 6px rgb(0 0 0 / 35%);
-  /* Por cima de tudo: modal, toast. */
-  --relevo-3: inset 0 1px 0 var(--luz), 0 2px 6px rgb(0 0 0 / 40%), 0 18px 44px rgb(0 0 0 / 55%);
-  /* Afundado: trilho, campo, lista. A luz inverte — sombra em cima, fio claro no pé. */
-  --relevo-cava: inset 0 2px 4px rgb(0 0 0 / 60%), inset 0 -1px 0 rgb(255 255 255 / 5%);
-  /* Apertado: some a sombra externa e a interna vira a de fenda. É a peça descendo. */
-  --relevo-apertado: inset 0 2px 5px rgb(0 0 0 / 55%);
+  /* Apoiado na superfície: painel, seção. Degrau duro de 2 px. */
+  --relevo-1:
+    inset 0 1px 0 var(--luz),
+    0 0 0 1px var(--contorno),
+    0 2px 0 rgb(0 0 0 / 30%),
+    0 4px 10px rgb(0 0 0 / 32%);
+  /* Levantado e agarrável: botão, cartão clicável. Degrau de 3 px — é ele que se vê sumir no
+   * `:active`, e é esse sumiço que faz o botão parecer ter sido apertado. */
+  --relevo-2:
+    inset 0 1px 0 var(--luz-forte),
+    0 0 0 1px var(--contorno-forte),
+    0 3px 0 rgb(0 0 0 / 38%),
+    0 5px 12px rgb(0 0 0 / 35%);
+  /* Por cima de tudo: modal, cartão da entrada. */
+  --relevo-3:
+    inset 0 1px 0 var(--luz-forte),
+    0 0 0 1px var(--contorno-forte),
+    0 4px 0 rgb(0 0 0 / 30%),
+    0 22px 50px rgb(0 0 0 / 60%);
+  /* Afundado: trilho, campo, lista. A luz inverte — sombra em cima, fio claro no pé — e o
+   * contorno vem por DENTRO, porque fenda não projeta sombra para fora. */
+  --relevo-cava:
+    inset 0 0 0 1px var(--contorno),
+    inset 0 2px 5px rgb(0 0 0 / 65%),
+    inset 0 -1px 0 rgb(255 255 255 / 6%);
+  /* Apertado: o degrau duro some inteiro e a peça desce a mesma altura que ele tinha. Sem isso,
+   * `translateY` sozinho move o botão e a sombra junto, e nada parece ter afundado. */
+  --relevo-apertado:
+    inset 0 0 0 1px var(--contorno-forte),
+    inset 0 3px 6px rgb(0 0 0 / 60%);
+
+  /*
+   * O brilho de estado. Sombra colorida por fora é como interface de jogo diz "este é o item
+   * ligado" sem gastar mais nenhuma cor de superfície — e é o degrau que faltava entre "normal"
+   * e "selecionado", que aqui davam o salto inteiro de uma vez.
+   */
+  --brilho-selecao: 0 0 0 1px color-mix(in srgb, var(--selecao) 70%, black), 0 0 14px rgb(111 138 230 / 45%);
+  --brilho-primaria: 0 0 0 1px color-mix(in srgb, var(--primaria) 55%, black), 0 0 16px rgb(233 21 21 / 40%);
 
   /* ── Tempo: interface de tarefa reage, não coreografa ── */
   --rapido: 120ms;

@@ -117,12 +117,12 @@ button {
   font-size: var(--t-s); font-weight: 700;
   color: var(--texto); cursor: pointer;
   background: var(--face-alta);
-  border: var(--border-w) solid var(--borda);
+  /* Sem `border`: o contorno virou a segunda camada do relevo. Borda de verdade rouba 1 px do
+   * conteúdo de cada lado e não acompanha o `border-radius` do contorno escuro. */
+  border: 0;
   border-radius: var(--raio);
   padding: var(--space-2) var(--space-3);
   min-height: var(--alvo);
-  /* Relevo de peça agarrável: fio de luz no topo, sombra curta embaixo. O botão era um retângulo
-   * chapado com um fio CLARO em volta — o fio contornava, e contorno não é o mesmo que volume. */
   box-shadow: var(--relevo-2);
   transition: background var(--rapido) ease-out, box-shadow var(--rapido) ease-out, transform var(--rapido) ease-out;
 }
@@ -131,10 +131,12 @@ button:hover:not([disabled]) {
 }
 /* Apertado AFUNDA de verdade: a sombra externa some, a interna aparece, e a peça desce 1 px. É o
  * que substitui a arte trocada no `:active` da versão de madeira, e custa três linhas. */
+/* Apertado desce EXATAMENTE a altura do degrau duro que ele perde — 3 px. Descer menos deixa a
+ * peça flutuando; descer mais a faz pular. É esse casamento que faz o clique ter peso. */
 button:active:not([disabled]) {
   background: var(--face-cava);
   box-shadow: var(--relevo-apertado);
-  transform: translateY(1px);
+  transform: translateY(3px);
 }
 button[disabled] { opacity: 0.45; cursor: default; box-shadow: var(--relevo-1); }
 
@@ -146,15 +148,18 @@ button[disabled] { opacity: 0.45; cursor: default; box-shadow: var(--relevo-1); 
 button.primary {
   background: linear-gradient(180deg, var(--primaria-alta), var(--primaria) 55%, color-mix(in srgb, var(--primaria) 82%, black));
   color: var(--primaria-texto);
-  border-color: color-mix(in srgb, var(--primaria) 60%, black);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 28%), 0 1px 1px rgb(0 0 0 / 30%), 0 3px 8px rgb(233 21 21 / 28%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 35%),
+    0 0 0 1px color-mix(in srgb, var(--primaria) 45%, black),
+    0 3px 0 color-mix(in srgb, var(--primaria) 55%, black),
+    0 5px 14px rgb(233 21 21 / 35%);
 }
 button.primary:hover:not([disabled]) {
   background: linear-gradient(180deg, color-mix(in srgb, var(--primaria-alta) 80%, white), var(--primaria-alta) 55%, var(--primaria));
 }
 button.primary:active:not([disabled]) {
   background: linear-gradient(180deg, color-mix(in srgb, var(--primaria) 80%, black), var(--primaria));
-  box-shadow: inset 0 2px 5px rgb(0 0 0 / 45%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primaria) 40%, black), inset 0 3px 6px rgb(0 0 0 / 50%);
 }
 
 /*
@@ -164,14 +169,13 @@ button.primary:active:not([disabled]) {
 input, select {
   font: inherit; color: var(--texto); width: 100%;
   background: var(--face-cava);
-  border: var(--border-w) solid var(--borda);
+  border: 0;
   border-radius: var(--raio);
   padding: var(--space-2) var(--space-3);
   /* Campo é fenda, e a fenda tem a luz invertida: sombra no topo, fio claro no pé. É isso que
    * diferencia "escrevo aqui" de "aperto aqui" sem depender de ler o rótulo. */
   box-shadow: var(--relevo-cava);
 }
-input:focus-visible, select:focus-visible { border-color: var(--borda-forte); }
 select { appearance: none; cursor: pointer; }
 select option { background: var(--painel); color: var(--texto); }
 .field { margin: 0; }
@@ -191,11 +195,12 @@ h2 { font-size: var(--t-l); }
  * a linha de agora — e é por isso que nenhum outro elemento usa esse preenchimento.
  */
 .tabs { display: flex; gap: var(--space-2); }
+/* A aba de agora não muda só de cor: ela ACENDE. O brilho externo é o degrau que faltava entre
+ * "normal" e "selecionado", que davam o salto inteiro de uma vez. */
 .tab-active {
   background: linear-gradient(180deg, color-mix(in srgb, var(--selecao) 84%, white), var(--selecao));
   color: var(--selecao-texto);
-  border-color: color-mix(in srgb, var(--selecao) 65%, black);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 35%), 0 1px 2px rgb(0 0 0 / 35%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 45%), var(--brilho-selecao);
 }
 .tab-active:hover:not([disabled]) {
   background: linear-gradient(180deg, color-mix(in srgb, var(--selecao) 70%, white), var(--selecao));

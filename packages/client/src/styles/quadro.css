@@ -24,7 +24,7 @@
 /** Superfície que se levanta: painel, seção. Não é para chip nem para linha de lista. */
 .quadro, .panel {
   background: var(--face-painel);
-  border: var(--border-w) solid var(--borda);
+  border: 0;
   border-radius: var(--raio-g);
   box-shadow: var(--relevo-1);
 }
@@ -39,7 +39,7 @@
  */
 .quadro-fundo {
   background: var(--face-cava);
-  border: var(--border-w) solid var(--borda);
+  border: 0;
   border-radius: var(--raio);
   box-shadow: var(--relevo-cava);
 }
@@ -47,16 +47,29 @@
 /** Flutua acima de tudo: modal e toast. É o único lugar onde o terceiro degrau é gasto. */
 .quadro-flutua {
   background: var(--face-painel);
-  border: var(--border-w) solid var(--borda);
+  border: 0;
   border-radius: var(--raio-gg);
   box-shadow: var(--relevo-3);
 }
 
-/** Cabeçalho de seção: caixa alta espacejada, no menor degrau da escala. Não compete com o dado. */
+/**
+ * Cabeçalho de seção: caixa alta espacejada, no menor degrau da escala. Não compete com o dado.
+ *
+ * `.cabeca-barra` é a variante que vira BARRA DE TÍTULO: uma faixa mais escura no topo do painel,
+ * com o fio de luz embaixo dela. É o que diz "aqui começa outra caixa" num painel que encosta em
+ * outro — e é a peça que interface de jogo tem e interface de site não, porque no site cada bloco
+ * tem a página inteira em volta para separá-lo.
+ */
 .cabeca {
   display: flex; align-items: baseline; gap: var(--space-2);
   font-size: var(--t-xs); font-weight: 700;
   letter-spacing: 0.12em; text-transform: uppercase; color: var(--texto-fraco);
+}
+.cabeca-barra {
+  padding: var(--space-2) var(--space-3);
+  background: linear-gradient(180deg, rgb(0 0 0 / 22%), rgb(0 0 0 / 34%));
+  border-radius: var(--raio-g) var(--raio-g) 0 0;
+  box-shadow: inset 0 -1px 0 rgb(255 255 255 / 7%), 0 1px 0 rgb(0 0 0 / 35%);
 }
 .cabeca-conta { color: var(--texto); font-weight: 400; }
 
@@ -72,7 +85,7 @@
   /* Declara a face em vez de herdar: chip quase sempre carrega NÚMERO, e ele aparece dentro de
    * títulos que falam na voz de HUD. Herdando, o "nv 65" do cartão do ativo saía "nv 68". */
   font-family: var(--fonte-texto); font-size: var(--t-xs); font-weight: 700;
-  background: var(--face-cava); border: var(--border-w) solid var(--borda); color: var(--texto);
+  background: var(--face-cava); border: 0; color: var(--texto);
   box-shadow: var(--relevo-cava);
   white-space: nowrap;
 }
@@ -131,7 +144,7 @@
 progress {
   appearance: none; display: block; width: 100%; height: 10px;
   background: var(--face-cava);
-  border: var(--border-w) solid var(--borda);
+  border: 0;
   border-radius: 999px;
   /* Trilho cavado e preenchimento com brilho no topo: é o mesmo par de luz e sombra do resto do
    * sistema, aplicado à peça que mais se repete na tela. Com o trilho chapado, a barra de vida

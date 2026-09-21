@@ -103,10 +103,9 @@
  */
 .moves-cabeca {
   display: grid; grid-template-columns: 1fr auto 3ch 40px; gap: var(--space-2);
-  padding: var(--space-2) var(--space-2) var(--space-1);
 }
 .moves-cabeca > :nth-child(2) { grid-column: 3; text-align: right; }
-.moves { list-style: none; margin: 0; padding: 0 var(--space-2) var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); overflow-y: auto; min-height: 0; }
+.moves { list-style: none; margin: 0; padding: var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); overflow-y: auto; min-height: 0; }
 /* Cada golpe é uma FAIXA, não uma linha de texto solta: oito nomes flutuando sobre o painel não
  * têm onde a coluna começar, e a comparação entre eles depende da coluna. */
 .move {
@@ -136,7 +135,9 @@
 }
 
 /* ── Situação ───────────────────────────────────────────────────────────────── */
-.situacao { padding: var(--space-2) var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
+.situacao { padding: 0 0 var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
+/* A barra sangra até a borda do painel, então quem paga o recuo é o conteúdo, não o painel. */
+.situacao > :not(.cabeca-barra) { margin-inline: var(--space-3); }
 .situacao-texto { font-size: var(--t-m); }
 /* Combate é o estado NORMAL de um idle: ele acontece o tempo todo. Acender o que está sempre
  * aceso é ruído, não ênfase — então o combate vem em tinta cheia e os estados de pausa é que
@@ -173,9 +174,8 @@
  * também no log e na situação o transformaria em decoração, e aí ele não marcaria mais nada. */
 .slot-active {
   background: linear-gradient(180deg, color-mix(in srgb, var(--selecao) 82%, white), var(--selecao));
-  border-color: color-mix(in srgb, var(--selecao) 62%, black);
   color: var(--selecao-texto);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 38%), 0 2px 6px rgb(0 0 0 / 35%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 45%), var(--brilho-selecao);
 }
 /* Vaga vazia e vaga travada são lugares onde ainda não há nada: afundam, em vez de se levantar
  * como as ocupadas. Mesma regra do resto do sistema — o que se lê afunda, o que se age levanta. */
@@ -183,11 +183,10 @@
  * linha. Com a altura das ocupadas, três vagas vazias tomavam um terço da coluna do time para
  * não dizer nada. */
 .slot-empty, .slot-locked {
-  background: var(--cava); border-color: var(--borda);
   justify-content: center; color: var(--texto-fraco); font-size: var(--t-xs);
   letter-spacing: 0.08em; min-height: var(--alvo); padding: 2px var(--space-2);
   background: var(--face-cava);
-  border: var(--border-w) solid var(--borda);
+  border: 0;
   border-radius: var(--raio);
   box-shadow: var(--relevo-cava);
 }

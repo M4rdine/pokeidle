@@ -15,7 +15,7 @@
   border-radius: var(--raio-gg);
   width: min(560px, 92vw); max-height: 86vh;
   display: flex; flex-direction: column; min-height: 0;
-  background: var(--face-painel); border: var(--border-w) solid var(--borda);
+  background: var(--face-painel); border: 0;
   /* O terceiro degrau de relevo, e o único lugar que o gasta. A sombra daqui ainda era MARROM —
    * `rgb(51 38 31)`, sobrevivente da paleta de madeira que caiu duas trocas de mundo atrás. Num
    * mundo ardósia ela punha um halo quente em volta de todo modal, e ninguém veria isso olhando. */
@@ -52,7 +52,7 @@
 .dex-cell {
   display: flex; flex-direction: column; align-items: center; gap: var(--space-1);
   padding: var(--space-1); font-size: var(--t-s);
-  background: var(--face-cava); border: 1px solid var(--borda); border-radius: var(--raio-p);
+  background: var(--face-cava); border: 0; border-radius: var(--raio-p);
   box-shadow: var(--relevo-cava);
 }
 /* Capturado é notável, não urgente nem selecionado: ouro na borda, que a varredura da grade pega

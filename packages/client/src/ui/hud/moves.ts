@@ -11,7 +11,7 @@ export function mountMoves(root: HTMLElement, ctx: AppContext): () => void {
   // para comparar oito golpes, e comparar é ler a MESMA coluna de cima a baixo: repetir o rótulo
   // em cada linha empurra os números para posições diferentes e desfaz justamente a coluna.
   const caixa = el('div', { class: 'moves-caixa panel' },
-    el('div', { class: 'cabeca moves-cabeca' }, el('span', {}, 'Golpes'), el('span', {}, 'poder')),
+    el('div', { class: 'cabeca cabeca-barra moves-cabeca' }, el('span', {}, 'Golpes'), el('span', {}, 'poder')),
     list)
   root.append(caixa)
   let rendered = ''

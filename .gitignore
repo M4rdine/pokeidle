@@ -12,6 +12,9 @@ packages/client/dist
 packages/client/coverage
 packages/client/test-results
 packages/client/playwright-report
+# Os mapas de região são compostos das áreas já versionadas e regerados por
+# `pnpm assets region-preview`; entram no git para que um clone limpo mostre a tela de caça.
+
 # O atlas servido ao navegador (4 arquivos, 2,4 MB) É versionado: sem ele quem clona não
 # consegue rodar o jogo, e o projeto aceita PR. O dump bruto de 647 MB continua fora, em
 # /assets/ — é material de origem, e nada no build precisa dele depois que o atlas existe.

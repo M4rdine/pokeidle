@@ -8,6 +8,8 @@ const bool = z.enum(['true', 'false']).transform((v) => v === 'true')
 // ao navegador é versionado em `public/atlas` (só os quatro arquivos da allowlist), para a imagem
 // de produção não depender do dump de sprites, que é gigante e fica fora do git.
 const DEFAULT_ASSETS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../public/atlas')
+/** Mapas de região, gerados por `pnpm assets region-preview`. */
+const DEFAULT_MAPS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../public/maps')
 // `src/config.ts` → `packages/server/src` → dois níveis acima é `packages/`.
 const DEFAULT_CLIENT_DIST = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist')
 
@@ -45,6 +47,7 @@ export const ConfigSchema = z.object({
   DEBUG_VIEWER: bool.default('false'),
   /** Diretório com o atlas de assets (`tiles.png`/`.json`, `pokemon.png`/`.json`) gerado por `pnpm assets build`. */
   ASSETS_DIR: z.string().min(1).default(DEFAULT_ASSETS_DIR),
+  MAPS_DIR: z.string().min(1).default(DEFAULT_MAPS_DIR),
   /**
    * Acelera o relógio do agendador sem mudar a simulação, que é determinística por tick.
    * Serve a teste de carga; NÃO usar no smoke: a cadência de persistência acompanha o tick e

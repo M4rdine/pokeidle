@@ -8,6 +8,7 @@ import { extractAll } from './extract.js'
 import { readJson } from './json-file.js'
 import { loadManifest } from './manifest.js'
 import { loadTilesAtlas, renderMapPreview } from './map-preview.js'
+import { composeRegion, downsample } from './region-preview.js'
 import { parseSpr } from './spr.js'
 import { encodePng } from './png.js'
 import type { PixiSpritesheet } from './atlas.js'
@@ -38,6 +39,14 @@ function withExtendedHint<T>(extended: boolean, parse: () => T): T {
     const message = error instanceof Error ? error.message : String(error)
     throw new Error(`${message}\ndica: se o pack tem mais de 65535 sprites, tente --extended`)
   }
+}
+
+/** Lado do tile em pixels: é o que `renderMapPreview` usa ao desenhar cada área. */
+const TILE_SIZE_PADRAO = 32
+
+interface RegionDoArquivo {
+  readonly id: string
+  readonly areas: readonly { readonly id: string; readonly bounds: { x: number; y: number; width: number; height: number } }[]
 }
 
 const program = new Command().name('pokeidle-assets').description('Pipeline de assets do Pokeidle')
@@ -146,6 +155,43 @@ program
       (a as { order?: number }).order === undefined ? 0 : ((a as { order: number }).order - (b as { order: number }).order))
     await writeFile(opts.regions, `${JSON.stringify(lista, null, 2)}\n`)
     out(`região ${region.id} com ${hunts.length} área(s): ${hunts.map((h) => `${h.id} (${h.width}x${h.height})`).join(', ')}`)
+  })
+
+program
+  .command('region-preview')
+  .argument('[regiao]', 'id da região; sem argumento, gera todas')
+  .option('--atlas <dir>', 'pasta do atlas gerado pelo build', 'assets/atlas')
+  .option('--hunts <dir>', 'pasta dos mapas de área', 'packages/shared/data/hunts')
+  .option('--regions <file>', 'arquivo das regiões', 'packages/shared/data/regions.json')
+  .option('--out <dir>', 'pasta de saída', 'packages/server/public/maps')
+  .option('--escala <n>', 'quantos pixels por tile no mapa final', '8')
+  .action(async (regiao: string | undefined, opts: { atlas: string; hunts: string; regions: string; out: string; escala: string }) => {
+    const atlas = await loadTilesAtlas(opts.atlas)
+    const regioes = (await readJson(opts.regions)) as RegionDoArquivo[]
+    const escolhidas = regiao === undefined ? regioes : regioes.filter((r) => r.id === regiao)
+    if (escolhidas.length === 0) throw new Error(`região ${regiao ?? ''} não existe em ${opts.regions}`)
+    await mkdir(opts.out, { recursive: true })
+
+    for (const reg of escolhidas) {
+      const pedacos = []
+      for (const area of reg.areas) {
+        const mapa = parseHuntMap(await readJson(join(opts.hunts, `${area.id}.json`)))
+        pedacos.push({ imagem: renderMapPreview(mapa, atlas), bounds: area.bounds })
+      }
+      // A grade da região sai dos próprios limites das áreas: o desenho não precisa saber o
+      // tamanho de antemão, e uma área a mais não exige mexer aqui.
+      const grade = {
+        width: Math.max(...reg.areas.map((a) => a.bounds.x + a.bounds.width)),
+        height: Math.max(...reg.areas.map((a) => a.bounds.y + a.bounds.height)),
+        tileSize: TILE_SIZE_PADRAO,
+      }
+      const inteiro = composeRegion(grade, pedacos)
+      const fator = Math.max(1, Math.round(TILE_SIZE_PADRAO / Number(opts.escala)))
+      const menor = fator > 1 ? downsample(inteiro, fator) : inteiro
+      const alvo = join(opts.out, `${reg.id}.png`)
+      await writeFile(alvo, encodePng(menor))
+      out(`mapa de ${reg.id} em ${alvo} (${menor.width}x${menor.height}, ${reg.areas.length} áreas)`)
+    }
   })
 
 program

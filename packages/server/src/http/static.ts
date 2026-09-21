@@ -37,6 +37,25 @@ export async function registerStatic(app: FastifyInstance, config: Config): Prom
     if (!body) return reply.status(404).send(errorBody('not-found', 'atlas não encontrado; gere com pnpm assets build'))
     return reply.header('cache-control', 'public, max-age=3600').type(type).send(body)
   })
+  /**
+   * Mapa-múndi de cada região. Só PNG e só desta pasta: o nome vem da URL, e resolver antes de
+   * ler é o que impede um `..` de virar leitura de qualquer arquivo do servidor.
+   */
+  app.get<{ Params: { file: string } }>('/assets/maps/:file', async (request, reply) => {
+    const { file } = parseBody(AtlasParams, request.params)
+    if (!file.endsWith('.png')) return reply.status(404).send(errorBody('not-found', 'só PNG é servido aqui'))
+    const pedido = path.resolve(config.MAPS_DIR, file)
+    const relativo = path.relative(config.MAPS_DIR, pedido)
+    if (relativo.startsWith('..') || path.isAbsolute(relativo)) {
+      return reply.status(404).send(errorBody('not-found', 'mapa não encontrado'))
+    }
+    const body = await fileOr404(pedido)
+    if (!body) {
+      return reply.status(404).send(errorBody('not-found', 'mapa da região não gerado; rode pnpm assets region-preview'))
+    }
+    return reply.header('cache-control', 'public, max-age=3600').type('image/png').send(body)
+  })
+
   if (!existsSync(config.CLIENT_DIST)) return
   const pastaApp = path.join(config.CLIENT_DIST, 'app')
   /**

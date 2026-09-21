@@ -123,3 +123,43 @@ describe('arquivo com hash criado depois do boot', () => {
     await app.close()
   })
 })
+
+describe('mapa das regiões', () => {
+  it('serve o PNG da região com o content-type certo', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-maps-'))
+    await writeFile(join(dir, 'kanto.png'), Buffer.from([0x89, 0x50, 0x4e, 0x47]))
+    const app = await freshApp(t, undefined, { MAPS_DIR: dir })
+
+    const r = await api(app).get('/assets/maps/kanto.png')
+
+    expect(r.statusCode).toBe(200)
+    expect(r.headers['content-type']).toMatch(/image\/png/)
+    await app.close()
+  })
+
+  it('não deixa sair da pasta de mapas, e só serve PNG', async () => {
+    const base = await mkdtemp(join(tmpdir(), 'pokeidle-maps-'))
+    const dir = join(base, 'maps')
+    await mkdir(dir, { recursive: true })
+    await writeFile(join(base, 'segredo.txt'), 'nao vazar')
+    const app = await freshApp(t, undefined, { MAPS_DIR: dir })
+
+    for (const caminho of ['/assets/maps/..%2Fsegredo.txt', '/assets/maps/%2e%2e/segredo.txt']) {
+      const r = await api(app).get(caminho)
+      expect(r.body, caminho).not.toContain('nao vazar')
+    }
+    // Extensão fora da lista não é servida, nem que o arquivo exista.
+    await writeFile(join(dir, 'kanto.svg'), '<svg/>')
+    expect((await api(app).get('/assets/maps/kanto.svg')).statusCode).toBe(404)
+    await app.close()
+  })
+
+  it('região sem mapa gerado responde 404 com recado útil', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-maps-'))
+    const app = await freshApp(t, undefined, { MAPS_DIR: dir })
+    const r = await api(app).get('/assets/maps/nao-existe.png')
+    expect(r.statusCode).toBe(404)
+    expect(r.body).toMatch(/region-preview/)
+    await app.close()
+  })
+})

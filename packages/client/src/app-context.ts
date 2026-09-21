@@ -9,7 +9,7 @@ import { initialSession, type SessionState } from './state/session.js'
 import { createStore, type Store } from './state/store.js'
 import type { ToastKind } from './ui/toast.js'
 
-export type ModalName = 'bag' | 'team' | 'settings' | 'pokedex' | 'shop'
+export type ModalName = 'mapa' | 'bag' | 'team' | 'settings' | 'pokedex' | 'shop'
 
 export interface AppContext {
   readonly http: Http

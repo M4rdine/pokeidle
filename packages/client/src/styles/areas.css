@@ -226,23 +226,64 @@
 /* A camada de marcadores não intercepta o clique; só os botões dentro dela interceptam. */
 .mapa-marcadores { position: absolute; inset: 0; pointer-events: none; }
 
+/*
+ * O marcador é um MEDALHÃO: um disco escuro com o sprite da primeira espécie e a faixa de nível
+ * pendurada embaixo. Antes era uma plaqueta com o nome da área, e nome não responde a pergunta
+ * que se faz olhando um mapa — "o que mora ali". Um Butterfree responde na hora; "Bosque Denso"
+ * manda o jogador abrir a ficha para descobrir.
+ */
 .mapa-marcador {
   position: absolute; transform: translate(-50%, -50%);
-  display: flex; flex-direction: column; align-items: center; gap: 0;
-  padding: var(--space-1) var(--space-2); line-height: 1.15;
-  pointer-events: auto; white-space: nowrap;
-  min-height: 24px;
+  display: grid; place-items: center;
+  width: 46px; height: 46px; padding: 0;
+  pointer-events: auto;
+  border-radius: 50%;
+  background: var(--fora);
+  border: var(--border-w) solid var(--madeira);
+  border-image-source: none;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 55%);
 }
-.mapa-nome { font-size: var(--t-s); font-weight: 700; }
-.mapa-nivel { font-size: var(--t-xs); color: var(--tinta-fraca); font-variant-numeric: tabular-nums; }
-/* O marcador aberto é o único grifado: o marca-texto diz onde se está, não onde dá para ir. */
-.mapa-marcador-ativo { background: var(--marca); border-color: var(--marca-borda); color: var(--fora); }
-.mapa-marcador-ativo .mapa-nome { color: var(--tinta); }
-/* Travado recua de plano e mantém o número legível: é por ele que se decide o que perseguir. */
-.mapa-marcador-travado { background: var(--cava); }
+.mapa-marcador:hover { border-color: var(--madeira-luz); }
+.mapa-medalha { display: grid; place-items: center; line-height: 0; }
+/* A faixa de nível sai para fora do disco: dentro ela cobriria o sprite, que é o conteúdo. */
+.mapa-nivel {
+  position: absolute; bottom: -9px;
+  padding: 0 var(--space-1);
+  font-size: var(--t-xs); font-weight: 700; font-variant-numeric: tabular-nums;
+  background: var(--painel); border: 1px solid var(--madeira-escura); color: var(--tinta);
+  white-space: nowrap;
+}
+/* O medalhão aberto é o único grifado: o marca-texto diz onde se está, não onde dá para ir. */
+.mapa-marcador-ativo { border-color: var(--marca-borda); box-shadow: 0 0 0 3px var(--marca); }
+.mapa-marcador-ativo .mapa-nivel { background: var(--marca); color: var(--fora); border-color: var(--marca-borda); }
+/* Travado apaga o sprite e mantém o número aceso: é pelo número que se decide o que perseguir. */
+.mapa-marcador-travado .mapa-medalha { opacity: 0.35; }
 .mapa-marcador-travado .mapa-nivel { color: var(--ouro); }
 
-@media (max-width: 600px) {
-  .mapa-nome { display: none; }
-  .mapa-marcador { padding: var(--space-1); }
+/* ── O mapa como modal ───────────────────────────────────────────────────────
+ * Abas de região em cima, mapa à esquerda e analisador à direita. O modal existe para trocar de
+ * área SEM sair da caçada: numa tela, sair é parar de caçar.
+ */
+.mapa-modal { display: flex; flex-direction: column; gap: var(--space-3); min-width: 0; }
+.mapa-abas { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.mapa-aba { display: flex; align-items: baseline; gap: var(--space-2); }
+.mapa-aba-nivel { font-size: var(--t-xs); color: var(--tinta-fraca); font-variant-numeric: tabular-nums; }
+.mapa-aba.tab-active .mapa-aba-nivel { color: var(--fora); }
+
+/* O mapa manda na largura e o analisador fica com o que sobra, com piso: abaixo de 260 px a
+   tabela de drops quebra em duas linhas por item e deixa de ser tabela. */
+.mapa-palco { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 420px); gap: var(--space-3); align-items: start; }
+.mapa-analise { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+/* A tabela do analisador foi desenhada para a tela de áreas, que é larga; num painel lateral ela
+ * não cabe e as colunas de captura e confronto saíam cortadas na borda. Ela rola no PRÓPRIO
+ * container — a página nunca rola de lado —, que é o tratamento certo para tabela densa. */
+.mapa-analise .area-analyzer { overflow-x: auto; max-width: 100%; }
+.mapa-analise .analyzer-table { min-width: 360px; }
+.mapa-analise-topo { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
+.mapa-analise h3 { margin: 0; font-family: var(--fonte-hud); font-size: var(--t-l); }
+
+@media (max-width: 900px) {
+  /* O analisador desce para baixo do mapa: lado a lado, os dois ficam estreitos demais para
+     servir a qualquer um dos dois. */
+  .mapa-palco { grid-template-columns: 1fr; }
 }

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { AppContext, ModalName } from '../../app-context.js'
-import { MODAL_LABELS } from '../../config.js'
+import { MODAL_ICONS, MODAL_LABELS } from '../../config.js'
 import { el } from '../dom.js'
 import { intentButton } from './intent-button.js'
 
@@ -16,9 +16,10 @@ import { intentButton } from './intent-button.js'
 export function mountMenu(root: HTMLElement, ctx: AppContext): () => void {
   const funcoes = (Object.keys(MODAL_LABELS) as ModalName[]).map((modal) =>
     el('button', { type: 'button', class: 'menu-item', 'data-open': modal, onclick: () => ctx.openModal?.(modal) },
-      MODAL_LABELS[modal]))
+      el('span', { class: 'icone', 'data-icone': MODAL_ICONS[modal] }),
+      el('span', {}, MODAL_LABELS[modal])))
 
-  const stop = intentButton('Parar', () => ctx.sendIntent?.({ t: 'hunt.stop' }))
+  const stop = intentButton('Parar', () => ctx.sendIntent?.({ t: 'hunt.stop' }), 'parar')
   const leave = el('button', { type: 'button' }, 'Sair')
   leave.addEventListener('click', () => {
     leave.setAttribute('disabled', '')

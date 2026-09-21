@@ -45,10 +45,15 @@
  * menu tomava 170 px de altura para cinco botões, e essa altura sai do mundo. */
 .menu { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-1); }
 .menu-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: var(--space-1); flex: 1; min-width: 0; }
-.menu-item { width: 100%; }
+/* Ícone e rótulo lado a lado, centralizados: a fileira só funciona se os seis tiverem a mesma
+ * caixa, e é a igualdade entre eles que faz o conjunto parecer um conjunto. */
+.menu-item { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-1); }
 /* Parar e Sair mudam o ESTADO DA SESSÃO, e são as duas únicas coisas aqui que fazem isso: ficam
  * numa faixa própria, alinhadas à direita, longe do alvo de quem só quer abrir a Pokédex. */
 .menu-sessao { display: flex; gap: var(--space-1); flex-shrink: 0; }
+/* Ícone e rótulo lado a lado, com o ícone na frente: quem lê da esquerda encontra primeiro o
+ * símbolo e confirma no texto. */
+.menu-sessao button { display: inline-flex; align-items: center; gap: var(--space-1); }
 .menu-sessao button:last-child:hover:not([disabled]) { color: var(--perigo); }
 
 /* ── Coluna de perfil ────────────────────────────────────────────────────────

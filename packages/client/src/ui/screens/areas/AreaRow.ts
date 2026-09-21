@@ -84,7 +84,16 @@ const rotulo = (area: AreaView, estimado: boolean): string => {
   const faltam = area.estimate.missing.length
   const pokedex = estimado && faltam > 0 ? `, ${faltaTexto(faltam)}` : ''
   const portao = area.locked ? `, bloqueada até o nível ${area.minTrainerLevel}` : ''
-  return `${area.name}, níveis ${area.minLevel} a ${area.maxLevel}${pokedex}${portao}. Ver detalhes`
+  // Os três números que a tela existe para comparar entravam só na coluna visual; para quem usa
+  // leitor de tela, a linha dizia o nome e o nível e escondia justamente o que decide a escolha.
+  const e = area.estimate
+  const ritmo = estimado && e.xpPerHour !== null && e.goldPerHour !== null
+    ? `, ${Math.round(e.xpPerHour).toLocaleString('pt-BR')} xp por hora, ${Math.round(e.goldPerHour).toLocaleString('pt-BR')} ouro por hora`
+    : ''
+  // `matchup` é o multiplicador de dano, não um rótulo: reusar `matchupLabel` mantém uma só
+  // fonte de verdade entre o que se vê e o que se ouve.
+  const confronto = `, confronto ${matchupLabel(e.matchup)}`
+  return `${area.name}, níveis ${area.minLevel} a ${area.maxLevel}${ritmo}${confronto}${pokedex}${portao}. Ver detalhes`
 }
 
 export function areaRow(props: Props): HTMLElement {

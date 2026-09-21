@@ -39,7 +39,7 @@ export function mountAuth(root: HTMLElement, ctx: AppContext): () => void {
         el('button', { type: 'button', 'data-tab': name, class: name === tab ? 'tab tab-active' : 'tab', onclick: () => { tab = name; render() } },
           name === 'login' ? 'Entrar' : 'Registrar')),
     )
-    mount(root, el('section', { class: 'screen screen-auth panel' }, el('h1', {}, 'Pokeidle'), tabs, form))
+    mount(root, el('main', { class: 'screen screen-auth panel' }, el('h1', {}, 'Pokeidle'), tabs, form))
   }
   render()
   return () => { root.replaceChildren() }

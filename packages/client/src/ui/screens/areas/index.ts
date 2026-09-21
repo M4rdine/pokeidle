@@ -177,7 +177,7 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
     ...(Object.keys(MODAL_LABELS) as ModalName[]).map((name) =>
       el('button', { type: 'button', 'data-open': name, onclick: () => ctx.openModal?.(name) }, MODAL_LABELS[name])))
 
-  mount(root, el('section', { class: 'screen screen-areas' },
+  mount(root, el('main', { class: 'screen screen-areas' },
     bar,
     el('div', { class: 'area-head' }, el('h1', {}, 'Onde caçar'), limparBox),
     filtrosBox,

@@ -5,7 +5,9 @@ import { el } from '../dom.js'
 
 /** Log em português com filtro "só combate"; a lista rola sozinha quando já estava no fim. */
 export function mountLog(root: HTMLElement, ctx: AppContext): () => void {
-  const list = el('ol', { class: 'log-lines' })
+  // `polite` e não `assertive`: o registro ganha linha a cada dois segundos, e interromper o
+  // leitor a cada derrota tornaria o jogo impossível de acompanhar por áudio.
+  const list = el('ol', { class: 'log-lines', 'aria-live': 'polite', 'aria-relevant': 'additions' })
   const filter = el('input', { type: 'checkbox', name: 'combat-only', id: 'log-combat-only' })
   // O cabeçalho nomeia o painel; sem isso o log era uma caixa de texto solta no rodapé.
   const section = el('section', { class: 'log panel' },

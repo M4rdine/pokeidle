@@ -15,7 +15,26 @@ colors:
   ouro: "#f0c040"
   xp: "#58a6f0"
   danger: "#e04848"
+  danger-texto: "#ff8a8a"
   ok: "#52c46a"
+  type-normal: "#a8a878"
+  type-fire: "#f08030"
+  type-water: "#6890f0"
+  type-electric: "#f8d030"
+  type-grass: "#78c850"
+  type-ice: "#98d8d8"
+  type-fighting: "#c03028"
+  type-poison: "#a040a0"
+  type-ground: "#e0c068"
+  type-flying: "#a890f0"
+  type-psychic: "#f85888"
+  type-bug: "#a8b820"
+  type-rock: "#b8a038"
+  type-ghost: "#705898"
+  type-dragon: "#7038f8"
+  type-dark: "#705848"
+  type-steel: "#b8b8d0"
+  type-fairy: "#ee99ac"
 typography:
   title:
     fontFamily: "system-ui, sans-serif"
@@ -57,30 +76,30 @@ spacing:
   "4": "32px"
 components:
   button:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.painel}"
     textColor: "{colors.text}"
     rounded: "{rounded.none}"
     padding: "8px 16px"
     typography: "{typography.body}"
   button-hover:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.painel}"
     textColor: "{colors.text}"
   button-primary:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.painel}"
     textColor: "{colors.text}"
     rounded: "{rounded.none}"
     padding: "8px 16px"
   button-disabled:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.painel}"
     textColor: "{colors.muted}"
   input:
-    backgroundColor: "{colors.bg}"
+    backgroundColor: "{colors.cava}"
     textColor: "{colors.text}"
     rounded: "{rounded.none}"
     padding: "8px"
     width: "100%"
   panel:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.painel}"
     textColor: "{colors.text}"
     rounded: "{rounded.none}"
   type-badge:
@@ -97,20 +116,20 @@ components:
   filter-type-pressed:
     textColor: "{colors.text}"
   filter-toggle:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.painel}"
     textColor: "{colors.text}"
     rounded: "{rounded.none}"
     padding: "4px 8px"
   filter-toggle-pressed:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.painel}"
     textColor: "{colors.accent}"
   area-row:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.painel}"
     textColor: "{colors.text}"
     rounded: "{rounded.none}"
     padding: "8px 16px"
   area-row-locked:
-    backgroundColor: "{colors.bg}"
+    backgroundColor: "{colors.cava}"
     textColor: "{colors.text}"
   area-gate:
     textColor: "{colors.accent}"
@@ -118,17 +137,17 @@ components:
     padding: "2px 8px"
     typography: "{typography.micro}"
   area-analyzer:
-    backgroundColor: "{colors.bg}"
+    backgroundColor: "{colors.cava}"
     textColor: "{colors.text}"
     rounded: "{rounded.none}"
     padding: "16px"
   modal:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.painel}"
     textColor: "{colors.text}"
     rounded: "{rounded.none}"
     width: "min(560px, 92vw)"
   toast:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.painel}"
     textColor: "{colors.text}"
     rounded: "{rounded.none}"
     padding: "8px 16px"
@@ -194,11 +213,11 @@ entram só onde identificam uma espécie.
   fundo esmaecido por `color-mix`, e só chegam ao texto depois de misturados com o claro do tema.
 
 ### Neutral
-- **Preto de Página** (`{colors.bg}`): o fundo da janela. É também o fundo do que recuou de plano
+- **Preto de Página** (`{colors.cava}`): o fundo da janela. É também o fundo do que recuou de plano
   (linha de área bloqueada, gaveta do analisador) e o fundo dos campos de entrada.
-- **Grafite de Painel** (`{colors.panel}`): toda superfície que se levanta — painel, botão, modal,
+- **Grafite de Painel** (`{colors.painel}`): toda superfície que se levanta — painel, botão, modal,
   toast, linha de área disponível.
-- **Cinza de Borda** (`{colors.border}`): a borda de 2 px, os divisores de 1 px e o trilho vazio de
+- **Cinza de Borda** (`{colors.moldura-sombra}`): a borda de 2 px, os divisores de 1 px e o trilho vazio de
   qualquer medidor.
 - **Branco de Leitura** (`{colors.text}`): o texto corrente.
 - **Cinza de Rótulo** (`{colors.muted}`): rótulo de unidade, legenda de filtro, cabeçalho de tabela,
@@ -326,12 +345,12 @@ declarado que recorta e escala o sprite por dentro, para que um Rhydon de 64 px 
 vizinha.
 
 Medidores são barras retas sem raio: 10 px de altura para o `progress` de HP, 40 × 6 px para o
-cooldown de golpe, preenchidos por `transform: scaleX()` sobre trilho `{colors.border}`.
+cooldown de golpe, preenchidos por `transform: scaleX()` sobre trilho `{colors.moldura-sombra}`.
 
 ## Components
 
 ### Buttons
-- **Shape:** retângulo puro (raio 0), borda de 2 px, fundo `{colors.panel}`, padding 8 × 16 px.
+- **Shape:** retângulo puro (raio 0), borda de 2 px, fundo `{colors.painel}`, padding 8 × 16 px.
 - **Primary:** idêntico ao padrão, exceto pela borda em `{colors.accent}`. A ação primária se declara
   pela borda, não por fundo preenchido.
 - **Hover:** a borda vai para `{colors.accent}`; nada mais muda. Botão desabilitado não responde.
@@ -352,13 +371,13 @@ cooldown de golpe, preenchidos por `transform: scaleX()` sobre trilho `{colors.b
 
 ### Cards / Containers
 - **Corner Style:** raio 0.
-- **Background:** `{colors.panel}` sobre página `{colors.bg}`.
-- **Border:** 2 px sólida em `{colors.border}`.
+- **Background:** `{colors.painel}` sobre página `{colors.cava}`.
+- **Border:** 2 px sólida em `{colors.moldura-sombra}`.
 - **Shadow Strategy:** nenhuma — ver *Elevation & Depth*.
 - **Internal Padding:** 16 px nas telas de leitura, 8 px nos painéis do HUD.
 
 ### Inputs / Fields
-- **Style:** fundo `{colors.bg}` (mais escuro que o painel que o contém, então o campo afunda em vez
+- **Style:** fundo `{colors.cava}` (mais escuro que o painel que o contém, então o campo afunda em vez
   de saltar), borda de 2 px, padding de 8 px, largura total, raio 0.
 - **Campo numérico curto:** largura declarada em `ch` (`5ch` no filtro de nível) e texto centrado.
 - **Label:** empilhado acima do campo, 4 px de distância, em `{colors.muted}`.
@@ -396,21 +415,21 @@ medida.
 ### Gaveta do analisador (componente-assinatura)
 O detalhe abre dentro da própria ficha, colado sob a linha escolhida: `margin-top` negativo de 8 px
 para encostar, borda de 2 px em `{colors.accent}` sem borda superior (ela continua a borda da linha),
-fundo `{colors.bg}`, padding de 16 px. Dentro, uma tabela de colunas colapsadas: cabeçalho em caixa
+fundo `{colors.cava}`, padding de 16 px. Dentro, uma tabela de colunas colapsadas: cabeçalho em caixa
 alta e `{colors.muted}`, primeira coluna com `width: 100%` para absorver a sobra, colunas numéricas
 alinhadas à direita com `white-space: nowrap`, e divisores de 1 px só entre linhas do corpo.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** usar a borda como canal de estado: 2 px em `{colors.border}` em repouso, `{colors.accent}` em
+- **Do** usar a borda como canal de estado: 2 px em `{colors.moldura-sombra}` em repouso, `{colors.accent}` em
   `hover`, foco, ativo e aberto.
 - **Do** declarar largura de coluna sempre que uma tela existir para comparar linhas. `auto` deixa o
   conteúdo mover o alinhamento, e o alinhamento é a comparação.
 - **Do** escrever o estado por extenso junto da cor ("arrasa", "não fere", "faltam 2 na Pokédex").
 - **Do** distinguir "ainda não sei" de "medi e deu zero": enquanto o dado não chega, travessão e
   `aria-busy`, nunca um zero formatado.
-- **Do** recuar de plano (fundo `{colors.bg}`) para marcar o indisponível, mantendo os números em
+- **Do** recuar de plano (fundo `{colors.cava}`) para marcar o indisponível, mantendo os números em
   contraste cheio.
 - **Do** manter `tabular-nums` em qualquer número que entre em coluna.
 - **Do** abrir o detalhe em gaveta, dentro da lista, quando o jogador vai abrir uma, olhar, fechar e

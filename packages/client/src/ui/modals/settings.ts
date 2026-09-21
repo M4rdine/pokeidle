@@ -7,6 +7,17 @@ const number = (id: string, label: string, value: number): HTMLElement =>
   el('p', { class: 'field' }, el('label', { for: id }, label), el('input', { id, name: id, type: 'number', min: '0', max: '100', value: String(value) }))
 
 /** Um PATCH grava tudo: o servidor repassa ao runner da hunt, então não precisa mandar pelo socket. */
+/**
+ * Os valores são os identificadores do protocolo; o que o jogador lê é o nome da bola. Expor
+ * `best`/`poke` a um jogo inteiramente em português era vazar nome de campo de API para a tela.
+ */
+const BOLAS = [
+  ['best', 'A melhor disponível'],
+  ['poke', 'Poké Bola'],
+  ['great', 'Great Bola'],
+  ['ultra', 'Ultra Bola'],
+] as const
+
 export function openSettings(ctx: AppContext): Modal {
   const current = ctx.session.get().me?.trainer.settings
   const error = el('p', { class: 'form-error', role: 'alert' })
@@ -15,8 +26,8 @@ export function openSettings(ctx: AppContext): Modal {
   const wildHp = number('set-wild-hp', 'Capturar com HP do selvagem abaixo de (%)', current?.capture.maxWildHpPercent ?? 30)
   const tier = el('p', { class: 'field' }, el('label', { for: 'set-tier' }, 'Bola preferida'),
     el('select', { id: 'set-tier', name: 'set-tier' },
-      ...(['best', 'poke', 'great', 'ultra'] as const).map((value) =>
-        el('option', { value, ...(current?.capture.ballTier === value && { selected: true }) }, value))))
+      ...BOLAS.map(([value, rotulo]) =>
+        el('option', { value, ...(current?.capture.ballTier === value && { selected: true }) }, rotulo))))
   const duplicates = el('p', { class: 'field field-check' },
     el('label', { for: 'set-dupes' }, 'Capturar duplicatas'),
     el('input', { id: 'set-dupes', name: 'set-dupes', type: 'checkbox', ...(current?.capture.allowDuplicates && { checked: true }) }))

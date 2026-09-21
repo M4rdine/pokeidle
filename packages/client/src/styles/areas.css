@@ -127,7 +127,7 @@
 .area-start { align-self: center; white-space: nowrap; }
 
 .matchup-good strong { color: var(--ok); }
-.matchup-bad strong { color: var(--danger); }
+.matchup-bad strong { color: var(--danger-texto); }
 .matchup-none strong { color: var(--muted); }
 
 /* --- analisador --- */

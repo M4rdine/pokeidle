@@ -17,9 +17,10 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
   const xpBar = el('progress', { class: 'xp-bar', max: '100', value: '0' })
   const nextUnlock = el('span', { class: 'tb-corta', 'data-next': '' }, '—')
   const gold = el('span', { 'data-gold': '' }, '0')
-  // Telemetria: prova de que a simulação está rodando, e nada mais. Não compete com decisão.
-  const tick = el('span', { class: 'muted', 'data-tick': '' }, 'tick 0')
-  const conn = el('span', { class: 'conn', 'data-conn': 'closed' }, CONN_TEXT['closed']!)
+  // O número do tique é telemetria de desenvolvedor: o que ele diz ao jogador é só "a simulação
+  // está viva". Fica no título, para quem quiser o número, e some do texto corrente.
+  const tick = el('span', { class: 'muted tb-pulso', 'data-tick': '', title: 'tique da simulação' }, 'simulando')
+  const conn = el('span', { class: 'conn', 'data-conn': 'closed', role: 'status' }, CONN_TEXT['closed']!)
   const dex = el('span', { 'data-dex': '' }, '—')
   /** Rótulo do mostrador de área: o nome da área nomeia o próprio medidor. */
   const areaNome = el('span', {}, 'área')
@@ -67,7 +68,7 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
   const offGold = ctx.hunt.subscribe((v) => v.state?.trainer.gold ?? null, (value) => {
     if (value !== null) gold.textContent = String(value)
   })
-  const offTick = ctx.hunt.subscribe((v) => v.tick, (value) => { tick.textContent = `tick ${value}` })
+  const offTick = ctx.hunt.subscribe((v) => v.tick, (value) => { tick.title = `tique ${value} da simulação` })
   // Contador "Rota 1: n/m": a Pokédex do servidor é lida uma vez e `seen` da sessão atualiza ao vivo.
   let entries: Awaited<ReturnType<typeof loadEntries>> = []
   async function loadEntries() { return (await ctx.http.get('/trainer/pokedex', PokedexSchema)).entries }
@@ -79,7 +80,10 @@ export function mountTopBar(root: HTMLElement, ctx: AppContext): () => void {
     areaNome.textContent = area.name
     dex.textContent = `${n}/${m}`
   }
-  void loadEntries().then((loaded) => { entries = loaded; renderDex() }).catch(() => {})
+  // Engolir aqui deixava o mostrador em "—" para sempre, indistinguível de "ainda carregando".
+  void loadEntries()
+    .then((loaded) => { entries = loaded; renderDex() })
+    .catch(() => { areaNome.textContent = 'área'; dex.textContent = '?'; dex.title = 'não foi possível ler a Pokédex' })
   const offDex = ctx.hunt.subscribe((v) => v.state?.settings.seen, renderDex)
   const offConn = ctx.session.subscribe((s) => s.socket, (status) => {
     const phase = ctx.hunt.get().phase

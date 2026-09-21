@@ -64,3 +64,33 @@ describe('todo token usado existe', () => {
     }
   })
 })
+
+/**
+ * O `DESIGN.md` é a descrição do sistema; `tokens.css` é o sistema. Quando os dois divergem, a
+ * descrição vira mentira — e mentira documentada é pior que documentação nenhuma. Aconteceu duas
+ * vezes na troca do mundo visual: o sidecar ficou apontando para cores removidas, e a paleta de
+ * tipos sumiu do frontmatter enquanto o CSS seguia usando.
+ */
+describe('a descrição do sistema bate com o sistema', () => {
+  const DESIGN = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..', 'DESIGN.md')
+
+  it('toda cor que o DESIGN.md declara existe como token, e vice-versa', async () => {
+    const doc = await readFile(DESIGN, 'utf8')
+    const frontmatter = doc.split('---')[1] ?? ''
+    const naDoc = new Set([...frontmatter.matchAll(/^ {2}([a-z0-9-]+):\s*"#/gm)].map((m) => m[1]!))
+    const noCodigo = new Set([...(await definidos())]
+      .map((t) => t.slice(2))
+      .filter((n) => !n.startsWith('space-') && !n.startsWith('border-') && n !== 'bisel'))
+
+    expect([...naDoc].filter((c) => !noCodigo.has(c)), 'documentadas mas inexistentes').toEqual([])
+    expect([...noCodigo].filter((c) => !naDoc.has(c)), 'existentes mas não documentadas').toEqual([])
+  })
+
+  it('toda cor citada na prosa do DESIGN.md está na paleta que ele mesmo declara', async () => {
+    const doc = await readFile(DESIGN, 'utf8')
+    const frontmatter = doc.split('---')[1] ?? ''
+    const declaradas = new Set([...frontmatter.matchAll(/^ {2}([a-z0-9-]+):\s*"#/gm)].map((m) => m[1]!))
+    const citadas = [...doc.matchAll(/\{colors\.([a-z0-9-]+)\}/g)].map((m) => m[1]!)
+    expect([...new Set(citadas)].filter((c) => !declaradas.has(c))).toEqual([])
+  })
+})

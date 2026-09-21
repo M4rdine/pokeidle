@@ -2,7 +2,12 @@ import type { ContentRegistry } from '@pokeidle/shared'
 import type { Event, HuntState, StopReason } from '@pokeidle/shared/protocol'
 import { LOG_MAX_LINES } from '../config.js'
 
-export type LogKind = 'combat' | 'reward' | 'info' | 'alert'
+/**
+ * `marco` existe para separar o raro do rotineiro. Sem ele, capturar um Pokémon novo e derrotar
+ * mais um selvagem — que acontece a cada dois segundos — dividiam a mesma cor de destaque, e o
+ * destaque deixava de significar qualquer coisa.
+ */
+export type LogKind = 'combat' | 'reward' | 'marco' | 'info' | 'alert'
 export interface LogLine { readonly tick: number; readonly kind: LogKind; readonly text: string }
 export interface LogContext { readonly registry: ContentRegistry; readonly state: HuntState | null }
 
@@ -24,10 +29,10 @@ export function formatEvent(e: Event, ctx: LogContext): LogLine | null {
       const drops = e.drops.map((d) => `${itemName(ctx, d.item)} ×${d.quantity}`)
       return line(e.tick, 'reward', [`${displayName(e.speciesName)} L${e.level} derrotado: +${e.xpTrainer} XP`, `+${e.gold} ouro`, ...drops].join(', '))
     }
-    case 'captured': return line(e.tick, 'reward', `Capturou ${displayName(e.speciesName)} L${e.level}!${e.toBox ? ' Foi para a mochila de Pokémon' : ''}`)
+    case 'captured': return line(e.tick, 'marco', `Capturou ${displayName(e.speciesName)} L${e.level}!${e.toBox ? ' Foi para a mochila de Pokémon' : ''}`)
     case 'captureFailed': return line(e.tick, 'info', `A ${itemName(ctx, e.ball)} falhou`)
-    case 'levelUp': return line(e.tick, 'reward', `${pokemonName(ctx, e.pokemonId)} subiu para o nível ${e.level}`)
-    case 'evolved': return line(e.tick, 'reward', `${displayName(e.from)} evoluiu para ${displayName(e.to)}`)
+    case 'levelUp': return line(e.tick, 'marco', `${pokemonName(ctx, e.pokemonId)} subiu para o nível ${e.level}`)
+    case 'evolved': return line(e.tick, 'marco', `${displayName(e.from)} evoluiu para ${displayName(e.to)}`)
     case 'itemUsed': return line(e.tick, 'info', `Usou ${itemName(ctx, e.itemId)}: HP ${e.hp}`)
     case 'returning': return line(e.tick, 'info', 'HP baixo, voltando ao Centro')
     case 'healed': return line(e.tick, 'info', 'Time curado')

@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import type { AppContext } from '../../app-context.js'
 import { SettingsResponseSchema } from '../../api/dto.js'
 import { el } from '../dom.js'
@@ -55,5 +56,21 @@ export function openSettings(ctx: AppContext): Modal {
       .catch((err: unknown) => { error.textContent = err instanceof Error ? err.message : 'não foi possível salvar' })
       .finally(() => save.removeAttribute('disabled'))
   })
-  return openModal(document.body, 'Configurações', el('div', { class: 'settings' }, potion, ret, wildHp, tier, duplicates, save, error))
+  /**
+   * Sair da conta. Vem do menu de funções lá em cima, onde estava ao lado de Mapa e Pokédex — a
+   * única coisa naquela fileira que não abria painel, e a mais cara de apertar sem querer. Aqui
+   * fica atrás de dois cliques e abaixo de uma divisória, que é o lugar de quem mexe na conta.
+   */
+  const sair = el('button', { type: 'button', class: 'settings-sair' }, 'Sair da conta')
+  sair.addEventListener('click', () => {
+    sair.setAttribute('disabled', '')
+    void ctx.http.post('/auth/logout', {}, z.unknown())
+      .then(() => ctx.go())
+      .finally(() => sair.removeAttribute('disabled'))
+  })
+  const conta = el('div', { class: 'settings-conta' },
+    el('div', { class: 'cabeca' }, el('span', {}, 'conta')),
+    sair)
+
+  return openModal(document.body, 'Configurações', el('div', { class: 'settings' }, potion, ret, wildHp, tier, duplicates, save, error, conta))
 }

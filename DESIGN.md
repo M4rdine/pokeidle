@@ -325,8 +325,17 @@ As três colunas são agrupadas por **pergunta**, e não por tipo de componente:
 O **menu de funções fica no alto do centro**, numa linha de alvos iguais, e não numa barra que
 atravessa a tela. Em barra, cinco atalhos de texto disputavam a faixa com a identidade e com
 "Parar"/"Sair", e numa tela estreita a fila quebrava em três linhas de moldura comendo a altura do
-mundo. O par que muda o **estado da sessão** fica numa faixa à parte, à direita da grade: ele é a
-única coisa ali que não apenas abre um painel.
+mundo.
+
+**Na fileira só entra o que abre painel.** "Parar" e "Sair" moravam numa faixa à direita dela e
+saíram: enquanto estavam ali, a ação mais cara da tela tinha o mesmo alvo e o mesmo peso de abrir
+a Pokédex, e "Parar" aparecia igual mesmo sem caçada nenhuma — controle morto. Cada uma foi para
+onde a pergunta é feita:
+
+| ação | onde mora agora | por quê |
+|---|---|---|
+| Parar | painel de **situação**, à direita | é o painel que diz se existe caçada; o botão some quando não existe, em vez de ficar desabilitado — desabilitado promete uma ação esperando condição, e aqui não há ação nenhuma |
+| Sair da conta | modal de **Configurações**, abaixo de uma divisória | é onde se mexe na conta, e dois cliques é a distância certa para a única ação que descarta a sessão |
 
 Abaixo de 900 px a grade empilha na ordem `menu / mundo / combate / perfil / registro` — o jogo
 antes do perfil, porque uma coluna de identidade inteira empurraria o mundo para fora da primeira

@@ -1,10 +1,15 @@
 import type { AppContext } from '../../app-context.js'
 import { situacaoDoTime } from '../../state/situacao.js'
 import { el, pct } from '../dom.js'
+import { intentButton } from './intent-button.js'
 
 /**
- * O que o time faz agora, e contra quem. Ocupava o vazio de 197 px da coluna esquerda — mas entra
- * por ser o dado que o jogador de um jogo ocioso chega para conferir, não para preencher buraco.
+ * O que o time faz agora, contra quem, e o botão de encerrar.
+ *
+ * "Parar" morava no menu de funções lá em cima, ao lado de Mapa e Pokédex, e estava errado em
+ * dois sentidos: o menu só abre painel, e o botão aparecia igual mesmo sem caçada nenhuma —
+ * controle morto na tela. Aqui ele fica ao lado da frase que diz se existe caçada, e SOME quando
+ * não existe. É a mesma pergunta: o que o time está fazendo, e como faço parar.
  */
 export function mountSituacao(root: HTMLElement, ctx: AppContext): () => void {
   const texto = el('strong', { class: 'situacao-texto', 'data-situacao': '' }, 'sem caçada')
@@ -16,15 +21,22 @@ export function mountSituacao(root: HTMLElement, ctx: AppContext): () => void {
     el('div', { class: 'alvo-linha' }, alvoNome, alvoNivel, alvoHpTexto),
     alvoHp)
 
+  const parar = intentButton('Parar', () => ctx.sendIntent?.({ t: 'hunt.stop' }), 'parar')
+  parar.classList.add('situacao-parar')
+
   root.append(el('section', { class: 'situacao panel', 'aria-live': 'polite' },
     el('div', { class: 'cabeca' }, el('span', {}, 'situação')),
     texto,
-    alvo))
+    alvo,
+    parar))
 
   const render = (): void => {
     const s = situacaoDoTime(ctx.hunt.get())
     texto.textContent = s.texto
     texto.setAttribute('data-situacao', s.texto)
+    // Sem caçada não há o que parar. O botão some em vez de ficar desabilitado: desabilitado
+    // promete que existe uma ação ali esperando alguma condição, e aqui não existe.
+    parar.hidden = ctx.hunt.get().state === null
     if (!s.alvo) { alvo.hidden = true; return }
     alvo.hidden = false
     alvoNome.textContent = s.alvo.nome

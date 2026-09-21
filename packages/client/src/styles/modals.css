@@ -28,6 +28,18 @@
 .shop-item input { width: 64px; margin-left: auto; }
 .shop-item.locked { opacity: 0.55; }
 .settings .field { gap: var(--space-1); }
+/*
+ * A conta fica depois de uma divisória, abaixo de Salvar. É o único bloco do painel que não é
+ * ajuste de caçada, e a separação é o que impede que "Sair da conta" seja apertado no embalo de
+ * quem estava mexendo em porcentagem. Veio do menu de funções, onde ficava a um clique de Mapa.
+ */
+.settings-conta {
+  display: flex; flex-direction: column; gap: var(--space-1);
+  margin-top: var(--space-3); padding-top: var(--space-3);
+  border-top: var(--border-w) solid var(--borda);
+}
+.settings-sair { align-self: flex-start; }
+.settings-sair:hover:not([disabled]) { color: var(--perigo); }
 .field-check { flex-direction: row; align-items: center; gap: var(--space-2); }
 .field-check input[type="checkbox"] { width: 14px; flex-shrink: 0; }
 .pokedex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--space-2); }

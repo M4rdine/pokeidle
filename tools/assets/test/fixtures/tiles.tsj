@@ -4,10 +4,10 @@
   "name": "tibia-tiles",
   "image": "tiles.png",
   "imagewidth": 704,
-  "imageheight": 672,
+  "imageheight": 704,
   "tilewidth": 32,
   "tileheight": 32,
-  "tilecount": 462,
+  "tilecount": 484,
   "columns": 22,
   "margin": 0,
   "spacing": 0,
@@ -2718,7 +2718,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-aaaa"
+          "value": "areia-pedra-bbbb"
         }
       ]
     },
@@ -2728,7 +2728,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-abba"
+          "value": "areia-pedra-babb"
         }
       ]
     },
@@ -2738,7 +2738,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-aaba"
+          "value": "areia-pedra-baab"
         }
       ]
     },
@@ -2748,7 +2748,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-abaa"
+          "value": "areia-pedra-bbab"
         }
       ]
     },
@@ -2758,7 +2758,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-bbbb"
+          "value": "areia-pedra-aabb"
         }
       ]
     },
@@ -2768,7 +2768,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-baaa"
+          "value": "areia-pedra-aaaa"
         }
       ]
     },
@@ -2778,7 +2778,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-babb"
+          "value": "areia-pedra-bbaa"
         }
       ]
     },
@@ -2788,7 +2788,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-baab"
+          "value": "areia-pedra-abbb"
         }
       ]
     },
@@ -2798,7 +2798,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-abbb"
+          "value": "areia-pedra-abba"
         }
       ]
     },
@@ -2808,7 +2808,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-bbba"
+          "value": "areia-pedra-bbba"
         }
       ]
     },
@@ -2818,7 +2818,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-aaab"
+          "value": "areia-pedra-abaa"
         }
       ]
     },
@@ -2828,7 +2828,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-bbaa"
+          "value": "areia-pedra-aaba"
         }
       ]
     },
@@ -2838,7 +2838,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-baba"
+          "value": "areia-pedra-abab"
         }
       ]
     },
@@ -2848,7 +2848,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-abab"
+          "value": "areia-pedra-baaa"
         }
       ]
     },
@@ -2858,7 +2858,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-bbab"
+          "value": "areia-pedra-aaab"
         }
       ]
     },
@@ -2868,7 +2868,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-aabb"
+          "value": "areia-pedra-baba"
         }
       ]
     },
@@ -2878,7 +2878,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-aaaa-v2"
+          "value": "areia-pedra-aaaa-v2"
         }
       ]
     },
@@ -2888,7 +2888,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-aaaa-v3"
+          "value": "areia-pedra-aaaa-v3"
         }
       ]
     },
@@ -2898,7 +2898,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-aaaa-v4"
+          "value": "areia-pedra-bbbb-v2"
         }
       ]
     },
@@ -2908,7 +2908,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-bbbb-v2"
+          "value": "areia-pedra-bbbb-v3"
         }
       ]
     },
@@ -2918,7 +2918,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "campo-alta-bbbb-v3"
+          "value": "campo-alta-aaaa"
         }
       ]
     },
@@ -2928,7 +2928,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x0-y0"
+          "value": "campo-alta-abba"
         }
       ]
     },
@@ -2938,7 +2938,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x1-y0"
+          "value": "campo-alta-aaba"
         }
       ]
     },
@@ -2948,7 +2948,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x0-y1"
+          "value": "campo-alta-abaa"
         }
       ]
     },
@@ -2958,7 +2958,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-1-x1-y1"
+          "value": "campo-alta-bbbb"
         }
       ]
     },
@@ -2968,7 +2968,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x0-y0"
+          "value": "campo-alta-baaa"
         }
       ]
     },
@@ -2978,7 +2978,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x1-y0"
+          "value": "campo-alta-babb"
         }
       ]
     },
@@ -2988,7 +2988,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x0-y1"
+          "value": "campo-alta-baab"
         }
       ]
     },
@@ -2998,7 +2998,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-1-x1-y1"
+          "value": "campo-alta-abbb"
         }
       ]
     },
@@ -3008,7 +3008,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x0-y0"
+          "value": "campo-alta-bbba"
         }
       ]
     },
@@ -3018,7 +3018,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x1-y0"
+          "value": "campo-alta-aaab"
         }
       ]
     },
@@ -3028,7 +3028,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x0-y1"
+          "value": "campo-alta-bbaa"
         }
       ]
     },
@@ -3038,7 +3038,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-2-x1-y1"
+          "value": "campo-alta-baba"
         }
       ]
     },
@@ -3048,7 +3048,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x0-y0"
+          "value": "campo-alta-abab"
         }
       ]
     },
@@ -3058,7 +3058,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x1-y0"
+          "value": "campo-alta-bbab"
         }
       ]
     },
@@ -3068,7 +3068,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x0-y1"
+          "value": "campo-alta-aabb"
         }
       ]
     },
@@ -3078,7 +3078,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-2-x1-y1"
+          "value": "campo-alta-aaaa-v2"
         }
       ]
     },
@@ -3088,7 +3088,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x0-y0"
+          "value": "campo-alta-aaaa-v3"
         }
       ]
     },
@@ -3098,7 +3098,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x1-y0"
+          "value": "campo-alta-aaaa-v4"
         }
       ]
     },
@@ -3108,7 +3108,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x0-y1"
+          "value": "campo-alta-bbbb-v2"
         }
       ]
     },
@@ -3118,7 +3118,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-3-x1-y1"
+          "value": "campo-alta-bbbb-v3"
         }
       ]
     },
@@ -3128,7 +3128,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x0-y0"
+          "value": "arvore-larga-1-x0-y0"
         }
       ]
     },
@@ -3138,7 +3138,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x1-y0"
+          "value": "arvore-larga-1-x1-y0"
         }
       ]
     },
@@ -3148,7 +3148,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x0-y1"
+          "value": "arvore-larga-1-x0-y1"
         }
       ]
     },
@@ -3158,7 +3158,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-3-x1-y1"
+          "value": "arvore-larga-1-x1-y1"
         }
       ]
     },
@@ -3168,7 +3168,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x0-y0"
+          "value": "pinheiro-1-x0-y0"
         }
       ]
     },
@@ -3178,7 +3178,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x1-y0"
+          "value": "pinheiro-1-x1-y0"
         }
       ]
     },
@@ -3188,7 +3188,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x0-y1"
+          "value": "pinheiro-1-x0-y1"
         }
       ]
     },
@@ -3198,7 +3198,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arvore-larga-4-x1-y1"
+          "value": "pinheiro-1-x1-y1"
         }
       ]
     },
@@ -3208,7 +3208,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x0-y0"
+          "value": "arvore-larga-2-x0-y0"
         }
       ]
     },
@@ -3218,7 +3218,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x1-y0"
+          "value": "arvore-larga-2-x1-y0"
         }
       ]
     },
@@ -3228,7 +3228,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x0-y1"
+          "value": "arvore-larga-2-x0-y1"
         }
       ]
     },
@@ -3238,7 +3238,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pinheiro-4-x1-y1"
+          "value": "arvore-larga-2-x1-y1"
         }
       ]
     },
@@ -3248,7 +3248,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-1"
+          "value": "pinheiro-2-x0-y0"
         }
       ]
     },
@@ -3258,7 +3258,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-1"
+          "value": "pinheiro-2-x1-y0"
         }
       ]
     },
@@ -3268,7 +3268,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "flores-1"
+          "value": "pinheiro-2-x0-y1"
         }
       ]
     },
@@ -3278,7 +3278,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-2"
+          "value": "pinheiro-2-x1-y1"
         }
       ]
     },
@@ -3288,7 +3288,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-2"
+          "value": "arvore-larga-3-x0-y0"
         }
       ]
     },
@@ -3298,7 +3298,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "flores-2"
+          "value": "arvore-larga-3-x1-y0"
         }
       ]
     },
@@ -3308,7 +3308,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-3"
+          "value": "arvore-larga-3-x0-y1"
         }
       ]
     },
@@ -3318,7 +3318,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-3"
+          "value": "arvore-larga-3-x1-y1"
         }
       ]
     },
@@ -3328,7 +3328,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "flores-3"
+          "value": "pinheiro-3-x0-y0"
         }
       ]
     },
@@ -3338,7 +3338,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "arbusto-4"
+          "value": "pinheiro-3-x1-y0"
         }
       ]
     },
@@ -3348,7 +3348,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedra-4"
+          "value": "pinheiro-3-x0-y1"
         }
       ]
     },
@@ -3358,7 +3358,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "flores-4"
+          "value": "pinheiro-3-x1-y1"
         }
       ]
     },
@@ -3368,7 +3368,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "centro-pokemon-x0-y0"
+          "value": "arvore-larga-4-x0-y0"
         }
       ]
     },
@@ -3378,7 +3378,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "centro-pokemon-x1-y0"
+          "value": "arvore-larga-4-x1-y0"
         }
       ]
     },
@@ -3388,7 +3388,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "centro-pokemon-x2-y0"
+          "value": "arvore-larga-4-x0-y1"
         }
       ]
     },
@@ -3398,7 +3398,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "centro-pokemon-x0-y1"
+          "value": "arvore-larga-4-x1-y1"
         }
       ]
     },
@@ -3408,7 +3408,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "centro-pokemon-x1-y1"
+          "value": "pinheiro-4-x0-y0"
         }
       ]
     },
@@ -3418,7 +3418,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "centro-pokemon-x2-y1"
+          "value": "pinheiro-4-x1-y0"
         }
       ]
     },
@@ -3428,7 +3428,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "centro-pokemon-x0-y2"
+          "value": "pinheiro-4-x0-y1"
         }
       ]
     },
@@ -3438,7 +3438,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "centro-pokemon-x1-y2"
+          "value": "pinheiro-4-x1-y1"
         }
       ]
     },
@@ -3448,7 +3448,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "centro-pokemon-x2-y2"
+          "value": "arbusto-1"
         }
       ]
     },
@@ -3458,7 +3458,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "boca-de-caverna-x0-y0"
+          "value": "pedra-1"
         }
       ]
     },
@@ -3468,7 +3468,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "boca-de-caverna-x1-y0"
+          "value": "flores-1"
         }
       ]
     },
@@ -3478,7 +3478,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "boca-de-caverna-x2-y0"
+          "value": "arbusto-2"
         }
       ]
     },
@@ -3488,7 +3488,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "boca-de-caverna-x0-y1"
+          "value": "pedra-2"
         }
       ]
     },
@@ -3498,7 +3498,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "boca-de-caverna-x1-y1"
+          "value": "flores-2"
         }
       ]
     },
@@ -3508,7 +3508,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "boca-de-caverna-x2-y1"
+          "value": "arbusto-3"
         }
       ]
     },
@@ -3518,7 +3518,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "boca-de-caverna-x0-y2"
+          "value": "pedra-3"
         }
       ]
     },
@@ -3528,7 +3528,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "boca-de-caverna-x1-y2"
+          "value": "flores-3"
         }
       ]
     },
@@ -3538,7 +3538,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "boca-de-caverna-x2-y2"
+          "value": "arbusto-4"
         }
       ]
     },
@@ -3548,7 +3548,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "naufragio-x0-y0"
+          "value": "pedra-4"
         }
       ]
     },
@@ -3558,7 +3558,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "naufragio-x1-y0"
+          "value": "flores-4"
         }
       ]
     },
@@ -3568,7 +3568,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "naufragio-x2-y0"
+          "value": "centro-pokemon-x0-y0"
         }
       ]
     },
@@ -3578,7 +3578,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "naufragio-x0-y1"
+          "value": "centro-pokemon-x1-y0"
         }
       ]
     },
@@ -3588,7 +3588,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "naufragio-x1-y1"
+          "value": "centro-pokemon-x2-y0"
         }
       ]
     },
@@ -3598,7 +3598,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "naufragio-x2-y1"
+          "value": "centro-pokemon-x0-y1"
         }
       ]
     },
@@ -3608,7 +3608,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "naufragio-x0-y2"
+          "value": "centro-pokemon-x1-y1"
         }
       ]
     },
@@ -3618,7 +3618,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "naufragio-x1-y2"
+          "value": "centro-pokemon-x2-y1"
         }
       ]
     },
@@ -3628,7 +3628,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "naufragio-x2-y2"
+          "value": "centro-pokemon-x0-y2"
         }
       ]
     },
@@ -3638,7 +3638,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedras-erguidas-x0-y0"
+          "value": "centro-pokemon-x1-y2"
         }
       ]
     },
@@ -3648,7 +3648,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedras-erguidas-x1-y0"
+          "value": "centro-pokemon-x2-y2"
         }
       ]
     },
@@ -3658,7 +3658,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedras-erguidas-x2-y0"
+          "value": "boca-de-caverna-x0-y0"
         }
       ]
     },
@@ -3668,7 +3668,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedras-erguidas-x0-y1"
+          "value": "boca-de-caverna-x1-y0"
         }
       ]
     },
@@ -3678,7 +3678,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedras-erguidas-x1-y1"
+          "value": "boca-de-caverna-x2-y0"
         }
       ]
     },
@@ -3688,7 +3688,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedras-erguidas-x2-y1"
+          "value": "boca-de-caverna-x0-y1"
         }
       ]
     },
@@ -3698,7 +3698,7 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedras-erguidas-x0-y2"
+          "value": "boca-de-caverna-x1-y1"
         }
       ]
     },
@@ -3708,12 +3708,212 @@
         {
           "name": "name",
           "type": "string",
-          "value": "pedras-erguidas-x1-y2"
+          "value": "boca-de-caverna-x2-y1"
         }
       ]
     },
     {
       "id": 449,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x0-y2"
+        }
+      ]
+    },
+    {
+      "id": 450,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x1-y2"
+        }
+      ]
+    },
+    {
+      "id": 451,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "boca-de-caverna-x2-y2"
+        }
+      ]
+    },
+    {
+      "id": 452,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 453,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 454,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x2-y0"
+        }
+      ]
+    },
+    {
+      "id": 455,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 456,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 457,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x2-y1"
+        }
+      ]
+    },
+    {
+      "id": 458,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x0-y2"
+        }
+      ]
+    },
+    {
+      "id": 459,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x1-y2"
+        }
+      ]
+    },
+    {
+      "id": 460,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "naufragio-x2-y2"
+        }
+      ]
+    },
+    {
+      "id": 461,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x0-y0"
+        }
+      ]
+    },
+    {
+      "id": 462,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x1-y0"
+        }
+      ]
+    },
+    {
+      "id": 463,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x2-y0"
+        }
+      ]
+    },
+    {
+      "id": 464,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x0-y1"
+        }
+      ]
+    },
+    {
+      "id": 465,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x1-y1"
+        }
+      ]
+    },
+    {
+      "id": 466,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x2-y1"
+        }
+      ]
+    },
+    {
+      "id": 467,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x0-y2"
+        }
+      ]
+    },
+    {
+      "id": 468,
+      "properties": [
+        {
+          "name": "name",
+          "type": "string",
+          "value": "pedras-erguidas-x1-y2"
+        }
+      ]
+    },
+    {
+      "id": 469,
       "properties": [
         {
           "name": "name",
@@ -6015,18 +6215,18 @@
       ]
     },
     {
-      "name": "campo-alta",
+      "name": "areia-pedra",
       "type": "corner",
       "tile": -1,
       "colors": [
         {
-          "name": "campo",
+          "name": "areia",
           "color": "#ff0000",
           "probability": 1,
           "tile": -1
         },
         {
-          "name": "grama-alta",
+          "name": "pedra",
           "color": "#00ff00",
           "probability": 1,
           "tile": -1
@@ -6035,58 +6235,6 @@
       "wangtiles": [
         {
           "tileid": 349,
-          "wangid": [
-            0,
-            1,
-            0,
-            1,
-            0,
-            1,
-            0,
-            1
-          ]
-        },
-        {
-          "tileid": 350,
-          "wangid": [
-            0,
-            1,
-            0,
-            2,
-            0,
-            2,
-            0,
-            1
-          ]
-        },
-        {
-          "tileid": 351,
-          "wangid": [
-            0,
-            1,
-            0,
-            1,
-            0,
-            2,
-            0,
-            1
-          ]
-        },
-        {
-          "tileid": 352,
-          "wangid": [
-            0,
-            1,
-            0,
-            2,
-            0,
-            1,
-            0,
-            1
-          ]
-        },
-        {
-          "tileid": 353,
           "wangid": [
             0,
             2,
@@ -6099,10 +6247,62 @@
           ]
         },
         {
-          "tileid": 354,
+          "tileid": 350,
           "wangid": [
             0,
             2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 351,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 352,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 353,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 354,
+          "wangid": [
+            0,
+            1,
             0,
             1,
             0,
@@ -6117,22 +6317,22 @@
             0,
             2,
             0,
-            1,
-            0,
             2,
             0,
-            2
+            1,
+            0,
+            1
           ]
         },
         {
           "tileid": 356,
           "wangid": [
             0,
+            1,
+            0,
             2,
             0,
-            1,
-            0,
-            1,
+            2,
             0,
             2
           ]
@@ -6147,7 +6347,7 @@
             0,
             2,
             0,
-            2
+            1
           ]
         },
         {
@@ -6169,22 +6369,22 @@
             0,
             1,
             0,
-            1,
+            2,
             0,
             1,
             0,
-            2
+            1
           ]
         },
         {
           "tileid": 360,
           "wangid": [
             0,
-            2,
-            0,
-            2,
+            1,
             0,
             1,
+            0,
+            2,
             0,
             1
           ]
@@ -6193,6 +6393,235 @@
           "tileid": 361,
           "wangid": [
             0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 362,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 363,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 364,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "campo-alta",
+      "type": "corner",
+      "tile": -1,
+      "colors": [
+        {
+          "name": "campo",
+          "color": "#ff0000",
+          "probability": 1,
+          "tile": -1
+        },
+        {
+          "name": "grama-alta",
+          "color": "#00ff00",
+          "probability": 1,
+          "tile": -1
+        }
+      ],
+      "wangtiles": [
+        {
+          "tileid": 369,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 370,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 371,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 372,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 373,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 374,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 375,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 376,
+          "wangid": [
+            0,
+            2,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 377,
+          "wangid": [
+            0,
+            1,
+            0,
+            2,
+            0,
+            2,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 378,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            2,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 379,
+          "wangid": [
+            0,
+            1,
+            0,
+            1,
+            0,
+            1,
+            0,
+            2
+          ]
+        },
+        {
+          "tileid": 380,
+          "wangid": [
+            0,
+            2,
+            0,
+            2,
+            0,
+            1,
+            0,
+            1
+          ]
+        },
+        {
+          "tileid": 381,
+          "wangid": [
+            0,
             2,
             0,
             1,
@@ -6203,7 +6632,7 @@
           ]
         },
         {
-          "tileid": 362,
+          "tileid": 382,
           "wangid": [
             0,
             1,
@@ -6216,7 +6645,7 @@
           ]
         },
         {
-          "tileid": 363,
+          "tileid": 383,
           "wangid": [
             0,
             2,
@@ -6229,7 +6658,7 @@
           ]
         },
         {
-          "tileid": 364,
+          "tileid": 384,
           "wangid": [
             0,
             1,

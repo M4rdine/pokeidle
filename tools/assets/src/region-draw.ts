@@ -18,8 +18,13 @@ export const GRADE = { width: 96, height: 72, areaWidth: 24, areaHeight: 36, til
  * caminhável e o Centro acessível mesmo com o ruído puxando água ou rocha para perto da beirada.
  */
 const MARGEM = 2
-/** Semente de cada área: espalha as manchas de ruído sem repetir bioma a bioma. */
+/** Semente de cada área: posiciona o corpo d'água, a faixa de mar e o marco de cada uma. */
 const SEMENTE_POR_AREA = (indice: number): number => indice * 77 + 3
+/**
+ * Semente única do campo de ruído do terreno. É a mesma para a região inteira de propósito: um
+ * campo contínuo é o que faz a mancha atravessar a divisa entre duas áreas vizinhas.
+ */
+const SEMENTE_DA_REGIAO = 11
 /** Lado, em tiles, do retângulo de spawn em volta do alvo. */
 const RAIO_SPAWN = 4
 const RESPAWN_SEGUNDOS = 20
@@ -58,6 +63,32 @@ const LINHAS_ACIMA_DO_CENTRO = 2
 /** Deformação da borda de uma massa: multiplica o raio entre 0,7 e 1,3 em volta do contorno. */
 const BORDA_MIN = 0.7
 const BORDA_VAO = 0.6
+/**
+ * Pincel que pinta o material do vizinho como secundário, indexado por [meu material][o dele].
+ * É assimétrico porque o atlas é: existe conjunto com campo primário e areia secundária, e não o
+ * contrário. Onde só um lado tem pincel, só ele cresce língua — o que lido de longe já basta
+ * para a divisa perder a régua. Par sem pincel nenhum fica com a emenda reta, e a saída é gerar
+ * o conjunto que falta, não fingir com o pincel errado.
+ */
+const TRANSICAO: Readonly<Record<string, Readonly<Record<string, string>>>> = {
+  campo: { areia: 'campo-areia', pedra: 'campo-pedra' },
+  areia: { pedra: 'areia-pedra' },
+}
+/** Até onde a língua do vizinho avança área adentro, em tiles. */
+const FUNDURA_TRANSICAO = 6
+/**
+ * Escala do ruído que recorta a língua. Curta de propósito: uma faixa fina com ruído longo sai
+ * como um degrau reto deslocado, que é a mesma emenda com outro nome.
+ */
+const ESCALA_TRANSICAO = 4
+
+/**
+ * Folga do portão às bordas perpendiculares da divisa, em tiles. A estrada atravessa pelo meio
+ * do lado, não pelo canto: portão a dois tiles do vértice sai do mapa como se a estrada raspasse
+ * a quina, que é desenho de grade, não de mundo.
+ */
+const FOLGA_PORTAO = 9
+
 /**
  * Meia largura da trilha, em cantos de tile. Zero dá a faixa mais estreita que o pincel de canto
  * consegue desenhar — dois tiles, contando as bordas. Mais que isso vira praça, não caminho.
@@ -132,14 +163,22 @@ const indiceDe = (area: Area, x: number, y: number): number => (area.ay + y) * G
  * ruído para todo mundo, e era a razão de um lago sair como três poças iguais: ruído espalha, e
  * espalhar é o oposto de ser um lugar.
  */
-function formaDaMancha(bioma: Bioma, seed: number): (cx: number, cy: number) => boolean {
+function formaDaMancha(bioma: Bioma, seed: number, area: Area): (cx: number, cy: number) => boolean {
   const { areaWidth: aw, areaHeight: ah } = GRADE
   const forma = bioma.forma ?? 'ruido'
-  if (forma === 'ruido') return (cx, cy) => smooth(cx, cy, ESCALA_RUIDO, seed) < bioma.mistura
+  /**
+   * O ruído é amostrado em coordenada da REGIÃO e com semente da REGIÃO, não da área. Em
+   * coordenada local, o padrão recomeçava na divisa e duas áreas vizinhas de campo se encontravam
+   * numa faixa reta de material puro — a emenda que fazia o mapa parecer uma grade de retângulos.
+   */
+  const global = (cx: number, cy: number, escala: number, s: number): number =>
+    smooth(area.ax + cx, area.ay + cy, escala, s)
+
+  if (forma === 'ruido') return (cx, cy) => global(cx, cy, ESCALA_RUIDO, SEMENTE_DA_REGIAO) < bioma.mistura
 
   // A borda multiplica o raio (ou a fundura) por algo em torno de 1, então a fração coberta fica
   // perto de `mistura` sem bater nela exatamente — e é justamente o desvio que tira a cara de forma.
-  const recorte = (cx: number, cy: number): number => BORDA_MIN + BORDA_VAO * smooth(cx, cy, ESCALA_BORDA, seed + 47)
+  const recorte = (cx: number, cy: number): number => BORDA_MIN + BORDA_VAO * global(cx, cy, ESCALA_BORDA, seed + 47)
 
   if (forma === 'corpo') {
     const raio = Math.sqrt((bioma.mistura * aw * ah) / Math.PI)
@@ -164,12 +203,21 @@ function formaDaMancha(bioma: Bioma, seed: number): (cx: number, cy: number) => 
 /** Pinta o terreno da área com o pincel de canto do bioma, variando as peças puras. */
 function pintarTerreno(grade: Grade, area: Area, temTile: (nome: string) => boolean): void {
   const { bioma, ax, ay, seed } = area
-  const mancha = formaDaMancha(bioma, seed)
+  const mancha = formaDaMancha(bioma, seed, area)
+  // O anel de material primário vale só onde a área encosta na BORDA DA REGIÃO. Nas divisas
+  // internas ele era o que desenhava a faixa lisa entre dois vizinhos; lá o terreno agora
+  // atravessa, e a caminhabilidade é garantida pelo componente conexo, não pelo anel.
+  const bordaEsquerda = ax === 0
+  const bordaDireita = ax + GRADE.areaWidth >= GRADE.width
+  const bordaCima = ay === 0
+  const bordaBaixo = ay + GRADE.areaHeight >= GRADE.height
   const secundario = (cx: number, cy: number): boolean => {
-    // A faixa de mar nasce colada na borda de propósito: ela vem de fora do mapa. As outras
-    // formas respeitam o anel de material primário que mantém a volta da área caminhável.
+    // A faixa de mar nasce colada na borda de propósito: ela vem de fora do mapa.
     if (bioma.forma === 'margem') return mancha(cx, cy)
-    const dentro = cx > MARGEM && cy > MARGEM && cx < GRADE.areaWidth - MARGEM && cy < GRADE.areaHeight - MARGEM
+    const dentro = (!bordaEsquerda || cx > MARGEM)
+      && (!bordaCima || cy > MARGEM)
+      && (!bordaDireita || cx < GRADE.areaWidth - MARGEM)
+      && (!bordaBaixo || cy < GRADE.areaHeight - MARGEM)
     return dentro && mancha(cx, cy)
   }
   const canto = (cx: number, cy: number): string => (secundario(cx, cy) ? 'b' : 'a')
@@ -299,6 +347,61 @@ function pintarMarco(grade: Grade, area: Area, temTile: (nome: string) => boolea
   colocarPredio(grade, area, marco, canto)
 }
 
+/** Material primário de um conjunto: `campo-agua` é campo, `pedra-caverna` é pedra. */
+const materialPrimario = (set: string): string => set.split('-')[0]!
+
+/**
+ * Interdigita a divisa entre duas áreas de materiais primários diferentes.
+ *
+ * Sem isto, campo encontrava areia numa reta perfeita de 36 tiles: o ruído do terreno já
+ * atravessa a divisa, mas atravessar não adianta quando o material muda em bloco. Aqui a areia
+ * (ou a rocha) do vizinho avança como língua recortada para dentro do campo, e a fronteira deixa
+ * de ter régua.
+ *
+ * Roda depois de todas as áreas porque precisa saber o material do vizinho, e só pinta sobre
+ * material primário puro — trilha, grama alta e margem de lago já desenhadas sobrevivem.
+ */
+function pintarTransicoes(grade: Grade, areas: readonly Area[], porCanto: ReadonlyMap<string, Area>, temTile: (nome: string) => boolean): void {
+  const { areaWidth: aw, areaHeight: ah } = GRADE
+
+  for (const area of areas) {
+    const meu = materialPrimario(area.bioma.set)
+    const pinceis = TRANSICAO[meu]
+    if (pinceis === undefined) continue
+
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+      const vizinho = porCanto.get(`${area.ax + dx * aw},${area.ay + dy * ah}`)
+      if (vizinho === undefined) continue
+      const pincel = pinceis[materialPrimario(vizinho.bioma.set)]
+      if (pincel === undefined || !temTile(`${pincel}-bbbb`)) continue
+
+      // Distância do canto à divisa com este vizinho, em tiles.
+      const distancia = (cx: number, cy: number): number =>
+        dx === 1 ? aw - cx : dx === -1 ? cx : dy === 1 ? ah - cy : cy
+      // O recorte ao quadrado deixa a língua mais irregular que a borda de uma massa: o expoente
+      // puxa a distribuição para baixo, então a maioria dos cantos fica rasa e alguns avançam
+      // fundo. É a diferença entre uma faixa de largura quase constante e dedos de areia.
+      const lingua = (cx: number, cy: number): boolean => {
+        const recorte = BORDA_MIN + BORDA_VAO * smooth(area.ax + cx, area.ay + cy, ESCALA_TRANSICAO, SEMENTE_DA_REGIAO + 7)
+        return distancia(cx, cy) < FUNDURA_TRANSICAO * recorte * recorte
+      }
+      const canto = (cx: number, cy: number): string => (lingua(cx, cy) ? 'b' : 'a')
+
+      for (let y = 0; y < ah; y++) {
+        for (let x = 0; x < aw; x++) {
+          const code = `${canto(x + 1, y)}${canto(x + 1, y + 1)}${canto(x, y + 1)}${canto(x, y)}`
+          if (code === 'aaaa') continue
+          const i = indiceDe(area, x, y)
+          // Mesma guarda da grama alta: só campo puro vira transição. A margem do lago e a peça
+          // de trilha são o que faz a área parecer um lugar, e não se pisa nelas.
+          if (!grade.ground[i]!.includes('-aaaa') || grade.reservado.has(i) || grade.blocked[i]) continue
+          grade.ground[i] = `${pincel}-${code}`
+        }
+      }
+    }
+  }
+}
+
 /**
  * Pinta uma mancha de grama alta em volta de cada alvo de spawn, com o pincel de `campo-alta`.
  * É o que transforma o mapa em informação: quem olha vê onde os Pokémon aparecem, em vez de
@@ -334,6 +437,45 @@ function pintarGramaAlta(grade: Grade, area: Area, alvos: readonly Ponto[], temT
 }
 
 /**
+ * O maior pedaço da área que se alcança a pé, em índices de grade.
+ *
+ * Existe porque massa coerente pode partir a área em dois: um lago que toca as duas bordas deixa
+ * metade do terreno inalcançável, e um spawn sorteado do outro lado é um selvagem que o time
+ * nunca encontra. Escolher todos os pontos dentro de um componente só resolve por construção,
+ * em vez de abrir caminho na marra depois.
+ */
+function maiorPedacoAndavel(grade: Grade, area: Area): Set<number> {
+  const { areaWidth: aw, areaHeight: ah } = GRADE
+  const vistos = new Set<number>()
+  let maior = new Set<number>()
+
+  for (let y = 1; y < ah - 1; y++) {
+    for (let x = 1; x < aw - 1; x++) {
+      const inicio = indiceDe(area, x, y)
+      if (vistos.has(inicio) || grade.blocked[inicio] === true) continue
+      const pedaco = new Set<number>([inicio])
+      const fila = [{ x, y }]
+      vistos.add(inicio)
+      while (fila.length > 0) {
+        const p = fila.pop()!
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+          const nx = p.x + dx
+          const ny = p.y + dy
+          if (nx < 1 || ny < 1 || nx >= aw - 1 || ny >= ah - 1) continue
+          const i = indiceDe(area, nx, ny)
+          if (vistos.has(i) || grade.blocked[i] === true) continue
+          vistos.add(i)
+          pedaco.add(i)
+          fila.push({ x: nx, y: ny })
+        }
+      }
+      if (pedaco.size > maior.size) maior = pedaco
+    }
+  }
+  return maior
+}
+
+/**
  * Varre a área inteira a partir de (x0,y0), linha a linha na direção `dx`, dando a volta quando
  * chega na borda. Andável, vazio e fora da copa: um Centro debaixo de uma árvore existe, mas o
  * jogador nunca o vê, porque a copa desenha acima dele.
@@ -355,7 +497,7 @@ function tentarAcharLivre(grade: Grade, area: Area, x0: number, y0: number, dx: 
   return null
 }
 
-function acharLivre(grade: Grade, area: Area, x0: number, y0: number, dx: number, margem = 1, cabe?: (x: number, y: number) => boolean): { x: number; y: number } {
+function acharLivre(grade: Grade, area: Area, x0: number, y0: number, dx: number, margem = 1, cabe?: (x: number, y: number) => boolean, andavel?: ReadonlySet<number>): { x: number; y: number } {
   const { areaWidth: aw, areaHeight: ah } = GRADE
   const vago = (i: number): boolean =>
     !grade.blocked[i] && grade.detail[i] === null && grade.canopy[i] === null && !grade.reservado.has(i)
@@ -369,7 +511,8 @@ function acharLivre(grade: Grade, area: Area, x0: number, y0: number, dx: number
     let y = Math.min(Math.max(y0, margem), ah - margem - 1)
     for (let passo = 0; passo < aw * ah; passo++) {
       const i = indiceDe(area, x, y)
-      if (vago(i) && (!exigePuro || grade.ground[i]!.includes('-aaaa')) && (cabe === undefined || cabe(x, y))) return { x, y }
+      const noPedaco = andavel === undefined || andavel.has(i)
+      if (noPedaco && vago(i) && (!exigePuro || grade.ground[i]!.includes('-aaaa')) && (cabe === undefined || cabe(x, y))) return { x, y }
       x += dx
       if (x < margem || x >= aw - margem) {
         x = dx > 0 ? margem : aw - margem - 1
@@ -396,14 +539,21 @@ interface Pontos {
 function escolherPontos(grade: Grade, area: Area): Pontos {
   const { bioma } = area
   const { areaWidth: aw, areaHeight: ah } = GRADE
+  // Partida, Centro e todos os spawns saem do mesmo pedaço andável: é o que garante que o time
+  // alcança tudo que a área promete.
+  const andavel = maiorPedacoAndavel(grade, area)
   // Os spawns primeiro: a partida nasce perto do primeiro deles — a caçada começa sem uma
   // travessia longa — e o Centro fica no canto oposto, para a volta custar alguma coisa.
   // Os alvos ficam a pelo menos `RAIO_SPAWN` da borda: o retângulo de spawn é desse raio, e um
   // canto dele fora da área vira conteúdo que o importador recusa — ele recorta área por área.
   const alvos = bioma.especies.map((_esp, n) =>
-    acharLivre(grade, area, 4 + ((n * 7) % (aw - 9)), 5 + ((n * 11) % (ah - 11)), 1, RAIO_SPAWN))
+    acharLivre(grade, area, 4 + ((n * 7) % (aw - 9)), 5 + ((n * 11) % (ah - 11)), 1, RAIO_SPAWN, undefined, andavel))
+  // Os alvos entram no reservado junto com a partida e o Centro. Sem isso, o marco da área e os
+  // props podiam ser assentados em cima de um spawn — e o selvagem nascia dentro de um naufrágio,
+  // inalcançável a pé.
+  for (const alvo of alvos) grade.reservado.add(indiceDe(area, alvo.x, alvo.y))
   const primeiro = alvos[0]!
-  const partida = acharLivre(grade, area, Math.max(1, primeiro.x - 2), Math.max(1, primeiro.y - 2), 1)
+  const partida = acharLivre(grade, area, Math.max(1, primeiro.x - 2), Math.max(1, primeiro.y - 2), 1, 1, undefined, andavel)
   grade.reservado.add(indiceDe(area, partida.x, partida.y))
   // O Centro precisa de 3×3 livres acima da porta para o prédio caber. Exigir isso na busca, e
   // não depois, evita escolher uma porta boa e descobrir que o prédio não cabe nela.
@@ -411,7 +561,7 @@ function escolherPontos(grade: Grade, area: Area): Pontos {
     const canto = cantoDoPredio({ x, y })
     return livre(grade, area, canto.x, canto.y, LADO_CENTRO, LADO_CENTRO)
   }
-  const centro = acharLivre(grade, area, aw - 3, ah - 3, -1, 1, cabePredio)
+  const centro = acharLivre(grade, area, aw - 3, ah - 3, -1, 1, cabePredio, andavel)
   grade.reservado.add(indiceDe(area, centro.x, centro.y))
   return { alvos, partida, centro }
 }
@@ -438,7 +588,7 @@ const manhattan = (a: Ponto, b: Ponto): number => Math.abs(a.x - b.x) + Math.abs
  * A ordem é a do vizinho mais próximo. Não é a rota ótima, e não precisa ser: o que importa é não
  * ziguezaguear de um lado ao outro da área entre duas paradas vizinhas.
  */
-function percurso(partida: Ponto, alvos: readonly Ponto[], centro: Ponto): readonly (readonly [Ponto, Ponto])[] {
+function percurso(partida: Ponto, alvos: readonly Ponto[], centro: Ponto, portoes: readonly Ponto[]): readonly (readonly [Ponto, Ponto])[] {
   const restantes = [...alvos]
   const paradas: Ponto[] = [partida]
   let atual = partida
@@ -454,10 +604,55 @@ function percurso(partida: Ponto, alvos: readonly Ponto[], centro: Ponto): reado
 
   // Cada perna vira um L, porque o desenho só sabe pintar segmento reto. A dobra alterna de lado
   // a cada perna: dobrando sempre igual, o caminho vira escada e denuncia o gerador.
-  return paradas.slice(1).flatMap((para, i): (readonly [Ponto, Ponto])[] => {
-    const de = paradas[i]!
-    const dobra = i % 2 === 0 ? { x: para.x, y: de.y } : { x: de.x, y: para.y }
+  const emL = (de: Ponto, para: Ponto, dobraNoX: boolean): (readonly [Ponto, Ponto])[] => {
+    const dobra = dobraNoX ? { x: para.x, y: de.y } : { x: de.x, y: para.y }
     return [[de, dobra], [dobra, para]]
+  }
+  const tronco = paradas.slice(1).flatMap((para, i) => emL(paradas[i]!, para, i % 2 === 0))
+
+  // Cada portão entra como um ramal saindo da parada mais próxima, e não como mais uma parada do
+  // tronco: enfiado na ordem, ele arrastaria a estrada até a borda e de volta entre duas zonas de
+  // caça vizinhas. Ramal é o que uma estrada que sai da região realmente é.
+  const ramais = portoes.flatMap((portao) => {
+    const perto = paradas.reduce((a, b) => (manhattan(portao, b) < manhattan(portao, a) ? b : a))
+    // Dobra no eixo perpendicular à divisa: o último trecho chega no portão de frente, em vez de
+    // correr rente à borda e virar moldura.
+    return emL(perto, portao, portao.y === 0 || portao.y === GRADE.areaHeight)
+  })
+
+  return [...tronco, ...ramais]
+}
+
+/**
+ * Onde a estrada atravessa cada divisa interna, em cantos locais desta área.
+ *
+ * Existe porque sem ela toda trilha morre na borda: oito estradas privadas, uma por retângulo, é
+ * exatamente a leitura de grade que o terreno contínuo acabou de desfazer. O ponto sai das
+ * coordenadas GLOBAIS da divisa, iguais para os dois vizinhos, então os dois lados desenham até
+ * o mesmo canto e as duas metades se encontram sem ninguém combinar nada.
+ *
+ * Só entre áreas que ambas levam trilha. Atravessar para uma praia ou uma caverna exigiria o
+ * pincel de caminho sobre areia ou rocha, que o atlas não tem — e estrada que muda de material
+ * no meio é pior que estrada que não existe.
+ */
+function portoesDaArea(area: Area, porCanto: ReadonlyMap<string, Area>): readonly Ponto[] {
+  const { areaWidth: aw, areaHeight: ah } = GRADE
+  if (area.bioma.trilha === null) return []
+  const vao = (tamanho: number): number => Math.max(1, tamanho - 2 * FOLGA_PORTAO)
+
+  return [[1, 0], [-1, 0], [0, 1], [0, -1]].flatMap(([dx, dy]): Ponto[] => {
+    const vizinho = porCanto.get(`${area.ax + dx! * aw},${area.ay + dy! * ah}`)
+    if (vizinho === undefined || vizinho.bioma.trilha === null) return []
+    if (dy === 0) {
+      // Divisa vertical: a coluna global dela é a mesma para os dois lados, e as duas áreas estão
+      // na mesma linha, então a linha sorteada também é a mesma nas coordenadas locais.
+      const divisa = Math.max(area.ax, vizinho.ax)
+      const y = FOLGA_PORTAO + Math.floor(noise(divisa, 1, SEMENTE_DA_REGIAO) * vao(ah))
+      return [{ x: dx === 1 ? aw : 0, y }]
+    }
+    const divisa = Math.max(area.ay, vizinho.ay)
+    const x = FOLGA_PORTAO + Math.floor(noise(2, divisa, SEMENTE_DA_REGIAO) * vao(aw))
+    return [{ x, y: dy === 1 ? ah : 0 }]
   })
 }
 
@@ -467,11 +662,11 @@ function percurso(partida: Ponto, alvos: readonly Ponto[], centro: Ponto): reado
  * denunciaria o gerador. Além de dar direção ao olho, garante um corredor sem props entre os dois
  * pontos: prop só nasce em material primário.
  */
-function pintarTrilha(grade: Grade, area: Area, pontos: Pontos): void {
+function pintarTrilha(grade: Grade, area: Area, pontos: Pontos, portoes: readonly Ponto[]): void {
   const { bioma } = area
   if (bioma.trilha === null) return
   const { partida, alvos, centro } = pontos
-  const trechos = percurso(partida, alvos, centro)
+  const trechos = percurso(partida, alvos, centro, portoes)
   const naTrilha = (cx: number, cy: number): boolean =>
     trechos.some(([de, para]) => distanciaAoSegmento(cx, cy, de, para) <= LARGURA_TRILHA)
 
@@ -547,21 +742,29 @@ export function desenharRegiao(spec: RegionSpec, temTile: (nome: string) => bool
   }
   const objetos: ObjetoDraft[] = []
 
-  biomas.forEach((bioma, indice) => {
-    const area: Area = {
-      bioma,
-      ax: (indice % porLinha) * GRADE.areaWidth,
-      ay: Math.floor(indice / porLinha) * GRADE.areaHeight,
-      seed: SEMENTE_POR_AREA(indice),
-    }
-    pintarTerreno(grade, area, temTile)
+  const areas = biomas.map((bioma, indice): Area => ({
+    bioma,
+    ax: (indice % porLinha) * GRADE.areaWidth,
+    ay: Math.floor(indice / porLinha) * GRADE.areaHeight,
+    seed: SEMENTE_POR_AREA(indice),
+  }))
+
+  // Terreno de todas as áreas primeiro, depois as transições, e só então o resto. A transição
+  // precisa do material do vizinho, que não existe enquanto as áreas são desenhadas uma a uma; e
+  // precisa vir antes dos pontos e dos props, que só ocupam material primário puro — assim nada
+  // nasce em cima da língua de areia nem a atravessa.
+  const porCanto = new Map(areas.map((a) => [`${a.ax},${a.ay}`, a]))
+  for (const area of areas) pintarTerreno(grade, area, temTile)
+  pintarTransicoes(grade, areas, porCanto, temTile)
+
+  areas.forEach((area) => {
     const pontos = escolherPontos(grade, area)
     pintarCentro(grade, area, pontos.centro, temTile)
     pintarMarco(grade, area, temTile)
     // A trilha antes da grama alta: ela só pinta sobre material primário puro, então o que já é
     // caminho sobrevive e a grama cresce em volta. Na ordem inversa a grama cobria a zona de
     // spawn e a trilha não conseguia mais entrar nela.
-    pintarTrilha(grade, area, pontos)
+    pintarTrilha(grade, area, pontos, portoesDaArea(area, porCanto))
     pintarGramaAlta(grade, area, pontos.alvos, temTile)
     espalharProps(grade, area)
     objetos.push(...objetosDaArea(area, pontos))

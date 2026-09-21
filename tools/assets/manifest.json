@@ -555,6 +555,13 @@
       "swap": true
     },
     {
+      "name": "areia-pedra",
+      "from": "areia",
+      "to": "pedra",
+      "file": "areia-pedra.png",
+      "swap": true
+    },
+    {
       "name": "campo-alta",
       "from": "campo",
       "to": "grama-alta",

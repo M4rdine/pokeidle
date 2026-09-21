@@ -12,7 +12,8 @@ import { mountLog } from '../../../src/ui/hud/log.js'
 import { mountMoves } from '../../../src/ui/hud/moves.js'
 import { mountOverlays } from '../../../src/ui/hud/overlays.js'
 import { mountTeamStrip } from '../../../src/ui/hud/team-strip.js'
-import { mountTopBar } from '../../../src/ui/hud/top-bar.js'
+import { mountMenu } from '../../../src/ui/hud/menu.js'
+import { mountPerfil } from '../../../src/ui/hud/perfil.js'
 import fixture from '../../fixtures/route1-300.json' with { type: 'json' }
 
 const registry = loadRegistry()
@@ -33,20 +34,27 @@ const root = (): HTMLElement => document.createElement('div')
 describe('barra superior', () => {
   it('mostra treinador, nível, próximo destrave, ouro e conexão', () => {
     const r = root()
-    mountTopBar(r, ctxWith())
+    mountPerfil(r, ctxWith())
     expect(r.querySelector('strong')?.textContent).toBe('Ash')
     expect(r.querySelector('[data-level]')?.textContent).toBe('nível 1')
     expect(r.querySelector('[data-next]')?.textContent).toContain('4 vagas no time')
     expect(r.querySelector('[data-gold]')?.textContent).toBe('0') // o ouro vem do estado da hunt
     expect(r.querySelector('[data-conn]')?.getAttribute('data-conn')).toBe('open')
   })
-  it('em catch-up a conexão avisa; Parar manda a intenção uma vez a cada 200 ms', () => {
+  it('em catch-up a conexão avisa no perfil', () => {
+    // O estado da conexão mora no PERFIL e a ação de parar mora no MENU: são dois painéis
+    // diferentes desde que a tela virou três colunas, e o teste segue a separação.
+    const hunt = createStore({ ...view, phase: 'catching-up' as const, catchup: { remaining: 10 } })
+    const r = root()
+    mountPerfil(r, ctxWith({ hunt }))
+    expect(r.querySelector('[data-conn]')?.getAttribute('data-conn')).toBe('catching-up')
+  })
+  it('Parar manda a intenção uma vez a cada 200 ms', () => {
     vi.useFakeTimers()
     const sendIntent = vi.fn()
     const hunt = createStore({ ...view, phase: 'catching-up' as const, catchup: { remaining: 10 } })
     const r = root()
-    mountTopBar(r, ctxWith({ hunt, sendIntent }))
-    expect(r.querySelector('[data-conn]')?.getAttribute('data-conn')).toBe('catching-up')
+    mountMenu(r, ctxWith({ hunt, sendIntent }))
     const stop = [...r.querySelectorAll('button')].find((b) => b.textContent === 'Parar')!
     stop.click(); stop.click()
     expect(sendIntent).toHaveBeenCalledTimes(1)

@@ -7,75 +7,68 @@
  * quadro. Agora a barra cabe numa linha e o log encolhe com a janela.
  */
 .screen.game-grid { max-width: none; margin: 0; padding: var(--space-2); }
+/*
+ * Três colunas, agrupadas por PERGUNTA: quem eu sou (esquerda), o que está acontecendo (centro),
+ * o que o meu Pokémon pode fazer (direita). A cena é o centro e cada painel rola por dentro; a
+ * janela não rola.
+ *
+ * O menu de funções fica no ALTO DO CENTRO, não numa barra que atravessa a tela: em barra ele
+ * disputava a faixa com a identidade e com os botões de sessão, e numa tela estreita quebrava em
+ * três linhas de moldura comendo a altura do mundo.
+ */
 .game-grid {
   display: grid;
-  grid-template-columns: 280px 1fr 260px;
-  /* O log encolhe com a janela em vez de tomar 180 px fixos de qualquer tela. */
-  grid-template-rows: auto 1fr clamp(88px, 13vh, 150px);
-  grid-template-areas: "top top top" "left center right" "bottom bottom bottom";
+  grid-template-columns: 300px 1fr 260px;
+  /* O registro encolhe com a janela em vez de tomar altura fixa de qualquer tela. */
+  grid-template-rows: auto 1fr clamp(76px, 12vh, 140px);
+  grid-template-areas:
+    "left menu   right"
+    "left center right"
+    "left bottom right";
   gap: var(--space-2);
   height: 100vh;
   padding: var(--space-2);
 }
-.grid-top { grid-area: top; }
-.grid-left { grid-area: left; display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; }
-/* A tarja que sobra quando o mundo é menor que o painel mostra a MESA: o mundo visual tem três
- * uma penumbra só, e um preto puro não pertenceria a ela. O mesmo valor é lido
- * do token pelo renderizador, em `scene/app.ts`, para os dois não poderem divergir. */
+.grid-left { grid-area: left; display: flex; flex-direction: column; gap: var(--space-2); min-height: 0; overflow-y: auto; }
+.grid-menu { grid-area: menu; }
+/* A tarja que sobra quando o mundo é menor que o painel mostra o fundo da página; o mesmo valor
+ * é lido do token pelo renderizador, em `scene/app.ts`, para os dois não poderem divergir. */
 .grid-center { grid-area: center; position: relative; overflow: hidden; background: var(--fora); min-width: 0; min-height: 0; }
-.grid-right { grid-area: right; min-height: 0; display: flex; }
+.grid-right { grid-area: right; min-height: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 .grid-bottom { grid-area: bottom; min-height: 0; }
 
-/* ── Barra de topo ───────────────────────────────────────────────────────────
- * Três zonas: quem é o jogador, o que ele veio ler, e o que ele pode fazer. Antes era uma fila
- * corrida onde o ouro tinha o mesmo peso de `tick`, que é telemetria de desenvolvedor.
+/* ── Menu de funções ─────────────────────────────────────────────────────────
+ * Grade de alvos iguais. A ordem é estável e cada função tem o mesmo peso — nenhuma delas é mais
+ * "ação" que a outra, porque todas só abrem um painel.
  */
-.top-bar {
-  display: flex; align-items: center; gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
-  /* Uma linha só. A quebra encolhia o centro depois que os dados chegavam, e a cena ficava com
-   * uma banda preta embaixo porque o Pixi não re-mede sozinho. */
-  flex-wrap: nowrap; overflow-x: auto;
-}
-.tb-id { display: flex; align-items: baseline; gap: var(--space-2); flex-shrink: 0; }
-.tb-id strong { font-family: var(--fonte-hud); font-size: var(--t-l); letter-spacing: 0.01em; }
-.tb-id .xp-bar { width: 88px; height: 6px; }
+/* Numa linha só: a grade ocupa o que sobrar e a faixa de sessão fica à direita. Em coluna, o
+ * menu tomava 170 px de altura para cinco botões, e essa altura sai do mundo. */
+.menu { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-1); }
+.menu-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: var(--space-1); flex: 1; min-width: 0; }
+.menu-item { width: 100%; }
+/* Parar e Sair mudam o ESTADO DA SESSÃO, e são as duas únicas coisas aqui que fazem isso: ficam
+ * numa faixa própria, alinhadas à direita, longe do alvo de quem só quer abrir a Pokédex. */
+.menu-sessao { display: flex; gap: var(--space-1); flex-shrink: 0; }
+.menu-sessao button:last-child:hover:not([disabled]) { color: var(--perigo); }
 
-/* Leitura: rótulo micro em caixa alta sobre o número, como mostrador de instrumento. */
-.tb-leitura { display: flex; gap: var(--space-3); flex-shrink: 0; }
-.leitura { display: flex; flex-direction: column; line-height: 1.1; }
+/* ── Coluna de perfil ────────────────────────────────────────────────────────
+ * Quem é o jogador e como ele está. Rótulo micro em caixa alta sobre o número, como mostrador de
+ * instrumento — o mesmo padrão que a barra do treinador usa na tela de áreas.
+ */
+.perfil { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-2); }
+.perfil-id { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
+.perfil-id strong { font-family: var(--fonte-hud); font-size: var(--t-l); letter-spacing: 0.01em; }
+.perfil-leituras { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+.leitura { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
 .leitura > span:first-child {
   font-size: var(--t-xs); font-weight: 700;
   letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-fraca);
 }
-.leitura > :last-child { font-size: var(--t-m); }
-/* "Hiper Poção, 6 vagas no time · nv 30" não cabe numa barra de uma linha; o título devolve o resto. */
-.tb-corta { max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.leitura > :last-child { font-size: var(--t-m); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* O ouro é o número que o jogador veio ver; é recompensa, e recompensa acende. */
 .leitura-ouro > :last-child { color: var(--ouro); font-weight: 700; font-size: var(--t-l); }
 
-.tb-acoes { display: flex; gap: var(--space-1); margin-left: auto; flex-shrink: 0; }
-/*
- * Atalho de modal é NAVEGAÇÃO, não ação. Sem moldura: um botão emoldurado diz "isto
- * faz alguma coisa acontecer no mundo", e abrir a Pokédex não faz. Antes eram cinco molduras
- * idênticas em fila disputando o mesmo peso visual de Parar e de Sair, que são as duas únicas
- * coisas ali que mudam o estado do jogo.
- */
-.tb-acoes button[data-open] {
-  padding: var(--space-1) var(--space-2); font-size: var(--t-s); color: var(--tinta-fraca);
-  /* Tira a MOLDURA, não a cor da borda: o relevo agora vem de `border-image`, e zerar
-   * `border-color` deixava a peça de madeira desenhada do mesmo jeito. */
-  border-image-source: none; border-width: 0; background: none;
-}
-.tb-acoes button[data-open]:hover:not([disabled]) {
-  color: var(--tinta); text-decoration: underline; text-underline-offset: 0.25em;
-}
-/* Sair tira o jogador da caçada: fica discreto até o ponteiro chegar, e aí se declara. */
-.tb-saida button:hover:not([disabled]) { color: var(--perigo); }
-/* O par que sai da hunt fica separado do resto por um divisor, não por distância. */
-.tb-saida { display: flex; gap: var(--space-1); padding-left: var(--space-2); margin-left: var(--space-1); border-left: 1px solid var(--madeira-escura); flex-shrink: 0; }
-
-.tb-status { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.2; flex-shrink: 0; font-size: 0.75em; }
+.perfil-status { display: flex; align-items: baseline; gap: var(--space-2); font-size: var(--t-xs); }
 .conn { display: flex; align-items: center; gap: var(--space-1); }
 .conn::before { content: ""; width: 6px; height: 6px; background: currentColor; flex-shrink: 0; }
 .conn[data-conn="open"] { color: var(--ok); }
@@ -102,7 +95,7 @@
  * coluna alinhada que deixa comparar oito golpes de relance; antes, com o rótulo "poder" dentro
  * de cada linha, o número caía num lugar diferente conforme o tamanho do nome.
  */
-.moves-caixa { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
+.moves-caixa { display: flex; flex-direction: column; flex: 0 1 auto; min-height: 0; overflow: hidden; }
 .moves-cabeca { justify-content: space-between; padding: var(--space-2) var(--space-2) var(--space-1); }
 .moves { list-style: none; margin: 0; padding: 0 var(--space-2) var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); overflow-y: auto; min-height: 0; }
 .move { display: grid; grid-template-columns: 1fr auto 3ch 40px; gap: var(--space-2); align-items: center; }
@@ -195,31 +188,24 @@
   .game-grid {
     grid-template-columns: 1fr;
     /* Altura explícita para a cena. Com `1fr` numa grade de altura automática a linha resolve
-     * pelo conteúdo, e o container da cena crescia sem limite: a página virava um corredor preto
+     * pelo conteúdo, e o container da cena crescia sem limite: a página virava um corredor escuro
      * de milhares de pixels com o mapa perdido no meio. */
     grid-template-rows: auto 55vh auto auto auto;
-    grid-template-areas: "top" "center" "right" "left" "bottom";
+    /* A ordem muda: o menu primeiro, depois o mundo, e só então perfil e combate. Num telefone a
+     * coluna de perfil inteira antes da cena empurraria o jogo para fora da primeira tela. */
+    grid-template-areas: "menu" "center" "right" "left" "bottom";
     height: auto; min-height: 100vh;
   }
-  /* A coluna do time vira faixa horizontal abaixo da cena, em vez de sumir. Escondê-la deixava
-   * o jogador de celular sem NENHUM caminho para trocar o Pokémon ativo: o modal de Time fica
-   * bloqueado durante a caçada, e a faixa era a única outra porta. */
-  .grid-right { display: block; overflow-x: auto; overflow-y: visible; }
+  /* Nada de coluna rolando dentro de uma página que já rola: em telefone os painéis abrem por
+   * inteiro, um debaixo do outro. */
+  .grid-left { overflow-y: visible; }
   .grid-bottom { min-height: 120px; }
-
-  /* Numa janela estreita tudo pode quebrar e encolher. Sem soltar o `flex-shrink` dos grupos, a
-   * fileira de botões continuava numa linha só e empurrava a página para fora da tela. */
-  .top-bar { flex-wrap: wrap; overflow-x: visible; gap: var(--space-2); }
-  .top-bar > * { flex-shrink: 1; min-width: 0; }
-  .tb-acoes { margin-left: 0; flex-wrap: wrap; gap: var(--space-1); }
-  .tb-leitura { flex-wrap: wrap; gap: var(--space-3); }
-  /* A barra inteira encolhe: cinco linhas de moldura num telefone não sobram tela para o jogo. */
-  .top-bar button { padding: var(--space-1) var(--space-2); font-size: 0.85em; }
-  /* O divisor separa "sair da caçada" do resto quando os dois estão na MESMA linha. Quando a
-   * barra quebra, ele vira um traço solto no começo de uma linha nova e não separa nada. */
-  .tb-saida { padding-left: 0; margin-left: 0; border-left: none; }
-  /* Estado vira uma linha só, ao lado do nome, em vez de uma quarta faixa. */
-  .tb-status { flex-direction: row; align-items: baseline; gap: var(--space-2); }
-  /* "Próximo destrave" é o que menos decide numa tela estreita. */
-  .tb-leitura .leitura:last-child { display: none; }
+  /* Numa tela estreita a grade do menu aperta para caber mais função por linha. */
+  .menu { flex-direction: column; }
+  .menu-grade { grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); }
+  .menu-sessao button { flex: 1; }
+  /* A lista de golpes deixa de rolar por dentro: numa página que rola, rolagem aninhada esconde
+   * conteúdo sem nenhum sinal de que ele existe. */
+  .moves-caixa { overflow: visible; }
+  .moves { overflow-y: visible; }
 }

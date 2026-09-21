@@ -340,10 +340,27 @@ Três larguras, uma por modo de uso.
 painel em volta do conteúdo e a penumbra aparecendo só na margem.
 
 **Janela inteira** (`.game-grid`): a tela do jogo não rola. Ocupa `100vh` numa grade de
-`280px 1fr 260px` por `auto 1fr clamp(88px, 13vh, 150px)`, com áreas nomeadas
-(`top / left center right / bottom`), e cada painel rola por dentro. Abaixo de 900 px a grade
-empilha e a coluna do time vira faixa horizontal — escondê-la deixaria quem joga no celular sem
-nenhum caminho para trocar o Pokémon ativo.
+`300px 1fr 260px` por `auto 1fr clamp(76px, 12vh, 140px)`, com áreas nomeadas
+(`left menu right / left center right / left bottom right`), e cada painel rola por dentro.
+
+As três colunas são agrupadas por **pergunta**, e não por tipo de componente:
+
+| coluna | responde | o que carrega |
+|---|---|---|
+| esquerda | quem eu sou | identidade, nível com XP, ouro, área, Pokémon em campo, time |
+| centro | o que está acontecendo | menu de funções, o mundo, o registro |
+| direita | o que meu Pokémon pode fazer | golpes e situação |
+
+O **menu de funções fica no alto do centro**, numa linha de alvos iguais, e não numa barra que
+atravessa a tela. Em barra, cinco atalhos de texto disputavam a faixa com a identidade e com
+"Parar"/"Sair", e numa tela estreita a fila quebrava em três linhas de moldura comendo a altura do
+mundo. O par que muda o **estado da sessão** fica numa faixa à parte, à direita da grade: ele é a
+única coisa ali que não apenas abre um painel.
+
+Abaixo de 900 px a grade empilha na ordem `menu / mundo / combate / perfil / registro` — o jogo
+antes do perfil, porque uma coluna de identidade inteira empurraria o mundo para fora da primeira
+tela. A rolagem aninhada some junto: numa página que já rola, painel que rola por dentro esconde
+conteúdo sem nenhum sinal de que ele existe.
 
 O ritmo tem cinco degraus: 4 px para o que se cola, 8 px para o que se agrupa, 16 px para o que se
 separa, 32 px para o que respira, 48 px para margem de página.
@@ -367,6 +384,15 @@ quando a curva importa. Não existe entrada animada de seção, nem sequência d
 - **As superfícies do navegador são tematizadas**: seleção de texto, cursor, barra de rolagem,
   `accent-color` e deslocamento de sublinhado.
 - **Cor nunca sozinha** (ver *Named Rules* em Colors).
+
+## O que falta
+
+**Ícones.** O sistema não tem nenhum, e o pack do Kenney não resolve: as peças pequenas dele são
+formas de interface (caixa de marcar, botãozinho, controle deslizante), não ícones de assunto —
+não há livro, mapa, mochila nem engrenagem. Enquanto não houver um conjunto desenhado, nada de
+emoji e nada de glifo Unicode fazendo as vezes de ícone: o primeiro glifo seria o primeiro ícone
+de uma biblioteca que não existe, herdado de uma família qualquer, com peso e tamanho que não são
+os do resto do mundo. Candidato levantado na pesquisa: **Pixel UI Icons** do VerzatileDev (CC0).
 
 ## Créditos de arte
 

@@ -20,6 +20,7 @@ import { mountGame } from './ui/screens/game.js'
 import { mountAreas } from './ui/screens/areas/index.js'
 import { mountStarter } from './ui/screens/starter.js'
 import { openBag } from './ui/modals/bag.js'
+import { openMapa } from './ui/modals/mapa.js'
 import { openPokedex } from './ui/modals/pokedex.js'
 import { openSettings } from './ui/modals/settings.js'
 import { openShop } from './ui/modals/shop.js'
@@ -85,7 +86,7 @@ async function boot(): Promise<void> {
     random: Math.random,
     onAuthLost: onUnauthorized, // sessão expirada com o jogador parado: o socket avisa, o HTTP não
   })
-  const modals: Record<ModalName, (context: AppContext) => unknown> = { bag: openBag, team: openTeam, settings: openSettings, pokedex: openPokedex, shop: openShop }
+  const modals: Record<ModalName, (context: AppContext) => unknown> = { mapa: openMapa, bag: openBag, team: openTeam, settings: openSettings, pokedex: openPokedex, shop: openShop }
   ctx = { ...ctx, loop, sendIntent: loop.send, openModal: (name: ModalName) => { if (ctx) modals[name](ctx) } }
   loop.onEvent(createTipShower(ctx))
   const app = ctx

@@ -97,7 +97,12 @@ select option { background: var(--painel); color: var(--tinta); }
  * cima dele vira escuro, porque num mundo escuro o grifo é a única ilha clara.
  */
 .tabs { display: flex; gap: var(--space-2); }
-.tab-active { background: var(--marca); border-color: var(--marca-borda); color: var(--fora); }
+/* `border-image-source: none` é obrigatório aqui: com a moldura desenhada, o `fill` do recorte
+ * pinta o miolo da peça POR CIMA do `background`, e o grifo simplesmente não aparecia. */
+.tab-active {
+  border-image-source: none; border-width: var(--border-w);
+  background: var(--marca); border-color: var(--marca-borda); color: var(--fora);
+}
 
 .form-error { color: var(--perigo); min-height: 1.2em; margin: var(--space-2) 0 0; font-weight: 700; }
 

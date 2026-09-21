@@ -156,6 +156,7 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
           regiaoId: regiao.id,
           regiaoNome: regiao.name,
           grade: { width: regiao.width, height: regiao.height },
+          atlas: ctx.atlas,
           areas: comAncora,
           selecionada: aberta,
           aoEscolher: (id) => { aberta = aberta === id ? null : id; render() },

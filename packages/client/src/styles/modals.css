@@ -8,6 +8,9 @@
 .modal-backdrop { position: fixed; inset: 0; background: color-mix(in srgb, var(--fora) 70%, transparent); display: grid; place-items: center; z-index: 30; }
 /* Cabeçalho preso e corpo rolante. Com a rolagem no modal inteiro, uma ficha longa levava o
  * botão de fechar para fora da tela junto com o resto. */
+/* O modal do mapa é largo: ele carrega um mapa e uma tabela lado a lado, e em 560 px os dois
+ * ficariam estreitos demais para servir a qualquer um dos dois. */
+.modal:has(.mapa-modal) { width: min(1180px, 96vw); }
 .modal {
   width: min(560px, 92vw); max-height: 86vh;
   display: flex; flex-direction: column; min-height: 0;

@@ -8,5 +8,7 @@ export const INTENT_MIN_INTERVAL_MS = 200
 export const BACKOFF_MIN_MS = 1000
 export const BACKOFF_MAX_MS = 30000
 export const TIP_PREFIX = 'pokeidle.tip.'
-export const MODAL_LABELS = { team: 'Time', bag: 'Mochila', settings: 'Configurações', pokedex: 'Pokédex', shop: 'Loja' } as const
+/* A ordem é a de uso: o Mapa primeiro, porque trocar de área é a decisão mais frequente de um
+ * idle, e Configurações por último, porque é a mais rara. */
+export const MODAL_LABELS = { mapa: 'Mapa', team: 'Time', bag: 'Mochila', pokedex: 'Pokédex', shop: 'Loja', settings: 'Configurações' } as const
 export const MAX_TEAM_SLOTS = 6

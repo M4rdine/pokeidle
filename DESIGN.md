@@ -385,6 +385,26 @@ quando a curva importa. Não existe entrada animada de seção, nem sequência d
   `accent-color` e deslocamento de sublinhado.
 - **Cor nunca sozinha** (ver *Named Rules* em Colors).
 
+## O mapa
+
+Escolher onde caçar é uma decisão sobre o **mundo**, e o mundo se vê de relance. O mapa é um
+**modal** e não uma tela, e a razão é de produto: durante uma caçada, sair para uma tela significa
+parar de caçar. O modal abre por cima, o jogo continua rodando atrás, e trocar de área é um clique.
+
+- **A imagem é gerada**, não ilustrada: `pnpm assets region-preview` compõe o mapa a partir das
+  mesmas áreas que o servidor simula. O mapa-múndi é o chão que o jogador pisa, então não pode
+  divergir do jogo — um desenho à parte divergiria no primeiro ajuste de terreno.
+- **O marcador é um medalhão** com o sprite da primeira espécie e a faixa de nível pendurada
+  embaixo. Antes era uma plaqueta com o nome da área, e nome não responde à pergunta que se faz
+  olhando um mapa: *o que mora ali*. Um Butterfree responde na hora; "Bosque Denso" manda abrir a
+  ficha para descobrir.
+- **O analisador é o mesmo componente da tela de áreas.** Reusar em vez de desenhar outro é o que
+  impede os dois lugares de darem números diferentes para a mesma área.
+- **Trocar de área é parar e começar**, nessa ordem, e o rótulo do botão diz isso ("Trocar para
+  esta área"). O servidor recusa uma segunda caçada enquanto houver uma ativa, e com razão: a
+  sessão precisa ser fechada e o progresso gravado. Esconder isso atrás de "Caçar aqui" seria
+  mentir sobre uma ação que grava progresso.
+
 ## O que falta
 
 **Ícones.** O sistema não tem nenhum, e o pack do Kenney não resolve: as peças pequenas dele são

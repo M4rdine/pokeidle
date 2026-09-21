@@ -47,12 +47,38 @@ curl -H "Authorization: Bearer <token>" https://<app>.fly.dev/metrics
 Para histórico e alerta, aponte um Prometheus para essa URL; o endpoint não guarda série, e o
 painel mostra só o agora.
 
+## Antes de começar
+
+Três coisas na máquina de quem publica, e todas as três precisam estar lá porque o build é local:
+
+```bash
+brew install flyctl          # ou: curl -L https://fly.io/install.sh | sh
+docker info                  # Docker precisa estar no ar (Colima, Docker Desktop, o que for)
+pnpm assets build --extracted assets/extracted-otp2019   # gera o atlas que a imagem leva
+```
+
+Vale construir a imagem antes de gastar um deploy — é exatamente o que o `--local-only` faz:
+
+```bash
+docker build -t pokeidle:local .
+```
+
+Se isso passa, o deploy só pode falhar por credencial, variável ou banco — nunca por build.
+
 ## Primeiro deploy
 
 1. Criar o banco no Neon e copiar a URL de conexão com `sslmode=require`.
 2. `fly launch --no-deploy` (o `fly.toml` deste repositório já está pronto; responda que não quer
    criar Postgres nem Redis do Fly).
-3. `fly secrets set DATABASE_URL='...' APP_ORIGIN='https://<app>.fly.dev'`
+3. Definir os segredos de uma vez. `COOKIE_SECURE`, `TRUST_PROXY`, `PORT` e `NODE_ENV` já vêm do
+   `[env]` do `fly.toml` e não entram aqui:
+
+   ```bash
+   fly secrets set \
+     DATABASE_URL='postgres://...?sslmode=require' \
+     APP_ORIGIN='https://<app>.fly.dev' \
+     METRICS_TOKEN="$(openssl rand -hex 24)"
+   ```
 4. `fly deploy --local-only`
 
    O `--local-only` é obrigatório: o atlas de sprites **não está no repositório**, porque são
@@ -60,6 +86,8 @@ painel mostra só o agora.
    desenvolve, em `packages/server/public/atlas`, e entra no contexto do build local. Um build
    remoto geraria uma imagem sem sprites.
 5. Conferir `https://<app>.fly.dev/health`, que responde status, versão e tempo de atividade.
+6. Conferir que o mapa desenha: abrir o jogo, registrar e entrar numa área. Mapa em branco com o
+   `/health` verde significa atlas fora da imagem — veja o passo 4.
 
 ## Deploy seguinte
 

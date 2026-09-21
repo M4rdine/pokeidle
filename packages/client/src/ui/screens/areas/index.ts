@@ -185,10 +185,15 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
   }
 
   const progress = me ? trainerProgress(ctx.registry, me.trainer.xp) : null
+  // Cada número vem com o rótulo do que ele é. "81227" solto ao lado de "nível 65" obrigava a
+  // adivinhar qual dos dois era o ouro — e adivinhar é o que um painel de instrumento evita.
+  const leitura = (rotulo: string, valor: string, classe = ''): HTMLElement =>
+    el('span', { class: `leitura ${classe}`.trim() }, el('span', {}, rotulo), el('span', {}, valor))
+
   const bar = el('header', { class: 'trainer-bar panel' },
     el('strong', {}, me?.trainer.name ?? ''),
-    el('span', {}, `nível ${progress?.level ?? 1}`),
-    el('span', { 'data-gold': '' }, String(me?.trainer.gold ?? 0)),
+    leitura('nível', String(progress?.level ?? 1)),
+    leitura('ouro', (me?.trainer.gold ?? 0).toLocaleString('pt-BR'), 'leitura-ouro'),
     el('span', { class: 'muted' }, progress?.next ? `próximo: ${progress.next.what} no nível ${progress.next.level}` : 'tudo destravado'))
 
   const shortcuts = el('nav', { class: 'shortcuts' },

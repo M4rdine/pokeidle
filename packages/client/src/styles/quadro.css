@@ -1,88 +1,113 @@
 /*
- * A moldura e o vocabulário que nasce dela.
+ * O material da caderneta, e o vocabulário que nasce dele.
  *
- * O bisel é feito de duas sombras internas SEM desfoque: clara em cima à esquerda, escura embaixo
- * à direita. É o que dá volume numa interface de pixel, e em CSS ele fica nítido em qualquer
- * tamanho e muda de cor por token — coisa que um 9-slice em PNG não faz.
+ * DOIS REGISTROS DE PROFUNDIDADE, e cada um diz uma coisa diferente:
+ *
+ *  1. O BISEL — duas sombras internas sem desfoque, clara em cima à esquerda e escura embaixo à
+ *     direita. Diz "isto é entalhado no papel": botão que afunda ao ser pressionado, fenda de
+ *     medidor, campo de entrada. É a gramática do HUD de 16 bits, e em CSS ela fica nítida em
+ *     qualquer tamanho e troca de cor por token — coisa que um 9-slice em PNG não faz.
+ *  2. A SOMBRA PROJETADA — com deslocamento e desfoque de verdade. Diz "isto está POR CIMA da
+ *     caderneta": modal, toast, menu. Papel sobre papel projeta sombra; papel entalhado, não.
+ *
+ * Gastar os dois por papel é o ponto. Antes daqui havia um bisel só, carimbado em painel, botão,
+ * chip e moldura por igual — e emphasis uniforme em tudo é o mesmo que ênfase em nada.
  */
 
-/** Superfície que se levanta: todo painel, todo card, todo botão. */
+/** Superfície de papel que se levanta: painel, moldura de seção. Não é para chip nem para dado. */
 .quadro {
-  background: var(--painel);
-  border: var(--border-w) solid var(--moldura-sombra);
+  background: var(--papel);
+  border: var(--border-w) solid var(--couro-sombra);
   box-shadow:
-    inset var(--bisel) var(--bisel) 0 var(--moldura-luz),
-    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--moldura-sombra);
+    inset var(--bisel) var(--bisel) 0 var(--papel-alto),
+    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--couro);
 }
 
-/** A mesma superfície, um degrau à frente: usada dentro de um `.quadro`. */
-.quadro-alto { background: var(--painel-alto); }
+/** A mesma folha, um degrau à frente: usada dentro de um `.quadro`. */
+.quadro-alto { background: var(--papel-alto); }
 
 /**
- * Superfície que afunda: o bisel inverte. É onde se lê — trilho de medidor, lista, campo de
- * entrada. Inverter a luz é o que separa "aqui se age" de "aqui se lê" sem precisar de cor nova.
+ * A fenda: cortada através do papel, e o que se vê no fundo dela é a mesa. É onde se LÊ — trilho
+ * de medidor, lista, campo. Inverter a luz separa "aqui se age" de "aqui se lê" sem cor nova, e
+ * o fundo escuro é o que deixa a barra de vida e a de experiência atingirem contraste sobre ela.
  */
 .quadro-fundo {
-  background: var(--cava);
-  border: var(--border-w) solid var(--moldura-sombra);
+  background: var(--papel-cava);
+  border: var(--border-w) solid var(--couro-sombra);
   box-shadow:
-    inset var(--bisel) var(--bisel) 0 rgb(0 0 0 / 45%),
-    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--moldura-luz);
+    inset var(--bisel) var(--bisel) 0 var(--couro-sombra),
+    inset calc(var(--bisel) * -1) calc(var(--bisel) * -1) 0 var(--papel-alto);
 }
 
-/** Cabeçalho de seção: caixa alta, espacejada, discreta. O título não compete com o dado. */
+/** Flutua acima da caderneta: a borda do papel, e a sombra que ele joga na mesa. */
+.quadro-flutua {
+  background: var(--papel-alto);
+  border: var(--border-w) solid var(--couro-sombra);
+  box-shadow: 0 2px 0 var(--couro), 0 8px 20px rgb(51 38 31 / 38%);
+}
+
+/* Cabeçalho de seção: caixa alta espacejada, em negrito, no menor degrau da escala. Não é a face
+ * de HUD: ela não se sustenta a 11 px — ver a restrição em `tokens.css`. O título não compete
+ * com o dado. */
 .cabeca {
   display: flex; align-items: baseline; gap: var(--space-2);
-  font-size: 0.72em; font-weight: 700;
-  letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  font-size: var(--t-xs); font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-fraca);
 }
-.cabeca-conta { color: var(--text); font-weight: 400; }
+.cabeca-conta { color: var(--tinta); font-weight: 400; }
 
 /**
- * Chip: um atributo curto e repetível. A cor identifica a família do dado, nunca o valor — é a
+ * Chip: um atributo curto e repetível. SEM bisel e SEM sombra de propósito — chip não é objeto
+ * separado, é uma marca no papel. A cor identifica a família do dado, nunca o valor; é a
  * repetição em coluna que deixa comparar Pokémon com Pokémon de relance.
  */
 .chip {
   display: inline-flex; align-items: center;
   padding: 1px var(--space-1);
-  font-size: 0.72em; font-weight: 700; letter-spacing: 0.02em;
-  background: var(--cava); border: 1px solid var(--moldura-sombra); color: var(--text);
+  /* Declara a face em vez de herdar: chip quase sempre carrega NÚMERO, e ele aparece dentro de
+   * títulos que falam na voz de HUD. Herdando, o "nv 65" do cartão do ativo saía "nv 68". */
+  font-family: var(--fonte-texto); font-size: var(--t-xs); font-weight: 700;
+  background: var(--papel-cava); border: 1px solid var(--couro); color: var(--tinta);
   white-space: nowrap;
 }
-.chip-nivel { background: color-mix(in srgb, var(--xp) 28%, var(--cava)); }
-.chip-poder { background: color-mix(in srgb, var(--accent) 24%, var(--cava)); }
+.chip-nivel { background: color-mix(in srgb, var(--xp) 18%, var(--papel-cava)); }
+.chip-poder { background: color-mix(in srgb, var(--ouro-cheio) 30%, var(--papel-cava)); }
 
-/** Moeda: ícone e número, com o número em coluna tabular para somar de olho. */
+/** Moeda: o número em coluna tabular, para somar de olho. */
 .moeda { display: inline-flex; align-items: center; gap: var(--space-1); font-variant-numeric: tabular-nums; }
 .moeda-valor { font-weight: 700; }
 .moeda-ouro .moeda-valor { color: var(--ouro); }
 
-/** Botão só de ícone, quadrado. */
+/** Botão só de ícone, quadrado, no piso de alvo de toque. */
 .botao-icone {
   display: grid; place-items: center;
-  width: 32px; height: 32px; padding: 0; flex-shrink: 0;
+  width: var(--space-4); height: var(--space-4); padding: 0; flex-shrink: 0;
 }
 
 /**
  * Medidor. Veste o `<progress>` nativo em vez de trocá-lo por uma div: mantém a semântica e o
- * leitor de tela. O trilho afunda, o preenchimento é chapado — sem gradiente e sem brilho, porque
- * o que informa é o comprimento, e decoração em cima disso só atrapalha a leitura.
+ * leitor de tela. O trilho é fenda; o preenchimento é chapado — sem gradiente e sem brilho,
+ * porque o que informa é o comprimento, e decoração em cima disso só atrapalha a leitura.
  */
 .medidor { display: flex; flex-direction: column; gap: 2px; }
-.medidor-topo { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.72em; }
-.medidor-topo > :first-child { letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.medidor-topo { display: flex; justify-content: space-between; align-items: baseline; font-size: var(--t-xs); }
+.medidor-topo > :first-child {
+  font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tinta-fraca);
+}
 
 progress {
   appearance: none; display: block; width: 100%; height: 10px;
-  background: var(--cava);
-  border: 1px solid var(--moldura-sombra);
-  box-shadow: inset 1px 1px 0 rgb(0 0 0 / 50%);
+  background: var(--mesa);
+  border: 1px solid var(--couro-sombra);
+  box-shadow: inset 1px 1px 0 rgb(0 0 0 / 45%);
 }
-progress::-webkit-progress-bar { background: var(--cava); }
-progress::-webkit-progress-value { background: var(--medidor-cor, var(--accent)); transition: width 120ms linear; }
-progress::-moz-progress-bar { background: var(--medidor-cor, var(--accent)); }
+progress::-webkit-progress-bar { background: var(--mesa); }
+progress::-webkit-progress-value { background: var(--medidor-cor, var(--ouro-cheio)); transition: width var(--rapido) linear; }
+progress::-moz-progress-bar { background: var(--medidor-cor, var(--ouro-cheio)); }
 
-.hp-bar { --medidor-cor: var(--ok); }
-[data-hp-state="ferido"] { --medidor-cor: var(--accent); }
-[data-hp-state="critico"] { --medidor-cor: var(--danger); }
-.xp-bar { --medidor-cor: var(--xp); }
+.hp-bar { --medidor-cor: var(--hp); }
+/* Ferido e crítico não mudam só de cor: mudar a cor sozinha deixa de fora quem não a distingue.
+ * A largura da barra já é o sinal principal, e o texto ao lado dá o número. */
+[data-hp-state="ferido"] { --medidor-cor: var(--ouro-cheio); }
+[data-hp-state="critico"] { --medidor-cor: var(--perigo); }
+.xp-bar { --medidor-cor: var(--xp-cheio); }

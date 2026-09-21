@@ -5,7 +5,7 @@ export default defineConfig({
   server: {
     port: 5173, strictPort: true,
     proxy: {
-      '/auth': target, '/me': target, '/trainer': target, '/hunts': target, '/shop': target, '/assets/atlas': target,
+      '/auth': target, '/me': target, '/trainer': target, '/hunts': target, '/shop': target, '/assets/atlas': target, '/assets/maps': target,
       '/ws': { target: 'ws://localhost:3000', ws: true },
     },
   },

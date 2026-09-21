@@ -62,7 +62,10 @@ describe('cartão do ativo e golpes', () => {
   it('mostra nome, nível e HP do ativo', () => {
     const r = root()
     mountActivePokemon(r, ctxWith())
-    expect(r.querySelector('[data-name]')?.textContent).toBe('Charmander L10')
+    // Nome e nível são nós separados: o nível é valor e não vai na face de HUD, que confunde
+    // 5 com 8 — "L65" saía na tela como "L68".
+    expect(r.querySelector('[data-name]')?.textContent).toBe('Charmander')
+    expect(r.querySelector('[data-level]')?.textContent).toBe('nv 10')
     const hp = r.querySelector('[data-hp]')!
     expect(hp.getAttribute('value')).toBe(String(view.state!.player.team[0]!.hp))
     expect(r.querySelector('[data-hp-text]')?.textContent).toContain('/')

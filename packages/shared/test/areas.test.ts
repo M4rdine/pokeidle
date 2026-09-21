@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { areaUnlockLevel, canEnterArea, findArea } from '../src/areas.js'
+import { areaUnlockLevel, areasOfSpecies, canEnterArea, findArea } from '../src/areas.js'
 import { loadRegistry } from '../src/registry-full.js'
 
 const registry = loadRegistry()
@@ -55,5 +55,33 @@ describe('portão de nível por área', () => {
   it('a primeira área é sempre alcançável por quem acabou de começar', () => {
     const primeira = registry.regions.get('kanto')!.areas[0]!
     expect(areaUnlockLevel(registry, primeira.id)).toBe(1)
+  })
+})
+
+describe('onde uma espécie aparece', () => {
+  const registry = loadRegistry()
+
+  it('devolve toda área que lista a espécie, com a faixa de nível de cada uma', () => {
+    const onde = areasOfSpecies(registry.regions, 'zubat')
+    expect(onde.length, 'zubat mora em mais de uma área').toBeGreaterThan(1)
+    for (const { region, area } of onde) {
+      expect(area.species).toContain('zubat')
+      expect(region.areas).toContain(area)
+      expect(area.maxLevel).toBeGreaterThanOrEqual(area.minLevel)
+    }
+  })
+
+  it('vem em ordem de porta de entrada: a área que se alcança antes vem primeiro', () => {
+    const niveis = areasOfSpecies(registry.regions, 'zubat')
+      .map(({ region, area }) => Math.max(region.minTrainerLevel, area.minTrainerLevel))
+    expect(niveis).toEqual([...niveis].sort((a, b) => a - b))
+  })
+
+  it('espécie que não é selvagem em lugar nenhum devolve lista vazia, e não erro', () => {
+    // Inicial e lendário chegam por outro caminho; a ficha precisa saber disso para dizer de onde vêm.
+    const inicial = [...registry.species.values()].find((s) => s.obtainable === 'starter')
+    expect(inicial, 'o registro precisa ter um inicial').toBeDefined()
+    expect(areasOfSpecies(registry.regions, inicial!.name)).toEqual([])
+    expect(areasOfSpecies(registry.regions, 'nao-existe')).toEqual([])
   })
 })

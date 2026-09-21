@@ -34,3 +34,22 @@ export function areaUnlockLevel(registry: GateInput, areaId: string): number {
 
 export const canEnterArea = (registry: GateInput, areaId: string, trainerLevel: number): boolean =>
   trainerLevel >= areaUnlockLevel(registry, areaId)
+
+/**
+ * Toda área onde a espécie aparece como selvagem, da porta de entrada mais baixa para a mais
+ * alta. Lista vazia é resposta legítima: inicial e lendário não são selvagens em lugar nenhum, e
+ * a ficha precisa saber a diferença entre "não achei" e "não é caçável".
+ *
+ * A ordem é por nível exigido porque é assim que a pergunta é feita — "onde eu consigo esse
+ * agora?" —, e o desempate pelo nome mantém o resultado estável entre execuções.
+ */
+export function areasOfSpecies(regions: ReadonlyMap<string, Region>, species: string): AreaLocation[] {
+  const achadas: AreaLocation[] = []
+  for (const region of regions.values()) {
+    for (const area of region.areas) {
+      if (area.species.includes(species)) achadas.push({ region, area })
+    }
+  }
+  const porta = ({ region, area }: AreaLocation): number => Math.max(region.minTrainerLevel, area.minTrainerLevel)
+  return achadas.sort((a, b) => porta(a) - porta(b) || a.area.name.localeCompare(b.area.name))
+}

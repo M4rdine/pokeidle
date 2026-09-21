@@ -44,9 +44,18 @@ function withExtendedHint<T>(extended: boolean, parse: () => T): T {
 /** Lado do tile em pixels: é o que `renderMapPreview` usa ao desenhar cada área. */
 const TILE_SIZE_PADRAO = 32
 
+interface PontoNoMapa { readonly x: number; readonly y: number; readonly local: string }
+
 interface RegionDoArquivo {
   readonly id: string
-  readonly areas: readonly { readonly id: string; readonly bounds: { x: number; y: number; width: number; height: number } }[]
+  /** Qual Town Map a região usa. Escrito à mão: não vem do Tiled. */
+  readonly townMap?: string
+  readonly areas: readonly {
+    readonly id: string
+    readonly bounds: { x: number; y: number; width: number; height: number }
+    /** Onde a área cai no Town Map, em porcentagem. Escrito à mão: não vem do Tiled. */
+    readonly noMapa?: PontoNoMapa
+  }[]
 }
 
 const program = new Command().name('pokeidle-assets').description('Pipeline de assets do Pokeidle')
@@ -149,12 +158,35 @@ program
     for (const hunt of hunts) {
       await writeFile(join(opts.out, `${hunt.id}.json`), JSON.stringify(hunt, null, 2))
     }
-    // A região substitui a entrada de mesmo id e preserva as outras, para importar uma de cada vez.
-    const anteriores = (await readJson(opts.regions).catch(() => [])) as { id: string }[]
-    const lista = [...anteriores.filter((r) => r.id !== region.id), region].sort((a, b) =>
+    /*
+     * A região substitui a entrada de mesmo id e preserva as outras, para importar uma de cada vez.
+     *
+     * Só que `townMap` e `noMapa` NÃO saem do Tiled: são escritos à mão, e dizem onde cada área
+     * cai no Town Map oficial. Uma substituição cega os apagava — dezesseis posições conferidas a
+     * dedo perdidas numa reimportação de rotina. O schema recusaria o arquivo depois, o que ao
+     * menos faz a perda ser barulhenta, mas o trabalho já teria ido embora.
+     */
+    const anteriores = (await readJson(opts.regions).catch(() => [])) as RegionDoArquivo[]
+    const antiga = anteriores.find((r) => r.id === region.id)
+    const porArea = new Map((antiga?.areas ?? []).map((a) => [a.id, a.noMapa]))
+    const mesclada = {
+      ...region,
+      ...(antiga?.townMap !== undefined && { townMap: antiga.townMap }),
+      areas: region.areas.map((a) => {
+        const noMapa = porArea.get(a.id)
+        return noMapa === undefined ? a : { ...a, noMapa }
+      }),
+    }
+    const semPosicao = mesclada.areas.filter((a) => !('noMapa' in a)).map((a) => a.id)
+    const lista = [...anteriores.filter((r) => r.id !== region.id), mesclada].sort((a, b) =>
       (a as { order?: number }).order === undefined ? 0 : ((a as { order: number }).order - (b as { order: number }).order))
     await writeFile(opts.regions, `${JSON.stringify(lista, null, 2)}\n`)
     out(`região ${region.id} com ${hunts.length} área(s): ${hunts.map((h) => `${h.id} (${h.width}x${h.height})`).join(', ')}`)
+    if (antiga === undefined) {
+      out(`região nova: falta escrever "townMap" e o "noMapa" de cada área em ${opts.regions}`)
+    } else if (semPosicao.length > 0) {
+      out(`sem posição no Town Map: ${semPosicao.join(', ')} — escreva "noMapa" para elas em ${opts.regions}`)
+    }
   })
 
 program

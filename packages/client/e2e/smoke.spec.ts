@@ -14,7 +14,9 @@ test('registrar, inicial, Campo Inicial, derrota, mochila, parar e comprar na lo
   await page.locator('.starter-card[data-species=charmander]').getByRole('button', { name: 'Escolher' }).click()
 
   await expect(page.getByRole('heading', { name: 'Onde caçar' })).toBeVisible()
-  await page.locator('.area-row:not(.area-row-locked)').getByRole('button', { name: 'Caçar' }).first().click()
+  // Escolher é: apontar a área no mapa, e então apertar o botão que aparece no analisador.
+  await page.locator('.mapa-marcador:not(.mapa-marcador-travado)').first().click()
+  await page.locator('.mapa-analise').getByRole('button', { name: 'Caçar aqui' }).click()
 
   await expect(page.locator('#scene canvas')).toBeVisible({ timeout: 30_000 })
   await expect(page.locator('.log-line', { hasText: 'derrotado' }).first()).toBeVisible({ timeout: 120_000 })

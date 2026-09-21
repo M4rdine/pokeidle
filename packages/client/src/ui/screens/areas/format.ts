@@ -23,6 +23,3 @@ export const matchupClass = (multiplicador: number): string =>
 
 export const percent = (fracao: number): string => `${Math.round(fracao * 100)}%`
 
-/** Tempo por derrota em segundos, ou o travessão de "o time não consegue". */
-export const seconds = (valor: number | null): string =>
-  valor === null ? '—' : `${valor.toFixed(1).replace('.', ',')}s`

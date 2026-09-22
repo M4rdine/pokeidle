@@ -12,6 +12,7 @@
     "db:migrate": "tsx src/db/migrate-cli.ts",
     "smoke:ws": "tsx scripts/ws-smoke.ts",
     "record:route1": "tsx scripts/record-route1.ts",
+    "carga": "tsx scripts/carga.ts",
     "check": "pnpm typecheck && pnpm test && pnpm audit --prod"
   },
   "dependencies": {

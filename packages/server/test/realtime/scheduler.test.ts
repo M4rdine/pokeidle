@@ -74,16 +74,35 @@ describe('attach / tick / persist', () => {
     const runner = scheduler.get(trainerId)!
     expect(runner.state.tick).toBe(SNAPSHOT_EVERY_TICKS)
     const active = (await loadActive(db, trainerId))!
-    expect(active.state.tick).toBe(SNAPSHOT_EVERY_TICKS)
-    expect(active.lastSimulatedAt).toEqual(clock.now)
-    expect(await db.select().from(huntLog)).toEqual([]) // ainda sem sync
+    /*
+     * O tick gravado NÃO é o do período cheio: a fase de gravação é por treinador, de propósito —
+     * sem ela, todas as caçadas que começam juntas gravam no mesmo tick para sempre. O que o
+     * contrato garante é que o snapshot nunca fica mais de um período atrás do runner.
+     */
+    expect(active.state.tick).toBeGreaterThan(0)
+    expect(runner.state.tick - active.state.tick).toBeLessThan(SNAPSHOT_EVERY_TICKS)
+    expect(active.lastSimulatedAt.getTime()).toBeLessThanOrEqual(clock.now.getTime())
     expect(msgs(s).filter((m) => m.t === 'hunt.tick').length).toBeGreaterThan(0)
-    for (let i = SNAPSHOT_EVERY_TICKS; i < SYNC_EVERY_TICKS; i++) { clock.now = new Date(clock.now.getTime() + TICK_MS); scheduler.tick() }
+    /*
+     * Anda até a sincronização ACONTECER, em vez de supor que ela cai no tick 300 exato. A fase de
+     * gravação é por treinador, de propósito — sem ela, todas as caçadas que começam juntas
+     * sincronizam no mesmo tick, para sempre. O contrato que vale é o de sempre: dentro de um
+     * período de sync, o banco alcança o runner.
+     */
+    let tickDoSync: number | null = null
+    for (let i = 0; i < SYNC_EVERY_TICKS && tickDoSync === null; i++) {
+      clock.now = new Date(clock.now.getTime() + TICK_MS)
+      scheduler.tick()
+      const atual = scheduler.get(trainerId)!
+      if (atual.lastSyncTick > 0) tickDoSync = atual.lastSyncTick
+    }
+    expect(tickDoSync).not.toBeNull()
+    const xpNoSync = scheduler.get(trainerId)!.state.trainer.xp
     await scheduler.whenIdle(trainerId)
     const logRows = await db.select().from(huntLog).where(eq(huntLog.trainerId, trainerId))
     expect(logRows.length).toBeGreaterThan(0)
     const [tr] = await db.select().from(trainers).where(eq(trainers.id, trainerId))
-    expect(tr!.xp).toBe(scheduler.get(trainerId)!.state.trainer.xp)
+    expect(tr!.xp).toBe(xpNoSync)
     expect(scheduler.get(trainerId)!.pendingLog).toEqual([])
   })
   it('a simulação é igual a simulate() com a mesma seed e rngState', async () => {
@@ -193,6 +212,42 @@ describe('attach single-flight e finish durante catch-up (C1)', () => {
   })
 })
 
+describe('o que cada tipo de gravação escreve', () => {
+  /*
+   * Este caso morava no teste de integração acima, afirmado por COINCIDÊNCIA DE TEMPO: depois de
+   * 50 ticks ainda não havia sync, então `hunt_log` estar vazio provava que o save não o escreve.
+   * A prova dependia de todo runner gravar no mesmo compasso — e parou de valer no dia em que a
+   * fase de gravação passou a ser por treinador, para as caçadas não gravarem todas juntas.
+   *
+   * Aqui a mesma afirmação é direta, e não depende de compasso nenhum.
+   */
+  const snapDe = async (): Promise<PersistSnapshot> => {
+    await startHunt(db, registry, trainerId, 'campo-inicial', T0, { seed: 5 })
+    const active = (await loadActive(db, trainerId))!
+    return {
+      trainerId, huntId: active.huntId, state: active.state, rngState: active.rngState,
+      pendingLog: [{ huntId: active.huntId, speciesName: 'zubat', level: 3, xpTrainer: 7, gold: 9, drops: [], captured: false }],
+      lastSimulatedAt: T0,
+    }
+  }
+
+  it('o save grava o estado e NÃO toca no log nem no treinador', async () => {
+    const snap = await snapDe()
+    await flushRunner(db, { ...snap, state: { ...snap.state, tick: 42 } }, T0, { sync: false })
+    expect((await loadActive(db, trainerId))!.state.tick).toBe(42)
+    expect(await db.select().from(huntLog)).toEqual([])
+    expect((await db.select().from(trainers).where(eq(trainers.id, trainerId)))[0]!.xp).toBe(0)
+  })
+
+  it('o sync grava o estado, o log e o treinador', async () => {
+    const snap = await snapDe()
+    await flushRunner(db, { ...snap, state: { ...snap.state, tick: 42, trainer: { ...snap.state.trainer, xp: 77 } } }, T0, { sync: true })
+    expect((await loadActive(db, trainerId))!.state.tick).toBe(42)
+    expect((await db.select().from(huntLog).where(eq(huntLog.trainerId, trainerId))).length).toBe(1)
+    expect((await db.select().from(trainers).where(eq(trainers.id, trainerId)))[0]!.xp).toBe(77)
+  })
+})
+
 describe('insertLog em lotes (C2)', () => {
   it('flushRunner com 9 000 entradas de log (72 000 parâmetros) insere as 9 000 linhas sem estourar o limite do Postgres', async () => {
     await startHunt(db, registry, trainerId, 'campo-inicial', T0, { seed: 12 })
@@ -296,7 +351,11 @@ describe('intents e finish', () => {
     const trainer = await s2.finish(trainerId, 'intent')
     expect(trainer).not.toBeNull()
     expect(await db.select().from(huntSessions)).toEqual([]) // o save (UPDATE) não ressuscita a linha porque veio antes do DELETE
-    expect(kinds).toEqual(['save', 'finish'])
+    // O que este caso afirma é a ORDEM, não a contagem: com a fase de gravação por treinador, 70
+    // ticks podem render um save ou dois, mas o `finish` é sempre o último da fila.
+    expect(kinds).toContain('save')
+    expect(kinds[kinds.length - 1]).toBe('finish')
+    expect(kinds.slice(0, -1).every((k) => k === 'save')).toBe(true)
   })
 })
 

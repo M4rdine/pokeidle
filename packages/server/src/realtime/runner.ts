@@ -35,11 +35,41 @@ export interface PersistSnapshot {
 }
 export interface TickOutcome { readonly runner: Runner; readonly events: readonly Event[]; readonly stopped: StoppedEvent | null }
 
+/**
+ * A FASE de gravação deste treinador dentro do período, em ticks.
+ *
+ * `needsSave` compara `tick - lastSaveTick`. Com todo runner nascendo em `lastSaveTick =
+ * state.tick`, as caçadas que começam no mesmo instante ficam alinhadas PARA SEMPRE: gravam todas
+ * no mesmo tick, tick após tick, contra um pool de dez conexões. Não é hipótese — a sonda de carga
+ * mediu com 52 caçadas: 171 gravações a 2.322 ms cada, 100% acima de 200 ms, e o servidor a 57,8%
+ * da velocidade do relógio. O motor não era o gargalo; a 17 caçadas ele gasta 0,14 ms por caçada.
+ *
+ * FNV-1a sobre o id do treinador, e não `Math.random()`: a fase precisa ser ESTÁVEL. Sorteada a
+ * cada anexo, um jogador que reconecta muda de ritmo toda vez, e duas caçadas que se separaram
+ * podem voltar a coincidir no próximo boot — que é justamente quando todas reanexam juntas.
+ *
+ * O resultado fica em `[0, periodo)`, nunca no período cheio: fase igual ao período gravaria no
+ * tick 0, antes de o runner ter simulado qualquer coisa, escrevendo de volta o estado que acabou
+ * de ser lido do banco.
+ */
+function faseDe(trainerId: string, periodo: number): number {
+  let h = 2166136261
+  for (let i = 0; i < trainerId.length; i++) {
+    h ^= trainerId.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return (h >>> 0) % periodo
+}
+
 export function createRunner(trainerId: string, active: ActiveHunt): Runner {
   return {
     trainerId, huntId: active.huntId, sessionId: active.sessionId, seed: active.seed,
     rng: createRng(active.seed, active.rngState), state: active.state, pendingLog: [],
-    lastSaveTick: active.state.tick, lastSyncTick: active.state.tick, catchingUp: false, catchupRemaining: null,
+    // Recuar o relógio de gravação encurta só o PRIMEIRO intervalo; do primeiro corte em diante
+    // `markSaved` fixa o marco no tick em que gravou, e o período volta a ser o de sempre.
+    lastSaveTick: active.state.tick - faseDe(trainerId, SNAPSHOT_EVERY_TICKS),
+    lastSyncTick: active.state.tick - faseDe(trainerId, SYNC_EVERY_TICKS),
+    catchingUp: false, catchupRemaining: null,
     lastSimulatedAt: active.lastSimulatedAt, startedAt: active.startedAt, persistFailures: 0,
   }
 }

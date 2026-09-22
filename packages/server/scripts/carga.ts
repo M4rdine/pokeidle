@@ -92,10 +92,25 @@ const somaSeries = (m: Map<string, number>, prefixo: string): number => {
  * menos. O que passou do limite é o total menos esse balde — e sempre como DIFERENÇA entre as duas
  * leituras, senão o número carrega o histórico do processo desde o boot e dilui o teste.
  */
+/**
+ * O balde também carrega os rótulos da métrica: `{kind="save",le="0.25"}`, e não `{le="0.25"}`.
+ * Procurar a chave exata devolvia zero em silêncio, e zero dentro do balde vira "100% acima" —
+ * a sonda chegou a relatar 100% das gravações acima de 250 ms com média de 93,6 ms. Um número
+ * errado no relatório é pior que número nenhum: este aqui acusaria um problema inexistente
+ * justamente depois de o problema real ter sido corrigido.
+ */
+function somaBaldes(m: Map<string, number>, metrica: string, le: string): number {
+  let total = 0
+  for (const [chave, v] of m) {
+    if (chave.startsWith(`${metrica}_bucket{`) && chave.includes(`le="${le}"`)) total += v
+  }
+  return total
+}
+
 function fracaoAcima(antes: Map<string, number>, depois: Map<string, number>, metrica: string, le: string): number {
   const total = somaSeries(depois, `${metrica}_count`) - somaSeries(antes, `${metrica}_count`)
   if (total <= 0) return 0
-  const dentro = valor(depois, `${metrica}_bucket{le="${le}"}`) - valor(antes, `${metrica}_bucket{le="${le}"}`)
+  const dentro = somaBaldes(depois, metrica, le) - somaBaldes(antes, metrica, le)
   return (total - dentro) / total
 }
 
@@ -209,7 +224,9 @@ async function main(): Promise<void> {
   linha('atraso do tick (média)', `${media(antes, depois, 'pokeidle_tick_lag_seconds').toFixed(1)} ms`)
   linha('atraso acima de 200 ms', pct(fracaoAcima(antes, depois, 'pokeidle_tick_lag_seconds', '0.2')))
   linha('gravações', `${observacoes(antes, depois, 'pokeidle_persist_duration_seconds')} em ${media(antes, depois, 'pokeidle_persist_duration_seconds').toFixed(1)} ms cada`)
-  linha('gravações acima de 200 ms', pct(fracaoAcima(antes, depois, 'pokeidle_persist_duration_seconds', '0.25')))
+  // 250 ms e não 200: os baldes de I/O do servidor são outros, e rotular pelo balde errado seria
+  // relatar um limite que a métrica não tem.
+  linha('gravações acima de 250 ms', pct(fracaoAcima(antes, depois, 'pokeidle_persist_duration_seconds', '0.25')))
   linha('memória do processo', `${(valor(depois, 'process_resident_memory_bytes') / 1024 / 1024).toFixed(0)} MB`)
   linha('mensagens recebidas aqui', `${recebidas} (${(recebidas / quantas / decorrido).toFixed(1)}/s por socket)`)
   linha('erros de socket', erros.length === 0 ? 'nenhum' : `${erros.length} (${erros[0]!})`)

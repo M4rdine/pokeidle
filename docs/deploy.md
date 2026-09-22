@@ -168,17 +168,32 @@ caçada gasta uma no `POST /hunts/:id/start`.
 
 ### O que a primeira medição mostrou (22/09/2026, máquina de desenvolvimento)
 
-| caçadas | tempo por tick | ritmo do relógio | gravações |
-|---|---|---|---|
-| 17 | 2,4 ms | 100,0 % | — |
-| 52 | 204 ms | 57,8 % | 171 a 2.322 ms cada, 100 % acima de 200 ms |
+Com 52 caçadas simultâneas, e a fase de gravação igual para todas:
 
-**O motor não é o gargalo.** A 17 caçadas ele gasta 0,14 ms por caçada por tick. Quem derruba o
-ritmo é a persistência, e o problema não é o tamanho de cada gravação: é que elas chegam todas
-juntas. `needsSave` compara `tick - lastSaveTick`, então caçadas que começam no mesmo instante
-ficam alinhadas para sempre e as 52 gravam no mesmo tick, contra um pool de 10 conexões.
+| | antes | depois da fase por treinador |
+|---|---|---|
+| ritmo do relógio | 57,8 % | **97,9 %** |
+| tempo por tick | 204,4 ms | **23,4 ms** |
+| ticks acima de 200 ms | 24,6 % | **1,4 %** |
+| atraso do tick | 143,2 ms | **4,2 ms** |
+| gravações (média) | 2.322 ms | **381 ms** |
+| mensagens por socket | 2,3/s | **3,8/s** (o tick entrega 5/s) |
+
+**O motor não é o gargalo.** A 17 caçadas ele gasta 0,14 ms por caçada por tick. Quem derrubava o
+ritmo era a persistência, e não pelo tamanho de cada gravação: elas chegavam todas juntas.
+`needsSave` compara `tick - lastSaveTick`, então caçadas que começam no mesmo instante ficavam
+alinhadas para sempre e as 52 gravavam no mesmo tick, contra um pool de 10 conexões.
+
+A correção é uma linha em `createRunner`: a fase de gravação passou a ser uma função estável do id
+do treinador (FNV-1a), então o primeiro corte de cada caçada cai num ponto diferente do período e
+as seguintes herdam o deslocamento. O período não mudou.
 
 Os números absolutos são desta máquina, com o Postgres num disco virtualizado pelo Colima — o
 mesmo que já fez um `TRUNCATE` levar 30 s nos testes. O VPS não tem esses números. O que vale em
 qualquer máquina é a FORMA: rajada alinhada, não volume.
+
+> Uma ressalva de honestidade sobre a primeira rodada: ela também relatou "100 % das gravações
+> acima de 200 ms". Esse número era bug da sonda — o balde do histograma carrega os rótulos da
+> métrica (`{kind="save",le="0.25"}`), a leitura procurava a chave exata sem rótulo e achava zero,
+> e zero dentro do balde vira "100 % acima". A média de 2.322 ms era real; a porcentagem, não.
 

@@ -57,6 +57,13 @@ time caído no primeiro minuto. Com as regras deste documento, zero quedas em 3 
 - Poções em três níveis, por percentual do HP máximo: Poção 20 % (200 ouro), Super Poção 50 %
   (800), Hiper Poção 100 % (3 000). Venda pela metade. (Preços dobrados em 2026-09-20; ver §6.)
 - Medido: retorno em 50 % + poção de 50 % dá ~180 derrotas em 10 min sem quedas.
+- **Troca proativa** (2026-09-22), o degrau entre os dois: abaixo do limiar da poção, se a poção
+  que o motor usaria NÃO repõe o que o selvagem tira por golpe, ele passa a vez ao companheiro que
+  aguenta 1,5× mais golpes daquele selvagem — desde que esse companheiro esteja acima do limiar de
+  retorno e consiga ferir o alvo. A comparação é sempre no HP cheio: é matchup, não machucado.
+  Medido com bolsa de Poção comum e time subnivelado, 10 min × 3 seeds: quedas de 4,0 para 1,0 no
+  conjunto das áreas afetadas, XP/h líquido +0,75 %. Com Hiper Poção na bolsa a regra não dispara,
+  e é o comportamento certo: quando a cura acompanha o golpe, curar é mais barato que trocar.
 
 ### 3.3 Captura e time
 - Captura automática configurável (tier de bola, HP máximo do selvagem, duplicatas), uma

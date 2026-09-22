@@ -4,6 +4,7 @@ import { applyPotion, choosePotion } from './items.js'
 import { stepPlayer } from './player.js'
 import { applyDefeat } from './progression.js'
 import { processRespawns } from './spawn.js'
+import { resolveTroca } from './troca.js'
 import type { EngineDeps, Event, HuntState, StepResult } from './types.js'
 
 const chain = (a: StepResult, f: (s: HuntState) => StepResult): StepResult => { const b = f(a.state); return { state: b.state, events: [...a.events, ...b.events] } }
@@ -61,9 +62,17 @@ const clearSkippedOnGrowth = (result: StepResult): StepResult => {
   return { ...result, state: { ...result.state, player: { ...result.state.player, skippedWildIds: [] } } }
 }
 
+/*
+ * A escada de decisão, e a ORDEM importa em cada degrau.
+ *
+ * A troca entra DEPOIS do desmaio — quem já caiu não escolhe, o substituto é o primeiro vivo — e
+ * ANTES da poção, que é o ponto do desenho: no confronto perdido, curar é jogar poção fora. Era o
+ * que o motor fazia na `usina-velha`, onde 20% de cura respondia a 83% de dano por golpe.
+ */
 export function resolveConsequences(state: HuntState, deps: EngineDeps): StepResult {
   const defeats = clearSkippedOnGrowth(resolveDefeats(state, deps))
-  return chain(chain(defeats, resolveFaint), (s) => resolveLowHp(s, deps))
+  const trocado = chain(chain(defeats, resolveFaint), (s) => resolveTroca(s, deps))
+  return chain(trocado, (s) => resolveLowHp(s, deps))
 }
 
 export function step(state: HuntState, deps: EngineDeps): StepResult {

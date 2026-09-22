@@ -353,6 +353,45 @@
 .scene-error { color: var(--perigo); padding: var(--space-3); }
 .catchup, .stopped { display: flex; flex-direction: column; gap: var(--space-2); align-items: center; padding: var(--space-4); }
 
+/* ── Painel de volta ─────────────────────────────────────────────────────────
+ * A tela de pagamento do idle. Ela é um PAINEL de verdade, com a face e o relevo do resto do
+ * sistema, e não texto solto sobre o véu: o que ela diz é o motivo de o jogador ter deixado
+ * rodando, e isso merece moldura.
+ */
+.retorno {
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-3);
+  padding: var(--space-4); max-width: 420px;
+  background: var(--face-painel); border-radius: var(--raio-gg); box-shadow: var(--relevo-2);
+  /* O véu cobre só a área da cena, que em telefone é 55vh. Sem teto de altura, um painel com
+   * muita linha (subiu de nível, evoluiu, quedas, voltas, drops) passava do véu e era cortado
+   * sem nenhum sinal de que havia mais — e o que some no corte é justamente o que se veio ler. */
+  max-height: 100%; overflow-y: auto;
+}
+.retorno h2 { font-family: var(--fonte-hud); font-size: var(--t-l); letter-spacing: 0.02em; }
+.retorno-fora { color: var(--texto-fraco); font-size: var(--t-s); }
+.retorno-fora strong { color: var(--texto); }
+/* O par que se veio ver, lado a lado e no maior corpo da tela. */
+.retorno-ganho { display: flex; gap: var(--space-3); width: 100%; }
+.ganho {
+  flex: 1; display: flex; flex-direction: column; gap: var(--space-1);
+  padding: var(--space-2) var(--space-3); border-radius: var(--raio);
+  background: rgb(0 0 0 / 22%); box-shadow: var(--relevo-cava);
+}
+.ganho > span {
+  font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--texto-fraco);
+}
+/* Face de LEITURA, não a de HUD: estes são os dois números mais importantes da tela, e a face
+ * bitmap confunde 5 com 8 — foi o que já fez a coluna de poder dos golpes mentir. */
+.ganho > strong { font-family: var(--fonte-texto); font-size: var(--t-xl); font-weight: 700; font-variant-numeric: tabular-nums; }
+/* Ouro é recompensa, e recompensa acende — a mesma regra da coluna de perfil. */
+.ganho-ouro > strong { color: var(--ouro); }
+/* As leituras secundárias quebram sozinhas: quantas existem depende do que aconteceu. */
+.retorno-leituras { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2) var(--space-3); }
+.retorno-leituras .leitura { align-items: center; text-align: center; }
+.retorno-drops { font-size: var(--t-s); color: var(--texto-fraco); }
+.retorno-drops span:not(.muted) { color: var(--texto); }
+
 /* ── Janela estreita ────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .game-grid {
@@ -377,6 +416,8 @@
   .menu-grade { justify-content: center; }
   .menu-item { width: 72px; }
   .menu-item .icone { width: 40px; height: 40px; }
+  /* Em telefone o painel de volta encosta nas bordas do véu e aperta o respiro interno. */
+  .retorno { padding: var(--space-3); gap: var(--space-2); }
   /* A lista de golpes deixa de rolar por dentro: numa página que rola, rolagem aninhada esconde
    * conteúdo sem nenhum sinal de que ele existe. */
   .moves-caixa { overflow: visible; }

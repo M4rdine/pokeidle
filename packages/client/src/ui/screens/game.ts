@@ -1,6 +1,6 @@
 import { HuntMapSchema } from '@pokeidle/shared'
 import type { AppContext } from '../../app-context.js'
-import { createScene, type Scene } from '../../scene/app.js'
+import type { Scene } from '../../scene/app.js'
 import { mountActivePokemon } from '../hud/active-pokemon.js'
 import { mountLog } from '../hud/log.js'
 import { mountSituacao } from '../hud/situacao.js'
@@ -53,8 +53,19 @@ export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
 
   const huntId = ctx.hunt.get().session?.huntId ?? ctx.session.get().me?.trainer.activeHuntId
   if (huntId) {
-    void ctx.http.get(`/hunts/${huntId}/map`, HuntMapSchema)
-      .then(async (map) => {
+    /*
+     * A CENA CHEGA POR IMPORT DINÂMICO, e este é o único lugar do cliente que carrega o PixiJS.
+     *
+     * Estaticamente, ela entrava no pedaço inicial: quem abria a tela de entrar baixava o motor
+     * de renderização inteiro — 436 KB — para ver um formulário de e-mail e senha. Entrar,
+     * escolher o inicial e escolher o destino são três telas de DOM puro, e nenhuma delas desenha
+     * um pixel de mapa.
+     *
+     * O import sai junto com o pedido do mapa, e não depois dele: em série somaria uma ida e
+     * volta à espera de quem já está no jogo, que é justamente quem não deve pagar por isto.
+     */
+    void Promise.all([ctx.http.get(`/hunts/${huntId}/map`, HuntMapSchema), import('../../scene/app.js')])
+      .then(async ([map, { createScene }]) => {
         if (disposed) return
         scene = await createScene(center, { atlas: ctx.atlas, map, registry: ctx.registry, now: ctx.now })
         if (disposed) { scene.destroy(); scene = null; return }

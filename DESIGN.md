@@ -683,6 +683,62 @@ drops saíam cortados na borda**, e ninguém lê o que não vê.
 
 Sobrou o que decide: quanto rende, quanto paga, e a chance de capturar.
 
+## A curva de progressão
+
+A régua sai de `pnpm balanco`, que roda o motor nas dezesseis áreas e nomeia o que está errado.
+Ela existe porque **balanceamento não se estima — se estima errado**, e a primeira leitura provou:
+a última área do jogo rendia 262 mil XP/h contra 1,9 milhão de uma vinte níveis antes, e derrubava
+cinco vezes em dez minutos um time do próprio nível dela.
+
+### A descoberta que reformulou o problema
+
+Medir o fim do jogo com **Poção comum** — a bolsa de quem acabou de começar — acusava quatro áreas
+como quebradas. Com **Hiper Poção**, que a loja libera no nível 30 e que portanto qualquer jogador
+naquelas áreas já compra, três delas estavam sãs: `mata-fechada` passava de 922 mil para 4,85
+milhões. **Cinco vezes de diferença só no equipamento da medição.**
+
+A poção cura por PORCENTAGEM, então não é o valor que escala mal — é o número de turnos gastos
+curando. Com 20% por poção contra um selvagem que tira 35% por golpe, a cura não acompanha e a
+caçada vira ida e volta ao Centro. Por isso a régua equipa o time com o que a LOJA oferece no nível
+de entrada de cada área, e não com o que um jogador novo carrega.
+
+### O que estava mesmo quebrado
+
+Duas áreas, e a causa é uma matchup, não um número de planilha:
+
+| área | quem | o que fazia |
+|---|---|---|
+| `usina-velha` | Raichu | Thunderbolt tirava **83%** do HP do Charizard (elétrico é 2× em voador) e 70% do Blastoise |
+| `cume-indigo` | Snorlax | Hyper Beam tirava 43–51% de **todos** — normal não tem quem resista — e ele levava 4 turnos para cair |
+
+**O motor só troca de Pokémon quando o ativo CAI.** Então uma área com contra-tipo duro não tem
+resposta: o time morre, volta ao Centro, e passa a caçada comutando.
+
+Trocado o elenco das duas — Raichu → Muk na usina, Snorlax → Arcanine e Raichu → Wigglytuff no
+cume —, **nenhuma das dezesseis derruba mais um time do nível dela**, e a última área passou de
+262 mil para **2,54 milhões de XP/h**: de pior do jogo a melhor do jogo.
+
+### O que NÃO foi alcançado, e por quê
+
+A curva não é estritamente monotônica. Quatro áreas ainda rendem entre 77% e 94% da anterior.
+
+Entre um elenco manso e um duro há **2,4× de diferença de vazão**, e isso engole qualquer degrau
+que a densidade consiga dar. Tentei fechar por densidade e o tiro saiu pela culatra duas vezes:
+
+- Um afinador automático perseguindo a meta deixou áreas com **quatro selvagens** e outra com 66 —
+  otimizou a métrica e destruiu o que ela media.
+- Adensar de verdade afastou o **analisador** do motor: ele estima pelo teto de renascimento e não
+  modela a volta ao Centro, então quanto mais denso, mais ele promete o que a área não entrega. E
+  o número da tela vale mais que um degrau de curva — o jogador escolhe a área por ele.
+
+O teste `curva-de-progressao` trava o que é defensável: nenhuma área derruba, a última rende mais
+que qualquer área de Kanto, e nenhuma rende menos de 70% da anterior. O caminho para a monotonia
+estrita é o motor **trocar de Pokémon antes de cair** — um terceiro limiar ao lado de "usar poção"
+e "voltar ao Centro" —, que resolve a classe inteira em vez de dois casos.
+
+O analisador passou a contar o tempo de cura no tempo por derrota. Fica de fora a volta ao Centro,
+e isso está declarado no código: a estimativa é um teto, não uma promessa.
+
 ## Créditos de arte
 
 - Ícones de assunto: acervo de sprites da [PokeAPI](https://github.com/PokeAPI/sprites). O

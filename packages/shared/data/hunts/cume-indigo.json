@@ -3490,17 +3490,17 @@
       "respawnSeconds": 20
     },
     {
-      "speciesName": "raichu",
+      "speciesName": "wigglytuff",
       "minLevel": 66,
       "maxLevel": 72,
       "x": 5,
       "y": 22,
       "radius": 4,
-      "count": 2,
+      "count": 4,
       "respawnSeconds": 20
     },
     {
-      "speciesName": "snorlax",
+      "speciesName": "arcanine",
       "minLevel": 68,
       "maxLevel": 72,
       "x": 18,

@@ -28180,7 +28180,7 @@
       {
        "name": "species",
        "type": "string",
-       "value": "raichu"
+       "value": "muk"
       },
       {
        "name": "minLevel",
@@ -28710,7 +28710,7 @@
       {
        "name": "species",
        "type": "string",
-       "value": "raichu"
+       "value": "wigglytuff"
       },
       {
        "name": "minLevel",
@@ -28725,7 +28725,7 @@
       {
        "name": "count",
        "type": "int",
-       "value": 2
+       "value": 4
       },
       {
        "name": "respawnSeconds",
@@ -28748,7 +28748,7 @@
       {
        "name": "species",
        "type": "string",
-       "value": "snorlax"
+       "value": "arcanine"
       },
       {
        "name": "minLevel",

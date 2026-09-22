@@ -169,14 +169,31 @@ program
     const anteriores = (await readJson(opts.regions).catch(() => [])) as RegionDoArquivo[]
     const antiga = anteriores.find((r) => r.id === region.id)
     const porArea = new Map((antiga?.areas ?? []).map((a) => [a.id, a.noMapa]))
-    const mesclada = {
+    /*
+     * A mesclagem devolve as chaves NA ORDEM em que o arquivo já as tinha.
+     *
+     * Sem isso `townMap` e `noMapa` caem no fim do objeto a cada importação, e uma troca de
+     * espécie sai como um diff de duzentas linhas de reordenação. Mudança que ninguém consegue
+     * revisar é mudança que ninguém revisa — e este arquivo é conteúdo de jogo, onde um número
+     * trocado por engano não aparece em lugar nenhum a não ser jogando.
+     */
+    const naOrdemDe = <T extends Record<string, unknown>>(modelo: T | undefined, objeto: T): T => {
+      if (modelo === undefined) return objeto
+      const ordenado: Record<string, unknown> = {}
+      for (const chave of Object.keys(modelo)) if (chave in objeto) ordenado[chave] = objeto[chave]
+      for (const chave of Object.keys(objeto)) if (!(chave in ordenado)) ordenado[chave] = objeto[chave]
+      return ordenado as T
+    }
+    const antigasPorId = new Map((antiga?.areas ?? []).map((a) => [a.id, a]))
+    const mesclada = naOrdemDe(antiga as never, {
       ...region,
       ...(antiga?.townMap !== undefined && { townMap: antiga.townMap }),
       areas: region.areas.map((a) => {
         const noMapa = porArea.get(a.id)
-        return noMapa === undefined ? a : { ...a, noMapa }
+        const completa = noMapa === undefined ? a : { ...a, noMapa }
+        return naOrdemDe(antigasPorId.get(a.id) as never, completa as never)
       }),
-    }
+    } as never) as typeof region
     const semPosicao = mesclada.areas.filter((a) => !('noMapa' in a)).map((a) => a.id)
     const lista = [...anteriores.filter((r) => r.id !== region.id), mesclada].sort((a, b) =>
       (a as { order?: number }).order === undefined ? 0 : ((a as { order: number }).order - (b as { order: number }).order))

@@ -23,7 +23,7 @@
         },
         "noMapa": {
           "x": 22.7,
-          "y": 62.0,
+          "y": 62,
           "local": "Rota 1"
         },
         "species": [
@@ -205,7 +205,7 @@
           "y": 54
         },
         "noMapa": {
-          "x": 82.0,
+          "x": 82,
           "y": 48.3,
           "local": "Lavender"
         },
@@ -303,7 +303,7 @@
           "y": 18
         },
         "noMapa": {
-          "x": 81.0,
+          "x": 81,
           "y": 30.2,
           "local": "Túnel Rocha"
         },
@@ -332,7 +332,7 @@
           "y": 18
         },
         "noMapa": {
-          "x": 57.0,
+          "x": 57,
           "y": 81.6,
           "local": "Zona Safári"
         },
@@ -361,12 +361,12 @@
           "y": 18
         },
         "noMapa": {
-          "x": 82.0,
+          "x": 82,
           "y": 48.3,
           "local": "Usina, na Rota 10"
         },
         "species": [
-          "raichu",
+          "muk",
           "magmar"
         ],
         "minLevel": 48,
@@ -483,12 +483,12 @@
         },
         "species": [
           "nidoking",
-          "raichu",
-          "snorlax"
+          "wigglytuff",
+          "arcanine"
         ],
         "minLevel": 64,
         "maxLevel": 72,
-        "wildCount": 9,
+        "wildCount": 11,
         "respawnSeconds": 20,
         "minTrainerLevel": 62,
         "rarity": 8

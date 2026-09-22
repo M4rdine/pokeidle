@@ -28,6 +28,13 @@ const CAPTURE_HP_FRACTION = 0.3
  */
 const AVERAGE_ROLL = 0.925
 const DEFAULT_BALL_BONUS = 1
+/**
+ * Quanto uma poção devolve, como fração do máximo — a Poção comum, que é o piso do que o jogador
+ * carrega. Assumir a melhor faria o analisador prometer o melhor caso.
+ */
+const CURA_POR_POCAO = 0.2
+/** Uma poção custa o tique em que ela é usada: nele o time cura em vez de atacar. */
+const TICKS_POR_POCAO = 1
 
 export interface AreaSpecies {
   readonly species: readonly string[]
@@ -98,6 +105,30 @@ interface Golpe {
   readonly matchup: number
 }
 
+/**
+ * Quanto o SELVAGEM devolve por golpe, contra o membro mais frágil do time diante dele — e qual é
+ * o HP desse membro.
+ *
+ * Existe porque o analisador ignorava a cura, e por isso mentia justamente onde importa: numa
+ * área cujo elenco bate forte, o tempo da caçada é gasto bebendo poção, não atacando. Medido no
+ * motor, duas áreas rendiam 40% do que o analisador prometia — e o jogador escolhe a área por
+ * esse número.
+ */
+function troco(input: EstimateInput, alvo: Combatant, alvoSpecies: Species): { readonly dano: number; readonly hpMax: number } {
+  const { registry, team } = input
+  let pior = { dano: 0, hpMax: 1 }
+  for (const membro of team) {
+    const species = registry.species.get(membro.speciesName)
+    if (!species) continue
+    const nosso = combatente(species, membro.level)
+    const move = bestMove(availableMoves(alvoSpecies, alvo.level, registry.moves), alvo, nosso, registry.typeChart)
+    if (!move) continue
+    const dano = expectedDamage(alvo, nosso, move, registry.typeChart) * AVERAGE_ROLL
+    if (dano / nosso.stats.hp > pior.dano / pior.hpMax) pior = { dano, hpMax: nosso.stats.hp }
+  }
+  return pior
+}
+
 /** O melhor golpe que o time tem contra este alvo, com o tempo que ele custa. */
 function melhorGolpe(input: EstimateInput, alvo: Combatant, alvoSpecies: Species): Golpe | null {
   const { registry, team } = input
@@ -132,7 +163,21 @@ function estimarEspecie(input: EstimateInput, nome: string, level: number): Spec
   // O primeiro golpe sai no tick em que o jogador encosta no selvagem; só os seguintes esperam
   // o tempo de recarga. Contar N recargas para N golpes dobrava o tempo estimado.
   const golpes = golpe === null ? null : Math.ceil(hpMax / (golpe.damage * AVERAGE_ROLL))
-  const ticksDeLuta = golpe === null || golpes === null ? null : (golpes - 1) * golpe.ticks
+  /*
+   * O tempo de CURA entra no tempo por derrota. O selvagem revida a cada troca de golpes, e cada
+   * poção custa o tique em que é bebida. Sem este termo o analisador conta só o combate e promete
+   * um número que a área não entrega — e ele é justamente o número pelo qual o jogador escolhe.
+   *
+   * Fica de fora a volta ao Centro, que acontece quando a poção não dá conta. É simplificação
+   * declarada, e ela erra para MENOS tempo, ou seja, o analisador ainda promete um teto.
+   */
+  const revide = troco(input, alvo, species)
+  const pocoes = golpes === null || revide.dano === 0
+    ? 0
+    : (golpes * revide.dano) / (CURA_POR_POCAO * revide.hpMax)
+  const ticksDeLuta = golpe === null || golpes === null
+    ? null
+    : (golpes - 1) * golpe.ticks + pocoes * TICKS_POR_POCAO
 
   return {
     speciesName: nome,

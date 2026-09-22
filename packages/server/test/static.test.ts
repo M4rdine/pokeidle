@@ -23,6 +23,73 @@ describe('atlas público', () => {
   })
 })
 
+describe('revalidação dos assets', () => {
+  /*
+   * O atlas é o arquivo mais pesado que o jogo serve (240 KB só o `pokemon.json`) e o
+   * `max-age=3600` significa que, uma hora depois, TODO jogador que volta baixa tudo de novo —
+   * inclusive quando nada mudou, porque sem ETag o navegador não tem como perguntar.
+   *
+   * Com ETag a pergunta fica barata: 304 sem corpo. E o servidor não lê o arquivo do disco para
+   * responder, que é o que faz diferença quando o pedido vem de muita gente ao mesmo tempo.
+   */
+  it('o atlas responde com ETag, e o mesmo ETag de volta vira 304 sem corpo', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-atlas-'))
+    await writeFile(join(dir, 'tiles.json'), '{"frames":{}}')
+    const app = await freshApp(t, undefined, { ASSETS_DIR: dir })
+
+    const primeira = await api(app).get('/assets/atlas/tiles.json')
+    expect(primeira.statusCode).toBe(200)
+    const etag = primeira.headers['etag']
+    expect(etag).toMatch(/^"[a-f0-9]+"$/)
+
+    const segunda = await api(app).get('/assets/atlas/tiles.json', { 'if-none-match': etag as string })
+    expect(segunda.statusCode).toBe(304)
+    expect(segunda.body).toBe('')
+    expect(segunda.headers['etag']).toBe(etag)
+    await app.close()
+  })
+
+  it('o ETag muda quando o arquivo muda — senão o cache serviria conteúdo velho para sempre', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-atlas-'))
+    await writeFile(join(dir, 'tiles.json'), '{"frames":{}}')
+    const app = await freshApp(t, undefined, { ASSETS_DIR: dir })
+    const antes = (await api(app).get('/assets/atlas/tiles.json')).headers['etag']
+
+    await writeFile(join(dir, 'tiles.json'), '{"frames":{"grass":{}}}')
+    const depois = await api(app).get('/assets/atlas/tiles.json', { 'if-none-match': antes as string })
+
+    expect(depois.statusCode).toBe(200)
+    expect(depois.headers['etag']).not.toBe(antes)
+    expect(depois.body).toContain('grass')
+    await app.close()
+  })
+
+  it('o mapa da região também revalida: é PNG, e PNG não muda entre builds', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-maps-'))
+    await writeFile(join(dir, 'kanto.png'), Buffer.from([0x89, 0x50, 0x4e, 0x47]))
+    const app = await freshApp(t, undefined, { MAPS_DIR: dir })
+
+    const etag = (await api(app).get('/assets/maps/kanto.png')).headers['etag']
+    const r = await api(app).get('/assets/maps/kanto.png', { 'if-none-match': etag as string })
+
+    expect(r.statusCode).toBe(304)
+    await app.close()
+  })
+
+  it('ETag de outro arquivo não vale: cada um responde pelo seu conteúdo', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-atlas-'))
+    await writeFile(join(dir, 'tiles.json'), '{"a":1}')
+    await writeFile(join(dir, 'pokemon.json'), '{"b":2}')
+    const app = await freshApp(t, undefined, { ASSETS_DIR: dir })
+
+    const etagTiles = (await api(app).get('/assets/atlas/tiles.json')).headers['etag']
+    const r = await api(app).get('/assets/atlas/pokemon.json', { 'if-none-match': etagTiles as string })
+
+    expect(r.statusCode).toBe(200)
+    await app.close()
+  })
+})
+
 describe('saúde', () => {
   it('/health responde ok com versão e tempo de atividade, sem exigir sessão', async () => {
     const r = await api(t.app).get('/health')

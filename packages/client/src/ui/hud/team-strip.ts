@@ -1,7 +1,7 @@
 import { MAX_TEAM_SLOTS } from '../../config.js'
 import type { AppContext } from '../../app-context.js'
 import { displayName } from '../../state/log.js'
-import { el } from '../dom.js'
+import { comTipo, el } from '../dom.js'
 import { nivelDaVaga } from '../../state/progress.js'
 import { spriteThumb } from '../sprite-css.js'
 
@@ -28,7 +28,7 @@ export function mountTeamStrip(root: HTMLElement, ctx: AppContext): () => void {
         const tipos = (especie?.types ?? []).map((t) => el('span', { class: `chip type type-${t}` }, t))
         const hp = el('progress', { class: 'hp-bar', max: String(member.hpMax), value: String(member.hp) })
         hp.setAttribute('data-hp-state', member.hp / member.hpMax > 0.5 ? 'ok' : member.hp / member.hpMax > 0.2 ? 'ferido' : 'critico')
-        const slot = el('button', {
+        const slot = comTipo(el('button', {
           type: 'button',
           class: index === activeIndex ? 'slot slot-active' : 'slot',
           'data-pokemon': member.id,
@@ -36,7 +36,9 @@ export function mountTeamStrip(root: HTMLElement, ctx: AppContext): () => void {
         // O sprite mora num POÇO — uma caixa afundada, com o seu próprio contorno. É o que
         // transforma a linha numa peça de jogo em vez de um item de lista com uma figurinha ao
         // lado do texto: o retrato ganha moldura, e a moldura é do mesmo material das fendas.
-        }, el('span', { class: 'slot-poco' }, sprite), el('div', { class: 'slot-dados' },
+        // O poço leva a cor do TIPO. Seis slots de ardósia idêntica não diziam nada de relance; com
+        // a cor, a coluna do time vira seis criaturas diferentes antes de qualquer palavra ser lida.
+        }, comTipo(el('span', { class: 'slot-poco' }, sprite), especie?.types ?? []), el('div', { class: 'slot-dados' },
             el('div', { class: 'slot-linha' },
               el('span', { class: 'slot-nome' }, displayName(member.speciesName)),
               el('span', { class: 'chip chip-nivel' }, `nv ${member.level}`)),
@@ -45,6 +47,7 @@ export function mountTeamStrip(root: HTMLElement, ctx: AppContext): () => void {
             // linha de texto miúdo por slot — seis vezes na coluna — e ninguém liga 14/14 à barra
             // que está acima sem contar as linhas.
             el('div', { class: 'slot-medidor' }, hp, el('span', { class: 'slot-hp' }, `${member.hp}/${member.hpMax}`))))
+          , especie?.types ?? [])
         slot.addEventListener('click', () => ctx.sendIntent?.({ t: 'team.setActive', pokemonId: member.id }))
         return slot
       }

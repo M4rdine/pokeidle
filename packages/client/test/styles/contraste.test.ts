@@ -87,9 +87,17 @@ const PARES: readonly { readonly frente: string; readonly fundo: string; readonl
   { frente: 'borda-forte', fundo: 'fundo', minimo: TEXTO_GRANDE, onde: 'fio de controle sobre o fundo' },
   { frente: 'primaria', fundo: 'painel', minimo: TEXTO_GRANDE, onde: 'a ação primária contra a superfície' },
   { frente: 'selecao', fundo: 'painel', minimo: TEXTO_GRANDE, onde: 'a seleção contra a superfície' },
-  { frente: 'hp', fundo: 'cava', minimo: TEXTO_GRANDE, onde: 'barra de vida no trilho' },
-  { frente: 'xp-cheio', fundo: 'cava', minimo: TEXTO_GRANDE, onde: 'barra de experiência no trilho' },
-  { frente: 'ouro-cheio', fundo: 'cava', minimo: TEXTO_GRANDE, onde: 'preenchimento de moeda' },
+  /*
+   * O trilho VAZIO do medidor é `--trilho`, e não `--cava`: ele é de propósito mais claro que a
+   * fenda — trilho quase preto lê como buraco na peça, não como parte vazia de uma barra. Isso
+   * aperta o contraste do preenchimento, que é justamente o que precisa ser medido aqui: o
+   * comprimento da barra só informa se o cheio se separa do vazio.
+   */
+  { frente: 'hp', fundo: 'trilho', minimo: TEXTO_GRANDE, onde: 'barra de vida no trilho' },
+  { frente: 'xp-cheio', fundo: 'trilho', minimo: TEXTO_GRANDE, onde: 'barra de experiência no trilho' },
+  { frente: 'ouro-cheio', fundo: 'trilho', minimo: TEXTO_GRANDE, onde: 'preenchimento de moeda' },
+  { frente: 'perigo', fundo: 'trilho', minimo: TEXTO_GRANDE, onde: 'vida crítica no trilho' },
+  { frente: 'texto', fundo: 'trilho', minimo: TEXTO_NORMAL, onde: 'o número dentro do trilho do slot' },
 ]
 
 describe('a paleta passa no contraste que a WCAG exige', () => {
@@ -131,6 +139,42 @@ describe('a paleta passa no contraste que a WCAG exige', () => {
           ? []
           : [`${tipo}: o rótulo mede ${medido.toFixed(2)}:1 sobre o matiz, precisa de ${TEXTO_NORMAL}:1`]
       })
+    expect(reprovados).toEqual([])
+  })
+
+  it('o texto se lê sobre qualquer um dos dezoito matizes usados como tinta de fundo', async () => {
+    /*
+     * Desde que a cor do tipo entrou na ESTRUTURA — trilho do slot, trilho do golpe, poço do
+     * retrato —, o texto deixou de cair sempre sobre ardósia: ele cai sobre a mistura do matiz
+     * com a superfície. São dezoito misturas, e a conta muda com a porcentagem.
+     *
+     * Mede-se o PIOR CASO de cada mistura: a ponta do gradiente onde o matiz é mais forte. Os
+     * matizes claros — `electric`, `ice`, `ground`, `steel` — são os que apertam, e são
+     * exatamente os que o olho não desconfia, porque o resultado continua escuro.
+     *
+     * A tinta clara (`--texto-fraco`) NÃO passa nessas misturas: ela mede 3,1:1 no pior caso.
+     * Por isso a regra do sistema é que superfície tingida por tipo leva tinta cheia. Este teste
+     * guarda a tinta cheia; a regra da tinta fraca está escrita no DESIGN.md.
+     */
+    const cores = await paleta()
+    const texto = cores.get('texto')!
+    const misturar = (matiz: Rgb, fundo: Rgb, parte: number): Rgb =>
+      [0, 1, 2].map((i) => Math.round(parte * matiz[i]! + (1 - parte) * fundo[i]!)) as unknown as Rgb
+
+    // Onde a tinta de tipo é mais forte por trás de texto, e quanto dela entra ali.
+    const SUPERFICIES: readonly { readonly fundo: string; readonly parte: number; readonly onde: string }[] = [
+      { fundo: 'painel-pe', parte: 0.22, onde: 'trilho do slot do time' },
+      { fundo: 'painel', parte: 0.26, onde: 'trilho da linha de golpe' },
+    ]
+
+    const reprovados = [...cores.keys()]
+      .filter((n) => n.startsWith('type-'))
+      .flatMap((token) => SUPERFICIES.flatMap(({ fundo, parte, onde }) => {
+        const medido = razao(texto, misturar(cores.get(token)!, cores.get(fundo)!, parte))
+        return medido >= TEXTO_NORMAL
+          ? []
+          : [`${onde} tingido de ${token.slice(5)}: o texto mede ${medido.toFixed(2)}:1`]
+      }))
     expect(reprovados).toEqual([])
   })
 

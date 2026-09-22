@@ -2,7 +2,7 @@ import { xpForLevel } from '@pokeidle/shared'
 import type { AppContext } from '../../app-context.js'
 import { activePokemon } from '../../state/hunt-view.js'
 import { displayName } from '../../state/log.js'
-import { el, pct } from '../dom.js'
+import { comTipo, el, pct } from '../dom.js'
 import { spriteThumb } from '../sprite-css.js'
 
 /** Lado do sprite do ativo, em pixels. Dobro da miniatura das listas: aqui ele é o assunto. */
@@ -59,6 +59,7 @@ export function mountActivePokemon(root: HTMLElement, ctx: AppContext): () => vo
     if (active.speciesName !== species) {
       species = active.speciesName
       caixaSprite.replaceChildren(spriteThumb(ctx.atlas, species, LADO_SPRITE))
+      comTipo(caixaSprite, ctx.registry.species.get(species)?.types ?? [])
     }
     nome.textContent = displayName(active.speciesName)
     nivel.textContent = `nv ${active.level}`

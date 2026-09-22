@@ -150,3 +150,35 @@ identidade do servidor, sem o que um DNS sequestrado receberia a chave privada.
 A imagem é um `Dockerfile` comum, sem nada do Fly. Em Render, Railway ou qualquer runner de
 container, basta apontar para o repositório, definir as quatro variáveis acima e expor a porta
 3000. O `healthcheck` da imagem já responde em `/health`.
+
+## Capacidade
+
+`pnpm --filter @pokeidle/server carga` gera N caçadas simultâneas contra um servidor no ar e lê o
+que ele publica em `/metrics`. Ela existe porque a sobrecarga do agendador não aparece como erro em
+lugar nenhum: o processo roda todas as caçadas dentro da mesma janela de 200 ms, e quando a soma
+passa da janela o jogo inteiro anda mais devagar que o relógio, para todo mundo ao mesmo tempo. O
+sintoma que chega é "o jogo travou".
+
+```
+pnpm --filter @pokeidle/server carga --cacadas 50 --segundos 60
+```
+
+O teto prático por rodada é o limite global de 300 requisições por minuto por IP, porque cada
+caçada gasta uma no `POST /hunts/:id/start`.
+
+### O que a primeira medição mostrou (22/09/2026, máquina de desenvolvimento)
+
+| caçadas | tempo por tick | ritmo do relógio | gravações |
+|---|---|---|---|
+| 17 | 2,4 ms | 100,0 % | — |
+| 52 | 204 ms | 57,8 % | 171 a 2.322 ms cada, 100 % acima de 200 ms |
+
+**O motor não é o gargalo.** A 17 caçadas ele gasta 0,14 ms por caçada por tick. Quem derruba o
+ritmo é a persistência, e o problema não é o tamanho de cada gravação: é que elas chegam todas
+juntas. `needsSave` compara `tick - lastSaveTick`, então caçadas que começam no mesmo instante
+ficam alinhadas para sempre e as 52 gravam no mesmo tick, contra um pool de 10 conexões.
+
+Os números absolutos são desta máquina, com o Postgres num disco virtualizado pelo Colima — o
+mesmo que já fez um `TRUNCATE` levar 30 s nos testes. O VPS não tem esses números. O que vale em
+qualquer máquina é a FORMA: rajada alinhada, não volume.
+

@@ -129,26 +129,42 @@
  * golpe mais forte da lista tinha a barra mais curta. O rótulo estava certo e apontava para a
  * coluna errada — o tipo de erro que a tela não denuncia, porque continua bonita.
  */
-.moves-cabeca {
-  display: grid; grid-template-columns: 1fr auto 3ch 40px; gap: var(--space-2);
-}
-.moves-cabeca > :nth-child(2) { grid-column: 3; text-align: right; }
+.moves-cabeca { display: flex; justify-content: space-between; }
 .moves { list-style: none; margin: 0; padding: var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); overflow-y: auto; min-height: 0; }
 /* Cada golpe é uma FAIXA, não uma linha de texto solta: oito nomes flutuando sobre o painel não
  * têm onde a coluna começar, e a comparação entre eles depende da coluna. */
-/* O TRILHO da linha é do tipo do golpe. O cooldown segue em latão e verde: identidade e estado
- * são canais diferentes, e trocar um pelo outro apagaria o que diz se dá para usar agora. */
+/*
+ * DUAS LINHAS, e não quatro colunas.
+ *
+ * Em coluna única o nome ficava com 88 px numa caixa de 260, e "Flamethrower" precisa de 90: o
+ * golpe mais forte do Charizard aparecia como "Flamethrow…". Medido, não estimado — o selo de
+ * tipo, o poder e a barra comiam 108 px fixos mais 24 de vão.
+ *
+ * O nome sobe para a primeira linha inteira, e o tipo e a recarga descem. É como o próprio jogo
+ * lista golpe — nome em cima, tipo e PP embaixo — e assim o nome não trunca em largura nenhuma,
+ * que é o ponto: a coluna encolhe com a janela e a solução não pode depender dela ser larga.
+ *
+ * O TRILHO da linha é do tipo do golpe. O cooldown segue em latão e verde: identidade e estado
+ * são canais diferentes, e trocar um pelo outro apagaria o que diz se dá para usar agora.
+ */
 .move {
-  display: grid; grid-template-columns: 1fr auto 3ch 40px; gap: var(--space-2); align-items: center;
-  padding: 4px var(--space-2) 4px var(--space-3);
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px var(--space-2); align-items: center;
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
   border-radius: var(--raio-p);
   background: linear-gradient(90deg,
     color-mix(in srgb, var(--tipo, var(--borda-clara)) 26%, transparent),
     rgb(255 255 255 / 4%) 34%, rgb(255 255 255 / 1%));
   box-shadow: inset 3px 0 0 var(--tipo, var(--borda-clara)), inset 0 1px 0 rgb(255 255 255 / 6%);
 }
-.move-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.move-poder { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.move-name {
+  grid-area: 1 / 1; min-width: 0;
+  font-weight: 700;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.move-poder { grid-area: 1 / 2; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.move .type { grid-area: 2 / 1; justify-self: start; }
+.move-cd { grid-area: 2 / 2; width: 40px; }
 /* A recarga é uma fenda: fundo de penumbra, preenchimento de latão. Pronto fica VERDE e cheio — e o
  * "cheio" importa tanto quanto a cor, porque quem não distingue verde de âmbar lê o comprimento. */
 .move-cd {

@@ -99,9 +99,17 @@
   --trilho: #2a3350;
   --trilho-fundo: #222a44;
 
-  /* As faces prontas. Quem monta uma superfície usa a face, não as pontas. */
-  --face-painel: linear-gradient(180deg, var(--painel-topo), var(--painel-pe));
-  --face-alta: linear-gradient(180deg, var(--painel-alto-topo), var(--painel-alto-pe));
+  /*
+   * As faces prontas. Quem monta uma superfície usa a face, não as pontas.
+   *
+   * BISEL CILÍNDRICO: a parada mais clara fica a ~24% da altura, e não no topo. Com o claro na
+   * primeira linha o sarrafo lê como chanfro chapado; com ele um pouco abaixo, e o fio de luz de
+   * 1 px por cima, lê como um CILINDRO com a luz batendo em cima. É o mesmo truque do brilho
+   * especular da barra, aplicado à superfície — e é o que os packs de pixel art fazem no sarrafo
+   * da moldura.
+   */
+  --face-painel: linear-gradient(180deg, var(--painel) 0, var(--painel-topo) 24%, var(--painel-pe));
+  --face-alta: linear-gradient(180deg, var(--painel-alto) 0, var(--painel-alto-topo) 24%, var(--painel-alto-pe));
   --face-cava: linear-gradient(180deg, var(--cava-topo), var(--cava-pe));
   --face-trilho: linear-gradient(180deg, var(--trilho-fundo), var(--trilho));
 
@@ -195,10 +203,17 @@
    * decide se a superfície parece ter espessura. */
   --luz: rgb(255 255 255 / 20%);
   --luz-forte: rgb(255 255 255 / 30%);
-  /* O contorno. É preto e não um cinza da paleta: o contorno tem que funcionar contra o painel,
-   * contra a fenda e contra o mundo pixelado do jogo, e só o preto funciona contra os três. */
-  --contorno: rgb(0 0 0 / 55%);
-  --contorno-forte: rgb(0 0 0 / 72%);
+  /*
+   * O contorno é uma TINTA FRIA, não preto puro: um quase-preto azulado, com alfa.
+   *
+   * É como os packs de UI de jogo contornam — uma tinta só, a mesma para a arte do mundo e para a
+   * interface —, e o ganho é contraste de MATIZ além do de luminância: a peça se separa do fundo
+   * sem abrir um buraco neutro nele. Preto puro sobre um mundo azul-ardósia lê como recorte.
+   *
+   * Continua com alfa porque precisa funcionar contra painel, fenda e o mapa pixelado do jogo.
+   */
+  --contorno: rgb(7 10 20 / 62%);
+  --contorno-forte: rgb(5 7 15 / 78%);
 
   --sombra-1: 0 1px 2px rgb(0 0 0 / 30%);
   --sombra-2: 0 8px 24px rgb(0 0 0 / 45%);

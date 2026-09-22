@@ -72,5 +72,5 @@ export function openSettings(ctx: AppContext): Modal {
     el('div', { class: 'cabeca' }, el('span', {}, 'conta')),
     sair)
 
-  return openModal(document.body, 'Configurações', el('div', { class: 'settings' }, potion, ret, wildHp, tier, duplicates, save, error, conta))
+  return openModal(document.body, 'Ajustes', el('div', { class: 'settings' }, potion, ret, wildHp, tier, duplicates, save, error, conta))
 }

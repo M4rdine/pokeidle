@@ -41,13 +41,48 @@
  * Grade de alvos iguais. A ordem é estável e cada função tem o mesmo peso — nenhuma delas é mais
  * "ação" que a outra, porque todas só abrem um painel.
  */
-/* Uma faixa só, e tudo dentro dela abre painel. Em coluna, o menu tomava 170 px de altura para
- * cinco botões, e essa altura sai do mundo. */
-.menu { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-1); }
-.menu-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: var(--space-1); flex: 1; min-width: 0; }
-/* Ícone e rótulo lado a lado, centralizados: a fileira só funciona se os seis tiverem a mesma
- * caixa, e é a igualdade entre eles que faz o conjunto parecer um conjunto. */
-.menu-item { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-1); }
+/*
+ * O menu é uma fileira de PEÇAS, não uma barra de ferramentas.
+ *
+ * Ele era seis botões largos e achatados com um ícone de 22 px ao lado do rótulo — a forma exata
+ * de uma barra de navegação de site. O que separa menu de jogo de barra de site é a ordem de
+ * importância: no jogo **o ícone é o assunto e o rótulo é a legenda**, e cada item é uma peça
+ * quadrada com moldura própria, não um retângulo esticado até preencher a linha.
+ *
+ * O ícone mora num POÇO, o mesmo do retrato do Pokémon: é ele que faz a peça ter moldura. E o
+ * sprite fica em 1:1 com a arte original (30 px), porque ampliar sprite oficial por fator quebrado
+ * estraga justamente o contorno que faz ele ser reconhecível de relance.
+ */
+/* O painel ENCOSTA nas peças e centraliza: esticado até a largura da coluna ele voltava a ser uma
+ * barra, com um vazio de 300 px à direita dos seis itens. */
+.menu { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-2); width: fit-content; margin-inline: auto; }
+.menu-grade { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+/*
+ * Todas as peças têm a MESMA largura, e é isso que faz as seis lerem como um conjunto em vez de
+ * seis botões avulsos. A largura fixa só é possível porque os rótulos são curtos: enquanto um
+ * deles tinha treze letras, ele transbordava por cima da peça vizinha — a correção foi no rótulo
+ * (ver `MODAL_LABELS`), não aqui, porque afrouxar a largura desfazia o conjunto.
+ */
+.menu-item {
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-1);
+  width: 84px; padding: var(--space-2) var(--space-2) var(--space-1);
+  font-size: var(--t-xs); letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--texto-fraco); white-space: nowrap;
+}
+.menu-item .icone {
+  width: 46px; height: 46px;
+  background-size: 30px 30px;
+  background-color: rgb(0 0 0 / 28%);
+  border-radius: var(--raio-p);
+  box-shadow: var(--relevo-cava);
+}
+/* Passar o ponteiro ACENDE o poço e clareia o rótulo: a peça responde antes do clique, que é o
+ * que uma peça de jogo faz e um link de site não precisa fazer. */
+.menu-item:hover:not([disabled]) { color: var(--texto); }
+.menu-item:hover:not([disabled]) .icone {
+  background-color: color-mix(in srgb, var(--selecao) 26%, rgb(0 0 0 / 28%));
+  box-shadow: var(--relevo-cava), 0 0 12px rgb(111 138 230 / 40%);
+}
 
 /* ── Coluna de perfil ────────────────────────────────────────────────────────
  * Quem é o jogador e como ele está. Rótulo micro em caixa alta sobre o número, como mostrador de
@@ -337,7 +372,11 @@
   .grid-bottom { min-height: 120px; }
   /* Numa tela estreita a grade do menu aperta para caber mais função por linha. */
   .menu { flex-direction: column; }
-  .menu-grade { grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); }
+  /* Em tela estreita as peças encolhem e a fileira quebra sozinha; nada de esticá-las para
+   * preencher a linha, que é o que as fazia parecer barra de site. */
+  .menu-grade { justify-content: center; }
+  .menu-item { width: 72px; }
+  .menu-item .icone { width: 40px; height: 40px; }
   /* A lista de golpes deixa de rolar por dentro: numa página que rola, rolagem aninhada esconde
    * conteúdo sem nenhum sinal de que ele existe. */
   .moves-caixa { overflow: visible; }

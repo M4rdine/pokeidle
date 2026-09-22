@@ -10,8 +10,8 @@ export function tipFor(event: Event, view: HuntView): Tip | null {
   switch (event.type) {
     case 'wildDefeated': return { key: 'first-defeat', text: 'Seu Pokémon caça sozinho. Você pode fechar a aba.' }
     case 'captured': return { key: 'first-capture', text: `Capturou! O time tem ${view.state?.settings.teamSlots ?? 6} vagas; veja em Time.` }
-    case 'itemUsed': return { key: 'first-potion', text: 'Usou uma Poção. Ajuste em Configurações quando usar e quando voltar ao Centro.' }
-    case 'healed': return { key: 'first-return', text: 'Voltou ao Centro e curou o time. Ajuste o limiar em Configurações.' }
+    case 'itemUsed': return { key: 'first-potion', text: 'Usou uma Poção. Escolha em Ajustes quando usar e quando voltar ao Centro.' }
+    case 'healed': return { key: 'first-return', text: 'Voltou ao Centro e curou o time. Mude o limiar em Ajustes.' }
     default: return null
   }
 }

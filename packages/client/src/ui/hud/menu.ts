@@ -8,7 +8,7 @@ import { el } from '../dom.js'
  * Aqui só entra o que ABRE UM PAINEL. "Parar" e "Sair" moravam numa faixa à direita desta mesma
  * barra e saíram: as duas mexem no estado da sessão, e nenhuma delas é navegação. Cada uma foi
  * para onde a pergunta é feita — parar, para o painel de situação, que é o que diz se existe
- * caçada; sair, para Configurações, que é onde se mexe na conta.
+ * caçada; sair, para Ajustes, que é onde se mexe na conta.
  *
  * Antes disso tudo eram cinco atalhos de texto espremidos numa barra de uma linha, do mesmo peso
  * de "Parar" e "Sair". Em grade cada função tem o mesmo alvo e a ordem fica estável.

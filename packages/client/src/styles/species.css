@@ -23,7 +23,7 @@
 .ficha-areas { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .ficha-area {
   display: grid; grid-template-columns: 1fr auto auto auto; gap: var(--space-3);
-  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--painel);
+  align-items: baseline; padding: var(--space-2); background: var(--face-painel); border-radius: var(--raio-p); box-shadow: var(--relevo-1);
 }
 /* A linha inteira é dado denso e fica na face de leitura, nome incluído: a bitmap só entra a
    partir de --t-l, e aqui não há tamanho sobrando para chegar lá. */
@@ -41,27 +41,48 @@
 /* Mesma escala nas seis barras: é a comparação entre elas que mostra o formato da espécie.
    O trilho é a fenda do medidor, com a mesa no fundo — é ela que deixa o preenchimento de ouro
    atingir contraste. Sobre superfície clara, ouro mede 1,3:1 e a barra desaparece. */
-.stat-barra { height: 8px; background: var(--fundo); position: relative; }
+/*
+ * As seis barras usam o MESMO material dos medidores do jogo: trilho cavado em tom médio e
+ * preenchimento esmaltado, com o especular na segunda linha. Elas eram chapadas — fundo de página
+ * e um retângulo de ouro por cima —, e ficavam como a única peça da tela que não falava a língua
+ * do sistema, justamente onde ele mais se repete.
+ */
+.stat-barra {
+  height: 10px; position: relative; overflow: hidden;
+  background: var(--face-trilho); border-radius: 999px;
+  box-shadow: var(--relevo-cava);
+}
 .stat-barra::after {
   content: ""; position: absolute; inset: 0;
-  background: var(--ouro-cheio); transform: scaleX(var(--fracao, 0)); transform-origin: left;
+  border-radius: 999px;
+  background: linear-gradient(180deg,
+    var(--ouro-cheio) 0 12%,
+    color-mix(in srgb, var(--ouro-cheio) 45%, white) 12% 30%,
+    var(--ouro-cheio) 30% 72%,
+    color-mix(in srgb, var(--ouro-cheio) 74%, black));
+  transform: scaleX(var(--fracao, 0)); transform-origin: left;
 }
 
 /* ── Evolução ──────────────────────────────────────────────────────────────── */
 .ficha-evo { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
 .evo-estagio {
   display: flex; align-items: center; gap: var(--space-2);
-  padding: var(--space-1) var(--space-2); border: var(--border-w) solid var(--borda); background: var(--painel);
+  padding: var(--space-1) var(--space-2); border: 0; border-radius: var(--raio-p);
+  background: var(--face-painel); box-shadow: var(--relevo-1);
 }
 /* O estágio aberto é o único grifado: a linha é contexto, e o marca-texto diz onde se está. */
-.evo-atual { background: var(--selecao); border-color: var(--selecao); color: var(--selecao-texto); }
+.evo-atual {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--selecao) 82%, white), var(--selecao));
+  color: var(--selecao-texto);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 45%), var(--brilho-selecao);
+}
 .evo-seta { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* ── Golpes ────────────────────────────────────────────────────────────────── */
 .ficha-learnset { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 .learn-linha {
   display: grid; grid-template-columns: 4rem 1fr auto auto; gap: var(--space-2);
-  align-items: baseline; padding: var(--space-1) var(--space-2); background: var(--painel);
+  align-items: baseline; padding: var(--space-2); background: var(--face-painel); border-radius: var(--raio-p); box-shadow: var(--relevo-1);
 }
 .learn-nivel, .learn-poder { font-variant-numeric: tabular-nums; }
 

@@ -8,7 +8,7 @@ progresso continua com a aba fechada. A simulação inteira acontece no servidor
 **▶ Jogue: <https://pokeidle.187-77-37-92.sslip.io>** — crie uma conta, escolha o inicial e mande
 caçar. O progresso continua com a aba fechada.
 
-![A tela de jogo: mapa ao centro, ficha do Pokémon ativo à esquerda, time à direita e registro embaixo](docs/imagens/jogo.png)
+![A tela de jogo: o mundo ao centro, ficha e time à esquerda, golpes e situação à direita, registro embaixo](docs/imagens/jogo.webp)
 
 O servidor simula; o cliente desenha o que recebe e manda intenção. O cenário é gerado pelo
 pipeline deste repositório — terreno, props e prédios saem de conjuntos próprios, e o mapa é
@@ -16,7 +16,7 @@ composto por código a partir de uma lista de biomas.
 
 | Ficha de espécie | Painel de operação |
 |---|---|
-| ![Ficha do Vulpix: onde aparece, atributos-base, evolução e golpes por nível](docs/imagens/ficha.png) | ![Painel lendo /metrics: caçadas ativas, duração do tick, persistência e HTTP](docs/imagens/metricas.png) |
+| ![Ficha do Vulpix: onde aparece, atributos-base, evolução e golpes por nível](docs/imagens/ficha.webp) | ![Painel lendo /metrics: caçadas ativas, duração do tick, persistência e HTTP](docs/imagens/metricas.webp) |
 
 A ficha responde a pergunta que decide a próxima caçada — onde essa espécie aparece, em que faixa
 de nível e se o portão já abriu. O painel lê o mesmo `/metrics` que um Prometheus raparia.
@@ -143,5 +143,5 @@ O cenário — terreno, props, prédios e marcos — é gerado pelo pipeline des
 do pack; o teste `kanto-cenario` trava isso, recusando qualquer tile que não seja de conjunto
 próprio. A prévia abaixo sai de `pnpm assets map-preview` e é composta só desse material:
 
-![Recorte do Campo Inicial: trilha, grama alta e o Centro Pokémon, tudo em arte gerada pelo projeto](docs/imagens/campo-inicial.png) Quem clonar este repositório recebe o código inteiro e monta o
+![Recorte do Campo Inicial: trilha, grama alta e o Centro Pokémon, tudo em arte gerada pelo projeto](docs/imagens/campo-inicial.webp) Quem clonar este repositório recebe o código inteiro e monta o
 próprio atlas com `pnpm assets build`, apontando para os assets que tiver. O código é do autor.

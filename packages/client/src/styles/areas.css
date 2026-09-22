@@ -62,15 +62,45 @@
  * detalhe que não cabia, e sobre este mapa seriam dois controles sem para onde ir.
  */
 .mapa { position: relative; line-height: 0; }
+/*
+ * O mapa cabe INTEIRO na janela, sempre. Ele guarda a proporção 4:3 da arte e tem teto de altura;
+ * quando a janela é baixa, é a largura que cede e o mapa centraliza na coluna.
+ *
+ * Sem o teto, numa janela de 950 px o mapa ficava com 731 px de altura, o modal estourava o
+ * `max-height` e o corpo rolava: metade de Kanto ficava abaixo da dobra, numa tela cujo trabalho
+ * inteiro é mostrar Kanto de relance. Rolagem para ver um mapa é o mesmo que não mostrá-lo.
+ */
 .mapa-mundo {
   position: relative;
+  aspect-ratio: 192 / 144;
+  max-height: 58vh;
+  width: auto; max-width: 100%;
+  margin-inline: auto;
   border-radius: var(--raio-g);
   /* A moldura vem do mesmo relevo do resto do sistema: o mapa é uma peça apoiada, não uma
    * imagem solta na página. */
   box-shadow: var(--relevo-1);
 }
+/*
+ * COLCHETES EM "L" nos cantos do mapa — dois traços por canto, sem moldura fechada.
+ *
+ * É o único ornamento do sistema, e existe porque o mapa é o único lugar que é um INSTRUMENTO DE
+ * VISADA: os colchetes dizem "olhe aqui dentro", que é exatamente o trabalho da tela. Ornamento
+ * em painel de dado seria enfeite; aqui ele é a moldura de uma mira.
+ *
+ * O resto do vocabulário decorativo dos packs de referência — fita, filigrana, pilha de folhas,
+ * pergaminho rasgado — fica DE FORA. Tudo aquilo é do mundo de papel e fantasia que este projeto
+ * já recusou duas vezes, e trazê-lo seria cometer o mesmo erro de idioma pela terceira.
+ */
+.mapa-mundo::before, .mapa-mundo::after {
+  content: ""; position: absolute; width: 14px; height: 14px;
+  border: 2px solid color-mix(in srgb, var(--borda-forte) 70%, transparent);
+  pointer-events: none;
+}
+.mapa-mundo::before { top: 6px; left: 6px; border-right: 0; border-bottom: 0; border-radius: var(--raio-p) 0 0 0; }
+.mapa-mundo::after { bottom: 6px; right: 6px; border-left: 0; border-top: 0; border-radius: 0 0 var(--raio-p) 0; }
 .mapa-imagem {
-  display: block; width: 100%; height: auto;
+  display: block; width: 100%; height: 100%;
   border-radius: var(--raio-g);
   /* Pixel art sobe em degrau, nunca interpolada — 192 px de largura viram ~700 na tela. */
   image-rendering: pixelated;

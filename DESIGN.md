@@ -459,6 +459,41 @@ mede 3,10:1 e reprova**. Os matizes que apertam são os claros — `electric`, `
 Então: **nada de rótulo discreto sobre superfície tingida por tipo.** O teste de contraste percorre
 os dezoito matizes nas duas misturas que a interface pinta.
 
+## Os movimentos que separam UI de jogo de UI de site
+
+A anatomia de quatro packs de referência foi lida em PIXEL — varredura de borda, histograma de
+paleta — e rendeu catorze movimentos concretos. Estes são os que este sistema adotou, e ao lado
+está o que cada um resolve:
+
+| movimento | onde | o que muda |
+|---|---|---|
+| Sombra dura, desfoque zero | `--relevo-*` | o degrau de altura; desfoque sozinho é a assinatura de site |
+| Contorno escuro + luz por dentro | `--relevo-*` | a borda com contraste — ela não é grossa, é DUPLA |
+| Três pesos de relevo = três níveis | painel / botão / modal | profundidade vira sintaxe de importância |
+| **Tinta fria, não preto puro** | `--contorno` | contraste de MATIZ além do de luminância; preto abre buraco |
+| **Bisel cilíndrico: claro a 24%** | `--face-*` | a superfície lê como cilindro, não como chanfro chapado |
+| **Especular na 2ª linha da barra** | `progress` | barra esmaltada em vez de pintada |
+| **Trilho vazio em tom médio** | `--trilho` | trilho quase preto lê como buraco, não como parte vazia |
+| **Barra segmentada** | só a de XP | vida é contínua, XP se conta — a forma distingue as duas |
+| **Aba ativa funde com o painel** | abas de região | a FORMA diz que aquele painel é o conteúdo daquela aba |
+| **Algo quebra a moldura** | retrato do ativo | declara que ele é o assunto, não mais um campo |
+| **Estampa só na moldura** | `.cabeca-barra` | textura no passe-partout, carta lisa — nunca atrás do texto |
+| **Colchete em "L"** | cantos do mapa | o único ornamento, e só onde a peça é instrumento de visada |
+
+### O que ficou de fora, e por quê
+
+**Raio de 2 px em degrau.** Os packs usam canto quase reto, e isso contradiz a tese desta casa:
+os selos de tipo são pílulas, e canto macio é a linguagem da franquia. Adotar seria trocar o
+mundo, não amplificá-lo.
+
+**Recolorir o componente inteiro para outra família no hover.** Exige uma segunda família de cor,
+e o sistema tem uma cor de marca só — inventar a segunda é um `Don't` explícito. O hover continua
+mudando de degrau na mesma rampa.
+
+**Fita, filigrana, pilha de folhas, pergaminho rasgado, rebite.** Todo esse vocabulário é do mundo
+de papel e fantasia que este projeto **já recusou duas vezes**. Trazê-lo seria o mesmo erro de
+idioma pela terceira — o que derrubou a madeira e o que derrubou a arte-chave fotorrealista.
+
 ## Por que não usamos pack de UI
 
 A pergunta volta, então fica registrada. A resposta tem duas metades, e **cada uma sozinha já

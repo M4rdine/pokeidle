@@ -3,12 +3,23 @@ import { StartHuntSchema } from '../../api/dto.js'
 import { stopReasonText } from '../../state/log.js'
 import { el } from '../dom.js'
 import { showOverlay } from '../overlay.js'
+import { painelDeRetorno } from './retorno.js'
 
-/** Catch-up com progresso, resumo em toast e a sobreposição de hunt parada com "Iniciar de novo". */
+/**
+ * Catch-up com progresso, painel de volta e a sobreposição de hunt parada com "Iniciar de novo".
+ *
+ * DUAS sobreposições, com desligamento separado, e não uma só. O servidor manda `hunt.summary` e
+ * logo em seguida o snapshot; o snapshot muda a fase para `active`, e com um slot compartilhado a
+ * troca de fase apagava o painel de volta no mesmo quadro em que ele aparecia — a tela de
+ * pagamento do jogo piscava e sumia. A de fase é do servidor e troca sozinha; a de volta é do
+ * jogador e só fecha no botão dele.
+ */
 export function mountOverlays(root: HTMLElement, ctx: AppContext): () => void {
   let hide: (() => void) | null = null
+  let hideRetorno: (() => void) | null = null
   let catchupTotal = 0
   const clear = (): void => { hide?.(); hide = null }
+  const clearRetorno = (): void => { hideRetorno?.(); hideRetorno = null }
 
   const offPhase = ctx.hunt.subscribe((v) => ({ phase: v.phase, remaining: v.catchup?.remaining ?? null, stopped: v.stoppedInfo }), (state) => {
     clear()
@@ -41,10 +52,23 @@ export function mountOverlays(root: HTMLElement, ctx: AppContext): () => void {
     }
   }, { equals: (a, b) => a.phase === b.phase && a.remaining === b.remaining && a.stopped === b.stopped })
 
+  /*
+   * O resumo do tempo offline vira PAINEL, não toast.
+   *
+   * Num idle esta é a tela de pagamento — a única que responde "valeu a pena deixar rodando?" — e
+   * ela estava numa linha que sumia sozinha em segundos, começando por "N ticks". Quem voltasse
+   * depois de uma noite e olhasse a aba um instante tarde demais não via nada do que ganhou.
+   *
+   * Por ser sobreposição, ela também espera o jogador: fecha no botão, não no relógio.
+   */
   const offSummary = ctx.hunt.subscribe((v) => v.lastSummary, (summary) => {
     if (!summary) return
-    ctx.toasts.show(`Catch-up: ${summary.ticks} ticks, ${summary.defeats} derrotas, ${summary.captures} capturas, +${summary.xpTrainer} XP, +${summary.gold} ouro`, 'big')
+    clearRetorno()
+    hideRetorno = showOverlay(root, painelDeRetorno(summary, {
+      nomeDoItem: (id) => ctx.registry.items.get(id)?.name ?? id,
+      aoFechar: clearRetorno,
+    }))
   }, { immediate: false })
 
-  return () => { clear(); offPhase(); offSummary() }
+  return () => { clear(); clearRetorno(); offPhase(); offSummary() }
 }

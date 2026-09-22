@@ -301,7 +301,17 @@ h2 { font-size: var(--t-l); }
 }
 .toast-error { border-color: var(--perigo); }
 .toast-big { border-color: var(--selecao); background: var(--selecao); color: var(--selecao-texto); font-size: var(--t-l); }
-.overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(51 38 31 / 88%); color: var(--painel-alto); text-align: center; }
+/*
+ * O véu era `rgb(51 38 31 / 88%)` — marrom, resquício da paleta de madeira aposentada — e a cor de
+ * texto era `--painel-alto`, que é token de SUPERFÍCIE. Nenhum dos dois quebrava nada: o véu ficava
+ * levemente quente sobre um mundo azul e o texto continuava claro por coincidência. É a mesma
+ * classe do `--fora` que já tinha sobrevivido calado à troca de paleta.
+ */
+.overlay {
+  position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
+  background: color-mix(in srgb, var(--fundo) 88%, transparent);
+  color: var(--texto);
+}
 
 /* A caixa de marcar não tem ícone porque o sistema não tem nenhum: o "aceso" é um quadrado
  * cheio, e um glifo Unicode aqui seria o primeiro ícone de uma biblioteca que não existe. */

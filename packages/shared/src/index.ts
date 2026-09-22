@@ -1,4 +1,11 @@
 export const TICK_MS = 200
+/**
+ * O máximo que o servidor simula de uma vez ao recuperar tempo offline: doze horas (216 000 ticks
+ * a 200 ms). Mora aqui, e não no servidor, porque os dois lados precisam do mesmo número por
+ * motivos diferentes — o servidor para IMPOR o teto, o cliente para EXPLICAR que ele existe no
+ * painel de volta. Duplicado, um dos dois envelheceria calado.
+ */
+export const MAX_CATCHUP_TICKS = 216_000
 export { createRng, type Rng } from './rng.js'
 export { parseOrThrow } from './parse-or-throw.js'
 export * from './schemas/type-chart.js'

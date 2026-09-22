@@ -1,7 +1,8 @@
 export const SNAPSHOT_EVERY_TICKS = 50
 export const SYNC_EVERY_TICKS = 300
 export const CATCHUP_SLICE_TICKS = 250
-export const MAX_CATCHUP_TICKS = 216_000
+/* O teto mora em `@pokeidle/shared`: o cliente precisa do mesmo número para explicá-lo. */
+export { MAX_CATCHUP_TICKS } from '@pokeidle/shared'
 export const MIN_CATCHUP_TICKS = 5
 export const INTENT_MIN_INTERVAL_MS = 200
 export const WS_MAX_MESSAGE_BYTES = 4096

@@ -176,11 +176,25 @@ describe('sobreposições', () => {
     expect(r.querySelector('.stopped')?.textContent).toContain('Time caído. Time curado no Centro')
     expect([...r.querySelectorAll('button')].map((b) => b.textContent)).toEqual(['Iniciar de novo', 'Voltar'])
   })
-  it('um resumo novo vira toast grande', () => {
-    const show = vi.fn()
+  it('um resumo novo vira painel de volta, e ele espera o jogador', () => {
     const hunt = createStore(view)
-    mountOverlays(root(), ctxWith({ hunt, toasts: { show } }))
-    hunt.set({ ...view, lastSummary: { ticks: 10, defeats: 2, captures: 1, captureFailures: 0, faints: 0, xpTrainer: 40, gold: 9, drops: {}, levelUps: 0, evolutions: 0, returns: 0 } })
-    expect(show).toHaveBeenCalledWith(expect.stringContaining('2 derrotas'), 'big')
+    const r = root()
+    mountOverlays(r, ctxWith({ hunt }))
+    const resumo = { ticks: 18_000, defeats: 240, captures: 1, captureFailures: 0, faints: 0, xpTrainer: 91_234, gold: 9, drops: {}, levelUps: 0, evolutions: 0, returns: 0 }
+    hunt.set({ ...view, lastSummary: resumo })
+
+    expect(r.querySelector('.retorno [data-fora]')?.textContent).toBe('1 h')
+    expect(r.querySelector('.retorno [data-xp]')?.textContent).toBe('91.234')
+
+    /*
+     * O snapshot chega LOGO DEPOIS do resumo e muda a fase para `active`. Enquanto as duas
+     * sobreposições dividiam o mesmo slot, essa troca apagava o painel no mesmo quadro em que ele
+     * aparecia: a tela de pagamento do jogo piscava e sumia sem ninguém ler.
+     */
+    hunt.set({ ...view, lastSummary: resumo, phase: 'active' })
+    expect(r.querySelector('.retorno')).not.toBeNull()
+
+    r.querySelector<HTMLButtonElement>('.retorno button')!.click()
+    expect(r.querySelector('.retorno')).toBeNull()
   })
 })

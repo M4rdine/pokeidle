@@ -10,6 +10,8 @@ colors:
   painel-alto-topo: "#2f3853"
   painel-alto-pe: "#242c42"
   cava: "#11151f"
+  trilho: "#2a3350"
+  trilho-fundo: "#222a44"
   cava-topo: "#0c0f18"
   cava-pe: "#161c29"
   borda: "#171d2c"
@@ -416,6 +418,47 @@ barra de cima sem contar as linhas.
 preenchimento cheio fazia a linha parecer item selecionado de gerenciador de arquivos, e engolia
 os selos de tipo — que são a identidade da espécie e a única cor semântica do slot.
 
+## A cor do tipo entra na estrutura
+
+Este documento sempre disse que o design system do Pokémon **são os selos de tipo** — e o HUD não
+fazia nada com isso. Os dezoito matizes moravam nos tokens e apareciam em pílulas de 11 px;
+o resto da tela eram seis slots de time idênticos, oito linhas de golpe idênticas e marcadores
+idênticos, todos em ardósia. **O sistema estava optando por não usar o seu próprio motivo** — e era
+por isso que mais bisel e mais sombra não resolviam: o problema não era a casca, era ela ser a
+única coisa falando.
+
+`--tipo` e `--tipo-2` levam o matiz da espécie (ou do golpe) para dentro da peça:
+
+| peça | o que recebe a cor |
+|---|---|
+| slot do time | trilho de 3 px na borda esquerda + lavagem no início do gradiente |
+| poço do retrato | o fundo do poço, na diagonal quando há dois tipos, como o selo duplo do jogo |
+| cartão do ativo | o mesmo poço, mais forte, com halo para fora — é o retrato da peça em campo |
+| linha de golpe | trilho de 3 px + lavagem, pelo tipo do GOLPE |
+
+**Nenhuma cor nova entrou.** Os dezoito já eram token. É o mesmo `Don't` de sempre — não inventar
+uma segunda cor de marca — cumprido levando a que já existia para onde ela identifica.
+
+### Identidade e estado são canais diferentes
+
+A regra que mantém isso legível: **o tipo diz QUEM é, e nunca diz o que está acontecendo.**
+
+- No slot ativo o trilho **troca** para a cor de seleção. O tipo continua dito pelo poço e pelo
+  selo; o trilho passa a responder outra pergunta — qual é o de agora —, e é a troca que responde.
+- A barra de recarga do golpe **continua em latão e verde**. Pintá-la do tipo apagaria o único
+  sinal de se dá para usar agora.
+- Vaga vazia declara `--tipo: transparent`. Sem isso o valor padrão da variável fingiria uma
+  identidade que não existe.
+
+### Superfície tingida leva tinta CHEIA
+
+Medido: sobre as dezoito misturas, `--texto` fica em 6,67:1 no pior caso e passa; **`--texto-fraco`
+mede 3,10:1 e reprova**. Os matizes que apertam são os claros — `electric`, `ice`, `ground`,
+`steel` —, e são justamente os que o olho não desconfia, porque a mistura continua escura.
+
+Então: **nada de rótulo discreto sobre superfície tingida por tipo.** O teste de contraste percorre
+os dezoito matizes nas duas misturas que a interface pinta.
+
 ## Por que não usamos pack de UI
 
 A pergunta volta, então fica registrada. A resposta tem duas metades, e **cada uma sozinha já
@@ -626,6 +669,8 @@ Sobrou o que decide: quanto rende, quanto paga, e a chance de capturar.
 
 **Do**
 - Deixe os selos de tipo carregarem a cor. Eles são a identidade da franquia.
+- Leve `--tipo` para a estrutura quando a peça identifica uma espécie ou um golpe. É o motivo do
+  sistema, e ele não custa cor nova.
 - Use sprite oficial para ícone de assunto; desenhar só quando o jogo não tiver o objeto.
 - Declare a tinta junto do preenchimento, e ponha o par no teste de contraste.
 - Meça o contraste antes de aceitar uma cor. Nesta rodada o teste pegou cinco escolhidas a olho.
@@ -637,6 +682,9 @@ Sobrou o que decide: quanto rende, quanto paga, e a chance de capturar.
   e era de outro jogo — foi o erro que derrubou a versão anterior.
 - Não invente uma segunda cor de marca. Se precisa de destaque, use posição ou peso.
 - Não use o preenchimento de seleção em mais de um lugar por tela.
+- Não pinte de tipo o que informa ESTADO. Recarga, vida e seleção têm cor própria; trocar uma
+  pela outra apaga o sinal.
+- Não ponha tinta fraca sobre superfície tingida por tipo. Ela mede 3,1:1 no pior matiz.
 - Não ponha a face de HUD abaixo de 18 px nem em cima de um dígito.
 - Não use emoji ou glifo Unicode como ícone.
 - Não escreva cor literal em folha de estilo. Se falta um valor, falta um token.

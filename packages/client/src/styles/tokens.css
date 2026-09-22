@@ -86,14 +86,24 @@
   --painel-alto-topo: #2f3853;
   --painel-alto-pe: #242c42;
 
-  --cava: #11151f;         /* o que afunda: trilho de medidor, campo, lista */
+  --cava: #11151f;         /* o que afunda: campo, lista, poço */
   --cava-topo: #0c0f18;
   --cava-pe: #161c29;
+
+  /*
+   * O TRILHO VAZIO do medidor é separado da fenda, e é mais CLARO que ela de propósito: cerca de
+   * quatorze pontos de luminância abaixo do painel, não trinta. Trilho quase preto lê como buraco
+   * na peça — como falha de desenho, não como parte vazia de uma barra. É a mesma medida que os
+   * packs de UI de jogo usam, e a fenda continua quase preta onde ela é fenda de verdade.
+   */
+  --trilho: #2a3350;
+  --trilho-fundo: #222a44;
 
   /* As faces prontas. Quem monta uma superfície usa a face, não as pontas. */
   --face-painel: linear-gradient(180deg, var(--painel-topo), var(--painel-pe));
   --face-alta: linear-gradient(180deg, var(--painel-alto-topo), var(--painel-alto-pe));
   --face-cava: linear-gradient(180deg, var(--cava-topo), var(--cava-pe));
+  --face-trilho: linear-gradient(180deg, var(--trilho-fundo), var(--trilho));
 
   /* ── Traço ──
    * `--borda` é COSTURA, não moldura: fica mais escura que a superfície e some no olhar, deixando

@@ -29,8 +29,28 @@
  * lia como um painel que sobrou. */
 .mapa-palco { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 400px); gap: var(--space-3); align-items: stretch; }
 
-.mapa-abas { display: flex; flex-wrap: wrap; gap: var(--space-1); }
-.mapa-aba { display: flex; align-items: baseline; gap: var(--space-2); }
+/*
+ * A ABA ATIVA FUNDE COM O MAPA. Ela sobe dois pixels, perde o canto de baixo e o degrau duro de
+ * sombra, e encosta na peça — as inativas mantêm a aresta e ficam rebaixadas.
+ *
+ * É o truque de aba que todo pack de UI de jogo usa e que quase nenhuma interface de navegador
+ * faz, porque no navegador "aba" virou sinônimo de pílula solta numa fileira. Fundir custa uma
+ * classe e diz, pela FORMA, que aquele painel é o conteúdo daquela aba — sem depender da cor.
+ */
+.mapa-abas { display: flex; flex-wrap: wrap; gap: var(--space-1); margin-bottom: -1px; position: relative; z-index: 1; }
+.mapa-aba {
+  display: flex; align-items: baseline; gap: var(--space-2);
+  border-radius: var(--raio) var(--raio) 0 0;
+  padding-bottom: var(--space-2);
+}
+.mapa-aba.tab-active {
+  padding-bottom: calc(var(--space-2) + 3px);
+  margin-bottom: -2px;
+  border-radius: var(--raio) var(--raio) 0 0;
+  /* Sem o degrau duro embaixo: é ele que faria a aba parecer pousada em cima do mapa em vez de
+   * continuar dentro dele. */
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 45%), 0 0 0 1px color-mix(in srgb, var(--selecao) 70%, black), 0 -2px 14px rgb(111 138 230 / 45%);
+}
 .mapa-aba-nivel { font-size: var(--t-xs); color: var(--texto-fraco); font-variant-numeric: tabular-nums; }
 /* Sobre o preenchimento da seleção, o nível usa a TINTA da seleção — não a cor dela, que seria
  * a mesma do fundo e sumiria. Foi o que aconteceu: "Kanto nv 1" virou "Kanto". */

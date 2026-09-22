@@ -82,7 +82,21 @@
 .active-card { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-3); }
 /* Cabeçalho em linha: o sprite vive numa caixa de tamanho fixo, então não invade o nome. Antes
  * `transform: scale(2)` transbordava da caixa do frame e cobria o texto de baixo. */
+/*
+ * O RETRATO QUEBRA A MOLDURA: ele sobe acima da aresta do cartão e sai um pouco pela esquerda.
+ *
+ * É o truque que mais rende de todos os packs de UI de jogo, e é exatamente o que nenhum layout
+ * de site faz — no site tudo mora dentro da sua caixa. Uma peça que transborda a borda do painel
+ * declara, sem texto nenhum, que ela é o ASSUNTO daquele painel e não mais um campo dentro dele.
+ *
+ * O cartão ganha a margem de volta em cima, para o retrato ter para onde subir sem encostar no
+ * painel de cima.
+ */
+.active-card { margin-top: 18px; overflow: visible; }
 .active-topo { display: flex; align-items: center; gap: var(--space-3); }
+/* Só para CIMA. Sair também pela esquerda encostava o retrato na borda da janela, e o que era
+ * para ler como "transborda a moldura" lia como "não coube". */
+.active-topo .active-sprite-box { margin: -30px 0 calc(var(--space-2) * -1) 0; }
 .active-card h2 { font-size: var(--t-l); min-width: 0; overflow-wrap: anywhere; }
 .active-nome { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
 /* O mesmo poço do slot, no dobro do tamanho: as duas superfícies que mostram o mesmo Pokémon
@@ -122,12 +136,16 @@
 .moves { list-style: none; margin: 0; padding: var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); overflow-y: auto; min-height: 0; }
 /* Cada golpe é uma FAIXA, não uma linha de texto solta: oito nomes flutuando sobre o painel não
  * têm onde a coluna começar, e a comparação entre eles depende da coluna. */
+/* O TRILHO da linha é do tipo do golpe. O cooldown segue em latão e verde: identidade e estado
+ * são canais diferentes, e trocar um pelo outro apagaria o que diz se dá para usar agora. */
 .move {
   display: grid; grid-template-columns: 1fr auto 3ch 40px; gap: var(--space-2); align-items: center;
-  padding: 3px var(--space-2);
+  padding: 4px var(--space-2) 4px var(--space-3);
   border-radius: var(--raio-p);
-  background: linear-gradient(180deg, rgb(255 255 255 / 4%), rgb(255 255 255 / 1%));
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--tipo, var(--borda-clara)) 26%, transparent),
+    rgb(255 255 255 / 4%) 34%, rgb(255 255 255 / 1%));
+  box-shadow: inset 3px 0 0 var(--tipo, var(--borda-clara)), inset 0 1px 0 rgb(255 255 255 / 6%);
 }
 .move-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .move-poder { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
@@ -175,10 +193,18 @@
 /* ── Time ───────────────────────────────────────────────────────────────────── */
 .team-strip { display: flex; flex-direction: column; gap: var(--space-1); padding: var(--space-2); width: 100%; overflow-y: auto; }
 .team-strip .slot { flex-shrink: 0; }
+/*
+ * O slot ganha o mesmo TRILHO da linha de golpe, na cor do tipo. É o que faz as duas colunas —
+ * time à esquerda, golpes à direita — lerem como um sistema só em vez de duas listas.
+ */
 .slot {
   display: flex; align-items: center; gap: var(--space-2);
   min-height: 0; padding: var(--space-2); overflow: hidden; text-align: left;
   border-radius: var(--raio);
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--tipo, var(--borda-clara)) 22%, var(--painel-pe)),
+    var(--painel-pe) 46%);
+  box-shadow: inset 3px 0 0 var(--tipo, var(--borda-clara)), inset 0 1px 0 rgb(255 255 255 / 8%);
 }
 /* O dado do slot é uma coluna estreita: nome e nível na primeira linha, tipos na segunda,
  * medidor na terceira. Repetir a mesma ordem em seis slots é o que deixa comparar de relance. */
@@ -217,13 +243,15 @@
  * brilho. Preenchimento cheio fazia a linha parecer item selecionado de gerenciador de arquivos,
  * e engolia os selos de tipo — que são a identidade da espécie e a única cor semântica do slot.
  */
+/* No ativo o trilho TROCA para a cor de seleção. O tipo continua dito pelo poço e pelo selo; o
+ * trilho passa a responder outra pergunta — qual é o de agora —, e é a troca que a responde. */
 .slot-active {
   background: linear-gradient(90deg,
-    color-mix(in srgb, var(--selecao) 28%, var(--painel-topo)),
-    var(--painel-topo) 40%, var(--painel-pe));
+    color-mix(in srgb, var(--selecao) 30%, var(--painel-topo)),
+    var(--painel-topo) 42%, var(--painel-pe));
   box-shadow:
     inset 3px 0 0 var(--selecao),
-    inset 0 1px 0 rgb(255 255 255 / 22%),
+    inset 0 1px 0 rgb(255 255 255 / 24%),
     var(--brilho-selecao);
 }
 .slot-active .slot-nome { color: var(--texto); }
@@ -232,7 +260,10 @@
 /* Vaga vazia é ausência, e ausência não ocupa o mesmo espaço que presença: ela encolhe para uma
  * linha. Com a altura das ocupadas, três vagas vazias tomavam um terço da coluna do time para
  * não dizer nada. */
+/* Vaga sem Pokémon não tem tipo, então não tem trilho: o `--tipo` nunca é definido nela e o
+ * padrão da variável cairia na borda clara, fingindo uma identidade que não existe. */
 .slot-empty, .slot-locked {
+  --tipo: transparent;
   justify-content: center; color: var(--texto-fraco); font-size: var(--t-xs);
   letter-spacing: 0.08em; min-height: var(--alvo); padding: 2px var(--space-2);
   background: var(--face-cava);

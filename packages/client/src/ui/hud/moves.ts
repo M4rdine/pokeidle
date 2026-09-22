@@ -2,7 +2,7 @@ import { availableMoves, cooldownTicks } from '@pokeidle/shared'
 import type { AppContext } from '../../app-context.js'
 import { activePokemon } from '../../state/hunt-view.js'
 import { displayName } from '../../state/log.js'
-import { el, typeBadge } from '../dom.js'
+import { comTipo, el, typeBadge } from '../dom.js'
 
 /** Golpes disponíveis com poder, tipo e quanto falta do cooldown (1 = acabou de usar, 0 = pronto). */
 export function mountMoves(root: HTMLElement, ctx: AppContext): () => void {
@@ -23,14 +23,17 @@ export function mountMoves(root: HTMLElement, ctx: AppContext): () => void {
     const key = moves.map((m) => m.name).join(',')
     if (key !== rendered) {
       rendered = key
+      // O trilho da linha é do TIPO do golpe, e o cooldown segue em latão e verde: cor de
+      // identidade e cor de estado são canais diferentes, e trocar uma pela outra apagaria a que
+      // diz se dá para usar agora.
       list.replaceChildren(...moves.map((move) =>
-        el('li', { class: 'move', 'data-move': move.name },
+        comTipo(el('li', { class: 'move', 'data-move': move.name },
           el('span', { class: 'move-name' }, displayName(move.name)),
           typeBadge(move.type),
           // O rótulo continua existindo para quem ouve a tela: quem lê enxerga a coluna, quem
           // não lê receberia só um número solto.
           el('span', { class: 'move-poder', 'aria-label': `poder ${move.power}` }, String(move.power)),
-          el('span', { class: 'move-cd', 'data-cd': '0' }))))
+          el('span', { class: 'move-cd', 'data-cd': '0' })), [move.type])))
     }
     const { tick, derived } = ctx.hunt.get()
     for (const move of moves) {

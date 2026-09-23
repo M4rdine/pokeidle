@@ -84,20 +84,28 @@ describe('attach / tick / persist', () => {
     expect(active.lastSimulatedAt.getTime()).toBeLessThanOrEqual(clock.now.getTime())
     expect(msgs(s).filter((m) => m.t === 'hunt.tick').length).toBeGreaterThan(0)
     /*
-     * Anda até a sincronização ACONTECER, em vez de supor que ela cai no tick 300 exato. A fase de
-     * gravação é por treinador, de propósito — sem ela, todas as caçadas que começam juntas
-     * sincronizam no mesmo tick, para sempre. O contrato que vale é o de sempre: dentro de um
-     * período de sync, o banco alcança o runner.
+     * Anda até a sincronização ACONTECER, e detecta pela TRANSIÇÃO de `lastSyncTick` — não por ele
+     * ser maior que zero, e não pelo tick 300 exato.
+     *
+     * A fase de gravação é por treinador, de propósito: sem ela, todas as caçadas que começam
+     * juntas sincronizam no mesmo tick, para sempre. Mas isso significa que uma sincronização pode
+     * já ter acontecido nos 50 ticks acima, e aí "lastSyncTick > 0" sai verdadeiro num tick em que
+     * nada foi gravado — o xp lido depois seria o de agora contra o do banco lá atrás. Foi
+     * exatamente o que quebrou no CI e não aqui: o id do treinador é um uuid novo a cada rodada, e
+     * com ele a fase muda.
+     *
+     * O contrato continua o de sempre: no tick em que o sync roda, o banco fica igual ao runner.
      */
-    let tickDoSync: number | null = null
-    for (let i = 0; i < SYNC_EVERY_TICKS && tickDoSync === null; i++) {
+    let anterior = scheduler.get(trainerId)!.lastSyncTick
+    let xpNoSync: number | null = null
+    for (let i = 0; i < SYNC_EVERY_TICKS && xpNoSync === null; i++) {
       clock.now = new Date(clock.now.getTime() + TICK_MS)
       scheduler.tick()
       const atual = scheduler.get(trainerId)!
-      if (atual.lastSyncTick > 0) tickDoSync = atual.lastSyncTick
+      if (atual.lastSyncTick !== anterior) xpNoSync = atual.state.trainer.xp
+      anterior = atual.lastSyncTick
     }
-    expect(tickDoSync).not.toBeNull()
-    const xpNoSync = scheduler.get(trainerId)!.state.trainer.xp
+    expect(xpNoSync).not.toBeNull()
     await scheduler.whenIdle(trainerId)
     const logRows = await db.select().from(huntLog).where(eq(huntLog.trainerId, trainerId))
     expect(logRows.length).toBeGreaterThan(0)
@@ -351,11 +359,18 @@ describe('intents e finish', () => {
     const trainer = await s2.finish(trainerId, 'intent')
     expect(trainer).not.toBeNull()
     expect(await db.select().from(huntSessions)).toEqual([]) // o save (UPDATE) não ressuscita a linha porque veio antes do DELETE
-    // O que este caso afirma é a ORDEM, não a contagem: com a fase de gravação por treinador, 70
-    // ticks podem render um save ou dois, mas o `finish` é sempre o último da fila.
-    expect(kinds).toContain('save')
+    /*
+     * O que este caso afirma é a ORDEM, e só ela: o que foi enfileirado antes do `finish` chega
+     * antes dele, para o UPDATE não ressuscitar a linha que o DELETE apagou.
+     *
+     * Nem a contagem nem o TIPO da gravação entram na afirmação. Com a fase por treinador, estes
+     * 70 ticks rendem um save, dois, ou um sync — depende do uuid que o banco gerou nesta rodada.
+     * Cravar `['save', 'finish']` fazia o caso falhar em três de oito execuções, sempre por um
+     * motivo que não tem nada a ver com o que ele existe para provar.
+     */
+    expect(kinds.length).toBeGreaterThanOrEqual(2)
     expect(kinds[kinds.length - 1]).toBe('finish')
-    expect(kinds.slice(0, -1).every((k) => k === 'save')).toBe(true)
+    expect(kinds.slice(0, -1).every((k) => k === 'save' || k === 'sync')).toBe(true)
   })
 })
 

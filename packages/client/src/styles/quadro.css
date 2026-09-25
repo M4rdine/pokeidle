@@ -84,6 +84,34 @@
    * sombra do resto do sistema, aplicado a uma linha. */
   box-shadow: inset 0 -1px 0 rgb(0 0 0 / 55%), 0 1px 0 rgb(255 255 255 / 9%);
   position: relative; z-index: 1;
+  /* Abre espaço para a marca. Ela é posicionada ABSOLUTA, e não como item de flex, porque
+   * `.moves-cabeca` usa `space-between`: como item, a marca entraria na distribuição e jogaria o
+   * título para o meio da faixa. */
+  padding-left: calc(var(--space-3) + 11px);
+}
+/*
+ * A MARCA e o FIO — o que faltava para uma faixa de título parecer início de seção em vez de
+ * tarja mais escura.
+ *
+ * A marca é uma lâmina inclinada de 3 px, não um losango nem um ponto: losango e rebite são o
+ * vocabulário de pergaminho que esta casa já recusou duas vezes. Uma lâmina inclinada é
+ * instrumento, que é o que o DESIGN.md diz que esta tela é.
+ *
+ * O fio nasce aceso na esquerda e apaga antes da metade. Fio de ponta a ponta vira mais uma
+ * borda — e borda é justamente o que a tela já tinha demais.
+ */
+.cabeca-barra::before {
+  content: ""; position: absolute; left: var(--space-3); top: 50%;
+  width: 3px; height: 12px;
+  transform: translateY(-50%) skewX(-14deg);
+  background: var(--vivo);
+  box-shadow: 0 0 7px color-mix(in srgb, var(--vivo) 55%, transparent);
+}
+.cabeca-barra::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--vivo) 60%, transparent),
+    transparent 42%);
 }
 .cabeca-conta { color: var(--texto); font-weight: 400; }
 

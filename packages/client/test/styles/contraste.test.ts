@@ -68,6 +68,15 @@ const PARES: readonly { readonly frente: string; readonly fundo: string; readonl
   { frente: 'ouro', fundo: 'painel-topo', minimo: TEXTO_NORMAL, onde: 'moeda no alto do painel' },
   { frente: 'perigo', fundo: 'painel-topo', minimo: TEXTO_NORMAL, onde: 'erro no alto do painel' },
   { frente: 'borda-forte', fundo: 'painel-topo', minimo: TEXTO_GRANDE, onde: 'fio de controle no alto do painel' },
+  /*
+   * O TRAÇO VIVO nunca leva texto: é marca de cabeçalho, fio de acento e cantoneira da cena,
+   * sempre em peça de 1 a 3 px. O contrato dele é o de elemento não textual (WCAG 1.4.11), e ele
+   * precisa valer nas três superfícies onde a marca aparece — o alto do painel, a faixa escura do
+   * cabeçalho e o fundo da página, onde mora a moldura da cena.
+   */
+  { frente: 'vivo', fundo: 'painel-topo', minimo: TEXTO_GRANDE, onde: 'marca do cabeçalho no alto do painel' },
+  { frente: 'vivo', fundo: 'cava-pe', minimo: TEXTO_GRANDE, onde: 'marca do cabeçalho sobre a faixa escura' },
+  { frente: 'vivo', fundo: 'fundo', minimo: TEXTO_GRANDE, onde: 'cantoneira da cena sobre o chão' },
   { frente: 'texto', fundo: 'cava', minimo: TEXTO_NORMAL, onde: 'corpo sobre a fenda' },
   { frente: 'texto', fundo: 'fundo', minimo: TEXTO_NORMAL, onde: 'corpo sobre o fundo da página' },
   { frente: 'texto-fraco', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no painel' },

@@ -5,6 +5,8 @@ import './styles/hud.css'
 import './styles/areas.css'
 import './styles/modals.css'
 import './styles/species.css'
+/* Por último: o movimento sobrepõe transição a quem já foi desenhado. */
+import './styles/movimento.css'
 import { loadContentRegistry } from '@pokeidle/shared'
 import { HuntsSchema, MeSchema } from './api/dto.js'
 import { ApiError, createHttp } from './api/http.js'

@@ -3,7 +3,7 @@ import type { AppContext } from '../../app-context.js'
 import { PokedexSchema } from '../../api/dto.js'
 import { trainerProgress } from '../../state/progress.js'
 import { huntPokedexCount } from '../../state/tips.js'
-import { el, pct } from '../dom.js'
+import { el, escreverComPulso, pct } from '../dom.js'
 
 const CONN_TEXT: Readonly<Record<string, string>> = { open: 'conectado', connecting: 'conectando', reconnecting: 'reconectando', closed: 'desconectado' }
 
@@ -36,6 +36,10 @@ export function mountPerfil(root: HTMLElement, ctx: AppContext): () => void {
   const xpTexto = el('span', { class: 'muted', 'data-xp-texto': '' }, '—')
 
   root.append(el('header', { class: 'perfil panel' },
+    // A coluna da esquerda não tinha faixa de título em painel nenhum, enquanto a da direita
+    // tinha em todos: a tela lia como duas metades de sistemas diferentes. A faixa nomeia o
+    // painel; o nome do treinador continua sendo o DADO, na voz de HUD, logo abaixo dela.
+    el('div', { class: 'cabeca cabeca-barra' }, el('span', {}, 'treinador')),
     el('div', { class: 'perfil-id' }, name, level),
     el('div', { class: 'medidor' },
       el('div', { class: 'medidor-topo' }, el('span', {}, 'xp'), xpTexto),
@@ -53,7 +57,8 @@ export function mountPerfil(root: HTMLElement, ctx: AppContext): () => void {
     name.textContent = me.trainer.name
     const xp = ctx.hunt.get().state?.trainer.xp ?? me.trainer.xp
     const progress = trainerProgress(ctx.registry, xp)
-    level.textContent = `nível ${progress.level}`
+    // Subir de nível é o momento mais raro e mais importante da barra do treinador.
+    escreverComPulso(level, `nível ${progress.level}`)
     xpBar.setAttribute('value', String(pct(progress.xpInto, progress.xpSpan)))
     xpTexto.textContent = `${progress.xpInto.toLocaleString('pt-BR')} / ${progress.xpSpan.toLocaleString('pt-BR')}`
     nextUnlock.textContent = progress.next ? `${progress.next.what} · nv ${progress.next.level}` : 'tudo destravado'
@@ -63,8 +68,10 @@ export function mountPerfil(root: HTMLElement, ctx: AppContext): () => void {
   }
   const offMe = ctx.session.subscribe((s) => s.me, renderProgress)
   const offXp = ctx.hunt.subscribe((v) => v.state?.trainer.xp ?? null, renderProgress)
+  // O ouro é o número que o jogador veio ver, e ele sobe sozinho enquanto o olhar está no mapa:
+  // sem um aceno, a única forma de saber que subiu é ter decorado o valor anterior.
   const offGold = ctx.hunt.subscribe((v) => v.state?.trainer.gold ?? null, (value) => {
-    if (value !== null) gold.textContent = value.toLocaleString('pt-BR')
+    if (value !== null) escreverComPulso(gold, value.toLocaleString('pt-BR'))
   })
   const offTick = ctx.hunt.subscribe((v) => v.tick, (value) => { tick.title = `tique ${value} da simulação` })
   // Contador "Rota 1: n/m": a Pokédex do servidor é lida uma vez e `seen` da sessão atualiza ao vivo.

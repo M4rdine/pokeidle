@@ -11,7 +11,9 @@ export function mountLog(root: HTMLElement, ctx: AppContext): () => void {
   const filter = el('input', { type: 'checkbox', name: 'combat-only', id: 'log-combat-only' })
   // O cabeçalho nomeia o painel; sem isso o log era uma caixa de texto solta no rodapé.
   const section = el('section', { class: 'log panel' },
-    el('header', { class: 'log-header' },
+    // `cabeca cabeca-barra` e não uma classe própria: o registro reimplementava o cabeçalho de
+    // seção por conta, e por isso era o único painel da tela sem a marca e sem o fio aceso.
+    el('header', { class: 'cabeca cabeca-barra log-header' },
       el('span', {}, 'registro'),
       el('label', { class: 'log-filtro', for: 'log-combat-only' }, 'só combate', filter)),
     list)
@@ -19,7 +21,15 @@ export function mountLog(root: HTMLElement, ctx: AppContext): () => void {
 
   const visibleOf = (lines: readonly LogLine[]): readonly LogLine[] =>
     (filter as HTMLInputElement).checked ? lines.filter((line) => line.kind === 'combat') : lines
-  const lineNode = (line: LogLine): HTMLElement => el('li', { class: `log-line log-${line.kind}` }, line.text)
+  /*
+   * `nova` só na hora de ACRESCENTAR, nunca ao refazer a lista.
+   *
+   * A entrada tem que marcar "chegou agora". No `rebuild` — que redesenha até duzentas linhas de
+   * uma vez, ao ligar o filtro ou quando a última rolou para fora — animar tudo junto faria o
+   * painel inteiro tremer para dizer exatamente nada.
+   */
+  const lineNode = (line: LogLine, nova = false): HTMLElement =>
+    el('li', { class: `log-line log-${line.kind}${nova ? ' log-nova' : ''}` }, line.text)
   // Estado vazio com palavra, não caixa vazia: antes de a primeira hunt render alguma coisa, ou
   // com o filtro ligado num trecho sem combate, o painel ficava em branco sem dizer por quê.
   const vazio = (): HTMLElement =>
@@ -29,7 +39,7 @@ export function mountLog(root: HTMLElement, ctx: AppContext): () => void {
   const rebuild = (lines: readonly LogLine[]): void => {
     const visible = visibleOf(lines)
     last = visible.at(-1) ?? null
-    list.replaceChildren(...(visible.length === 0 ? [vazio()] : visible.map(lineNode)))
+    list.replaceChildren(...(visible.length === 0 ? [vazio()] : visible.map((linha) => lineNode(linha))))
     list.scrollTop = list.scrollHeight
   }
   // O store rotaciona com 200 linhas fixas, então contar não basta: acha a última já desenhada
@@ -42,7 +52,7 @@ export function mountLog(root: HTMLElement, ctx: AppContext): () => void {
     if (fresh.length === 0) return
     const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 40
     list.querySelector('.log-vazio')?.remove()
-    for (const line of fresh) list.append(lineNode(line))
+    for (const line of fresh) list.append(lineNode(line, true))
     while (list.children.length > LOG_MAX_LINES) list.firstElementChild?.remove()
     last = visible.at(-1) ?? null
     if (atBottom) list.scrollTop = list.scrollHeight

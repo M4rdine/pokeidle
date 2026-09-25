@@ -40,8 +40,9 @@ export function mountActivePokemon(root: HTMLElement, ctx: AppContext): () => vo
   const xp = el('progress', { class: 'xp-bar', 'data-xp': '', max: '100', value: '0' })
   const xpText = el('span', { class: 'muted', 'data-xp-text': '' }, '—')
   const corpo = el('div', { class: 'active-corpo' }, medidor('HP', hpText, hp), medidor('XP', xpText, xp))
-  root.append(el('section', { class: 'active-card panel' },
-    el('div', { class: 'active-topo' }, caixaSprite, title), corpo))
+  const cartao = el('section', { class: 'active-card panel' },
+    el('div', { class: 'active-topo' }, caixaSprite, title), corpo)
+  root.append(cartao)
 
   let species = ''
   return ctx.hunt.subscribe(activePokemon, (active) => {
@@ -59,14 +60,36 @@ export function mountActivePokemon(root: HTMLElement, ctx: AppContext): () => vo
     if (active.speciesName !== species) {
       species = active.speciesName
       caixaSprite.replaceChildren(spriteThumb(ctx.atlas, species, LADO_SPRITE))
-      comTipo(caixaSprite, ctx.registry.species.get(species)?.types ?? [])
+      const tipos = ctx.registry.species.get(species)?.types ?? []
+      comTipo(caixaSprite, tipos)
+      // A TESE DO SISTEMA, aplicada ao lugar onde ela mais rende e onde faltava: o cartão do
+      // Pokémon em campo leva a cor do PRÓPRIO tipo. Era o único painel da coluna que mostrava
+      // uma criatura e continuava sendo ardósia lisa — o slot dela, três dedos abaixo, já tinha
+      // trilho e poço tingidos.
+      comTipo(cartao, tipos)
     }
     nome.textContent = displayName(active.speciesName)
     nivel.textContent = `nv ${active.level}`
     nivel.hidden = false
+    /*
+     * O CLARÃO DO DANO. A barra já encolhe com transição, mas encolher devagar esconde o susto:
+     * com dano pequeno, o comprimento sozinho não conta que o Pokémon foi atingido.
+     *
+     * Só quando CAI, e só quando é o MESMO Pokémon: trocar de ativo muda o HP sem ninguém ter
+     * levado golpe nenhum, e piscar ali seria mentir sobre o que aconteceu.
+     */
+    const hpAnterior = Number(hp.getAttribute('value'))
+    const mesmoPokemon = hp.getAttribute('data-de') === active.id
     hp.setAttribute('max', String(active.hpMax))
     hp.setAttribute('value', String(active.hp))
+    hp.setAttribute('data-de', active.id)
     hp.setAttribute('data-hp-state', estadoDoHp(active.hp, active.hpMax))
+    if (mesmoPokemon && active.hp < hpAnterior) {
+      hp.classList.remove('levou-dano')
+      void hp.offsetWidth
+      hp.classList.add('levou-dano')
+      hp.addEventListener('animationend', () => hp.classList.remove('levou-dano'), { once: true })
+    }
     hpText.textContent = `${active.hp}/${active.hpMax}`
     const growth = ctx.registry.species.get(active.speciesName)?.growthRate ?? 'medium-fast'
     const floor = xpForLevel(growth, active.level)

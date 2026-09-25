@@ -24,6 +24,7 @@ colors:
   primaria-texto: "#ffffff"
   selecao: "#6f8ae6"
   selecao-texto: "#11151f"
+  vivo: "#45d9c8"
   ouro: "#ffcb05"
   ouro-cheio: "#ffcb05"
   xp: "#58a6f0"

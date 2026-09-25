@@ -1,0 +1,106 @@
+/*
+ * O movimento da interface.
+ *
+ * A tela era estaticamente idêntica à captura de tela dela: nada entrava, nada respondia ao
+ * ponteiro, nada acusava que um número tinha mudado. Interface de jogo se move — é o que diz que
+ * ela está viva e que a ação do jogador chegou.
+ *
+ * A REGRA, herdada do DESIGN.md: **reage, não coreografa**. Todo movimento aqui responde a um
+ * evento — a tela montou, o ponteiro entrou, o valor mudou. Nenhum roda em laço, porque laço num
+ * painel que o jogador olha por horas deixa de ser vida e vira tique.
+ *
+ * `prefers-reduced-motion` já é atendido globalmente em `tokens.css`, que zera duração de
+ * animação e de transição. Nada aqui precisa repetir a guarda, e nada aqui pode depender de a
+ * animação terminar para o elemento ficar legível — por isso todo `@keyframes` daqui termina no
+ * estado final, e o estado final é o normal.
+ */
+
+/* ── A tela se monta ──────────────────────────────────────────────────────────
+ * As cinco áreas da grade entram em escada, de cima para baixo e do centro para fora. É o que
+ * transforma "a página apareceu" em "o painel ligou".
+ *
+ * `translateY` de 6 px, não de 30: a entrada tem que ser percebida sem ser esperada. Acima de uns
+ * 10 px o olho passa a aguardar o fim do movimento antes de ler, e aí a animação custa tempo do
+ * jogador em vez de dar acabamento.
+ */
+@keyframes entra-painel {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.game-grid > * {
+  animation: entra-painel var(--normal) var(--saida) both;
+}
+.grid-menu { animation-delay: 0ms; }
+.grid-center { animation-delay: 40ms; }
+.grid-left { animation-delay: 80ms; }
+.grid-right { animation-delay: 80ms; }
+.grid-bottom { animation-delay: 120ms; }
+
+/* ── O time responde ao ponteiro ──────────────────────────────────────────────
+ * O slot era o único alvo clicável da tela sem nenhum estado: clicava e trocava o ativo sem que
+ * nada antes do clique dissesse que ele era clicável. O trilho de tipo acende e a peça sobe um
+ * pixel — o mesmo movimento das peças do menu, para a tela ter UM jeito de responder e não dois.
+ */
+button.slot {
+  transition:
+    transform var(--rapido) var(--saida),
+    box-shadow var(--rapido) ease-out,
+    background var(--rapido) ease-out;
+}
+button.slot:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--tipo, var(--borda-clara)) 34%, var(--painel-pe)),
+    var(--painel-pe) 52%);
+  box-shadow:
+    inset 3px 0 0 var(--tipo, var(--borda-clara)),
+    inset 0 1px 0 rgb(255 255 255 / 12%),
+    0 3px 10px rgb(0 0 0 / 40%);
+}
+/* Apertar AFUNDA. É o par do levantar, e é o que faz o clique ter peso: sem ele o botão sobe no
+ * hover e some no clique, que é o oposto do que a mão espera de uma peça física. */
+button.slot:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow:
+    inset 3px 0 0 var(--tipo, var(--borda-clara)),
+    inset 0 2px 4px rgb(0 0 0 / 45%);
+}
+
+/*
+ * A peça do menu NÃO ganha `:active` próprio: o botão base já afunda 3 px, que é exatamente a
+ * altura do degrau duro que ele perde ao ser apertado. Uma regra a mais aqui venceria por ordem
+ * de cascata e desfaria esse casamento — foi o que esta folha fez na primeira escrita, trocando
+ * os 3 px por 1 e deixando a peça flutuando ao ser clicada.
+ *
+ * O que falta ao menu é só a transição do POÇO, que o botão base não conhece.
+ */
+.menu-item .icone { transition: background-color var(--rapido) ease-out, box-shadow var(--rapido) ease-out; }
+
+/* ── O número acusa que mudou ─────────────────────────────────────────────────
+ * Ouro, XP e nível sobem sozinhos enquanto o jogador olha para o mapa. Sem sinal nenhum, a única
+ * forma de saber que subiu é ter decorado o valor anterior.
+ *
+ * A classe é posta e tirada pelo JavaScript (`pulsar()` em `ui/dom.ts`), e não fica: animação
+ * presa num elemento que se atualiza a cada 200 ms reinicia para sempre.
+ */
+@keyframes pulso-valor {
+  0% { transform: none; }
+  35% { transform: scale(1.12); }
+  100% { transform: none; }
+}
+.pulsa {
+  display: inline-block; /* `transform` não pega em caixa de linha pura */
+  animation: pulso-valor var(--normal) var(--saida);
+}
+
+/* ── A barra de vida acusa o golpe ────────────────────────────────────────────
+ * A barra já encolhe com transição, mas encolher devagar esconde o susto: o que o jogador precisa
+ * ver é QUE LEVOU DANO, e o comprimento sozinho não conta isso quando o dano é pequeno.
+ */
+@keyframes flash-dano {
+  0% { filter: brightness(2.2) saturate(0.4); }
+  100% { filter: none; }
+}
+.levou-dano::-webkit-progress-value { animation: flash-dano var(--normal) ease-out; }
+.levou-dano::-moz-progress-bar { animation: flash-dano var(--normal) ease-out; }

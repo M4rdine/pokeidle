@@ -10,14 +10,22 @@ const LADO_SLOT = 32
 
 /** Seis lugares: os do time, os vazios liberados e os bloqueados pelo nível do treinador. */
 export function mountTeamStrip(root: HTMLElement, ctx: AppContext): () => void {
-  const strip = el('section', { class: 'team-strip panel' })
-  root.append(strip)
+  // A lista deixa de ser o painel e passa a morar DENTRO dele: `render` troca os filhos da
+  // lista a cada tique, e um cabeçalho irmão dela seria varrido junto.
+  const strip = el('div', { class: 'team-strip' })
+  // A contagem mora no cabeçalho, à direita, como o "poder" da lista de golpes: é a mesma
+  // pergunta — quantos dos meus lugares estão ocupados — e ela não merece uma linha própria.
+  const contagem = el('span', { class: 'cabeca-conta', 'data-contagem': '' }, '')
+  root.append(el('section', { class: 'time-painel panel' },
+    el('div', { class: 'cabeca cabeca-barra' }, el('span', {}, 'time'), contagem),
+    strip))
 
   const render = (): void => {
     const view = ctx.hunt.get()
     const team = view.state?.player.team ?? []
     const activeIndex = view.state?.player.activeIndex ?? 0
     const slots = view.state?.settings.teamSlots ?? ctx.session.get().me?.trainer.teamSlots ?? MAX_TEAM_SLOTS
+    contagem.textContent = `${team.length}/${slots}`
     const nodes = Array.from({ length: MAX_TEAM_SLOTS }, (_unused, index) => {
       const member = team[index]
       if (member) {
@@ -51,13 +59,25 @@ export function mountTeamStrip(root: HTMLElement, ctx: AppContext): () => void {
         slot.addEventListener('click', () => ctx.sendIntent?.({ t: 'team.setActive', pokemonId: member.id }))
         return slot
       }
-      if (index < slots) return el('div', { class: 'slot slot-empty' }, 'vazio')
+      /*
+       * Vaga livre é um SOQUETE, não a palavra "vazio".
+       *
+       * Três linhas repetindo a mesma palavra é ruído: a informação ("cabe mais um aqui") é a
+       * mesma nas três, e texto repetido cobra leitura toda vez. Um encaixe afundado e vazio diz
+       * isso de forma, e forma repetida não cansa — é o que faz uma fileira de encaixes vazios
+       * ler como capacidade em vez de lista de nadas.
+       */
+      if (index < slots) {
+        return el('div', { class: 'slot slot-empty', title: 'vaga livre' },
+          el('span', { class: 'soquete' }))
+      }
       // O nível que destrava é informação; o cadeado em emoji que estava aqui não era.
       const nivel = nivelDaVaga(ctx.registry.unlocks, index)
       return el('div', {
         class: 'slot slot-locked',
         title: nivel === null ? 'vaga indisponível' : `destrava no nível ${nivel} do treinador`,
-      }, nivel === null ? 'indisponível' : `nv ${nivel}`)
+      }, el('span', { class: 'soquete soquete-travado' }),
+        el('span', {}, nivel === null ? 'indisponível' : `nv ${nivel}`))
     })
     strip.replaceChildren(...nodes)
   }

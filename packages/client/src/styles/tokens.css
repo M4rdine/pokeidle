@@ -322,7 +322,22 @@ html, body {
 
 body {
   margin: 0;
-  background: var(--fundo);
+  /*
+   * O CHÃO TEM LUZ. Ele era `--fundo` chapado de ponta a ponta, e chapado é o que faz uma tela
+   * inteira parecer recorte sobre cartolina: sem uma fonte de luz, nenhum painel está iluminado
+   * por nada, e o relevo de cada peça vira convenção em vez de consequência.
+   *
+   * Uma lâmpada só, no alto e no centro, do mesmo azul do painel e a 30% — o bastante para o
+   * olho encontrar o eixo da tela e para as bordas escurecerem sozinhas. Não é gradiente
+   * decorativo: é a mesma luz de cima que todo o `--relevo` do sistema já supõe, finalmente
+   * desenhada no chão em que as peças se apoiam.
+   */
+  background:
+    radial-gradient(120% 78% at 50% -8%,
+      color-mix(in srgb, var(--painel) 30%, var(--fundo)),
+      var(--fundo) 62%),
+    var(--fundo);
+  background-attachment: fixed;
   color: var(--texto);
   font-family: var(--fonte-texto);
   font-size: var(--t-m);

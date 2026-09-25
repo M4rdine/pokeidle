@@ -141,6 +141,28 @@ button:active:not([disabled]) {
 button[disabled] { opacity: 0.45; cursor: default; box-shadow: var(--relevo-1); }
 
 /*
+ * A voz DISCRETA: a ação que existe, é legítima e não é a que se veio fazer — vender numa loja,
+ * cancelar num diálogo.
+ *
+ * Ela não afunda a superfície, só tira o relevo e a face: fica no plano do painel, com o fio de
+ * controle que a WCAG 1.4.11 exige para identificar que ali há um botão. Sem o fio, "discreto"
+ * viraria "invisível", que é o erro clássico deste tipo de variante.
+ */
+button.discreto {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--borda-forte);
+  color: var(--texto-fraco);
+}
+button.discreto:hover:not([disabled]) {
+  background: rgb(255 255 255 / 6%);
+  color: var(--texto);
+}
+button.discreto:active:not([disabled]) {
+  background: var(--face-cava);
+  box-shadow: inset 0 0 0 1px var(--borda-forte), var(--relevo-apertado);
+}
+
+/*
  * Ação primária: o vermelho da Poké Ball, cheio, com texto branco. É a ÚNICA cor de marca do
  * sistema e aparece só aqui — o resto da cor é informação. O gradiente é o mesmo da Poké Ball
  * vista de frente: a luz pega a metade de cima.

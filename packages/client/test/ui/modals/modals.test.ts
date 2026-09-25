@@ -117,9 +117,14 @@ describe('loja', () => {
     const post = vi.fn(async () => ({ gold: 400, item: { itemId: 'potion', quantity: 3 } }))
     openShop(ctxWith({ http: { get, post } as never }))
     await flush()
-    expect(modal().querySelector('[data-item=potion] [data-owned]')?.textContent).toBe('2')
+    // `×2` e não `2`: o que já se tem virou SELO, com o mesmo formato da mochila. Era um número
+    // em cinza no meio de outros números em cinza, e nada dizia de qual quantidade ele falava.
+    expect(modal().querySelector('[data-item=potion] [data-owned]')?.textContent).toBe('×2')
     expect(modal().querySelector('[data-item=super-potion]')?.className).toContain('locked')
-    expect(modal().querySelector('[data-item=super-potion]')?.textContent).toContain('nível 20')
+    // `nv 20` em selo, e não `nível 20` solto: é a mesma abreviação que a vaga travada do time e
+    // o chip de nível do Pokémon já usam. O que trava a linha é da mesma família do que trava a
+    // vaga, e falar duas línguas para o mesmo fato é o que fazia a tela parecer montada.
+    expect(modal().querySelector('[data-item=super-potion]')?.textContent).toContain('nv 20')
     modal().querySelector<HTMLButtonElement>('[data-item=potion] button')!.click()
     await flush()
     expect(post).toHaveBeenCalledWith('/shop/buy', { itemId: 'potion', quantity: 1 }, expect.anything())

@@ -38,7 +38,10 @@ test('registrar, inicial, Campo Inicial, derrota, mochila, parar e comprar na lo
 
   await page.getByRole('button', { name: 'Loja' }).click()
   const potion = page.locator('.shop-item[data-item=potion]')
-  const before = Number(await potion.locator('[data-owned]').textContent())
+  // Lê o ATRIBUTO, não o texto: o selo é escrito para gente (`×1`, com separador de milhar), e
+  // amarrar o teste à forma de escrever um número o quebra a cada mudança de apresentação.
+  const contador = potion.locator('[data-owned]')
+  const before = Number(await contador.getAttribute('data-owned'))
   await potion.getByRole('button', { name: 'Comprar' }).click()
-  await expect(potion.locator('[data-owned]')).toHaveText(String(before + 1), { timeout: 15_000 })
+  await expect(contador).toHaveAttribute('data-owned', String(before + 1), { timeout: 15_000 })
 })

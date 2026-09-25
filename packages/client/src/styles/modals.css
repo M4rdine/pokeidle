@@ -21,7 +21,38 @@
    * mundo ardósia ela punha um halo quente em volta de todo modal, e ninguém veria isso olhando. */
   box-shadow: var(--relevo-3);
 }
-.modal-header { flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); padding: var(--space-2) var(--space-3); border-bottom: var(--border-w) solid var(--borda-clara); }
+/*
+ * O cabeçalho do modal fala a MESMA língua das faixas de título do jogo: hachura, marca inclinada
+ * e o fio aceso que apaga antes da metade. Ele não usa a classe `.cabeca-barra` porque o título
+ * aqui é um `h2` de display, e `.cabeca` o encolheria para rótulo miúdo — o que muda é o TAMANHO
+ * da voz, não o vocabulário da moldura.
+ *
+ * Sem isto, todo modal do jogo era a única superfície da aplicação sem marca nenhuma: a tela de
+ * jogo inteira tinha ganhado a linguagem e os diálogos tinham ficado para trás.
+ */
+.modal-header {
+  flex-shrink: 0; position: relative;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-2) calc(var(--space-3) + 11px);
+  border-bottom: 0;
+  background:
+    repeating-linear-gradient(135deg, rgb(255 255 255 / 4%) 0 1px, transparent 1px 5px),
+    linear-gradient(180deg, rgb(0 0 0 / 30%), rgb(0 0 0 / 46%));
+  border-radius: var(--raio-gg) var(--raio-gg) 0 0;
+  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 55%), 0 1px 0 rgb(255 255 255 / 9%);
+}
+.modal-header::before {
+  content: ""; position: absolute; left: var(--space-3); top: 50%;
+  width: 3px; height: 14px;
+  transform: translateY(-50%) skewX(-14deg);
+  background: var(--vivo);
+  box-shadow: 0 0 7px color-mix(in srgb, var(--vivo) 55%, transparent);
+}
+.modal-header::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--vivo) 60%, transparent), transparent 42%);
+}
 .modal-close { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; flex-shrink: 0; }
 .modal-body { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); overflow-y: auto; min-height: 0; }
 /* Linha de lista não é objeto: só o fio que a separa da seguinte, sem moldura e sem fundo. O fio
@@ -29,8 +60,41 @@
 .bag-item, .team-row, .shop-item { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-2) 0; border-bottom: 1px solid var(--borda-clara); }
 .bag-item button, .team-row button, .shop-item button { margin-left: auto; }
 .shop-item button { margin-left: 0; }
-.shop-item input { width: 64px; margin-left: auto; }
+.shop-item input { width: 58px; margin-left: auto; }
 .shop-item.locked { opacity: 0.55; }
+
+/*
+ * ── A loja ──
+ *
+ * A linha vira GRADE de colunas fixas, e não uma fileira de textos em cinza empurrados por
+ * `margin-left: auto`. Com colunas, preço se compara com preço e quantidade com quantidade
+ * descendo a lista — que é a única coisa que se faz numa loja.
+ */
+.shop-saldo {
+  display: flex; gap: var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--raio);
+  background: var(--face-cava); box-shadow: var(--relevo-cava);
+}
+.shop-saldo .leitura > :last-child { font-size: var(--t-l); font-weight: 700; }
+.shop-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto auto;
+  gap: var(--space-2); align-items: center;
+}
+.shop-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* O preço é dinheiro e leva a cor do ouro, como a moeda do perfil e do painel de áreas. */
+.shop-preco { gap: var(--space-1); font-size: var(--t-s); }
+/* O que já se tem é um SELO, não mais um número em cinza no meio de outros números em cinza. */
+.shop-tenho { font-variant-numeric: tabular-nums; }
+.shop-trava { background: color-mix(in srgb, var(--borda-clara) 40%, var(--cava)); color: var(--texto-fraco); }
+/* Numa tela estreita a linha quebra em duas: nome e preço em cima, controles embaixo. Seis
+ * colunas em 320 px deixariam o nome com espaço para três letras. */
+@media (max-width: 560px) {
+  .shop-item { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .shop-item input, .shop-item button { grid-row: 2; }
+  .shop-item input { margin-left: 0; }
+}
 .settings .field { gap: var(--space-1); }
 /*
  * A conta fica depois de uma divisória, abaixo de Salvar. É o único bloco do painel que não é

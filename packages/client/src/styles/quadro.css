@@ -115,6 +115,37 @@
 }
 .cabeca-conta { color: var(--texto); font-weight: 400; }
 
+/*
+ * ── CANTONEIRA ──
+ *
+ * Quatro marcas em L nos cantos, e não uma moldura fechada: a moldura inteira volta a ser o fio
+ * em volta de tudo que esta casa já tirou uma vez. O canto marcado dá o ENQUADRAMENTO e deixa as
+ * arestas livres, que é como visor de instrumento se desenha.
+ *
+ * Oito gradientes num pseudo-elemento só, em vez de quatro elementos: a cantoneira não tem
+ * conteúdo nem estado, e não merece nó no DOM.
+ *
+ * É componente, e não um efeito da cena: a mesma peça emoldura o visor do mundo e o cartão de
+ * entrada, que são as duas superfícies do produto que pedem "olhe para dentro daqui".
+ */
+.cantoneiras { position: relative; }
+/* A cor é parametrizada porque há DOIS usuários com significados diferentes: a cena usa o traço
+ * vivo ("o que está acontecendo"), a barra superior usa o latão ("esta é a estrutura"). */
+.cantoneiras::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  --cantoneira-cor: var(--vivo);
+  --cantoneira: linear-gradient(var(--cantoneira-cor), var(--cantoneira-cor));
+  background:
+    var(--cantoneira) left 0 top 0 / 18px 2px no-repeat,
+    var(--cantoneira) left 0 top 0 / 2px 18px no-repeat,
+    var(--cantoneira) right 0 top 0 / 18px 2px no-repeat,
+    var(--cantoneira) right 0 top 0 / 2px 18px no-repeat,
+    var(--cantoneira) left 0 bottom 0 / 18px 2px no-repeat,
+    var(--cantoneira) left 0 bottom 0 / 2px 18px no-repeat,
+    var(--cantoneira) right 0 bottom 0 / 18px 2px no-repeat,
+    var(--cantoneira) right 0 bottom 0 / 2px 18px no-repeat;
+}
+
 /**
  * Chip: um atributo curto e repetível. Sem sombra — chip não é objeto separado, é uma marca
  * sobre a superfície. A cor identifica a família do dado, nunca o valor; é a repetição em coluna

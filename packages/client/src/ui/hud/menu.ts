@@ -19,7 +19,20 @@ export function mountMenu(root: HTMLElement, ctx: AppContext): () => void {
       el('span', { class: 'icone', 'data-icone': MODAL_ICONS[modal] }),
       el('span', {}, MODAL_LABELS[modal])))
 
-  root.append(el('nav', { class: 'menu panel', 'aria-label': 'Funções do jogo' },
+  /*
+   * A BARRA SUPERIOR, e não seis peças soltas no alto da coluna.
+   *
+   * A referência do gênero abre com uma faixa que atravessa a tela, emoldurada, carregando a
+   * marca à esquerda e a navegação no meio — e é ela que diz "isto é um jogo, e você está dentro
+   * dele". Seis botões flutuando sobre o fundo dizem "isto é uma página".
+   *
+   * A marca fica aqui e em nenhum outro lugar da tela de jogo: uma vez, no canto de onde nunca
+   * sai, que é como todo produto assina a própria interface.
+   */
+  root.append(el('nav', { class: 'menu barra-topo cantoneiras', 'aria-label': 'Funções do jogo' },
+    el('div', { class: 'marca-topo' },
+      el('span', { class: 'marca-bola', 'aria-hidden': 'true' }),
+      el('span', { class: 'marca-nome' }, 'Pokeidle')),
     el('div', { class: 'menu-grade' }, ...funcoes)))
 
   return () => { /* sem assinatura: o menu não lê estado, só dispara ação. */ }

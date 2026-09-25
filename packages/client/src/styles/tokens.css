@@ -159,6 +159,21 @@
    */
   --vivo: #45d9c8;
 
+  /*
+   * ── O latão ──
+   *
+   * O metal da MOLDURA: a barra superior, o quadro do que está em foco, a aresta de uma peça que
+   * precisa parecer forjada. É o segundo acento da casa, e ele tem um trabalho que o teal não
+   * faz — o teal diz "vivo, acontecendo agora"; o latão diz "esta é a estrutura".
+   *
+   * DESSATURADO, e longe do `--ouro`. Não é capricho: `--ouro` (#ffcb05) é o amarelo do logotipo
+   * e já tem dono — é o dinheiro do jogador, o número que ele veio ver. Emoldurar a tela com o
+   * mesmo amarelo mataria esse canal, porque o ouro deixaria de ser o único amarelo saturado da
+   * tela. Um latão puxado para o ocre convive com ele sem disputar.
+   */
+  --latao: #c9a227;
+  --latao-fraco: #6d5a1c;
+
   /* ── Papéis semânticos. A cor aqui é informação; decoração não ganha nenhuma. ── */
   --ouro: #ffcb05;         /* o amarelo do logotipo da franquia */
   --ouro-cheio: #ffcb05;

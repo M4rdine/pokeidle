@@ -6,7 +6,29 @@
  * mais 180 px fixos de log), e o log, a superfície menos ligada a decisão, era o maior painel do
  * quadro. Agora a barra cabe numa linha e o log encolhe com a janela.
  */
-.screen.game-grid { max-width: none; margin: 0; padding: var(--space-2); }
+/*
+ * O MUNDO FICA ATRÁS DA INTERFACE.
+ *
+ * A tela de jogo estava sobre azul chapado, e é isso que a fazia parecer aplicação em vez de
+ * jogo: os painéis flutuavam sobre nada. Com a arte-chave ao fundo, fortemente abafada, o espaço
+ * ENTRE os painéis deixa de ser vazio e passa a ser o mundo — que é o que o jogador está jogando.
+ *
+ * O véu é pesado (88–94%) por dois motivos, e os dois são duros: os painéis precisam continuar
+ * ganhando do fundo no contraste medido, e a arte tem 256×144 — a seis vezes o tamanho, cada
+ * pixel dela vira um bloco de 6 px. Abafada nesse grau, ela não é figura: é campo de cor amplo,
+ * que é exatamente o trabalho que ela tem aqui.
+ *
+ * `fixed` para o fundo não deslizar junto com painel nenhum: o mundo está atrás de tudo e não se
+ * move com a interface.
+ */
+.screen.game-grid {
+  max-width: none; margin: 0; padding: var(--space-2);
+  background:
+    linear-gradient(180deg, rgb(11 15 26 / 78%), rgb(11 15 26 / 86%) 55%, rgb(11 15 26 / 92%)),
+    url('./arte/entrada.webp') center / cover no-repeat fixed,
+    var(--fundo);
+  image-rendering: pixelated;
+}
 /*
  * Três colunas, agrupadas por PERGUNTA: quem eu sou (esquerda), o que está acontecendo (centro),
  * o que o meu Pokémon pode fazer (direita). A cena é o centro e cada painel rola por dentro; a
@@ -21,8 +43,13 @@
   grid-template-columns: 300px 1fr 260px;
   /* O registro encolhe com a janela em vez de tomar altura fixa de qualquer tela. */
   grid-template-rows: auto 1fr clamp(76px, 12vh, 140px);
+  /*
+   * A BARRA SUPERIOR ATRAVESSA AS TRÊS COLUNAS. Presa à coluna do meio, ela era mais um painel
+   * flutuando entre outros dois; atravessando, ela vira o topo do produto — que é o papel que
+   * uma barra de marca tem, e é assim que a referência do gênero monta a tela.
+   */
   grid-template-areas:
-    "left menu   right"
+    "menu menu   menu"
     "left center right"
     "left bottom right";
   gap: var(--space-2);
@@ -57,33 +84,18 @@
 /*
  * A CENA É UM VISOR, e não um retângulo encostado nos painéis.
  *
- * Era o elemento menos desenhado da tela sendo o mais importante dela: o mapa terminava numa
- * aresta crua contra o fundo, sem nada dizendo onde o mundo acaba e a interface começa. Toda
- * interface de jogo emoldura o que é jogado — é o que separa "o jogo" de "um bloco da página".
+ * Era o elemento mais importante da tela e o menos desenhado: o mapa terminava numa aresta crua
+ * contra o fundo, sem nada dizendo onde o mundo acaba e a interface começa.
  *
- * Quatro CANTONEIRAS, e não uma borda inteira: a moldura fechada volta a ser o fio em volta de
- * tudo que esta casa já tirou uma vez. O canto marcado dá o enquadramento e deixa as arestas
- * livres, que é como visor de instrumento se desenha.
- *
- * Oito gradientes num pseudo-elemento só, em vez de quatro elementos: a cantoneira não tem
- * conteúdo nem estado, e não merece nó no DOM.
+ * As quatro cantoneiras vêm do componente `.cantoneiras`, em `quadro.css` — a mesma peça que
+ * emoldura o cartão de entrada. Aqui sobra só a sombra que CAVA a aresta: sem ela o mapa parece
+ * colado por cima do painel, e não visto através dele.
  */
-.grid-center::after {
+.grid-center::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
-  --cantoneira: linear-gradient(var(--vivo), var(--vivo));
-  background:
-    var(--cantoneira) left 0 top 0 / 18px 2px no-repeat,
-    var(--cantoneira) left 0 top 0 / 2px 18px no-repeat,
-    var(--cantoneira) right 0 top 0 / 18px 2px no-repeat,
-    var(--cantoneira) right 0 top 0 / 2px 18px no-repeat,
-    var(--cantoneira) left 0 bottom 0 / 18px 2px no-repeat,
-    var(--cantoneira) left 0 bottom 0 / 2px 18px no-repeat,
-    var(--cantoneira) right 0 bottom 0 / 18px 2px no-repeat,
-    var(--cantoneira) right 0 bottom 0 / 2px 18px no-repeat;
-  /* A sombra interna cava a borda do visor: sem ela o mapa parece colado por cima do painel, e
-   * não visto ATRAVÉS dele. */
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 55%), inset 0 0 24px rgb(0 0 0 / 45%);
 }
+
 .grid-right { grid-area: right; min-height: 0; display: flex; flex-direction: column; gap: var(--space-2); }
 .grid-bottom { grid-area: bottom; min-height: 0; }
 
@@ -111,10 +123,44 @@
  * Ele centraliza e encosta nas peças. Esticado até a largura da coluna, voltava a ser uma barra
  * com um vazio de 300 px à direita dos seis itens.
  */
+/*
+ * A barra atravessa a tela e é EMOLDURADA: face hachurada, fio de latão por dentro e cantoneiras
+ * de latão nos quatro cantos. É a peça que a referência do gênero usa para dizer "isto é um
+ * jogo" — e o que tínhamos era seis botões flutuando sobre o fundo, que diz "isto é uma página".
+ *
+ * O latão aqui não é enfeite: ele separa a ESTRUTURA (a moldura do produto) do traço vivo, que
+ * marca o que está acontecendo agora. Duas cores, dois trabalhos.
+ */
 .menu {
-  display: flex; align-items: flex-start; gap: var(--space-2);
-  padding: var(--space-2); width: fit-content; margin-inline: auto;
-  background: none; box-shadow: none;
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  width: auto; margin-inline: 0;
+  background:
+    repeating-linear-gradient(135deg, rgb(255 255 255 / 4%) 0 1px, transparent 1px 6px),
+    var(--face-painel);
+  border-radius: var(--raio-g);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--latao) 38%, transparent),
+    var(--relevo-1);
+}
+.menu.cantoneiras::after { --cantoneira-cor: var(--latao); }
+/* A grade fica no centro da barra, com a marca à esquerda e o mesmo vão do outro lado — sem o
+ * segundo vão, ela encostaria na borda direita e a barra ficaria torta. */
+.menu-grade { margin-inline: auto; }
+/*
+ * A MARCA assina a interface uma vez, no canto de onde nunca sai. A Poké Ball é o sprite oficial
+ * — o mesmo acervo dos ícones do menu —, e o nome vai na voz de HUD, que é a voz de título desta
+ * casa e está acima do piso da face bitmap em `--t-l`.
+ */
+.marca-topo { display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
+.marca-bola {
+  display: block; width: 26px; height: 26px; flex-shrink: 0;
+  background: url('./ui/icone-time.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+.marca-nome {
+  font-family: var(--fonte-hud); font-size: var(--t-l);
+  letter-spacing: 0.04em; color: var(--texto);
 }
 .menu-grade { display: flex; flex-wrap: wrap; gap: var(--space-2); }
 /*

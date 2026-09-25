@@ -77,6 +77,13 @@ const PARES: readonly { readonly frente: string; readonly fundo: string; readonl
   { frente: 'vivo', fundo: 'painel-topo', minimo: TEXTO_GRANDE, onde: 'marca do cabeçalho no alto do painel' },
   { frente: 'vivo', fundo: 'cava-pe', minimo: TEXTO_GRANDE, onde: 'marca do cabeçalho sobre a faixa escura' },
   { frente: 'vivo', fundo: 'fundo', minimo: TEXTO_GRANDE, onde: 'cantoneira da cena sobre o chão' },
+  /*
+   * O LATÃO é moldura, nunca tinta de texto — mesmo contrato de elemento não textual do traço
+   * vivo. Ele precisa valer sobre o chão (a barra superior flutua ali) e sobre a faixa escura do
+   * cabeçalho, que é onde a aresta dele encosta.
+   */
+  { frente: 'latao', fundo: 'fundo', minimo: TEXTO_GRANDE, onde: 'moldura de latão sobre o chão' },
+  { frente: 'latao', fundo: 'cava-pe', minimo: TEXTO_GRANDE, onde: 'moldura de latão sobre a faixa escura' },
   { frente: 'texto', fundo: 'cava', minimo: TEXTO_NORMAL, onde: 'corpo sobre a fenda' },
   { frente: 'texto', fundo: 'fundo', minimo: TEXTO_NORMAL, onde: 'corpo sobre o fundo da página' },
   { frente: 'texto-fraco', fundo: 'painel', minimo: TEXTO_NORMAL, onde: 'rótulo discreto no painel' },

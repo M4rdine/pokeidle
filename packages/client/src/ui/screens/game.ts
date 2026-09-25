@@ -23,7 +23,7 @@ import { el, mount } from '../dom.js'
 export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
   const left = el('div', { class: 'grid-left' })
   const menu = el('div', { class: 'grid-menu' })
-  const center = el('div', { class: 'grid-center', id: 'scene' })
+  const center = el('div', { class: 'grid-center cantoneiras', id: 'scene' })
   const right = el('div', { class: 'grid-right' })
   const bottom = el('div', { class: 'grid-bottom' })
   const titulo = el('h1', { class: 'so-leitor' }, 'Caçada em andamento')

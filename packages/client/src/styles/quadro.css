@@ -146,6 +146,34 @@
     var(--cantoneira) right 0 bottom 0 / 2px 18px no-repeat;
 }
 
+/*
+ * ── CARTÃO DE LEITURA ──
+ *
+ * Rótulo miúdo em caixa alta sobre o número, dentro de um encaixe afundado. É o componente de
+ * conteúdo mais distintivo da referência do gênero, e o que a nossa coluna do treinador não
+ * tinha: rótulo e número soltos sobre o painel não dizem onde um dado acaba e o outro começa, e
+ * uma fileira deles vira uma lista de palavras.
+ *
+ * Afundado, e não levantado: dado é o que se LÊ, e no vocabulário desta casa o que se lê mora
+ * numa fenda — trilho, campo, lista. Levantado seria botão, e ninguém clica num saldo.
+ */
+.cartao-leitura {
+  display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--raio-p);
+  background: var(--face-cava);
+  box-shadow: var(--relevo-cava);
+}
+.cartao-leitura > :first-child {
+  font-size: var(--t-xs); font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--texto-fraco);
+}
+.cartao-leitura > :last-child {
+  font-size: var(--t-l); font-weight: 700;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.cartao-ouro > :last-child { color: var(--ouro); }
+
 /**
  * Chip: um atributo curto e repetível. Sem sombra — chip não é objeto separado, é uma marca
  * sobre a superfície. A cor identifica a família do dado, nunca o valor; é a repetição em coluna

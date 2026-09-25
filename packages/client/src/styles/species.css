@@ -84,20 +84,42 @@
  * e um retângulo de ouro por cima —, e ficavam como a única peça da tela que não falava a língua
  * do sistema, justamente onde ele mais se repete.
  */
+/*
+ * O TRILHO É SEGMENTADO por marcas verticais, e o preenchimento anda do laranja ao amarelo.
+ *
+ * A barra chapada respondia "quanto", e só. Com as marcas ela responde também "quanto, comparado
+ * com o quê" — o olho conta divisões sem precisar do número, e é isso que deixa ler o FORMATO da
+ * espécie (rápida e frágil, lenta e dura) passando o olho pelas seis.
+ *
+ * E o gradiente horizontal carrega informação: um atributo alto termina na ponta amarela, um
+ * baixo morre no laranja. Não é decoração — é uma segunda leitura do mesmo dado, e ela funciona
+ * de relance, antes de o olho medir comprimento nenhum.
+ */
 .stat-barra {
-  height: 10px; position: relative; overflow: hidden;
-  background: var(--face-trilho); border-radius: 999px;
+  height: 12px; position: relative; overflow: hidden;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(90deg,
+      transparent 0 calc(12.5% - 1px), rgb(0 0 0 / 55%) calc(12.5% - 1px) 12.5%),
+    var(--face-trilho);
   box-shadow: var(--relevo-cava);
 }
 .stat-barra::after {
   content: ""; position: absolute; inset: 0;
   border-radius: 999px;
-  background: linear-gradient(180deg,
-    var(--ouro-cheio) 0 12%,
-    color-mix(in srgb, var(--ouro-cheio) 45%, white) 12% 30%,
-    var(--ouro-cheio) 30% 72%,
-    color-mix(in srgb, var(--ouro-cheio) 74%, black));
-  transform: scaleX(var(--fracao, 0)); transform-origin: left;
+  background:
+    /* O especular na segunda linha, como em todo medidor desta casa. */
+    linear-gradient(180deg,
+      rgb(255 255 255 / 0%) 0 12%,
+      rgb(255 255 255 / 34%) 12% 30%,
+      rgb(255 255 255 / 0%) 30% 72%,
+      rgb(0 0 0 / 22%)),
+    linear-gradient(90deg, #e8862c, #f5c518);
+  /* O gradiente pertence à barra INTEIRA, não ao pedaço preenchido: sem `background-size` fixo,
+   * `scaleX` esticaria a rampa junto e toda barra terminaria no mesmo amarelo, apagando a
+   * segunda leitura. */
+  background-size: 100% 100%;
+  width: calc(var(--fracao, 0) * 100%);
 }
 
 /* ── Evolução ──────────────────────────────────────────────────────────────── */

@@ -215,7 +215,9 @@
 .perfil > :not(.cabeca-barra) { margin-inline: var(--space-2); }
 .perfil-id { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
 .perfil-id strong { font-family: var(--fonte-hud); font-size: var(--t-l); letter-spacing: 0.01em; }
-.perfil-leituras { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+/* Dois cartões de largura igual: a comparação entre eles é o que faz a faixa ser faixa, e
+ * larguras diferentes fariam o maior parecer mais importante. */
+.perfil-leituras { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
 .leitura { display: flex; flex-direction: column; line-height: 1.1; min-width: 0; }
 .leitura > span:first-child {
   font-size: var(--t-xs); font-weight: 700;

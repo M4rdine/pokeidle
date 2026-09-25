@@ -44,9 +44,17 @@ export function mountPerfil(root: HTMLElement, ctx: AppContext): () => void {
     el('div', { class: 'medidor' },
       el('div', { class: 'medidor-topo' }, el('span', {}, 'xp'), xpTexto),
       xpBar),
+    /*
+     * Ouro e área viram CARTÕES, lado a lado. Soltos sobre o painel, os dois pares rótulo-número
+     * liam como quatro palavras numa lista; em encaixe, cada um é um mostrador, e os dois juntos
+     * são uma faixa de leitura — que é como a referência do gênero apresenta número de jogo.
+     *
+     * "Próximo" fica FORA da faixa: o valor dele é uma frase ("4 vagas no time · nv 10"), e frase
+     * dentro de um mostrador de número quebra a leitura dos dois.
+     */
     el('div', { class: 'perfil-leituras' },
-      leitura(el('span', {}, 'ouro'), gold, 'leitura-ouro'),
-      leitura(areaNome, dex)),
+      el('div', { class: 'cartao-leitura cartao-ouro' }, el('span', {}, 'ouro'), gold),
+      el('div', { class: 'cartao-leitura' }, areaNome, dex)),
     leitura(el('span', {}, 'próximo'), nextUnlock),
     el('div', { class: 'perfil-status' }, conn, tick)))
 

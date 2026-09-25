@@ -1,6 +1,7 @@
 import type { AppContext, ModalName } from '../../app-context.js'
 import { MODAL_ICONS, MODAL_LABELS } from '../../config.js'
 import { el } from '../dom.js'
+import { mountEstado } from './estado.js'
 
 /**
  * O menu de funções, em grade, no alto da coluna do centro.
@@ -35,5 +36,8 @@ export function mountMenu(root: HTMLElement, ctx: AppContext): () => void {
       el('span', { class: 'marca-nome' }, 'Pokeidle')),
     el('div', { class: 'menu-grade' }, ...funcoes)))
 
-  return () => { /* sem assinatura: o menu não lê estado, só dispara ação. */ }
+  // O menu em si não lê estado nenhum — só dispara ação. O que precisa de assinatura é a luz de
+  // status, que mora na mesma barra e traz o próprio desligamento.
+  const barra = root.querySelector<HTMLElement>('.menu')!
+  return mountEstado(barra, ctx)
 }

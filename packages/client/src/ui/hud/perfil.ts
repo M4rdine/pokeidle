@@ -5,7 +5,6 @@ import { trainerProgress } from '../../state/progress.js'
 import { huntPokedexCount } from '../../state/tips.js'
 import { el, escreverComPulso, pct } from '../dom.js'
 
-const CONN_TEXT: Readonly<Record<string, string>> = { open: 'conectado', connecting: 'conectando', reconnecting: 'reconectando', closed: 'desconectado' }
 
 /**
  * A coluna de perfil: quem é o jogador e como ele está.
@@ -22,8 +21,6 @@ export function mountPerfil(root: HTMLElement, ctx: AppContext): () => void {
   const gold = el('span', { 'data-gold': '' }, '0')
   // O número do tique é telemetria de desenvolvedor: o que ele diz ao jogador é só "a simulação
   // está viva". Fica no título, para quem quiser o número, e some do texto corrente.
-  const tick = el('span', { class: 'muted tb-pulso', 'data-tick': '', title: 'tique da simulação' }, 'simulando')
-  const conn = el('span', { class: 'conn', 'data-conn': 'closed', role: 'status' }, CONN_TEXT['closed']!)
   const dex = el('span', { 'data-dex': '' }, '—')
   /** Rótulo do mostrador de área: o nome da área nomeia o próprio medidor. */
   const areaNome = el('span', {}, 'área')
@@ -56,7 +53,7 @@ export function mountPerfil(root: HTMLElement, ctx: AppContext): () => void {
       el('div', { class: 'cartao-leitura cartao-ouro' }, el('span', {}, 'ouro'), gold),
       el('div', { class: 'cartao-leitura' }, areaNome, dex)),
     leitura(el('span', {}, 'próximo'), nextUnlock),
-    el('div', { class: 'perfil-status' }, conn, tick)))
+    ))
 
   // O XP do treinador sobe durante a hunt: o espelho manda, o /me só serve enquanto não há hunt.
   const renderProgress = (): void => {
@@ -81,7 +78,6 @@ export function mountPerfil(root: HTMLElement, ctx: AppContext): () => void {
   const offGold = ctx.hunt.subscribe((v) => v.state?.trainer.gold ?? null, (value) => {
     if (value !== null) escreverComPulso(gold, value.toLocaleString('pt-BR'))
   })
-  const offTick = ctx.hunt.subscribe((v) => v.tick, (value) => { tick.title = `tique ${value} da simulação` })
   // Contador "Rota 1: n/m": a Pokédex do servidor é lida uma vez e `seen` da sessão atualiza ao vivo.
   let entries: Awaited<ReturnType<typeof loadEntries>> = []
   async function loadEntries() { return (await ctx.http.get('/trainer/pokedex', PokedexSchema)).entries }
@@ -98,17 +94,7 @@ export function mountPerfil(root: HTMLElement, ctx: AppContext): () => void {
     .then((loaded) => { entries = loaded; renderDex() })
     .catch(() => { areaNome.textContent = 'área'; dex.textContent = '?'; dex.title = 'não foi possível ler a Pokédex' })
   const offDex = ctx.hunt.subscribe((v) => v.state?.settings.seen, renderDex)
-  const offConn = ctx.session.subscribe((s) => s.socket, (status) => {
-    const phase = ctx.hunt.get().phase
-    const key = phase === 'catching-up' ? 'catching-up' : status
-    conn.setAttribute('data-conn', key)
-    conn.textContent = key === 'catching-up' ? 'recuperando tempo' : CONN_TEXT[status] ?? status
-  })
-  const offPhase = ctx.hunt.subscribe((v) => v.phase, (phase) => {
-    const status = ctx.session.get().socket
-    const key = phase === 'catching-up' ? 'catching-up' : status
-    conn.setAttribute('data-conn', key)
-    conn.textContent = key === 'catching-up' ? 'recuperando tempo' : CONN_TEXT[status] ?? status
-  })
-  return () => { offMe(); offXp(); offGold(); offTick(); offDex(); offConn(); offPhase() }
+  // O estado do SISTEMA (socket e tique) saiu daqui para a barra superior, em `hud/estado.ts`:
+  // ele não fala do treinador, fala do produto, e o lugar dele é o canto oposto à marca.
+  return () => { offMe(); offXp(); offGold(); offDex() }
 }

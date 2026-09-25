@@ -14,6 +14,7 @@ import { mountOverlays } from '../../../src/ui/hud/overlays.js'
 import { mountTeamStrip } from '../../../src/ui/hud/team-strip.js'
 import { mountMenu } from '../../../src/ui/hud/menu.js'
 import { mountSituacao } from '../../../src/ui/hud/situacao.js'
+import { mountEstado } from '../../../src/ui/hud/estado.js'
 import { mountPerfil } from '../../../src/ui/hud/perfil.js'
 import fixture from '../../fixtures/route1-300.json' with { type: 'json' }
 
@@ -40,6 +41,9 @@ describe('barra superior', () => {
     expect(r.querySelector('[data-level]')?.textContent).toBe('nível 1')
     expect(r.querySelector('[data-next]')?.textContent).toContain('4 vagas no time')
     expect(r.querySelector('[data-gold]')?.textContent).toBe('0') // o ouro vem do estado da hunt
+    // A luz de status saiu do painel do treinador para a barra superior: ela fala do PRODUTO,
+    // não do jogador.
+    mountEstado(r, ctxWith())
     expect(r.querySelector('[data-conn]')?.getAttribute('data-conn')).toBe('open')
   })
   it('em catch-up a conexão avisa no perfil', () => {
@@ -47,7 +51,7 @@ describe('barra superior', () => {
     // colunas, e o teste segue a separação.
     const hunt = createStore({ ...view, phase: 'catching-up' as const, catchup: { remaining: 10 } })
     const r = root()
-    mountPerfil(r, ctxWith({ hunt }))
+    mountEstado(r, ctxWith({ hunt }))
     expect(r.querySelector('[data-conn]')?.getAttribute('data-conn')).toBe('catching-up')
   })
   it('o menu só tem função que abre painel: nada de parar nem de sair', () => {

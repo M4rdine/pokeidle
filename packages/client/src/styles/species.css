@@ -1,21 +1,56 @@
 /*
- * Ficha de espécie. Segue o DESIGN.md: canto reto, madeira sobre penumbra, nenhuma cor de acento —
- * o grifo marca o que está aberto, o ouro marca o que é valor — e número tabular. O que
- * hierarquiza é peso, caixa alta, voz da fonte e cor de rótulo — não um segundo tamanho de fonte.
+ * Ficha de espécie.
+ *
+ * O cabeçalho deste arquivo dizia "canto reto, madeira sobre penumbra" — a descrição do mundo
+ * visual que caiu DUAS trocas atrás, ainda aqui depois de o sistema virar ardósia fria e canto
+ * macio. Documentação que mente é pior que documentação nenhuma, e esta sobreviveu porque
+ * comentário não quebra build.
+ *
+ * O que vale: o material é o do resto do jogo — face, costura e relevo —, o ouro marca valor, o
+ * número é tabular, e a hierarquia sai de peso, caixa alta e voz da fonte.
  */
 .ficha { display: flex; flex-direction: column; gap: var(--space-4); }
 
 .ficha-topo { display: flex; align-items: center; gap: var(--space-3); }
+/* O mesmo poço do cartão do ativo, com o halo do tipo por fora: as três superfícies que mostram
+ * um Pokémon — slot, cartão e ficha — usam uma moldura só, e é isso que faz o jogo inteiro ler
+ * como um sistema em vez de três telas parecidas. */
+.ficha-poco {
+  flex-shrink: 0; display: grid; place-items: center;
+  width: 84px; height: 84px;
+  background: var(--face-cava);
+  border-radius: var(--raio);
+  box-shadow: var(--relevo-cava), 0 0 18px -4px color-mix(in srgb, var(--tipo, transparent) 60%, transparent);
+}
 .ficha-id { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
-.ficha-id h2 { font-size: var(--t-l); }
+/* O nome da espécie é o assunto da ficha e ganha o maior corpo dela — `--t-xl` está acima do
+ * piso da face bitmap. */
+.ficha-id h2 { font-size: var(--t-xl); }
 .ficha-tipos { display: flex; gap: var(--space-1); }
 
 .ficha-secao { display: flex; flex-direction: column; gap: var(--space-2); }
 /* Mais espaço acima do título do que abaixo: o título pertence ao que vem depois dele. Neste
    tamanho ele fica na voz de leitura: a bitmap abaixo de 12 px perde a grade e vira borrão. */
+/*
+ * O título de seção da ficha fala a mesma língua das faixas do jogo: marca inclinada e fio que
+ * apaga. Ele não é uma faixa — a ficha não tem painéis internos, e uma tarja por seção picotaria
+ * a leitura —, então leva só a marca e o fio, sem o fundo hachurado.
+ */
 .ficha-secao h3 {
-  margin: 0; font-size: var(--t-xs); font-weight: 400;
-  letter-spacing: 0.08em; text-transform: uppercase; color: var(--texto-fraco);
+  margin: 0; font-size: var(--t-xs); font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--texto-fraco);
+  position: relative; padding: 0 0 var(--space-1) 11px;
+}
+.ficha-secao h3::before {
+  content: ""; position: absolute; left: 0; top: 2px;
+  width: 3px; height: 11px;
+  transform: skewX(-14deg);
+  background: var(--vivo);
+  box-shadow: 0 0 7px color-mix(in srgb, var(--vivo) 55%, transparent);
+}
+.ficha-secao h3::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--vivo) 45%, transparent), transparent 55%);
 }
 .ficha-vazio { margin: 0; }
 
@@ -35,7 +70,9 @@
 
 /* ── Atributos ─────────────────────────────────────────────────────────────── */
 .ficha-stats { display: flex; flex-direction: column; gap: var(--space-1); }
-.stat-linha { display: grid; grid-template-columns: 5.5rem 2.5rem 1fr; gap: var(--space-2); align-items: center; }
+/* Rótulo, barra, número — nesta ordem. A coluna do número encosta à direita e vira um eixo de
+ * leitura próprio; no meio, ela cortava a barra do rótulo. */
+.stat-linha { display: grid; grid-template-columns: 5.5rem 1fr 2.5rem; gap: var(--space-2); align-items: center; }
 .stat-rotulo { color: var(--texto-fraco); font-size: var(--t-s); }
 .stat-valor { text-align: right; font-variant-numeric: tabular-nums; }
 /* Mesma escala nas seis barras: é a comparação entre elas que mostra o formato da espécie.

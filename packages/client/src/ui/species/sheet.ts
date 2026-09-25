@@ -1,7 +1,7 @@
 import type { AppContext } from '../../app-context.js'
 import { displayName } from '../../state/log.js'
 import { trainerProgress } from '../../state/progress.js'
-import { el, typeBadge } from '../dom.js'
+import { comTipo, el, typeBadge } from '../dom.js'
 import { spriteThumb } from '../sprite-css.js'
 import { evolutionLine } from './evolution.js'
 import { learnsetTable } from './learnset.js'
@@ -45,7 +45,12 @@ export function speciesSheet(ctx: AppContext, name: string): HTMLElement {
   const evo = evolutionLine(ctx.registry, ctx.atlas, name)
   return el('div', { class: 'ficha' },
     el('header', { class: 'ficha-topo' },
-      spriteThumb(ctx.atlas, name, LADO_SPRITE),
+      /*
+       * O retrato mora num POÇO tingido pelo tipo — o mesmo do cartão do ativo e o mesmo dos
+       * slots do time. Solto, um sprite de 64 px ao lado de um nome de 24 flutuava sem moldura e
+       * era a única figura do jogo sem a caixa que todas as outras têm.
+       */
+      comTipo(el('span', { class: 'ficha-poco' }, spriteThumb(ctx.atlas, name, LADO_SPRITE)), species.types),
       el('div', { class: 'ficha-id' },
         el('h2', {}, displayName(name)),
         el('span', { class: 'muted' }, `#${species.id}`),

@@ -18,9 +18,17 @@ export function statBars(base: BaseStats): HTMLElement {
     const valor = base[chave]
     const barra = el('div', { class: 'stat-barra' })
     barra.style.setProperty('--fracao', String(Math.min(1, valor / TETO)))
+    /*
+     * O NÚMERO VAI DEPOIS DA BARRA, não entre o rótulo e ela.
+     *
+     * No meio, os seis números caíam numa coluna estreita espremida contra as barras, e o olho
+     * tinha que atravessar o número para chegar ao comprimento — que é o dado que realmente se
+     * compara aqui. Encostados à direita, os seis formam uma coluna própria, e a barra fica
+     * contínua da esquerda até ela.
+     */
     return el('div', { class: 'stat-linha', 'data-stat': chave },
       el('span', { class: 'stat-rotulo' }, rotulo),
-      el('span', { class: 'stat-valor' }, String(valor)),
-      barra)
+      barra,
+      el('span', { class: 'stat-valor' }, String(valor)))
   }))
 }

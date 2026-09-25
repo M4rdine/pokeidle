@@ -54,6 +54,18 @@ const DE_ASSUNTO: readonly { readonly nome: string; readonly item: string }[] = 
   { nome: 'configuracoes', item: 'machine-part' },
 ]
 
+/**
+ * Os ITENS do jogo, pelo `itemId` do registro.
+ *
+ * Aqui não há escolha a fazer, e é isso que torna esta lista diferente da de assunto: o nome do
+ * sprite na PokeAPI é o mesmo `itemId` que o nosso registro usa, porque os dois vieram do mesmo
+ * acervo. Loja e mochila listavam "Poção" como texto puro num jogo em que tudo o mais tem figura.
+ */
+const DE_ITEM: readonly string[] = [
+  'potion', 'super-potion', 'hyper-potion',
+  'poke-ball', 'great-ball', 'ultra-ball',
+]
+
 const DE_CONTROLE: readonly { readonly nome: string; readonly tile: number }[] = [
   { nome: 'mais', tile: 33 },
   { nome: 'menos', tile: 34 },
@@ -116,6 +128,19 @@ async function main(): Promise<void> {
     // Sem repintura: a cor do item oficial é o ponto, e é ela que faz o ícone ser do jogo.
     await writeFile(join(SAIDA, `icone-${nome}.png`), encodePng(decodePng(bruto)))
     process.stdout.write(`${nome.padEnd(16)} oficial  ${item}\n`)
+  }
+
+  for (const item of DE_ITEM) {
+    const origem = join(OFICIAIS, `${item}.png`)
+    let bruto
+    try {
+      bruto = await readFile(origem)
+    } catch {
+      throw new Error(`falta o sprite oficial em ${origem}. Rode "pnpm icones-baixar" para trazer o acervo.`)
+    }
+    // Sem repintura, pela mesma razão dos de assunto: a cor do item é o que o torna reconhecível.
+    await writeFile(join(SAIDA, `item-${item}.png`), encodePng(decodePng(bruto)))
+    process.stdout.write(`${item.padEnd(16)} item     oficial\n`)
   }
 
   const folha = decodePng(await readFile(FOLHA_CONTROLE))

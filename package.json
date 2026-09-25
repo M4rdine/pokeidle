@@ -17,6 +17,7 @@
     "client:e2e": "pnpm --filter @pokeidle/client e2e",
     "db:up": "docker compose up -d",
     "cores": "tsx tools/assets/scripts/cores-do-mundo.ts",
+    "icones-baixar": "tsx tools/assets/scripts/ui-baixar.ts",
     "icones": "tsx tools/assets/scripts/ui-icones.ts"
   },
   "devDependencies": {

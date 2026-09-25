@@ -21,7 +21,8 @@ export function openBag(ctx: AppContext): Modal {
     body.replaceChildren(...items.map(({ itemId, quantity }) => {
       const item = ctx.registry.items.get(itemId)
       const row = el('div', { class: 'bag-item', 'data-item': itemId },
-        el('span', {}, item?.name ?? itemId),
+        el('span', { class: 'icone-item', 'data-item': itemId, 'aria-hidden': 'true' }),
+        el('span', { class: 'bag-nome' }, item?.name ?? itemId),
         el('span', { class: 'muted', 'data-quantity': '' }, `×${quantity}`))
       if (inHunt && item?.kind === 'potion') {
         const full = !active || active.hp >= active.hpMax

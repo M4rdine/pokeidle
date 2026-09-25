@@ -212,6 +212,26 @@
   background-repeat: no-repeat; background-position: center; background-size: contain;
   image-rendering: pixelated;
 }
+/*
+ * ÍCONE DE ITEM: o sprite oficial do próprio item, pelo `itemId` do registro.
+ *
+ * Loja e mochila listavam "Poção" como texto puro num jogo em que tudo o mais tem figura — e a
+ * figura aqui não é enfeite: numa lista de seis itens com nomes parecidos ("Poção", "Super
+ * Poção", "Hiper Poção"), a cor do frasco separa de relance o que o nome só separa depois de
+ * lido. Sem repintura: a cor do item é o que o torna reconhecível.
+ */
+.icone-item {
+  display: block; width: 26px; height: 26px; flex-shrink: 0;
+  background-repeat: no-repeat; background-position: center; background-size: contain;
+  image-rendering: pixelated;
+}
+.icone-item[data-item="potion"] { background-image: url('./ui/item-potion.png'); }
+.icone-item[data-item="super-potion"] { background-image: url('./ui/item-super-potion.png'); }
+.icone-item[data-item="hyper-potion"] { background-image: url('./ui/item-hyper-potion.png'); }
+.icone-item[data-item="poke-ball"] { background-image: url('./ui/item-poke-ball.png'); }
+.icone-item[data-item="great-ball"] { background-image: url('./ui/item-great-ball.png'); }
+.icone-item[data-item="ultra-ball"] { background-image: url('./ui/item-ultra-ball.png'); }
+
 .icone[data-icone="mapa"] { background-image: url('./ui/icone-mapa.png'); }
 .icone[data-icone="time"] { background-image: url('./ui/icone-time.png'); }
 .icone[data-icone="mochila"] { background-image: url('./ui/icone-mochila.png'); }

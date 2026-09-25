@@ -48,6 +48,7 @@ export function openShop(ctx: AppContext): Modal {
      * abre uma loja. Vender continua existindo, em voz secundária.
      */
     return el('div', { class: `shop-item${item.unlocked ? '' : ' locked'}`, 'data-item': item.itemId },
+      el('span', { class: 'icone-item', 'data-item': item.itemId, 'aria-hidden': 'true' }),
       el('span', { class: 'shop-name' }, item.name),
       el('span', { class: 'moeda moeda-ouro shop-preco' },
         el('span', { class: 'moeda-valor' }, item.buyPrice.toLocaleString('pt-BR')),

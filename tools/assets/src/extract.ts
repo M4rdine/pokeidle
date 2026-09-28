@@ -52,6 +52,23 @@ async function writeItem(spr: SprFile, item: ThingType, outDir: string): Promise
   }
 }
 
+/**
+ * Reescreve só o `catalog.json`, a partir do mesmo `.spr` e `.dat`.
+ *
+ * Existe porque o catálogo é uma LEITURA do dump, e os PNGs são o dump: quando se descobre uma
+ * bandeira nova que vale registrar — poça, cadáver —, refazer trinta mil PNGs idênticos para
+ * ganhar dois booleanos é minutos de espera por nada.
+ */
+export async function extractCatalog(opts: ExtractOptions, log: Logger = () => {}): Promise<Catalog> {
+  const format = { extended: opts.extended ?? false }
+  const spr = parseSpr(new Uint8Array(await readFile(opts.sprPath)), format)
+  const dat = parseDat(new Uint8Array(await readFile(opts.datPath)), opts.version, format)
+  const catalog = buildCatalog(spr, dat)
+  await writeFile(join(opts.outDir, 'catalog.json'), JSON.stringify(catalog, null, 2))
+  log(`catalog.json com ${catalog.outfits.length} outfits e ${catalog.items.length} itens`)
+  return catalog
+}
+
 export async function extractAll(opts: ExtractOptions, log: Logger = () => {}): Promise<Catalog> {
   const format = { extended: opts.extended ?? false }
   const spr = parseSpr(new Uint8Array(await readFile(opts.sprPath)), format)

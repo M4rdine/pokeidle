@@ -16,8 +16,8 @@ const catalog: Catalog = {
     { id: 11, width: 1, height: 1, directions: 4, phases: 1, layers: 1, displacement: { x: 0, y: 0 } },
   ],
   items: [
-    { id: 100, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false },
-    { id: 101, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: false, isBlocking: true },
+    { id: 100, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false, isSplash: false, isCorpse: false, isContainer: false, isNotPathable: false, hasLight: false },
+    { id: 101, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: false, isBlocking: true, isSplash: false, isCorpse: false, isContainer: false, isNotPathable: false, hasLight: false },
   ],
 }
 

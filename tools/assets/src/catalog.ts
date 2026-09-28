@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { parseOrThrow } from '@pokeidle/shared'
-import { FLAG_GROUND, FLAG_NOT_WALKABLE, type DatFile, type DatVersion, type ThingType } from './dat.js'
+import { FLAG_CONTAINER, FLAG_GROUND, FLAG_LIGHT, FLAG_LYING_CORPSE, FLAG_NOT_PATHABLE, FLAG_NOT_WALKABLE, FLAG_SPLASH, type DatFile, type DatVersion, type ThingType } from './dat.js'
 import type { SprFile } from './spr.js'
 
 export interface CatalogOutfit {
@@ -22,6 +22,15 @@ export interface CatalogItem {
   readonly phases: number
   readonly isGround: boolean
   readonly isBlocking: boolean
+  /** Poça de líquido no chão. Ver `FLAG_SPLASH`. */
+  readonly isSplash: boolean
+  /** Corpo caído. Ver `FLAG_LYING_CORPSE`. */
+  readonly isCorpse: boolean
+  /** Guarda coisas dentro. Cadáver é container: é dele que se saqueia. */
+  readonly isContainer: boolean
+  /** O monstro não traça rota por cima. */
+  readonly isNotPathable: boolean
+  readonly hasLight: boolean
 }
 
 export interface Catalog {
@@ -59,6 +68,11 @@ function toItem(t: ThingType): CatalogItem {
     phases: t.phases,
     isGround: t.flags.has(FLAG_GROUND),
     isBlocking: t.flags.has(FLAG_NOT_WALKABLE),
+    isSplash: t.flags.has(FLAG_SPLASH),
+    isCorpse: t.flags.has(FLAG_LYING_CORPSE),
+    isContainer: t.flags.has(FLAG_CONTAINER),
+    isNotPathable: t.flags.has(FLAG_NOT_PATHABLE),
+    hasLight: t.flags.has(FLAG_LIGHT),
   }
 }
 
@@ -94,6 +108,11 @@ const CatalogItemSchema = z.object({
   phases: z.number().int().positive(),
   isGround: z.boolean(),
   isBlocking: z.boolean(),
+  isSplash: z.boolean(),
+  isCorpse: z.boolean(),
+  isContainer: z.boolean(),
+  isNotPathable: z.boolean(),
+  hasLight: z.boolean(),
 })
 
 export const CatalogSchema = z.object({

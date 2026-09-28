@@ -8,10 +8,23 @@ export const FIRST_ITEM_ID = 100
 export const FLAG_GROUND = 0x00
 export const FLAG_WRITABLE = 0x08
 export const FLAG_WRITABLE_ONCE = 0x09
+/**
+ * Poça: sangue, gosma, água derramada. É o cliente dizendo "isto é líquido no chão".
+ *
+ * Importa porque um servidor VIVO derruba poça e cadáver e deixa decair. Quem grava o `.otbm`
+ * grava o instante, e o recorte herda a sujeira daquele dia — foi assim que uma caverna nossa
+ * nasceu com gosma verde e amarela espalhada e bichos mortos pelo chão.
+ */
+export const FLAG_SPLASH = 0x0b
+export const FLAG_CONTAINER = 0x04
+/** Não é caminho: o monstro não traça rota por cima. Campo mágico tem; decoração de chão não. */
+export const FLAG_NOT_PATHABLE = 0x0f
 export const FLAG_NOT_WALKABLE = 0x0c
 export const FLAG_LIGHT = 0x15
 export const FLAG_DISPLACEMENT = 0x18
 export const FLAG_ELEVATION = 0x19
+/** Corpo caído: o cadáver. Ver `FLAG_SPLASH`. */
+export const FLAG_LYING_CORPSE = 0x1a
 export const FLAG_MINIMAP_COLOR = 0x1c
 export const FLAG_LENS_HELP = 0x1d
 export const FLAG_CLOTH = 0x20

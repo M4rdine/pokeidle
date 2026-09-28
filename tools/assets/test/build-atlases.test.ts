@@ -17,10 +17,10 @@ const catalog: Catalog = {
     { id: 11, width: 2, height: 2, directions: 4, phases: 1, layers: 1, displacement: { x: 8, y: 8 } },
   ],
   items: [
-    { id: 100, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false },
-    { id: 101, width: 2, height: 2, patternX: 1, patternY: 1, phases: 1, isGround: false, isBlocking: true },
-    { id: 102, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false },
-    { id: 103, width: 1, height: 1, patternX: 1, patternY: 1, phases: 3, isGround: true, isBlocking: false },
+    { id: 100, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false, isSplash: false, isCorpse: false, isContainer: false, isNotPathable: false, hasLight: false },
+    { id: 101, width: 2, height: 2, patternX: 1, patternY: 1, phases: 1, isGround: false, isBlocking: true, isSplash: false, isCorpse: false, isContainer: false, isNotPathable: false, hasLight: false },
+    { id: 102, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false, isSplash: false, isCorpse: false, isContainer: false, isNotPathable: false, hasLight: false },
+    { id: 103, width: 1, height: 1, patternX: 1, patternY: 1, phases: 3, isGround: true, isBlocking: false, isSplash: false, isCorpse: false, isContainer: false, isNotPathable: false, hasLight: false },
   ],
 }
 

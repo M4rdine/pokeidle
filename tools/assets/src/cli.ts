@@ -4,7 +4,7 @@ import { Command } from 'commander'
 import { loadRegistry, parseHuntMap } from '@pokeidle/shared'
 import { buildAtlases } from './build-atlases.js'
 import { parseDat, type DatVersion } from './dat.js'
-import { extractAll } from './extract.js'
+import { extractAll, extractCatalog } from './extract.js'
 import { lerMinimapa, pintarAndar } from './otmm.js'
 import { readJson } from './json-file.js'
 import { loadManifest } from './manifest.js'
@@ -88,8 +88,10 @@ program
   .option('--out <dir>', 'pasta de saída', 'assets/extracted')
   .option('--version <v>', 'versão do .dat (860 ou 854)', '860')
   .option('--extended', 'formato extended: contagem e ids de sprite em u32 (packs com mais de 65535 sprites)', false)
-  .action(async (sprPath: string, datPath: string, opts: { out: string; version: string; extended: boolean }) => {
-    await extractAll({ sprPath, datPath, outDir: opts.out, version: parseVersion(opts.version), extended: opts.extended }, out)
+  .option('--somente-catalogo', 'reescreve só o catalog.json, sem refazer os PNGs', false)
+  .action(async (sprPath: string, datPath: string, opts: { out: string; version: string; extended: boolean; somenteCatalogo: boolean }) => {
+    const args = { sprPath, datPath, outDir: opts.out, version: parseVersion(opts.version), extended: opts.extended }
+    await (opts.somenteCatalogo ? extractCatalog : extractAll)(args, out)
   })
 
 program

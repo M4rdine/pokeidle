@@ -16,6 +16,7 @@ import { readFile, writeFile } from 'node:fs/promises'
 import { lerMapa, type TileDoMapa } from '../src/otbm.js'
 import { lerItensOtb } from '../src/otb-itens.js'
 import { loadCatalog } from '../src/extract.js'
+import { ehSujeira } from '../src/sujeira.js'
 
 const MAPA = 'assets/otbm/map.otbm'
 const ITENS = 'assets/otbm/items.otb'
@@ -77,6 +78,7 @@ async function main(): Promise<void> {
   const blocking: boolean[] = []
   const usados = new Map<string, { cid: number; padX: number; padY: number }>()
   let semTraducao = 0
+  let sujeira = 0
 
   /** O id de cliente, ou `null` quando este servidor conhece um item que o nosso dump não tem. */
   const cliente = (idDeServidor: number): number | null => {
@@ -139,6 +141,11 @@ async function main(): Promise<void> {
         const cid = cliente(idServidor)
         if (cid === null) continue
         const item = porId.get(cid)!
+        /*
+         * A SUJEIRA DO DIA EM QUE O MAPA FOI GRAVADO não entra: cadáver, poça e campo mágico
+         * decairiam no servidor de origem e aqui ficariam para sempre. Ver `sujeira.ts`.
+         */
+        if (ehSujeira(item)) { sujeira++; continue }
         if (item.isBlocking) blocking[i] = true
         /*
          * ITEM ALTO VAI PARA A COPA, desenhada DEPOIS dos personagens: é o que faz o Pokémon passar
@@ -194,6 +201,15 @@ async function main(): Promise<void> {
   console.log(`  ${usados.size} tiles distintos · ${novas.length} novos no manifest`)
   console.log(`  parede em ${paredes} de ${blocking.length} tiles (${(100 * paredes / blocking.length).toFixed(0)}%)`)
   console.log(`  entrada em (${saida.spawnPoint.x},${saida.spawnPoint.y}) · centro em (${saida.pokecenter.x},${saida.pokecenter.y})`)
+  if (sujeira > 0) console.log(`  ${sujeira} cadáver/poça/campo mágico varridos do recorte`)
+  /*
+   * A DECORAÇÃO QUE SOBROU SAI IMPRESSA, e não é enfeite de log. As bandeiras do `.dat` pegam o
+   * que decai; o que o autor do mapa pôs de propósito passa por elas — e foi assim que um corpo
+   * humano ensanguentado sobreviveu à primeira varrida. Quem converte a próxima área olha esta
+   * lista antes de aceitar.
+   */
+  const sobrou = [...new Set([...detail, ...canopy].filter((n): n is string => n !== null))].sort()
+  console.log(`  decoração que ficou em pé (confira): ${sobrou.length === 0 ? 'nenhuma' : sobrou.join(', ')}`)
   if (semTraducao > 0) console.log(`  ${semTraducao} item(ns) sem sprite no nosso dump, descartados`)
 }
 

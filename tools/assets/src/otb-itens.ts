@@ -25,11 +25,27 @@ const ITEM_ID_DE_CLIENTE = 0x11
 /** Tamanho do bloco de versão da raiz: três u32 e 128 bytes de descrição. */
 const TAMANHO_DA_DESCRICAO = 128
 
+/**
+ * O GRUPO do item, o primeiro byte de cada nó.
+ *
+ * É o que separa cenário de sujeira. Um servidor vivo derruba cadáver e poça no chão e deixa
+ * decair; quem grava o mapa grava o instante, e o recorte herda o lixo do dia. Cadáver é
+ * CONTAINER (é dele que se saqueia) e gosma é SPLASH — e é por isso que este byte, que eu
+ * descartava, vale ser lido.
+ */
+export const GRUPO = {
+  CONTAINER: 2,
+  SPLASH: 11,
+  FLUIDO: 12,
+} as const
+
 export interface ItensOtb {
   /** O que o arquivo diz de si: por exemplo `OTB 3.21.22-8.61`. */
   readonly descricao: string
   /** Id de servidor → id de cliente. */
   readonly paraCliente: ReadonlyMap<number, number>
+  /** Id de servidor → grupo. Ver `GRUPO`. */
+  readonly grupos: ReadonlyMap<number, number>
 }
 
 class Leitor {
@@ -68,9 +84,10 @@ export function lerItensOtb(dados: Uint8Array): ItensOtb {
   }
 
   const paraCliente = new Map<number, number>()
+  const grupos = new Map<number, number>()
   while (!r.fim && r.espiar() === NO_INICIO) {
     r.cru()
-    r.u8()   // grupo do item
+    const grupo = r.u8()
     r.u32()  // bandeiras
     let servidor: number | null = null
     let cliente: number | null = null
@@ -84,6 +101,7 @@ export function lerItensOtb(dados: Uint8Array): ItensOtb {
     r.cru() // NO_FIM
     // Sem id de cliente não há sprite: o item existe para o servidor e não desenha nada.
     if (servidor !== null && cliente !== null) paraCliente.set(servidor, cliente)
+    if (servidor !== null) grupos.set(servidor, grupo)
   }
-  return { descricao, paraCliente }
+  return { descricao, paraCliente, grupos }
 }

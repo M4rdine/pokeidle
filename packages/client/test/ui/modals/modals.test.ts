@@ -48,6 +48,42 @@ describe('mochila', () => {
   })
 })
 
+describe('as famílias da mochila', () => {
+  it('agrupa por família na ordem de uso, e some com a que está vazia', async () => {
+    /*
+     * A lista era ALFABÉTICA: "Bola Ninho" caía entre "Bola Repetida" e "Hiper Poção", três
+     * famílias sem parentesco intercaladas pela letra inicial. Ordem alfabética é o critério de
+     * quem não escolheu critério nenhum.
+     */
+    const get = vi.fn(async () => ({ items: [
+      { itemId: 'super-potion', quantity: 2 },
+      { itemId: 'ultra-ball', quantity: 5 },
+      { itemId: 'poke-ball', quantity: 30 },
+      { itemId: 'potion', quantity: 7 },
+    ] }))
+    openBag(ctxWith({ http: { get } as never }))
+    await flush()
+    const familias = [...modal().querySelectorAll('.bag-familia')]
+    // Bolas antes de poções; sem pedra e sem Reviver na mochila, as duas seções não existem.
+    expect(familias.map((f) => f.getAttribute('data-familia'))).toEqual(['ball', 'potion'])
+
+    // Dentro da família, a ordem é a do registro — de poder crescente, não a do alfabeto.
+    const nomes = (f: Element) => [...f.querySelectorAll('.bag-nome')].map((n) => n.textContent)
+    expect(nomes(familias[0]!)).toEqual(['Poké Bola', 'Ultra Bola'])
+
+    // A contagem do cabeçalho soma a família inteira, não conta os tipos de item.
+    expect(familias[0]!.querySelector('.cabeca-conta')?.textContent).toBe('35')
+    expect(familias[1]!.querySelector('.cabeca-conta')?.textContent).toBe('9')
+  })
+
+  it('mochila vazia diz onde comprar, em vez de só "vazia"', async () => {
+    const get = vi.fn(async () => ({ items: [] }))
+    openBag(ctxWith({ http: { get } as never }))
+    await flush()
+    expect(modal().querySelector('.bag-vazia')?.textContent).toContain('A Loja vende')
+  })
+})
+
 describe('pedra na mochila', () => {
   it('lista SÓ quem a pedra evolui, e manda o alvo junto', async () => {
     /*

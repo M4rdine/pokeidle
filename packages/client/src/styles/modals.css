@@ -65,8 +65,81 @@
 .modal-body { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); overflow-y: auto; min-height: 0; }
 /* Linha de lista não é objeto: só o fio que a separa da seguinte, sem moldura e sem fundo. O fio
  * aqui é `--borda-clara`, e não a costura: divisória DENTRO de um painel precisa ser vista. */
-.bag-item, .team-row, .shop-item { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-2) 0; border-bottom: 1px solid var(--borda-clara); }
-.bag-item button, .team-row button, .shop-item button { margin-left: auto; }
+/* `.team-row` saiu daqui junto com as linhas de texto do modal de Time, que virou peça. */
+.shop-item { display: flex; gap: var(--space-2); align-items: center; padding: var(--space-2) 0; border-bottom: 1px solid var(--borda-clara); }
+.shop-item button { margin-left: auto; }
+
+/* ── A mochila ───────────────────────────────────────────────────────────────
+ * Quatro famílias, cada uma com a sua faixa de título e contagem. Era uma lista alfabética única
+ * separada por fio de cabelo, onde "Bola Ninho" caía entre "Bola Repetida" e "Hiper Poção".
+ */
+.bag { display: flex; flex-direction: column; gap: var(--space-3); }
+.bag-familia { display: flex; flex-direction: column; }
+.bag-lista { display: flex; flex-direction: column; gap: var(--space-1); padding-top: var(--space-2); }
+.bag-vazia { margin: 0; padding: var(--space-4); text-align: center; }
+/*
+ * A peça do item: poço, nome, contagem e o trilho de ação. Mesma gramática da peça de Pokémon —
+ * o que se lê afunda no poço, o que se age fica à direita.
+ */
+.bag-item {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--raio);
+  background: var(--painel-pe);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+}
+.bag-poco {
+  display: grid; place-items: center; flex-shrink: 0;
+  width: 36px; height: 36px;
+  border-radius: var(--raio-p);
+  background: var(--face-cava);
+  box-shadow: var(--relevo-cava);
+}
+.bag-nome { flex: 1; min-width: 0; font-weight: 600; }
+/*
+ * A contagem é o dado da mochila, e vinha em cinza de legenda: é o número que decide se dá para
+ * continuar caçando.
+ *
+ * NA FACE DE LEITURA, não na de HUD. A bitmap confunde 5 com 8, e "×5 Ultra Bola" lido como "×8"
+ * é a diferença entre sair para caçar e voltar sem nada. Há um teste que barra dígito alinhado na
+ * face de HUD, e ele me pegou escrevendo exatamente isto.
+ */
+.bag-conta {
+  font-size: var(--t-l); font-weight: 700;
+  font-variant-numeric: tabular-nums; color: var(--texto);
+}
+.bag-acoes { display: flex; gap: var(--space-1); flex-wrap: wrap; justify-content: flex-end; }
+.bag-sem-alvo { font-size: var(--t-s); }
+
+/* ── Ajustes ─────────────────────────────────────────────────────────────────
+ * Dois grupos, porque são duas perguntas: como o time se mantém de pé, e como ele decide
+ * capturar. Em lista única eram cinco números sem parentesco visível.
+ */
+.settings { display: flex; flex-direction: column; gap: var(--space-3); }
+.ajuste-grupo { display: flex; flex-direction: column; }
+.ajuste-corpo { display: flex; flex-direction: column; gap: var(--space-3); padding-top: var(--space-3); }
+/* O rótulo, o controle e a REGRA que ele governa. A regra é o que transforma um campo de
+ * porcentagem em uma decisão que o jogador entende — este é o painel onde se programa o que a
+ * máquina faz sozinha. */
+/*
+ * A coluna do controle tem 88 px porque o que mora nela é uma porcentagem de dois dígitos. O
+ * SELETOR DE BOLA não cabe nela: "A melhor disponível" saía cortado no meio da palavra. Ele ganha
+ * a largura do próprio conteúdo, e a do número continua estreita — é ela que alinha os campos em
+ * coluna e deixa comparar as duas porcentagens de relance.
+ */
+.ajuste { display: grid; grid-template-columns: 1fr 88px; gap: var(--space-1) var(--space-3); align-items: center; }
+.ajuste:has(select) { grid-template-columns: 1fr auto; }
+.ajuste select { width: auto; min-width: 88px; }
+.ajuste label { min-width: 0; }
+.ajuste-regra {
+  grid-column: 1 / -1; margin: 0;
+  font-size: var(--t-s); color: var(--texto-fraco); max-width: 62ch; text-wrap: pretty;
+}
+/* A caixa de marcar fica ANTES do rótulo e não estica: num grid de duas colunas ela ocuparia os
+ * 88 px da coluna do número. */
+.ajuste.field-check { grid-template-columns: auto 1fr; }
+.ajuste.field-check label { grid-column: 2; }
+.settings-acoes { display: flex; flex-direction: column; gap: var(--space-2); }
 .shop-item button { margin-left: 0; }
 .shop-item input { width: 58px; margin-left: auto; }
 .shop-item.locked { opacity: 0.55; }

@@ -11,7 +11,10 @@ test('registrar, inicial, Campo Inicial, derrota, mochila, parar e comprar na lo
   await page.getByRole('button', { name: 'Criar conta' }).click()
 
   await expect(page.getByText('Escolha seu inicial')).toBeVisible()
-  await page.locator('.starter-card[data-species=charmander]').getByRole('button', { name: 'Escolher' }).click()
+  // Escolher e confirmar, em dois passos: o cartão seleciona e o botão único embaixo efetiva. Era
+  // um "Escolher" por cartão, e aquele clique decidia o jogo inteiro sem passo nenhum no meio.
+  await page.locator('.starter-card[data-species=charmander]').click()
+  await page.getByRole('button', { name: 'Começar com Charmander' }).click()
 
   await expect(page.getByRole('heading', { name: 'Onde caçar' })).toBeVisible()
   // Escolher é: apontar a área no mapa, e então apertar o botão que aparece no analisador.

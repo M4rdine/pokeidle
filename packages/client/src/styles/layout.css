@@ -95,6 +95,9 @@ button, [role="button"], label:has(> input[type="checkbox"]) { min-height: var(-
   border-radius: var(--raio-gg);
   box-shadow: var(--relevo-3);
 }
+/* Latão, como a barra do topo: a cantoneira é MOLDURA, e moldura nesta casa é latão. No vivo — o
+ * padrão do componente — ela disputaria com a única coisa viva da tela, que é o botão de entrar. */
+.auth-cartao.cantoneiras::after { --cantoneira-cor: var(--latao); }
 .auth-cartao h1 { font-size: var(--t-2xl); display: flex; align-items: center; gap: var(--space-2); }
 /* A marca: a Poké Ball oficial, no tamanho da caixa alta do nome. `pixelated` porque o sprite
  * tem 30 px de lado e sobe para 32 — sem isso o navegador suaviza e ela perde o contorno. */
@@ -289,19 +292,131 @@ h2 { font-size: var(--t-l); }
   text-shadow: 0 2px 8px rgb(0 0 0 / 70%);
 }
 
-.starter-grid { display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center; }
-/* Os três com a MESMA largura e o mesmo empilhamento: é a igualdade entre eles que deixa a
- * escolha ser sobre o Pokémon, e não sobre qual cartão chama mais atenção. */
-.starter-card {
-  width: 210px; padding: var(--space-3);
-  display: flex; flex-direction: column; gap: var(--space-2); align-items: center; text-align: center;
-  box-shadow: var(--sombra-2);
+.starter-cabeca { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); }
+.starter-nota {
+  margin: 0; max-width: 54ch; text-align: center;
+  color: var(--texto-fraco); font-size: var(--t-s);
+  text-shadow: 0 1px 6px rgb(0 0 0 / 80%);
 }
-.starter-sprite { display: grid; place-items: center; min-height: 104px; }
-.starter-card h2 { font-size: var(--t-l); }
-.starter-card .level { color: var(--texto-fraco); font-size: var(--t-s); margin: 0; }
-.starter-card .types { margin: 0; }
-.starter-card button { width: 100%; }
+
+/* `fieldset` porque os três SÃO um grupo de escolha única, e o rádio nativo cuida das setas do
+ * teclado e da exclusividade. A moldura e o recheio padrão do elemento saem: o agrupamento já é
+ * dito pela composição, e mais uma borda era o que esta casa vive tirando. */
+.starter-grade {
+  display: flex; flex-wrap: wrap; gap: var(--space-3); justify-content: center;
+  margin: 0; padding: 0; border: 0;
+}
+
+/*
+ * Os três partem IGUAIS — mesma largura, mesmo empilhamento —, porque a escolha tem de ser sobre
+ * o Pokémon e não sobre qual cartão grita mais. A hierarquia aparece na SELEÇÃO, não no repouso:
+ * é ela que responde "qual eu estou olhando", e uma tela onde nada muda ao clicar não tem como
+ * dizer isso.
+ */
+.starter-card {
+  width: 230px; padding: var(--space-3);
+  display: flex; flex-direction: column; gap: var(--space-2); align-items: center; text-align: center;
+  cursor: pointer;
+  border-radius: var(--raio-g);
+  /* Translúcido como o cartão da entrada, e pelo mesmo motivo: o mundo ao fundo é pixel art, e
+   * desfocar seria apagar a única coisa que a arte tem. */
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--painel-topo) 90%, transparent),
+    color-mix(in srgb, var(--painel-pe) 92%, transparent));
+  box-shadow: var(--relevo-2);
+  transition: transform var(--normal) var(--saida), box-shadow var(--normal) var(--saida), opacity var(--normal) var(--saida);
+}
+/* O poço do retrato, na cor do tipo — o mesmo componente das peças do time, em tamanho de pôster.
+ * É o que liga esta tela ao resto do jogo antes de qualquer palavra. */
+.starter-poco {
+  display: grid; place-items: center;
+  width: 100%; min-height: 116px; padding: var(--space-2);
+  border-radius: var(--raio);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--tipo, var(--borda-clara)) 34%, var(--cava-topo)),
+    var(--cava-pe));
+  box-shadow: var(--relevo-cava);
+}
+.starter-nome { font-family: var(--fonte-hud); font-size: var(--t-l); letter-spacing: 0.02em; }
+.starter-tipos { display: flex; gap: var(--space-1); flex-wrap: wrap; justify-content: center; }
+
+/*
+ * ── O BLOCO DE ATRIBUTOS ──
+ *
+ * Seis linhas de rótulo, barra e número. A barra é normalizada entre os TRÊS iniciais, e é ela
+ * que faz o trabalho: lado a lado, dá para VER que um é rápido e o outro aguenta pancada, sem ler
+ * dezoito números. O número fica porque comparar é uma coisa e saber o valor é outra.
+ *
+ * Isto substitui a linha "Nível 10", que era o cartão inteiro dizendo o mesmo para os três.
+ */
+.starter-numeros { width: 100%; display: flex; flex-direction: column; gap: 3px; }
+.starter-atributo { display: flex; align-items: center; gap: var(--space-2); }
+.starter-atributo-nome {
+  flex: 0 0 38px; text-align: left;
+  font-size: var(--t-xs); font-weight: 700; letter-spacing: 0.06em;
+  color: var(--texto-fraco);
+}
+.starter-trilho {
+  flex: 1; height: 6px; border-radius: 3px; overflow: hidden;
+  background: var(--trilho-fundo);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 55%);
+}
+.starter-preenche {
+  display: block; height: 100%;
+  width: calc(var(--fracao) * 100%);
+  border-radius: 3px;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--tipo, var(--selecao)) 70%, white 10%),
+    var(--tipo, var(--selecao)));
+}
+.starter-atributo-valor {
+  flex: 0 0 3ch; text-align: right;
+  font-size: var(--t-xs); font-variant-numeric: tabular-nums;
+}
+.starter-evolucao { font-size: var(--t-xs); color: var(--texto-fraco); }
+
+/*
+ * ── A SELEÇÃO ──
+ *
+ * O escolhido SOBE e acende no fio do próprio tipo; os outros dois recuam em opacidade e saturação.
+ * Recuar os outros é metade do efeito: destacar um sem apagar o resto deixa três cartões brilhantes
+ * e nenhuma resposta à pergunta "qual é o meu".
+ */
+.starter-card:has(:checked) {
+  transform: translateY(-6px);
+  box-shadow:
+    inset 0 0 0 2px var(--tipo, var(--selecao)),
+    var(--relevo-3),
+    0 0 26px color-mix(in srgb, var(--tipo, var(--selecao)) 45%, transparent);
+}
+/*
+ * Os não escolhidos recuam por FILTRO, nunca por `opacity`.
+ *
+ * O cartão é translúcido de propósito — ele vive sobre a arte do mundo. Baixar a opacidade dele
+ * em cima disso furava a superfície: o poste e as árvores do fundo apareciam ATRAVÉS dos trilhos
+ * dos atributos, e as barras do Bulbasaur ganhavam borrões marrons que pareciam um terceiro dado.
+ * `filter` escurece e dessatura sem abrir buraco nenhum.
+ */
+.starter-grade:has(:checked) .starter-card:not(:has(:checked)) { filter: saturate(0.45) brightness(0.72); }
+.starter-card:hover:not(:has(:checked)) { transform: translateY(-2px); }
+/* O foco do teclado mora no CARTÃO, porque o rádio está escondido: sem isto, navegar por setas
+ * movia uma seleção invisível. */
+.starter-card:has(:focus-visible) { outline: 2px solid var(--vivo); outline-offset: 3px; }
+
+/* Um só, e é o vermelho da marca: a ação principal da tela. Eram três, um por cartão — e três
+ * vermelhos lado a lado não destacam coisa nenhuma.
+ *
+ * ENQUANTO NÃO HÁ ESCOLHA ELE NÃO É VERMELHO. Um `primary` desabilitado guarda o vermelho da
+ * marca e fica lendo como "clicável, mas quebrado" — a cor mais forte da tela gasta num controle
+ * morto. Neutro, ele é claramente um lugar que ainda vai acender, e o vermelho aparece no mesmo
+ * instante em que passa a haver o que confirmar. */
+.starter-confirmar { min-width: 280px; }
+.starter-confirmar[disabled] {
+  background: var(--face-painel);
+  color: var(--texto-fraco);
+  box-shadow: var(--relevo-cava);
+  text-shadow: none;
+}
 
 .hunt-grid { display: flex; flex-wrap: wrap; gap: var(--space-3); }
 .hunt-card { padding: var(--space-3); min-width: 180px; display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; }

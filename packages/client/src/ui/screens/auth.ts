@@ -43,7 +43,10 @@ export function mountAuth(root: HTMLElement, ctx: AppContext): () => void {
     // cartão, e por isso a folha de login se esticava pela janela inteira com dois campos
     // gigantes dentro — a primeira tela que alguém vê do jogo.
     mount(root, el('main', { class: 'screen screen-auth' },
-      el('div', { class: 'auth-cartao panel' },
+      // `cantoneiras`: as quatro marcas em L de latão, as mesmas da barra de funções e do
+      // analisador. É o que faz a primeira tela pertencer ao mesmo produto que as de dentro —
+      // antes dela, o cartão de entrada era a única superfície do jogo sem moldura nenhuma.
+      el('div', { class: 'auth-cartao panel cantoneiras' },
         // A Poké Ball acompanha o nome, não o substitui: é a marca do produto na primeira tela,
         // e é o sprite oficial — o mesmo acervo dos ícones do menu, não um desenho nosso.
         el('h1', {}, el('span', { class: 'auth-marca', 'aria-hidden': 'true' }), 'Pokeidle'),

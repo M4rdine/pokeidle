@@ -16,6 +16,10 @@
  *    bandeira de casa não engana.
  *  - ILHA: a maior parte andável conectada, sobre o total andável. Uma sala atrás de uma parede é
  *    área que o jogador vê e nunca alcança.
+ *  - DECORAÇÃO: células com algo em cima do chão que NÃO é sujeira de servidor. A primeira caverna
+ *    escolhida tinha geometria impecável e ficou vazia depois da varrida: era rocha e corredor, e
+ *    nada mais. Cenário não se espalha por script — quem o pôs foi quem desenhou o mapa —, então
+ *    a busca precisa saber onde ele está em vez de torcer.
  *
  * Nada aqui lê pixel: tudo sai da geometria do `.otbm`.
  */
@@ -28,6 +32,8 @@ export interface Plano {
   readonly temChao: Uint8Array
   readonly bloqueia: Uint8Array
   readonly casa: Uint8Array
+  /** 1 quando há algo empilhado que não é sujeira de servidor. Ver `sujeira.ts`. */
+  readonly decoracao: Uint8Array
 }
 
 export interface Medidas {
@@ -42,6 +48,8 @@ export interface Medidas {
   /** A maior área andável conectada, sobre o total andável. */
   readonly ilha: number
   readonly andaveis: number
+  /** Células com decoração de verdade. */
+  readonly decorados: number
 }
 
 export interface Limites {
@@ -54,6 +62,8 @@ export interface Limites {
   readonly andavelMaximo: number
   readonly ilhaMinima: number
   readonly buracosMaximos: number
+  /** Piso de células decoradas. Zero aceita caverna pelada; ver `DECORACAO_IDEAL`. */
+  readonly decoradosMinimos: number
 }
 
 export const LIMITES_PADRAO: Limites = {
@@ -73,6 +83,7 @@ export const LIMITES_PADRAO: Limites = {
   andavelMaximo: 0.7,
   ilhaMinima: 0.9,
   buracosMaximos: 0,
+  decoradosMinimos: 0,
 }
 
 const andavelEm = (p: Plano, i: number): boolean => p.temChao[i] === 1 && p.bloqueia[i] === 0
@@ -121,11 +132,13 @@ export function medir(p: Plano, x0: number, y0: number, largura: number, altura:
   let buracos = 0
   let casas = 0
   let andaveis = 0
+  let decorados = 0
   for (let dy = 0; dy < altura; dy++) {
     for (let dx = 0; dx < largura; dx++) {
       const i = (y0 + dy) * p.largura + x0 + dx
       if (p.temChao[i] === 0) buracos++
       if (p.casa[i] === 1) casas++
+      if (p.decoracao[i] === 1) decorados++
       if (andavelEm(p, i)) andaveis++
     }
   }
@@ -148,6 +161,7 @@ export function medir(p: Plano, x0: number, y0: number, largura: number, altura:
     andavel: andaveis / celulas,
     ilha: andaveis === 0 ? 0 : maiorIlha(p, x0, y0, largura, altura) / andaveis,
     andaveis,
+    decorados,
   }
 }
 
@@ -157,11 +171,22 @@ export function medir(p: Plano, x0: number, y0: number, largura: number, altura:
  * proporção de corredor e parede que se lê como caverna e não como labirinto nem como salão.
  */
 const IDEAL_ANDAVEL = 0.45
-export const nota = (m: Medidas): number => m.vedado * 2 + (1 - Math.abs(m.andavel - IDEAL_ANDAVEL) / IDEAL_ANDAVEL)
+/**
+ * A partir daqui o cenário já não é o que falta. Uma peça a cada vinte células é o que separa
+ * "caverna mobiliada" de "corredor vazio"; acima disso a diferença deixa de decidir a escolha, e
+ * por isso a parcela satura em vez de premiar acúmulo.
+ */
+export const DECORACAO_IDEAL = 0.05
+
+export const nota = (m: Medidas, celulas: number): number =>
+  m.vedado * 2
+  + (1 - Math.abs(m.andavel - IDEAL_ANDAVEL) / IDEAL_ANDAVEL)
+  + Math.min(1, m.decorados / (celulas * DECORACAO_IDEAL))
 
 export function aprovado(m: Medidas, l: Limites): boolean {
   return m.buracos <= l.buracosMaximos && m.casas === 0 && m.vedado >= l.vedadoMinimo
     && m.andavel >= l.andavelMinimo && m.andavel <= l.andavelMaximo && m.ilha >= l.ilhaMinima
+    && m.decorados >= l.decoradosMinimos
 }
 
 /**
@@ -178,7 +203,8 @@ export function procurar(p: Plano, limites: Limites = LIMITES_PADRAO): Medidas[]
       if (aprovado(m, limites)) achados.push(m)
     }
   }
-  achados.sort((a, b) => nota(b) - nota(a))
+  const celulas = largura * altura
+  achados.sort((a, b) => nota(b, celulas) - nota(a, celulas))
   const escolhidos: Medidas[] = []
   for (const m of achados) {
     const perto = escolhidos.some((e) => Math.abs(e.x - m.x) < largura / 2 && Math.abs(e.y - m.y) < altura / 2)

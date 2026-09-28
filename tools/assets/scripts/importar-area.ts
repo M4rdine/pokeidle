@@ -17,12 +17,34 @@ import { lerMapa, type TileDoMapa } from '../src/otbm.js'
 import { lerItensOtb } from '../src/otb-itens.js'
 import { loadCatalog } from '../src/extract.js'
 import { ehSujeira } from '../src/sujeira.js'
+import { mobiliar, OPCOES_PADRAO, type Prop } from '../src/mobiliar.js'
 
 const MAPA = 'assets/otbm/map.otbm'
 const ITENS = 'assets/otbm/items.otb'
 const EXTRAIDO = 'assets/extracted-otp2019'
 const MANIFEST = 'tools/assets/manifest.json'
 const HUNTS = 'packages/shared/data/hunts'
+
+/**
+ * A paleta de cenário por tema.
+ *
+ * São peças que o próprio mapa usa, conferidas uma a uma ampliadas — e não ids adivinhados. Para
+ * caverna, três pedregulhos soltos da mesma família de ids: o Tibia agrupa peças irmãs em ids
+ * contíguos, e foi assim que eles apareceram. O grande é raro de propósito; o pequeno é o que
+ * povoa. Ver `mobiliar.ts` para as regras de onde cada um cai.
+ */
+const PALETAS: Readonly<Record<string, readonly Prop[]>> = {
+  caverna: [
+    // Três pedregulhos soltos da mesma família de ids, do menor ao maior.
+    { nome: 'otbm-2166', itemId: 2166, barra: true, peso: 3 },
+    { nome: 'otbm-2167', itemId: 2167, barra: true, peso: 3 },
+    { nome: 'otbm-2164', itemId: 2164, barra: true, peso: 2 },
+    // Entulho, na cor do chão desta caverna — é o que quebra a monotonia do cinza.
+    { nome: 'otbm-1803', itemId: 1803, barra: true, peso: 2 },
+    // Osso: não barra nada, e é detalhe de chão em vez de obstáculo.
+    { nome: 'otbm-3115', itemId: 3115, barra: false, peso: 2 },
+  ],
+}
 
 /**
  * O nome do tile no nosso atlas. Vem do id de CLIENTE, que é o que aponta para um sprite, e do
@@ -39,7 +61,11 @@ const HUNTS = 'packages/shared/data/hunts'
 const nomeDoTile = (clientId: number, padX: number, padY: number): string =>
   padX === 0 && padY === 0 ? `otbm-${clientId}` : `otbm-${clientId}-p${padX}${padY}`
 
-interface Argumentos { readonly area: string; readonly x: number; readonly y: number; readonly z: number }
+interface Argumentos {
+  readonly area: string; readonly x: number; readonly y: number; readonly z: number
+  /** Tema do cenário posto por cima do recorte, ou `null` para deixar como veio. Ver `PALETAS`. */
+  readonly cenario: string | null
+}
 
 function argumentos(): Argumentos {
   const [area] = process.argv.slice(2)
@@ -48,18 +74,22 @@ function argumentos(): Argumentos {
     if (i < 0) throw new Error(`falta --${nome}`)
     return Number(process.argv[i + 1])
   }
-  if (!area || area.startsWith('--')) throw new Error('uso: importar-area <id-da-area> --x N --y N --z N')
-  return { area, x: valor('x'), y: valor('y'), z: valor('z') }
+  if (!area || area.startsWith('--')) throw new Error('uso: importar-area <id-da-area> --x N --y N --z N [--cenario caverna]')
+  const i = process.argv.indexOf('--cenario')
+  const cenario = i < 0 ? null : process.argv[i + 1] ?? null
+  if (cenario !== null && !(cenario in PALETAS)) throw new Error(`cenário "${cenario}" não existe; há: ${Object.keys(PALETAS).join(', ')}`)
+  return { area, x: valor('x'), y: valor('y'), z: valor('z'), cenario }
 }
 
 async function main(): Promise<void> {
-  const { area, x: x0, y: y0, z } = argumentos()
+  const { area, x: x0, y: y0, z, cenario } = argumentos()
   const alvo = `${HUNTS}/${area}.json`
   const nosso = JSON.parse(await readFile(alvo, 'utf8')) as {
     width: number; height: number
     layers: { ground: (string | null)[]; detail: (string | null)[]; blocking: boolean[]; canopy?: (string | null)[] }
     spawnPoint: { x: number; y: number }
     pokecenter: { x: number; y: number }
+    spawns: { x: number; y: number }[]
   }
   const { width: largura, height: altura } = nosso
 
@@ -156,8 +186,15 @@ async function main(): Promise<void> {
     }
   }
 
-  // O ponto de entrada e o Centro precisam ser ANDÁVEIS: no mapa novo, o antigo pode ter caído
-  // dentro de uma parede.
+  /*
+   * A ENTRADA, O CENTRO E CADA NASCIMENTO precisam ser ANDÁVEIS: no mapa novo, o ponto antigo pode
+   * ter caído dentro de uma parede.
+   *
+   * Os NASCIMENTOS eu esqueci na primeira versão, e o Pico Rochoso foi publicado com o rhydon
+   * nascendo dentro da rocha. Não dava erro em lugar nenhum — o teste de caminhabilidade que
+   * existia olha o mapa desenhado no Tiled, e esta área já não vem de lá. Por isso agora há um
+   * guarda sobre as áreas PUBLICADAS, em packages/shared.
+   */
   const andavel = (p: { x: number; y: number }): boolean => !blocking[p.y * largura + p.x]
   const primeiroAndavel = (de: { x: number; y: number }): { x: number; y: number } => {
     if (andavel(de)) return de
@@ -170,13 +207,40 @@ async function main(): Promise<void> {
     throw new Error('o recorte não tem um tile andável: escolha outro pedaço do mundo')
   }
 
+  const entrada = primeiroAndavel(nosso.spawnPoint)
+  const centro = primeiroAndavel(nosso.pokecenter)
+  // Realocados ANTES de mobiliar, senão reservá-los não protege nada: a pedra cairia em cima.
+  const nascimentos = nosso.spawns.map(primeiroAndavel)
+
+  /*
+   * O CENÁRIO ENTRA DEPOIS DA COLISÃO ESTAR FECHADA, porque `mobiliar` precisa saber onde se anda
+   * para encostar as peças na parede e para recusar a que trancaria um trecho.
+   */
+  if (cenario !== null) {
+    const postos = mobiliar(
+      { largura, altura, bloqueio: blocking },
+      PALETAS[cenario]!,
+      [entrada, centro, ...nascimentos],
+      // A semente sai do nome da área: cada uma tem o seu arranjo, e sempre o mesmo.
+      { ...OPCOES_PADRAO, semente: [...area].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) },
+    )
+    for (const p of postos) {
+      const item = porId.get(p.prop.itemId)!
+      // A mesma `colocar` do recorte: ela é quem sabe fatiar peça grande e nomear cada pedaço.
+      colocar(item.height > 1 ? canopy : detail, p.x, p.y, p.prop.itemId)
+      if (p.prop.barra) blocking[p.y * largura + p.x] = true
+    }
+    console.log(`  ${postos.length} peça(s) de cenário "${cenario}" postas`)
+  }
+
   const saida = {
     ...nosso,
     // Tira a área do contrato com o Tiled: a partir daqui a geografia é do `.otbm`, não do `.tmj`.
     origem: 'otbm' as const,
     layers: { ground, detail, blocking, canopy },
-    spawnPoint: primeiroAndavel(nosso.spawnPoint),
-    pokecenter: primeiroAndavel(nosso.pokecenter),
+    spawnPoint: entrada,
+    pokecenter: centro,
+    spawns: nosso.spawns.map((s, i) => ({ ...s, ...nascimentos[i]! })),
   }
   await writeFile(alvo, `${JSON.stringify(saida, null, 2)}\n`)
 

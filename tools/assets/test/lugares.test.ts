@@ -3,7 +3,10 @@ import { LIMITES_PADRAO, aprovado, medir, procurar, type Limites, type Plano } f
 
 const LADO = 10
 
-/** Um andar de `LADO`×`LADO` desenhado com caracteres: `.` anda, `#` bloqueia, ` ` é vazio. */
+/**
+ * Um andar desenhado com caracteres: `.` anda, `#` bloqueia, ` ` é vazio, `C` é casa e `o` é chão
+ * com cenário em cima.
+ */
 function plano(desenho: readonly string[]): Plano {
   const largura = desenho[0]!.length
   const altura = desenho.length
@@ -12,6 +15,7 @@ function plano(desenho: readonly string[]): Plano {
     temChao: new Uint8Array(largura * altura),
     bloqueia: new Uint8Array(largura * altura),
     casa: new Uint8Array(largura * altura),
+    decoracao: new Uint8Array(largura * altura),
   }
   desenho.forEach((linha, y) => {
     [...linha].forEach((c, x) => {
@@ -20,6 +24,7 @@ function plano(desenho: readonly string[]): Plano {
       p.temChao[i] = 1
       if (c === '#') p.bloqueia[i] = 1
       if (c === 'C') p.casa[i] = 1
+      if (c === 'o') p.decoracao[i] = 1
     })
   })
   return p
@@ -73,6 +78,21 @@ describe('medir', () => {
       '#...#....#', '#...#....#', '#...#....#', '#...#....#', '##########',
     ])
     expect(medir(diagonal, 0, 0, LADO, LADO).ilha).toBeLessThan(1)
+  })
+})
+
+describe('decoração', () => {
+  it('conta as células com cenário de verdade', () => {
+    const mobiliada = plano([
+      '##########', '#..o.....#', '#........#', '#...o....#', '#........#',
+      '#..####..#', '#......o.#', '#.##..##.#', '#........#', '##########',
+    ])
+    expect(medir(mobiliada, 0, 0, LADO, LADO).decorados).toBe(3)
+  })
+
+  it('reprova a caverna pelada quando se exige cenário, porque vazia ela já foi entregue uma vez', () => {
+    const exigente: Limites = { ...limites, decoradosMinimos: 5 }
+    expect(aprovado(medir(caverna, 0, 0, LADO, LADO), exigente)).toBe(false)
   })
 })
 

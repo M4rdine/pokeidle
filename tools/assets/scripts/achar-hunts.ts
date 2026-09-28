@@ -16,6 +16,7 @@ import { loadCatalog, itemFramePath } from '../src/extract.js'
 import { decodePng, encodePng } from '../src/png.js'
 import type { RgbaImage } from '../src/compose.js'
 import { LIMITES_PADRAO, nota, procurar, type Limites, type Plano } from '../src/lugares.js'
+import { ehSujeira } from '../src/sujeira.js'
 
 const MAPA = 'assets/otbm/map.otbm'
 const ITENS = 'assets/otbm/items.otb'
@@ -34,6 +35,7 @@ async function main(): Promise<void> {
     ...LIMITES_PADRAO,
     largura: numero('largura', LIMITES_PADRAO.largura),
     altura: numero('altura', LIMITES_PADRAO.altura),
+    decoradosMinimos: numero('decorados', LIMITES_PADRAO.decoradosMinimos),
   }
   const porAndar = numero('por-andar', 3)
 
@@ -94,6 +96,7 @@ async function main(): Promise<void> {
       temChao: new Uint8Array(celulas),
       bloqueia: new Uint8Array(celulas),
       casa: new Uint8Array(celulas),
+      decoracao: new Uint8Array(celulas),
     }
     for (const [i, t] of doAndar) {
       const chao = t.chao === null ? null : item(t.chao)
@@ -101,6 +104,9 @@ async function main(): Promise<void> {
       plano.temChao[i] = 1
       if (t.casa) plano.casa[i] = 1
       if (chao.isBlocking || t.pilha.some((s) => item(s)?.isBlocking)) plano.bloqueia[i] = 1
+      // Só conta como cenário o que SOBREVIVE à varrida: cadáver e poça não mobiliam nada.
+      const enfeites = t.pilha.map(item).filter((x) => x !== null && !ehSujeira(x))
+      if (enfeites.length > 0) plano.decoracao[i] = 1
     }
 
     const achados = procurar(plano, limites)
@@ -121,6 +127,8 @@ async function main(): Promise<void> {
             if (id === null) continue
             const it = item(id)
             if (!it) continue
+            // O desenho mostra o que o jogo VAI ver, e o jogo não vê sujeira.
+            if (it !== item(t.chao ?? -1) && ehSujeira(it)) continue
             // O padrão do Tibia varia com a POSIÇÃO no mundo: é o que tira a repetição da grama.
             const img = await desenho(it.id, mundoX % it.patternX, mundoY % it.patternY)
             if (img) colar(alvo, img, dx, dy)
@@ -129,7 +137,7 @@ async function main(): Promise<void> {
       }
       const arquivo = `${SAIDA}/z${z}-${posicao + 1}-${m.x}x${m.y}.png`
       await writeFile(arquivo, encodePng(alvo))
-      console.log(`  ${arquivo} · vedado ${(m.vedado * 100).toFixed(0)}% · andável ${(m.andavel * 100).toFixed(0)}% (${m.andaveis}) · nota ${nota(m).toFixed(2)}`)
+      console.log(`  ${arquivo} · vedado ${(m.vedado * 100).toFixed(0)}% · andável ${(m.andavel * 100).toFixed(0)}% · cenário em ${m.decorados} células · nota ${nota(m, limites.largura * limites.altura).toFixed(2)}`)
     }
   }
 }

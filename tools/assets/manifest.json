@@ -5926,6 +5926,48 @@
       "itemId": 380,
       "patternX": 0,
       "patternY": 0
+    },
+    {
+      "name": "otbm-3115",
+      "itemId": 3115,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-1803",
+      "itemId": 1803,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2166",
+      "itemId": 2166,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2164-p01",
+      "itemId": 2164,
+      "patternX": 0,
+      "patternY": 1,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2167",
+      "itemId": 2167,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
     }
   ],
   "transitions": [

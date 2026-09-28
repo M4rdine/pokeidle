@@ -1,5 +1,6 @@
 import { access, copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { aoQuadradoNoGrupo } from './apertar-quadros.js'
 import { packGrid, toTiledTileset, type AtlasFrame, type TerrainInput } from './atlas.js'
 import type { Catalog, CatalogOutfit } from './catalog.js'
 import { DIRECTION_NAMES, type RgbaImage } from './compose.js'
@@ -50,7 +51,29 @@ function findOutfit(catalog: Catalog, id: number): CatalogOutfit {
   return outfit
 }
 
+/**
+ * Confere que a extração escolhida tem os outfits que o manifest pede, ANTES de ler quadro nenhum.
+ *
+ * Sem isto a falha chegava como um `ENOENT` no meio da construção, apontando um caminho de PNG —
+ * e a causa real (extração errada na linha de comando) não aparecia em lugar nenhum da mensagem.
+ */
+async function conferirExtracao(extractedDir: string, manifest: Manifest): Promise<void> {
+  const faltando: string[] = []
+  for (const species of manifest.species) {
+    if (!(await exists(join(extractedDir, 'outfits', String(species.outfitId))))) {
+      faltando.push(`${species.name} (outfit ${species.outfitId})`)
+    }
+  }
+  if (faltando.length === 0) return
+  throw new Error(
+    `${faltando.length} de ${manifest.species.length} espécies não têm outfit em "${extractedDir}": ` +
+    `${faltando.slice(0, 5).join(', ')}${faltando.length > 5 ? '…' : ''}. ` +
+    'Esta extração não é a que o manifest usa — aponte a certa com --extracted.',
+  )
+}
+
 async function pokemonFrames(extractedDir: string, manifest: Manifest, catalog: Catalog): Promise<AtlasFrame[]> {
+  await conferirExtracao(extractedDir, manifest)
   const frames: AtlasFrame[] = []
   for (const species of manifest.species) {
     frames.push(...(await outfitFrames(extractedDir, species, findOutfit(catalog, species.outfitId), 'walk')))
@@ -59,26 +82,6 @@ async function pokemonFrames(extractedDir: string, manifest: Manifest, catalog: 
     }
   }
   return frames
-}
-
-/**
- * A grade é de células QUADRADAS, e todo consumidor escala o sprite pelo lado do quadro. Um PNG de
- * origem retangular entra com margem morta de um lado, e o bicho passa a ser desenhado menor que os
- * vizinhos e fora do centro — em silêncio, porque nada quebra.
- *
- * Foi assim que o Charmander ficou com quadro de 64×32, com o desenho na metade direita, e
- * apareceu pela metade do tamanho dos outros dois na tela do inicial. O erro estava na folha de
- * origem desde a primeira construção do atlas, e nenhum teste o via.
- */
-function conferirQuadrados(frames: readonly AtlasFrame[]): void {
-  const tortos = frames.filter((f) => f.image.width !== f.image.height)
-  if (tortos.length === 0) return
-  const exemplos = tortos.slice(0, 3).map((f) => `${f.name} (${f.image.width}x${f.image.height})`).join(', ')
-  throw new Error(
-    `${tortos.length} quadro(s) de Pokémon não são quadrados: ${exemplos}. ` +
-    'A folha de origem tem margem morta — corrija o recorte no dump, ou rode ' +
-    '"pnpm apertar-atlas --gravar" depois de publicar para apertar o retângulo até o conteúdo.',
-  )
 }
 
 async function exists(path: string): Promise<boolean> {
@@ -284,8 +287,20 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
   if (manifest.tiles.length === 0) throw new Error('manifest sem tiles: adicione ao menos uma entrada em "tiles"')
 
   await mkdir(opts.outDir, { recursive: true })
-  const pokemon = await pokemonFrames(opts.extractedDir, manifest, catalog)
-  conferirQuadrados(pokemon)
+  /*
+   * A grade é de células QUADRADAS, e todo consumidor escala o sprite pelo lado do quadro. Um PNG
+   * de origem retangular entra com margem morta de um lado, e o bicho passa a ser desenhado menor
+   * que os vizinhos e fora do centro — em silêncio, porque nada quebra.
+   *
+   * Foi assim que o Charmander, cujas folhas no dump têm 64×32 com o desenho na metade direita,
+   * apareceu pela metade do tamanho dos outros dois na tela do inicial. O erro vinha da origem
+   * desde a primeira construção do atlas, e nenhum teste o via.
+   *
+   * NORMALIZAR, E NÃO FALHAR. A primeira versão disto era um erro que parava o build — e travar a
+   * construção inteira por uma margem morta que se corrige com geometria é transformar um
+   * problema mecânico em bloqueio. Quem já é quadrado passa intacto.
+   */
+  const pokemon = aoQuadradoNoGrupo(await pokemonFrames(opts.extractedDir, manifest, catalog))
   await writeAtlas(opts.outDir, 'pokemon', pokemon)
   log(`pokemon.png: ${pokemon.length} frames de ${manifest.species.length} espécies`)
 

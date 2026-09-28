@@ -93,7 +93,16 @@ program
 
 program
   .command('build')
-  .option('--extracted <dir>', 'pasta com PNGs extraídos e catalog.json', 'assets/extracted')
+  /*
+   * O PADRÃO É A EXTRAÇÃO QUE O MANIFEST USA.
+   *
+   * Existem duas aqui — `assets/extracted` e `assets/extracted-otp2019` —, e o manifest de
+   * curadoria aponta para os outfits da segunda. Com o padrão na primeira, `pnpm assets build`
+   * falhava em três das 42 espécies com um "arquivo não encontrado", e o atlas publicado deixou de
+   * ser reproduzível a partir do repositório sem ninguém perceber: quem construiu passou a flag na
+   * mão uma vez, e o padrão nunca acompanhou.
+   */
+  .option('--extracted <dir>', 'pasta com PNGs extraídos e catalog.json', 'assets/extracted-otp2019')
   .option('--manifest <file>', 'manifest de curadoria', 'tools/assets/manifest.json')
   .option('--out <dir>', 'pasta de saída dos atlases', 'assets/atlas')
   .option('--publish <dir>', 'cópia servida ao navegador; "nenhum" para não publicar', 'packages/server/public/atlas')

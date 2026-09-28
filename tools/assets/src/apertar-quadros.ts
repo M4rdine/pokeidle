@@ -8,8 +8,11 @@
  * vizinhos e deslocado para a direita. Na tela do inicial, onde os três aparecem lado a lado, dava
  * para ver a olho nu.
  *
- * Isto NÃO mexe num pixel: só corrige o retângulo. A arte já está certa na folha; o que estava
- * errado era o recorte anunciado sobre ela.
+ * O conserto acontece ANTES de empacotar, sobre os pixels da folha de origem — não depois, sobre
+ * o retângulo do atlas publicado. Houve uma versão que corrigia o retângulo depois, num roteiro à
+ * parte, porque na época o build não rodava: o padrão do CLI apontava para a extração errada. Com
+ * o build reproduzível de novo, manter os dois caminhos seria manter duas verdades sobre a mesma
+ * geometria, e a segunda envelheceria calada.
  *
  * UMA CAIXA POR ANIMAÇÃO, e não por quadro. Se cada fase da caminhada fosse apertada contra o
  * próprio conteúdo, o bicho SALTARIA de posição a cada fase — o passo faz o desenho andar dentro
@@ -63,18 +66,86 @@ export function unir(a: Caixa, b: Caixa): Caixa {
 /**
  * Cresce `conteudo` até virar um quadrado, centrado nele e contido em `celula`.
  *
- * Quando o conteúdo é maior que a célula em algum eixo — o que não deve acontecer, mas é o tipo
- * de coisa que um dump novo traz —, o lado é limitado pela célula em vez de vazar para a vizinha.
+ * `prenderNaCelula` decide o que acontece quando o quadrado não cabe, e os dois chamadores querem
+ * coisas opostas:
+ *
+ *  - **Retângulo dentro do atlas** (`true`): o quadro é uma janela sobre uma folha compartilhada, e
+ *    passar da célula significa mostrar o vizinho. O lado é limitado — melhor apertado que sujo.
+ *  - **Recorte da imagem de origem** (`false`): aqui não há vizinho, e o que cai fora vira
+ *    transparente. Limitar seria CORTAR O DESENHO: um conteúdo de 34 px de largura numa folha de
+ *    64×32 virava um recorte de 32 e comia dois pixels do bicho — que foi exatamente o que o
+ *    primeiro build normalizado fez com o Charmander.
  */
-export function aoQuadrado(conteudo: Caixa, celula: Caixa): Caixa {
-  const lado = Math.min(Math.max(conteudo.w, conteudo.h), celula.w, celula.h)
+export function aoQuadrado(conteudo: Caixa, celula: Caixa, prenderNaCelula = true): Caixa {
+  const desejado = Math.max(conteudo.w, conteudo.h)
+  const lado = prenderNaCelula ? Math.min(desejado, celula.w, celula.h) : desejado
   const centroX = conteudo.x + conteudo.w / 2
   const centroY = conteudo.y + conteudo.h / 2
   const prender = (valor: number, minimo: number, maximo: number): number => Math.min(Math.max(valor, minimo), maximo)
+  const x = Math.round(centroX - lado / 2)
+  const y = Math.round(centroY - lado / 2)
   return {
-    x: prender(Math.round(centroX - lado / 2), celula.x, celula.x + celula.w - lado),
-    y: prender(Math.round(centroY - lado / 2), celula.y, celula.y + celula.h - lado),
+    x: prenderNaCelula ? prender(x, celula.x, celula.x + celula.w - lado) : x,
+    y: prenderNaCelula ? prender(y, celula.y, celula.y + celula.h - lado) : y,
     w: lado,
     h: lado,
   }
+}
+
+/*
+ * ── A NORMALIZAÇÃO NA ORIGEM ──
+ *
+ * O conserto no lugar certo: antes de empacotar, e sobre os pixels em vez do retângulo. Uma folha
+ * de origem com margem morta deixa de virar quadro torto, e o problema morre onde nasce em vez de
+ * precisar de um passo de correção depois de publicar.
+ */
+export interface ImagemRgba { readonly width: number; readonly height: number; readonly data: Uint8Array }
+
+/** Recorta uma região. Fora dos limites vira transparente, que é o certo para uma caixa ampliada. */
+export function recortar(img: ImagemRgba, caixa: Caixa): ImagemRgba {
+  const data = new Uint8Array(caixa.w * caixa.h * CANAIS)
+  for (let y = 0; y < caixa.h; y++) {
+    const oy = caixa.y + y
+    if (oy < 0 || oy >= img.height) continue
+    for (let x = 0; x < caixa.w; x++) {
+      const ox = caixa.x + x
+      if (ox < 0 || ox >= img.width) continue
+      const de = (oy * img.width + ox) * CANAIS
+      const para = (y * caixa.w + x) * CANAIS
+      for (let c = 0; c < CANAIS; c++) data[para + c] = img.data[de + c]!
+    }
+  }
+  return { width: caixa.w, height: caixa.h, data }
+}
+
+/**
+ * Deixa QUADRADOS os quadros de um grupo, recortando a margem morta comum a todos eles.
+ *
+ * A caixa é a UNIÃO das fases: apertar fase a fase faria o desenho saltar de posição a cada passo,
+ * porque é justamente o deslocamento dentro do quadro que produz o movimento da caminhada.
+ *
+ * Quadros que já são quadrados passam intactos — a normalização existe para o caso torto, e
+ * reapertar o que está certo seria recortar o atlas inteiro por causa de uma espécie.
+ */
+export function aoQuadradoNoGrupo<T extends { readonly name: string; readonly image: ImagemRgba }>(
+  quadros: readonly T[],
+): T[] {
+  const porGrupo = new Map<string, Caixa>()
+  for (const q of quadros) {
+    if (q.image.width === q.image.height) continue
+    const conteudo = limitesDoConteudo(q.image.data, q.image.width, { x: 0, y: 0, w: q.image.width, h: q.image.height })
+    if (!conteudo) continue
+    const grupo = grupoDoQuadro(q.name)
+    const anterior = porGrupo.get(grupo)
+    porGrupo.set(grupo, anterior ? unir(anterior, conteudo) : conteudo)
+  }
+  if (porGrupo.size === 0) return [...quadros]
+  return quadros.map((q) => {
+    const conteudo = porGrupo.get(grupoDoQuadro(q.name))
+    if (!conteudo || q.image.width === q.image.height) return q
+    // `false`: o recorte pode passar dos limites da folha de origem, e o que cai fora vira
+    // transparente. Prender aqui cortaria o desenho — ver `aoQuadrado`.
+    const caixa = aoQuadrado(conteudo, { x: 0, y: 0, w: q.image.width, h: q.image.height }, false)
+    return { ...q, image: recortar(q.image, caixa) }
+  })
 }

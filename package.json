@@ -18,8 +18,7 @@
     "db:up": "docker compose up -d",
     "cores": "tsx tools/assets/scripts/cores-do-mundo.ts",
     "icones-baixar": "tsx tools/assets/scripts/ui-baixar.ts",
-    "icones": "tsx tools/assets/scripts/ui-icones.ts",
-    "apertar-atlas": "tsx tools/assets/scripts/apertar-atlas.ts"
+    "icones": "tsx tools/assets/scripts/ui-icones.ts"
   },
   "devDependencies": {
     "tsx": "^4.19.0"

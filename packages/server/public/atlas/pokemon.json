@@ -1202,402 +1202,402 @@
     },
     "charmander/walk_north_0": {
       "frame": {
-        "x": 512,
+        "x": 545,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       }
     },
     "charmander/walk_north_1": {
       "frame": {
-        "x": 576,
+        "x": 609,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       }
     },
     "charmander/walk_north_2": {
       "frame": {
-        "x": 640,
+        "x": 673,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       }
     },
     "charmander/walk_north_3": {
       "frame": {
-        "x": 704,
+        "x": 737,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       }
     },
     "charmander/walk_north_4": {
       "frame": {
-        "x": 768,
+        "x": 801,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       }
     },
     "charmander/walk_east_0": {
       "frame": {
-        "x": 832,
+        "x": 862,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       }
     },
     "charmander/walk_east_1": {
       "frame": {
-        "x": 896,
+        "x": 926,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       }
     },
     "charmander/walk_east_2": {
       "frame": {
-        "x": 960,
+        "x": 990,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       }
     },
     "charmander/walk_east_3": {
       "frame": {
-        "x": 1024,
+        "x": 1054,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       }
     },
     "charmander/walk_east_4": {
       "frame": {
-        "x": 1088,
+        "x": 1118,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       }
     },
     "charmander/walk_south_0": {
       "frame": {
-        "x": 1152,
+        "x": 1185,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       }
     },
     "charmander/walk_south_1": {
       "frame": {
-        "x": 1216,
+        "x": 1249,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       }
     },
     "charmander/walk_south_2": {
       "frame": {
-        "x": 1280,
+        "x": 1313,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       }
     },
     "charmander/walk_south_3": {
       "frame": {
-        "x": 1344,
+        "x": 1377,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       }
     },
     "charmander/walk_south_4": {
       "frame": {
-        "x": 1408,
+        "x": 1441,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 31,
+        "h": 31
       }
     },
     "charmander/walk_west_0": {
       "frame": {
-        "x": 1472,
+        "x": 1502,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       }
     },
     "charmander/walk_west_1": {
       "frame": {
-        "x": 1536,
+        "x": 1566,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       }
     },
     "charmander/walk_west_2": {
       "frame": {
-        "x": 1600,
+        "x": 1630,
         "y": 128,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       }
     },
     "charmander/walk_west_3": {
       "frame": {
-        "x": 0,
+        "x": 30,
         "y": 192,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       }
     },
     "charmander/walk_west_4": {
       "frame": {
-        "x": 64,
+        "x": 94,
         "y": 192,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "rotated": false,
       "trimmed": false,
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       },
       "sourceSize": {
-        "w": 64,
-        "h": 32
+        "w": 34,
+        "h": 34
       }
     },
     "charmeleon/walk_north_0": {

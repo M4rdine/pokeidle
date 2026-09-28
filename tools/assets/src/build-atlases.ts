@@ -61,6 +61,26 @@ async function pokemonFrames(extractedDir: string, manifest: Manifest, catalog: 
   return frames
 }
 
+/**
+ * A grade é de células QUADRADAS, e todo consumidor escala o sprite pelo lado do quadro. Um PNG de
+ * origem retangular entra com margem morta de um lado, e o bicho passa a ser desenhado menor que os
+ * vizinhos e fora do centro — em silêncio, porque nada quebra.
+ *
+ * Foi assim que o Charmander ficou com quadro de 64×32, com o desenho na metade direita, e
+ * apareceu pela metade do tamanho dos outros dois na tela do inicial. O erro estava na folha de
+ * origem desde a primeira construção do atlas, e nenhum teste o via.
+ */
+function conferirQuadrados(frames: readonly AtlasFrame[]): void {
+  const tortos = frames.filter((f) => f.image.width !== f.image.height)
+  if (tortos.length === 0) return
+  const exemplos = tortos.slice(0, 3).map((f) => `${f.name} (${f.image.width}x${f.image.height})`).join(', ')
+  throw new Error(
+    `${tortos.length} quadro(s) de Pokémon não são quadrados: ${exemplos}. ` +
+    'A folha de origem tem margem morta — corrija o recorte no dump, ou rode ' +
+    '"pnpm apertar-atlas --gravar" depois de publicar para apertar o retângulo até o conteúdo.',
+  )
+}
+
 async function exists(path: string): Promise<boolean> {
   try {
     await access(path)
@@ -265,6 +285,7 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
 
   await mkdir(opts.outDir, { recursive: true })
   const pokemon = await pokemonFrames(opts.extractedDir, manifest, catalog)
+  conferirQuadrados(pokemon)
   await writeAtlas(opts.outDir, 'pokemon', pokemon)
   log(`pokemon.png: ${pokemon.length} frames de ${manifest.species.length} espécies`)
 

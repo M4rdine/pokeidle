@@ -33,15 +33,28 @@ export function openPokedex(ctx: AppContext): Modal {
     const species = [...ctx.registry.species.values()].sort((a, b) => a.id - b.id)
     const caught = species.filter((s) => byName.get(s.name)?.caughtAt != null || seenInSession.has(s.name)).length
     const seen = species.filter((s) => byName.has(s.name) || seenInSession.has(s.name)).length
+    /*
+     * A contagem em CARTÕES DE LEITURA, os mesmos do painel do treinador e do cabeçalho de áreas.
+     * Ela era uma linha cinza — "Capturados: 12 · Vistos: 20 · Total: 42" — que é a forma de
+     * legenda, e estes três números são o placar da Pokédex: o motivo de a tela existir.
+     */
     body.replaceChildren(
-      el('p', { class: 'muted' }, `Capturados: ${caught} · Vistos: ${seen} · Total: ${species.length}`),
+      el('div', { class: 'dex-placar' },
+        el('div', { class: 'cartao-leitura cartao-ouro' }, el('span', {}, 'capturados'), el('span', {}, String(caught))),
+        el('div', { class: 'cartao-leitura' }, el('span', {}, 'vistos'), el('span', {}, String(seen))),
+        el('div', { class: 'cartao-leitura' }, el('span', {}, 'total'), el('span', {}, String(species.length)))),
       el('div', { class: 'pokedex-grid' }, ...species.map((one) => {
         const entry = byName.get(one.name)
         const isCaught = entry?.caughtAt != null || seenInSession.has(one.name)
         const isSeen = entry !== undefined || isCaught
         const cell = el('div', { class: `dex-cell ${isCaught ? 'caught' : isSeen ? 'seen' : 'unknown'}`, 'data-species': one.name })
         if (isSeen) {
-          cell.append(spriteThumb(ctx.atlas, one.name, LADO_DEX), el('span', {}, displayName(one.name)))
+          // O NÚMERO é o que faz uma grade de bichos ser uma Pokédex: é por ele que a lista é
+          // ordenada, e sem ele a única forma de achar uma espécie é varrer os nomes.
+          cell.append(
+            el('span', { class: 'dex-numero' }, `#${String(one.id).padStart(3, '0')}`),
+            spriteThumb(ctx.atlas, one.name, LADO_DEX),
+            el('span', { class: 'dex-nome' }, displayName(one.name)))
           // Só o que já foi visto abre ficha: mostrar atributos de quem o jogador nunca encontrou
           // entregaria o conteúdo que a Pokédex existe para revelar aos poucos.
           cell.setAttribute('role', 'button')
@@ -49,7 +62,9 @@ export function openPokedex(ctx: AppContext): Modal {
           const abrir = (): void => mostrarFicha(one.name, () => render(entries))
           cell.addEventListener('click', abrir)
           cell.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); abrir() } })
-        } else cell.append(el('span', { class: 'muted' }, '???'))
+        } else cell.append(
+          el('span', { class: 'dex-numero' }, `#${String(one.id).padStart(3, '0')}`),
+          el('span', { class: 'dex-vazio' }, '???'))
         return cell
       })))
   }

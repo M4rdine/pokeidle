@@ -1,6 +1,6 @@
 import { evolutionChain, type ContentRegistry } from '@pokeidle/shared'
 import { displayName } from '../../state/log.js'
-import { el } from '../dom.js'
+import { comTipo, el } from '../dom.js'
 import { spriteThumb } from '../sprite-css.js'
 import type { AtlasData } from '../../scene/atlas.js'
 
@@ -28,8 +28,10 @@ export function evolutionLine(registry: ContentRegistry, atlas: AtlasData, name:
     const seta = i === 0 ? [] : [el('span', { class: 'evo-seta muted' }, `${passagem} →`)]
     return [
       ...seta,
+      // O retrato no POÇO tingido pelo tipo, como em toda figura desta casa. Solto, o sprite era a
+      // única imagem da ficha sem a caixa que o cabeçalho logo acima dela tem.
       el('div', { class: `evo-estagio ${especie.name === name ? 'evo-atual' : ''}`.trim(), 'data-evo': especie.name },
-        spriteThumb(atlas, especie.name, LADO),
+        comTipo(el('span', { class: 'evo-poco' }, spriteThumb(atlas, especie.name, LADO)), especie.types),
         el('span', {}, displayName(especie.name))),
     ]
   }))

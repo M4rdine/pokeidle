@@ -159,8 +159,20 @@ describe('pokédex', () => {
     await flush()
     expect(modal().querySelector('[data-species=charmander]')?.className).toContain('caught')
     expect(modal().querySelector('[data-species=zubat]')?.className).toContain('seen')
-    expect(modal().querySelector('[data-species=mewtwo]')?.textContent).toBe('???')
-    expect(modal().textContent).toContain('Capturados: 1')
+    /*
+     * A desconhecida mostra o NÚMERO e esconde o resto. O número é o que faz a grade ser uma
+     * Pokédex — é por ele que a lista é ordenada —, e escondê-lo junto com o nome transformava as
+     * lacunas em buracos anônimos, sem dizer sequer qual espécie falta.
+     */
+    const desconhecida = modal().querySelector('[data-species=mewtwo]')!
+    expect(desconhecida.querySelector('.dex-numero')?.textContent).toBe('#150')
+    expect(desconhecida.querySelector('.dex-vazio')?.textContent).toBe('???')
+    expect(desconhecida.textContent).not.toContain('Mewtwo')
+    // O placar em cartões de leitura: era uma linha cinza, que é a forma de legenda, para os três
+    // números que são o motivo de a tela existir.
+    const placar = [...modal().querySelectorAll('.dex-placar .cartao-leitura')]
+    expect(placar.map((c) => c.firstElementChild?.textContent)).toEqual(['capturados', 'vistos', 'total'])
+    expect(placar[0]?.lastElementChild?.textContent).toBe('1')
   })
 })
 

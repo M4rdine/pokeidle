@@ -22,7 +22,16 @@
   border-radius: var(--raio);
   box-shadow: var(--relevo-cava), 0 0 18px -4px color-mix(in srgb, var(--tipo, transparent) 60%, transparent);
 }
-.ficha-id { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
+.ficha-id { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+.ficha-linha-nome { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+/* O número da Pokédex é um atributo da espécie, como o tipo — e por isso veste o mesmo chip. Em
+ * cinza solto ao lado do nome ele lia como legenda de imagem. */
+.chip-dex { font-variant-numeric: tabular-nums; letter-spacing: 0.04em; }
+
+/* Os três números no alto, em cartões. Estavam no RODAPÉ, depois da tabela de golpes: quem abria
+ * a ficha para saber se a espécie pega fácil tinha de rolar até o fim para descobrir. */
+.ficha-leituras { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.ficha-leituras .cartao-leitura { flex: 1 1 130px; }
 /* O nome da espécie é o assunto da ficha e ganha o maior corpo dela — `--t-xl` está acima do
  * piso da face bitmap. */
 .ficha-id h2 { font-size: var(--t-xl); }
@@ -146,6 +155,8 @@
 .learn-nivel, .learn-poder { font-variant-numeric: tabular-nums; }
 
 /* ── Números soltos ────────────────────────────────────────────────────────── */
+/* A lista de definição do rodapé saiu; estes seletores ficam para não quebrar nada que ainda a
+ * use, e devem cair na próxima limpeza se ninguém a referenciar. */
 .ficha-numeros {
   display: grid; grid-template-columns: repeat(3, auto); gap: var(--space-1) var(--space-3);
   margin: 0; justify-content: start;
@@ -170,3 +181,32 @@
   .learn-linha { grid-template-columns: 3.5rem 1fr; row-gap: var(--space-1); }
   .stat-linha { grid-template-columns: 4.5rem 2.5rem 1fr; }
 }
+
+/* O poço de cada estágio da evolução: o mesmo do cabeçalho da ficha, menor. Solto, o sprite era a
+ * única imagem da ficha sem a caixa que todas as outras figuras do jogo têm. */
+.evo-poco {
+  display: grid; place-items: center;
+  padding: var(--space-1);
+  border-radius: var(--raio-p);
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--tipo, var(--borda-clara)) 28%, var(--cava-topo)),
+    var(--cava-pe));
+  box-shadow: var(--relevo-cava);
+}
+
+/* ── Pokédex ─────────────────────────────────────────────────────────────────
+ * O placar em cartões, e a célula com o NÚMERO em cima do retrato: é por ele que a lista é
+ * ordenada, e sem ele achar uma espécie exigia varrer os nomes um a um.
+ */
+.dex-placar { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.dex-placar .cartao-leitura { flex: 1 1 100px; }
+.dex-numero {
+  align-self: flex-start;
+  font-size: var(--t-xs); font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em; color: var(--texto-fraco);
+}
+.dex-nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+/* A célula desconhecida guarda a MESMA altura das outras: sem isso a grade fica com buracos de
+ * alturas diferentes e deixa de ler como um catálogo completo com lacunas. */
+.dex-vazio { color: var(--texto-fraco); margin: auto 0; letter-spacing: 0.12em; }
+.dex-cell.unknown { min-height: 74px; justify-content: flex-start; }

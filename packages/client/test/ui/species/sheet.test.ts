@@ -20,7 +20,9 @@ describe('ficha de espécie', () => {
     const charizard = registry.species.get('charizard')!
     const ficha = speciesSheet(ctx(), 'charizard')
     expect(texto(ficha)).toContain('Charizard')
-    expect(texto(ficha)).toContain(`#${charizard.id}`)
+    // O número veste o CHIP, como o tipo: ele é um atributo da espécie, e em cinza solto ao lado
+    // do nome lia como legenda de imagem. Três dígitos para a coluna não dançar entre #6 e #150.
+    expect(ficha.querySelector('.chip-dex')?.textContent).toBe(`#${String(charizard.id).padStart(3, '0')}`)
     for (const tipo of charizard.types) {
       expect(ficha.querySelector(`.type-${tipo}`), tipo).not.toBeNull()
     }

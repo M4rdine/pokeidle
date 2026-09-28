@@ -36,11 +36,19 @@ export function speciesSheet(ctx: AppContext, name: string): HTMLElement {
     return el('div', { class: 'ficha' }, el('p', { class: 'muted' }, `Espécie não encontrada: ${name}`))
   }
 
+  /*
+   * Os três números em CARTÕES DE LEITURA, e no ALTO da ficha.
+   *
+   * Eram uma lista de definição no RODAPÉ, em corpo miúdo — a forma de nota de rodapé para os três
+   * dados que mais decidem se vale caçar esta espécie. E lá embaixo eles chegavam depois da tabela
+   * de golpes, que é a seção mais longa: quem abria a ficha para saber se pega fácil precisava
+   * rolar até o fim para descobrir.
+   */
   const captura = Math.round((species.captureRate / CAPTURA_MAX) * 100)
-  const numeros = el('dl', { class: 'ficha-numeros' },
-    el('dt', {}, 'captura'), el('dd', {}, `${captura}%`),
-    el('dt', {}, 'exp. base'), el('dd', {}, String(species.baseExperience)),
-    el('dt', {}, 'crescimento'), el('dd', {}, species.growthRate))
+  const numeros = el('div', { class: 'ficha-leituras' },
+    el('div', { class: 'cartao-leitura' }, el('span', {}, 'captura'), el('span', {}, `${captura}%`)),
+    el('div', { class: 'cartao-leitura' }, el('span', {}, 'exp. base'), el('span', {}, String(species.baseExperience)),),
+    el('div', { class: 'cartao-leitura' }, el('span', {}, 'crescimento'), el('span', {}, species.growthRate)))
 
   const evo = evolutionLine(ctx.registry, ctx.atlas, name)
   return el('div', { class: 'ficha' },
@@ -52,12 +60,15 @@ export function speciesSheet(ctx: AppContext, name: string): HTMLElement {
        */
       comTipo(el('span', { class: 'ficha-poco' }, spriteThumb(ctx.atlas, name, LADO_SPRITE)), species.types),
       el('div', { class: 'ficha-id' },
-        el('h2', {}, displayName(name)),
-        el('span', { class: 'muted' }, `#${species.id}`),
+        el('div', { class: 'ficha-linha-nome' },
+          el('h2', {}, displayName(name)),
+          // O número vira CHIP: ele é um atributo da espécie, como o tipo, e como texto cinza
+          // solto ao lado do nome ele lia como legenda de imagem.
+          el('span', { class: 'chip chip-dex' }, `#${String(species.id).padStart(3, '0')}`)),
         el('div', { class: 'ficha-tipos' }, ...species.types.map(typeBadge)))),
+    numeros,
     secao('Onde aparece', whereFound(ctx.registry, species, nivelDoTreinador(ctx))),
     secao('Atributos-base', statBars(species.baseStats)),
     ...(evo ? [secao('Evolução', evo)] : []),
-    secao('Golpes', learnsetTable(ctx.registry, species)),
-    numeros)
+    secao('Golpes', learnsetTable(ctx.registry, species)))
 }

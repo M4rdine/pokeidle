@@ -8,7 +8,8 @@ import { TILE_ANIMATION_MS, TILE_SIZE } from '../config.js'
 import { activePokemon, type HuntView } from '../state/hunt-view.js'
 import type { AtlasData } from './atlas.js'
 import { cameraStep, type Camera } from './camera.js'
-import { createEffectRunner, fadeOut, floatingText, lunge, ring, shake } from './effects.js'
+import { bolaDeCaptura, createEffectRunner, fadeOut, floatingText, lunge, ring, shake } from './effects.js'
+import { carregarBolas } from './bolas.js'
 import { createEntityLayer } from './entities.js'
 import { isDone, positionAt } from './interpolate.js'
 import { animatedTileLayer, bakePlacements } from './map-layer.js'
@@ -72,6 +73,15 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
   parent.appendChild(app.canvas)
 
   const sheets = await loadSheets(deps.atlas)
+  /*
+   * Junto das folhas, e não sob demanda: buscar a textura no instante da captura a faria chegar
+   * depois do momento que a animação existe para marcar.
+   *
+   * `carregarBolas` NUNCA lança — ver o cabeçalho de `bolas.ts`. Isto aqui é enfeite no caminho de
+   * arranque da cena, e a primeira versão derrubou o mapa inteiro quando a CSP barrou o
+   * carregamento: tela preta, jogo rodando por baixo, nada na tela.
+   */
+  const bolas = await carregarBolas()
   const world = new Container()
   const worldSize = { w: deps.map.width * TILE_SIZE, h: deps.map.height * TILE_SIZE }
   const anims = deps.atlas.tiles.animations
@@ -163,6 +173,22 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
     effects.add(floatingText(overlay, targetRoot.x, targetRoot.y - 36, String(e.damage), color, size))
   }
 
+  /*
+   * A bola cai sobre o selvagem, treme e termina de um jeito ou de outro. Era um anel branco de
+   * 400 ms — a mesma marca que a poção e a cura usam, com outra cor: nada dizia que uma bola tinha
+   * sido atirada, e pegar e errar eram visualmente idênticos.
+   *
+   * SEM TEXTURA, O ANEL DE ANTES. Perder a decoração é aceitável; ficar sem nenhuma marca no
+   * momento mais importante do jogo, não.
+   */
+  const capturaNoMundo = (wildId: number, ball: string, sucesso: boolean): void => {
+    const alvo = spriteOf(`wild:${wildId}`)
+    if (!alvo) return
+    const textura = bolas.de(ball)
+    if (textura) effects.add(bolaDeCaptura(overlay, alvo.x, alvo.y - 10, textura, sucesso))
+    else effects.add(ring(overlay, alvo.x, alvo.y, sucesso ? 0xffffff : 0x8899aa, 400))
+  }
+
   const onEvent = (e: Event, view: HuntView): void => {
     if (isHidden()) return
     const player = spriteOf('player')
@@ -172,16 +198,14 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
         if (player) effects.add(floatingText(overlay, player.x, player.y - 40, `+${e.xpPokemon} XP`, 0xffdd44))
         return
       }
-      case 'captured': {
-        const t = spriteOf(`wild:${e.wildId}`)
-        if (t) effects.add(ring(overlay, t.x, t.y, 0xffffff, 400))
-        return
-      }
-      case 'captureFailed': {
-        const t = spriteOf(`wild:${e.wildId}`)
-        if (t) effects.add(floatingText(overlay, t.x, t.y - 30, '○', 0xffffff, 14))
-        return
-      }
+      /*
+       * A BOLA CAI SOBRE O SELVAGEM, treme e termina de um jeito ou de outro.
+       *
+       * Era um anel branco de 400 ms — a mesma marca que a poção e a cura usam, com outra cor.
+       * Nada dizia que uma bola tinha sido atirada, e pegar e errar eram visualmente idênticos.
+       */
+      case 'captured': return capturaNoMundo(e.wildId, e.ball, true)
+      case 'captureFailed': return capturaNoMundo(e.wildId, e.ball, false)
       case 'levelUp': {
         if (player) effects.add(ring(overlay, player.x, player.y, 0xffcc00, 600))
         return

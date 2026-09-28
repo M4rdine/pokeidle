@@ -2,6 +2,7 @@ import { HuntMapSchema } from '@pokeidle/shared'
 import type { AppContext } from '../../app-context.js'
 import type { Scene } from '../../scene/app.js'
 import { mountActivePokemon } from '../hud/active-pokemon.js'
+import { mountCaptura } from '../hud/captura.js'
 import { mountLog } from '../hud/log.js'
 import { mountSituacao } from '../hud/situacao.js'
 import { mountMoves } from '../hud/moves.js'
@@ -31,7 +32,7 @@ export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
 
   const offs = [mountPerfil(left, ctx), mountActivePokemon(left, ctx), mountTeamStrip(left, ctx),
     mountMenu(menu, ctx), mountMoves(right, ctx), mountSituacao(right, ctx),
-    mountLog(bottom, ctx), mountOverlays(center, ctx)]
+    mountLog(bottom, ctx), mountOverlays(center, ctx), mountCaptura(center, ctx)]
   let scene: Scene | null = null
   let offScene: (() => void) | null = null
   let offEvents: (() => void) | null = null

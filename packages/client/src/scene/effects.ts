@@ -1,8 +1,16 @@
-import { ColorMatrixFilter, Container, Graphics, Text, type Ticker } from 'pixi.js'
+import { ColorMatrixFilter, Container, Graphics, Sprite, Text, type Texture, type Ticker } from 'pixi.js'
 
 export type Updater = (dtMs: number) => boolean // devolve false quando termina
 
 const MAX_ACTIVE_EFFECTS = 200
+/** De quanto acima do alvo a bola cai, em pixels do mundo. */
+const ALTURA_DA_QUEDA = 34
+const MS_QUEDA = 170
+const MS_TREMOR = 720
+const MS_SUCESSO = 1150
+const MS_FALHA = 1010
+const BALANCOS = 3
+const AMPLITUDE = 0.3
 const FLASH_BRIGHTNESS = 2
 
 export interface EffectRunner {
@@ -125,4 +133,62 @@ export function ring(layer: Container, x: number, y: number, color: number, ms =
   return over(ms, (k) => {
     g.clear().circle(x, y - 12, radius * (0.5 + k)).stroke({ width: 3, color, alpha: 1 - k })
   }, () => { g.destroy() })
+}
+
+/*
+ * ── A BOLA DE CAPTURA, no mundo ──
+ *
+ * A captura é o que o jogo existe para produzir, e no mundo ela era um anel branco de 400 ms sobre
+ * o selvagem: a mesma marca que a poção e a cura usam, com outra cor. Nada dizia que uma BOLA foi
+ * atirada, e nada distinguia pegar de errar a não ser a linha do registro.
+ *
+ * A bola é a DO EVENTO. O motor escolhe a bola por encontro desde que elas viraram situacionais, e
+ * ver a Rápida cair sobre um selvagem intacto mostra essa decisão acontecendo — de graça, porque a
+ * textura já estava no pacote.
+ *
+ * O SELVAGEM NÃO ENTRA NA CONTA. Ele some do estado no mesmo tique da captura, e o sprite dele é
+ * removido pelo reconcile logo em seguida: uma animação que dependesse dele quebraria na metade.
+ * A bola se basta — cai, treme e termina de um jeito ou de outro.
+ */
+export function bolaDeCaptura(
+  layer: Container,
+  x: number,
+  y: number,
+  textura: Texture,
+  sucesso: boolean,
+): Updater {
+  const bola = new Sprite(textura)
+  bola.anchor.set(0.5)
+  bola.x = x
+  bola.y = y - ALTURA_DA_QUEDA
+  bola.scale.set(0.6)
+  layer.addChild(bola)
+
+  const total = sucesso ? MS_SUCESSO : MS_FALHA
+  return over(total, (k) => {
+    const t = k * total
+    if (t < MS_QUEDA) {
+      // Cai sobre o alvo, crescendo: é o arco do arremesso, curto o bastante para não atrasar o
+      // que interessa, que é o tremor.
+      const q = t / MS_QUEDA
+      bola.y = y - ALTURA_DA_QUEDA * (1 - q * q)
+      bola.scale.set(0.6 + 0.4 * q)
+      return
+    }
+    bola.y = y
+    bola.scale.set(1)
+    if (t < MS_QUEDA + MS_TREMOR) {
+      // TRÊS balanços. É o número que o gênero fixou e que se reconhece antes de ler qualquer
+      // palavra: dois parecem engasgo, quatro viram espera.
+      const q = (t - MS_QUEDA) / MS_TREMOR
+      bola.rotation = Math.sin(q * Math.PI * 2 * BALANCOS) * AMPLITUDE * (1 - q)
+      return
+    }
+    bola.rotation = 0
+    const fim = (t - MS_QUEDA - MS_TREMOR) / (total - MS_QUEDA - MS_TREMOR)
+    // Pegou: a bola assenta e some. Escapou: ela ABRE — cresce e apaga rápido. O mesmo objeto com
+    // dois fins é o que deixa ler o resultado sem procurar no registro.
+    if (sucesso) bola.alpha = 1 - fim * fim
+    else { bola.scale.set(1 + fim * 0.8); bola.alpha = 1 - fim }
+  }, () => { bola.destroy() })
 }

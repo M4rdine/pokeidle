@@ -2,7 +2,7 @@ import { xpForLevel } from '@pokeidle/shared'
 import type { AppContext } from '../../app-context.js'
 import { activePokemon } from '../../state/hunt-view.js'
 import { displayName } from '../../state/log.js'
-import { comTipo, el, pct } from '../dom.js'
+import { comTipo, el, pct, pulsar } from '../dom.js'
 import { spriteThumb } from '../sprite-css.js'
 
 /** Lado do sprite do ativo, em pixels. Dobro da miniatura das listas: aqui ele é o assunto. */
@@ -45,6 +45,8 @@ export function mountActivePokemon(root: HTMLElement, ctx: AppContext): () => vo
   root.append(cartao)
 
   let species = ''
+  /** Quem está em campo agora. Separa "trocou de Pokémon" de "o mesmo mudou". */
+  let emCampo = ''
   return ctx.hunt.subscribe(activePokemon, (active) => {
     if (!active) {
       // Estado vazio com palavra, não travessão: quem chega e vê "—" não sabe se quebrou ou se
@@ -54,9 +56,27 @@ export function mountActivePokemon(root: HTMLElement, ctx: AppContext): () => vo
       corpo.hidden = true
       caixaSprite.replaceChildren()
       species = ''
+      // Também zera quem estava em campo: voltar depois de o campo ficar vazio é uma ENTRADA, e
+      // sem isto o mesmo Pokémon voltaria sem o deslize que anuncia a troca.
+      emCampo = ''
       return
     }
     corpo.hidden = false
+    /*
+     * A TROCA DE POKÉMON ENTRA, não corta.
+     *
+     * O retrato trocava de imagem no mesmo quadro, e num idle — onde a troca acontece sozinha,
+     * sem ninguém clicar — o jogador só descobria olhando o nome. O deslize dura o tempo de um
+     * pulso e diz, pela FORMA, que alguém novo entrou em campo.
+     */
+    // Calculado ANTES de qualquer atualização: as duas reações abaixo dependem de saber se
+    // trocou, e `emCampo` só avança no fim.
+    const trocou = active.id !== emCampo
+    if (trocou) {
+      caixaSprite.classList.remove('entrou-em-campo')
+      void caixaSprite.offsetWidth
+      caixaSprite.classList.add('entrou-em-campo')
+    }
     if (active.speciesName !== species) {
       species = active.speciesName
       caixaSprite.replaceChildren(spriteThumb(ctx.atlas, species, LADO_SPRITE))
@@ -69,7 +89,23 @@ export function mountActivePokemon(root: HTMLElement, ctx: AppContext): () => vo
       comTipo(cartao, tipos)
     }
     nome.textContent = displayName(active.speciesName)
+    /*
+     * SUBIR DE NÍVEL PULSA. É o progresso do jogo acontecendo, e ele passava como um número que
+     * trocava calado — o mesmo tratamento que o HP e o XP recebem a cada tique.
+     *
+     * Só quando SOBE, e só no MESMO Pokémon: trocar de ativo muda o número sem ninguém ter subido
+     * nada, e pulsar ali contaria uma conquista que não houve.
+     */
+    const nivelAnterior = Number(nivel.getAttribute('data-nivel'))
+    if (!trocou && Number.isFinite(nivelAnterior) && active.level > nivelAnterior) {
+      pulsar(nivel)
+      cartao.classList.remove('subiu-de-nivel')
+      void cartao.offsetWidth
+      cartao.classList.add('subiu-de-nivel')
+      cartao.addEventListener('animationend', () => cartao.classList.remove('subiu-de-nivel'), { once: true })
+    }
     nivel.textContent = `nv ${active.level}`
+    nivel.setAttribute('data-nivel', String(active.level))
     nivel.hidden = false
     /*
      * O CLARÃO DO DANO. A barra já encolhe com transição, mas encolher devagar esconde o susto:
@@ -97,5 +133,6 @@ export function mountActivePokemon(root: HTMLElement, ctx: AppContext): () => vo
     const dentro = pct(Math.max(0, active.xp - floor), span)
     xp.setAttribute('value', String(dentro))
     xpText.textContent = `${dentro}%`
+    emCampo = active.id
   })
 }

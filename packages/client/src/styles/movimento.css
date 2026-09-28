@@ -104,3 +104,82 @@ button.slot:active:not(:disabled) {
 }
 .levou-dano::-webkit-progress-value { animation: flash-dano var(--normal) ease-out; }
 .levou-dano::-moz-progress-bar { animation: flash-dano var(--normal) ease-out; }
+
+/* ── A captura ────────────────────────────────────────────────────────────────
+ * Capturar é o que o jogo existe para produzir, e passava como um anel de 400 ms no canvas e uma
+ * linha no registro: menos presença na tela do que um Pokémon tomando dano.
+ *
+ * A peça fica por cima da cena, no pé — longe do centro, onde o mundo está acontecendo, e perto do
+ * registro, que é onde o jogador confere o que aconteceu.
+ */
+.captura {
+  position: absolute; left: 50%; bottom: var(--space-3); z-index: 3;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  pointer-events: none; text-align: center;
+  border-radius: var(--raio-g);
+  background: linear-gradient(180deg, rgb(17 21 31 / 88%), rgb(11 15 26 / 94%));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--latao) 44%, transparent), var(--relevo-3);
+  animation: captura-entra var(--normal) var(--saida) both;
+}
+@keyframes captura-entra {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+/* O clarão só no fim, quando a bola para: é ele que diz "fechou". Antes do fim, seria um flash
+ * sobre uma bola ainda tremendo, e as duas leituras se anulariam. */
+@keyframes captura-firma {
+  0%, 70% { box-shadow: none; }
+  80% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--ouro) 55%, transparent); }
+  100% { box-shadow: 0 0 0 14px transparent; }
+}
+/*
+ * A BOLA GRANDE MORA NO MAPA, não aqui.
+ *
+ * Esta peça teve uma bola de 56 px por um tempo, tentando ser o momento da captura. Estava no
+ * lugar errado: o arremesso acontece sobre o SELVAGEM, e é lá que a bola cai, treme e termina —
+ * ver `bolaDeCaptura` na cena. Duas bolas ao mesmo tempo, uma no mundo e outra no rodapé, eram a
+ * mesma frase dita duas vezes, e a do rodapé chegava sem o alvo do lado.
+ *
+ * Aqui ela volta a ser ÍCONE: diz QUAL bola pegou, ao lado do nome e do destino. A ação é do
+ * mundo; o resultado é desta peça.
+ */
+.captura-bola {
+  display: grid; place-items: center;
+  width: 34px; height: 34px; border-radius: 999px;
+  animation: captura-firma 1.3s ease-out both;
+}
+.captura-nome { margin: 0; font-family: var(--fonte-hud); font-size: var(--t-l); color: var(--texto); }
+.captura-nota { margin: 0; font-size: var(--t-xs); color: var(--texto-fraco); letter-spacing: 0.06em; }
+
+/*
+ * A FALHA É A MESMA PEÇA COM OUTRO FIM: treme menos e a bola se afasta, em vez de firmar. Ver o
+ * mesmo objeto terminar de dois jeitos é o que faz o movimento informar — o jogador aprende a ler
+ * o fim e para de procurar no registro se pegou.
+ */
+@keyframes captura-escapa {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.72); opacity: 0.35; }
+}
+.captura-falhou { box-shadow: inset 0 0 0 1px rgb(255 255 255 / 10%), var(--relevo-2); }
+.captura-falhou .captura-bola { animation: captura-escapa 0.4s 0.35s ease-in both; }
+
+/* ── O cartão do ativo reage ──────────────────────────────────────────────────
+ * Duas coisas que aconteciam caladas: alguém novo entrar em campo, e o nível subir. Num idle as
+ * duas acontecem SOZINHAS, sem ninguém clicar — é justamente quando o movimento precisa avisar.
+ */
+@keyframes entra-em-campo {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.entrou-em-campo { animation: entra-em-campo var(--normal) var(--saida) both; }
+
+/* O cartão inteiro acende no dourado do progresso, por fora: o pulso do número diz QUE mudou, e o
+ * halo diz que a mudança foi boa. */
+@keyframes brilho-de-nivel {
+  0% { box-shadow: var(--relevo-1), 0 0 0 0 color-mix(in srgb, var(--ouro) 60%, transparent); }
+  35% { box-shadow: var(--relevo-1), 0 0 18px 3px color-mix(in srgb, var(--ouro) 55%, transparent); }
+  100% { box-shadow: var(--relevo-1), 0 0 0 0 transparent; }
+}
+.subiu-de-nivel { animation: brilho-de-nivel 900ms ease-out both; }

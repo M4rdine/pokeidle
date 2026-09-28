@@ -7,7 +7,7 @@ export interface EngineDeps { readonly registry: Registry; readonly hunt: HuntMa
 
 export type Intent =
   | { type: 'stop' }
-  | { type: 'useItem'; itemId: string }
+| { type: 'useItem'; itemId: string; pokemonId?: string }
   | { type: 'setActive'; pokemonId: string }
   | { type: 'updateSettings'; patch: Partial<{ returnHpPercent: number; potionHpPercent: number; capture: Partial<CaptureSettings> }> }
 

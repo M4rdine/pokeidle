@@ -24,7 +24,10 @@
     "hyper-potion": 30,
     "ultra-ball": 40,
     "revive": 25,
-    "max-revive": 45
+    "max-revive": 45,
+    "fire-stone": 15,
+    "thunder-stone": 15,
+    "moon-stone": 15
   },
   "regions": {
     "kanto": 1,

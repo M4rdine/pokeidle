@@ -1,4 +1,4 @@
-import { applyPotion } from './items.js'
+import { applyPotion, applyStone } from './items.js'
 import type { CaptureSettings, EngineDeps, EngineError, HuntState, Intent, IntentResult } from './types.js'
 
 const fail = (code: string, message: string): { error: EngineError } => ({ error: { code, message } })
@@ -40,7 +40,16 @@ function updateSettings(state: HuntState, patch: Extract<Intent, { type: 'update
 export function applyIntent(state: HuntState, intent: Intent, deps: EngineDeps): IntentResult {
   switch (intent.type) {
     case 'stop': return stop(state)
-    case 'useItem': return applyPotion(state, deps.registry, intent.itemId)
+    /*
+     * O TIPO DO ITEM decide o que usar faz — não um segundo intent. Um `stone.use` ao lado de um
+     * `item.use` obrigaria o cliente a saber a taxonomia do registro para mandar a mensagem
+     * certa, e ele já sabe menos que o servidor sobre isso.
+     */
+    case 'useItem': {
+      const item = deps.registry.items.get(intent.itemId)
+      if (item?.kind === 'stone') return applyStone(state, deps.registry, intent.itemId, intent.pokemonId)
+      return applyPotion(state, deps.registry, intent.itemId)
+    }
     case 'setActive': return setActive(state, intent.pokemonId)
     case 'updateSettings': return updateSettings(state, intent.patch)
   }

@@ -26,7 +26,14 @@ describe('unlocks', () => {
   })
   it('nextUnlock caminha pela tabela', () => {
     expect(nextUnlock(u, 1, items)).toEqual({ level: 10, what: '4 vagas no time' })
-    expect(nextUnlock(u, 10, items)).toEqual({ level: 20, what: 'Super Poção, Great Bola, 5 vagas no time' })
+    /*
+     * As TRÊS pedras abrem juntas, no 15. Só existem três porque só três têm alvo no registro:
+     * Pikachu, Growlithe e Jigglypuff. Vender Pedra da Água num jogo sem nenhuma espécie que a
+     * exija seria item morto na prateleira — e a prateleira é onde o jogador procura o que fazer
+     * com o ouro.
+     */
+    expect(nextUnlock(u, 10, items)).toEqual({ level: 15, what: 'Pedra do Fogo, Pedra do Trovão, Pedra da Lua' })
+    expect(nextUnlock(u, 15, items)).toEqual({ level: 20, what: 'Super Poção, Great Bola, 5 vagas no time' })
     // O Reviver abre entre as vagas e a região nova: ele é a resposta ao time inteiro cair, e
     // cair é o que começa a acontecer justamente nessa faixa.
     expect(nextUnlock(u, 20, items)).toEqual({ level: 25, what: 'Reviver' })

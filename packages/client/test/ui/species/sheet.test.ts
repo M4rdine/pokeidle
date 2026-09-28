@@ -60,7 +60,18 @@ describe('ficha de espécie', () => {
     expect(estagios).toEqual(['charmander', 'charmeleon', 'charizard'])
     // O estágio aberto se destaca dos outros: a linha é contexto, não navegação.
     expect(ficha.querySelector('[data-evo=charmeleon]')?.classList.contains('evo-atual')).toBe(true)
-    expect(texto(ficha)).toContain(String(registry.species.get('charmander')!.evolvesTo!.level))
+    const evo = registry.species.get('charmander')!.evolvesTo!
+    expect('level' in evo).toBe(true)
+    expect(texto(ficha)).toContain(String('level' in evo ? evo.level : ''))
+  })
+
+  it('a passagem por PEDRA mostra o nome da pedra, não "nv ?"', () => {
+    // Pikachu evolui por Pedra do Trovão, não por nível. Um "nv ?" ali leria como dado faltando
+    // no registro, quando a regra é simplesmente outra.
+    const ficha = speciesSheet(ctx(), 'pikachu')
+    expect([...ficha.querySelectorAll('[data-evo]')].map((n) => n.getAttribute('data-evo'))).toEqual(['pikachu', 'raichu'])
+    expect(texto(ficha)).toContain('Pedra do Trovão')
+    expect(texto(ficha)).not.toContain('nv ?')
   })
 
   it('lista os golpes que a espécie aprende, com o nível de cada um', () => {

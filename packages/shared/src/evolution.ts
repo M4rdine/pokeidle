@@ -1,12 +1,33 @@
 import type { Registry } from './registry.js'
 import type { Species } from './schemas/species.js'
 
+const alvo = (species: Species, nome: string, registry: Pick<Registry, 'species'>): Species => {
+  const target = registry.species.get(nome)
+  if (!target) throw new Error(`espécie ${species.name}: evolução ${nome} não existe no registro`)
+  return target
+}
+
+/**
+ * A evolução que o MOTOR resolve sozinho: por nível, e só por nível.
+ *
+ * Quem evolui por pedra não evolui aqui em nível nenhum, nem no cem. É o que faz a pedra ser uma
+ * decisão do jogador em vez de um atalho opcional para algo que ia acontecer de qualquer jeito.
+ */
 export function nextEvolution(species: Species, level: number, registry: Pick<Registry, 'species'>): Species | undefined {
   const evo = species.evolvesTo
-  if (!evo || level < evo.level) return undefined
-  const target = registry.species.get(evo.species)
-  if (!target) throw new Error(`espécie ${species.name}: evolução ${evo.species} não existe no registro`)
-  return target
+  if (!evo || !('level' in evo) || level < evo.level) return undefined
+  return alvo(species, evo.species, registry)
+}
+
+/**
+ * A evolução que a PEDRA destrava. Devolve `undefined` quando a espécie não evolui por item ou
+ * quando o item na mão não é o que ela pede — usar Pedra do Fogo num Pikachu não pode virar um
+ * Raichu, e também não pode gastar a pedra.
+ */
+export function evolutionByItem(species: Species, itemId: string, registry: Pick<Registry, 'species'>): Species | undefined {
+  const evo = species.evolvesTo
+  if (!evo || !('item' in evo) || evo.item !== itemId) return undefined
+  return alvo(species, evo.species, registry)
 }
 
 /**

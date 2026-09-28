@@ -1,5 +1,7 @@
+import { evolutionByItem } from '@pokeidle/shared'
 import type { AppContext } from '../../app-context.js'
 import { InventorySchema } from '../../api/dto.js'
+import { displayName } from '../../state/log.js'
 import { activePokemon } from '../../state/hunt-view.js'
 import { hasActiveHunt } from '../../state/hunt-active.js'
 import { el } from '../dom.js'
@@ -29,6 +31,32 @@ export function openBag(ctx: AppContext): Modal {
         const use = el('button', { type: 'button', ...(full && { disabled: true }) }, 'Usar')
         use.addEventListener('click', () => ctx.sendIntent?.({ t: 'item.use', itemId }))
         row.append(use)
+      }
+      /*
+       * A PEDRA lista quem ela evolui, em vez de um botão genérico.
+       *
+       * O motor recusa a pedra errada e não a gasta — mas deixar o jogador chegar até lá é
+       * desenhar o erro e depois defendê-lo. Mostrando só os alvos possíveis, a pedra errada
+       * deixa de ser clicável, e o jogador descobre o que ela serve olhando, não errando.
+       */
+      if (inHunt && item?.kind === 'stone') {
+        const time = ctx.hunt.get().state?.player.team ?? []
+        const alvos = time.filter((p) => {
+          const especie = ctx.registry.species.get(p.speciesName)
+          return especie !== undefined && evolutionByItem(especie, itemId, ctx.registry) !== undefined
+        })
+        if (alvos.length === 0) {
+          row.append(el('span', { class: 'muted bag-sem-alvo' }, 'ninguém do time evolui com ela'))
+        } else {
+          row.append(el('div', { class: 'bag-alvos' }, ...alvos.map((p) => {
+            const especie = ctx.registry.species.get(p.speciesName)!
+            const destino = evolutionByItem(especie, itemId, ctx.registry)!
+            const usar = el('button', { type: 'button', 'data-alvo': p.id },
+              `${displayName(p.speciesName)} → ${displayName(destino.name)}`)
+            usar.addEventListener('click', () => ctx.sendIntent?.({ t: 'item.use', itemId, pokemonId: p.id }))
+            return usar
+          })))
+        }
       }
       return row
     }))

@@ -11,7 +11,12 @@ export type SettingsPatch = z.infer<typeof SettingsPatchSchema>
 
 export const ClientMessageSchema = z.discriminatedUnion('t', [
   z.object({ t: z.literal('hunt.stop') }).strict(),
-  z.object({ t: z.literal('item.use'), itemId: z.string().min(1).max(64) }).strict(),
+  /*
+   * `pokemonId` é OPCIONAL e o padrão é o ativo. Poção cura quem está em campo — pedir o alvo
+   * ali seria burocracia. Pedra age num Pokémon escolhido, quase sempre um do banco: forçar a
+   * trocar o ativo antes seria mandar o jogador desfazer o time para evoluir um Pikachu.
+   */
+  z.object({ t: z.literal('item.use'), itemId: z.string().min(1).max(64), pokemonId: z.string().min(1).max(64).optional() }).strict(),
   z.object({ t: z.literal('team.setActive'), pokemonId: z.string().min(1).max(128) }).strict(),
   z.object({ t: z.literal('settings.update'), patch: SettingsPatchSchema }).strict(),
   z.object({ t: z.literal('ping') }).strict(),

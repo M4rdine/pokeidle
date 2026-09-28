@@ -16,8 +16,16 @@ export function evolutionLine(registry: ContentRegistry, atlas: AtlasData, name:
   // Um estágio só não é uma linha: mostrar "Butterfree →" sem seta nem destino seria ruído.
   if (linha.length < 2) return null
   return el('div', { class: 'ficha-evo' }, ...linha.flatMap((especie, i) => {
-    const passagem = i > 0 ? linha[i - 1]!.evolvesTo?.level : undefined
-    const seta = i === 0 ? [] : [el('span', { class: 'evo-seta muted' }, `nv ${passagem ?? '?'} →`)]
+    /*
+     * A passagem entre dois estágios é um NÍVEL ou uma PEDRA, e a seta diz qual. Mostrar "nv ?"
+     * para quem evolui por pedra era a resposta errada com cara de dado faltando — o jogador
+     * concluiria que o registro está incompleto, quando na verdade a regra é outra.
+     */
+    const evo = i > 0 ? linha[i - 1]!.evolvesTo : undefined
+    const passagem = evo === undefined ? '?'
+      : 'level' in evo ? `nv ${evo.level}`
+        : registry.items.get(evo.item)?.name ?? evo.item
+    const seta = i === 0 ? [] : [el('span', { class: 'evo-seta muted' }, `${passagem} →`)]
     return [
       ...seta,
       el('div', { class: `evo-estagio ${especie.name === name ? 'evo-atual' : ''}`.trim(), 'data-evo': especie.name },

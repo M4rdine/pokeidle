@@ -62,5 +62,26 @@
     "healPercent": 100,
     "buyPrice": 8000,
     "sellPrice": 4000
+  },
+  {
+    "id": "fire-stone",
+    "name": "Pedra do Fogo",
+    "kind": "stone",
+    "buyPrice": 5000,
+    "sellPrice": 2500
+  },
+  {
+    "id": "thunder-stone",
+    "name": "Pedra do Trovão",
+    "kind": "stone",
+    "buyPrice": 5000,
+    "sellPrice": 2500
+  },
+  {
+    "id": "moon-stone",
+    "name": "Pedra da Lua",
+    "kind": "stone",
+    "buyPrice": 5000,
+    "sellPrice": 2500
   }
 ]

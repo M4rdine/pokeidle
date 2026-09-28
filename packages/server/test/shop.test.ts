@@ -33,9 +33,13 @@ describe('GET /shop', () => {
     expect(body).toMatchObject({ level: 10, gold: 500 })
     // A ordem é por NÍVEL de destrave, e depois por preço. O Reviver (25) entra entre a Great
     // Bola (20) e a Hiper Poção (30); o Máximo (45) fecha a lista depois da Ultra Bola.
-    expect(body.items.map((i) => i.itemId)).toEqual(['potion', 'poke-ball', 'super-potion', 'great-ball', 'revive', 'hyper-potion', 'ultra-ball', 'max-revive'])
-    expect(body.items[0]).toEqual({ itemId: 'potion', name: 'Poção', kind: 'potion', buyPrice: 200, sellPrice: 100, unlockLevel: 0, unlocked: true, owned: 2 })
-    expect(body.items[2]).toMatchObject({ itemId: 'super-potion', unlockLevel: 20, unlocked: false, owned: 0 })
+    expect(body.items.map((i) => i.itemId)).toEqual(['potion', 'poke-ball', 'fire-stone', 'thunder-stone', 'moon-stone', 'super-potion', 'great-ball', 'revive', 'hyper-potion', 'ultra-ball', 'max-revive'])
+    // Procura por ID, não por índice: a posição muda a cada item novo no catálogo, e um teste
+    // preso a ela quebra por um motivo que não tem nada a ver com o que ele afirma.
+    const item = (id: string) => body.items.find((i) => i.itemId === id)
+    expect(item('potion')).toEqual({ itemId: 'potion', name: 'Poção', kind: 'potion', buyPrice: 200, sellPrice: 100, unlockLevel: 0, unlocked: true, owned: 2 })
+    expect(item('super-potion')).toMatchObject({ itemId: 'super-potion', unlockLevel: 20, unlocked: false, owned: 0 })
+    expect(item('thunder-stone')).toMatchObject({ itemId: 'thunder-stone', kind: 'stone', unlockLevel: 15, unlocked: false })
   })
 })
 

@@ -611,7 +611,11 @@
         "move": "thunder",
         "level": 41
       }
-    ]
+    ],
+    "evolvesTo": {
+      "species": "raichu",
+      "item": "thunder-stone"
+    }
   },
   {
     "id": 26,
@@ -765,7 +769,11 @@
         "move": "double-edge",
         "level": 49
       }
-    ]
+    ],
+    "evolvesTo": {
+      "species": "wigglytuff",
+      "item": "moon-stone"
+    }
   },
   {
     "id": 40,
@@ -1024,7 +1032,11 @@
         "move": "flamethrower",
         "level": 49
       }
-    ]
+    ],
+    "evolvesTo": {
+      "species": "arcanine",
+      "item": "fire-stone"
+    }
   },
   {
     "id": 59,

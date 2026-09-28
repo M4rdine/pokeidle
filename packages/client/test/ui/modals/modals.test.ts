@@ -48,6 +48,47 @@ describe('mochila', () => {
   })
 })
 
+describe('pedra na mochila', () => {
+  it('lista SÓ quem a pedra evolui, e manda o alvo junto', async () => {
+    /*
+     * O motor recusa a pedra errada e não a gasta — mas deixar o jogador chegar até lá é
+     * desenhar o erro e depois defendê-lo. A mochila mostra os alvos possíveis, então a pedra
+     * errada deixa de ser clicável.
+     */
+    const sendIntent = vi.fn()
+    const time = [
+      { ...inHuntView.state!.player.team[0]!, id: 'a', speciesName: 'charmander' },
+      { ...inHuntView.state!.player.team[0]!, id: 'b', speciesName: 'pikachu' },
+    ]
+    const comPedra = {
+      ...inHuntView,
+      state: {
+        ...inHuntView.state!,
+        inventory: { 'thunder-stone': 1 },
+        player: { ...inHuntView.state!.player, team: time },
+      },
+    }
+    openBag(ctxWith({ hunt: createStore(comPedra), sendIntent, session: inHuntSession() }))
+    const alvos = [...modal().querySelectorAll('[data-item=thunder-stone] [data-alvo]')]
+    expect(alvos.map((b) => b.getAttribute('data-alvo'))).toEqual(['b'])
+    expect(alvos[0]!.textContent).toContain('Raichu')
+
+    alvos[0]!.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    expect(sendIntent).toHaveBeenCalledWith({ t: 'item.use', itemId: 'thunder-stone', pokemonId: 'b' })
+  })
+
+  it('sem ninguém que evolua, diz isso em vez de oferecer um botão morto', async () => {
+    const time = [{ ...inHuntView.state!.player.team[0]!, id: 'a', speciesName: 'charmander' }]
+    const semAlvo = {
+      ...inHuntView,
+      state: { ...inHuntView.state!, inventory: { 'thunder-stone': 1 }, player: { ...inHuntView.state!.player, team: time } },
+    }
+    openBag(ctxWith({ hunt: createStore(semAlvo), session: inHuntSession() }))
+    expect(modal().querySelector('[data-item=thunder-stone]')?.textContent).toContain('ninguém do time evolui')
+    expect(modal().querySelector('[data-item=thunder-stone] [data-alvo]')).toBeNull()
+  })
+})
+
 describe('time', () => {
   it('lista time e mochila, e reordenar manda PUT /trainer/team', async () => {
     const team = [

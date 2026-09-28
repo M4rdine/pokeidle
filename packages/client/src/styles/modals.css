@@ -83,6 +83,11 @@
   gap: var(--space-2); align-items: center;
 }
 .bag-nome { flex: 1; min-width: 0; }
+/* Os alvos da pedra quebram para a linha de baixo quando não cabem: um Pokémon com nome longo
+ * não pode empurrar a quantidade para fora do modal. */
+.bag-alvos { display: flex; flex-wrap: wrap; gap: var(--space-1); justify-content: flex-end; }
+.bag-alvos button { font-size: var(--t-s); padding: var(--space-1) var(--space-2); }
+.bag-sem-alvo { font-size: var(--t-xs); text-align: right; }
 .shop-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* O preço é dinheiro e leva a cor do ouro, como a moeda do perfil e do painel de áreas. */
 .shop-preco { gap: var(--space-1); font-size: var(--t-s); }

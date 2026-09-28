@@ -112,7 +112,9 @@ describe('nível e destraves', () => {
   it('/me expõe nível, xpToNext, vagas e próximo destrave', async () => {
     await t.db.update(trainers).set({ xp: 1000 }).where(eq(trainers.id, trainerId))
     const me = (await api(t.app, cookie).get('/me')).json() as { trainer: Record<string, unknown> }
-    expect(me.trainer).toMatchObject({ level: 10, xpToNext: 331, teamSlots: 4, nextUnlock: { level: 20, what: expect.stringContaining('5 vagas') }, settings: { potionHpPercent: 50 } })
+    // No nível 10 o próximo degrau passou a ser o das PEDRAS (15), que entram antes das vagas
+    // do nível 20: é nessa faixa que Pikachu, Growlithe e Jigglypuff deixam de ser becos sem saída.
+    expect(me.trainer).toMatchObject({ level: 10, xpToNext: 331, teamSlots: 4, nextUnlock: { level: 15, what: expect.stringContaining('Pedra') }, settings: { potionHpPercent: 50 } })
   })
   it('PUT /trainer/team respeita as vagas do nível', async () => {
     await api(t.app, cookie).post('/trainer/starter', { species: 'charmander' })

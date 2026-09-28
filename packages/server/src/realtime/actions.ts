@@ -64,7 +64,8 @@ export async function applySettings(d: RealtimeDeps, trainerId: string, patch: S
   return row
 }
 
-export const useItem = (d: RealtimeDeps, trainerId: string, itemId: string): IntentResult => d.scheduler.applyIntent(trainerId, { type: 'useItem', itemId })
+export const useItem = (d: RealtimeDeps, trainerId: string, itemId: string, pokemonId?: string): IntentResult =>
+  d.scheduler.applyIntent(trainerId, { type: 'useItem', itemId, ...(pokemonId !== undefined && { pokemonId }) })
 export const setActive = (d: RealtimeDeps, trainerId: string, pokemonId: string): IntentResult => d.scheduler.applyIntent(trainerId, { type: 'setActive', pokemonId })
 
 /** S25: monta campo a campo; nunca devolve seed/rngState. */

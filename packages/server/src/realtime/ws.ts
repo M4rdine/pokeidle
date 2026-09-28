@@ -67,7 +67,7 @@ async function dispatch(conn: Conn, msg: ClientMessage): Promise<void> {
         await stopViaScheduler(rt, trainerId)
         return
       case 'item.use': {
-        const r = useItem(rt, trainerId, msg.itemId)
+        const r = useItem(rt, trainerId, msg.itemId, msg.pokemonId)
         if ('error' in r) send(errorMessage(r.error.code, r.error.message))
         return
       }

@@ -14,6 +14,8 @@ export const ItemSchema = z.discriminatedUnion('kind', [
    * espremido no lugar errado.
    */
   z.object({ ...base, kind: z.literal('revive'), healPercent: z.number().int().min(1).max(100) }),
+  /* A PEDRA não tem número: o que ela faz está na espécie que a exige, não nela. */
+  z.object({ ...base, kind: z.literal('stone') }),
 ])
 export type Item = z.infer<typeof ItemSchema>
 export const ItemListSchema = z.array(ItemSchema)

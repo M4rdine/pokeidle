@@ -116,6 +116,20 @@ program
     }, out)
   })
 
+/*
+ * A folha que torna a curadoria possível: as peças agrupadas por corrida de ids contíguos, que no
+ * Tibia é como as famílias de terreno foram autoradas. Ver `familias.ts`.
+ */
+program
+  .command('familias')
+  .option('--extracted <dir>', 'pasta com PNGs extraídos e catalog.json', 'assets/extracted-otp2019')
+  .option('--minimo <n>', 'ignora famílias menores que isto', '4')
+  .action(async (opts: { extracted: string; minimo: string }) => {
+    const { writeFamilySheet } = await import('./contact-sheet.js')
+    const path = await writeFamilySheet(opts.extracted, Number(opts.minimo))
+    out(`famílias em ${path}`)
+  })
+
 program
   .command('contact-sheet')
   .option('--extracted <dir>', 'pasta com PNGs extraídos e catalog.json', 'assets/extracted')

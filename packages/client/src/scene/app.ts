@@ -123,7 +123,18 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
   let prev: Entities = {}
   let cam: Camera = { x: 0, y: 0 }
   let firstCameraTick = true
-  let zoom: 1 | 2 = 1
+  /*
+   * DOIS É O PADRÃO, e não um.
+   *
+   * A 1x, um Pokémon ocupa 32 px de tela: do tamanho de um ícone de lista, com a câmera mostrando
+   * 27 tiles de largura de um mapa de 24. Sobrava mundo e faltava bicho — o oposto do que uma cena
+   * de combate precisa mostrar. A 2x o painel enquadra ~13 tiles e a criatura tem 64 px, que é a
+   * proporção que o gênero usa e a que a referência mostra.
+   *
+   * `pixelated` e `roundPixels` já estão ligados na cena, então dobrar é ampliação inteira de
+   * pixel art: nenhum contorno borra. O 1x continua no teclado, para quem quiser ver mais mapa.
+   */
+  let zoom: 1 | 2 = 2
 
   app.ticker.add(() => {
     const now = deps.now()

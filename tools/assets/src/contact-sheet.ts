@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import type { PixiSpritesheet } from './atlas.js'
 import type { Catalog, CatalogItem, CatalogOutfit } from './catalog.js'
 import { directionName, loadCatalog } from './extract.js'
+import { familiasDe, type Familia, type Genero } from './familias.js'
 
 export interface ContactSheetOptions {
   readonly onlyMultiTileOutfits: boolean
@@ -58,5 +59,51 @@ export async function writeContactSheet(extractedDir: string, opts: ContactSheet
   const catalog = await loadCatalog(extractedDir)
   const path = join(extractedDir, 'index.html')
   await writeFile(path, renderContactSheet(catalog, opts))
+  return path
+}
+
+/**
+ * A folha de FAMÍLIAS: cada corrida de ids contíguos vira uma tira, da maior para a menor.
+ *
+ * É a folha que torna a curadoria possível. A de contato mostra os 18.602 itens numa grade só, e
+ * ninguém escolhe olhando isso; aqui as peças de um mesmo terreno aparecem lado a lado, na ordem
+ * em que foram autoradas — chão, bordas, cantos —, e a decisão passa a ser por FAMÍLIA.
+ *
+ * As tiras trazem o intervalo de ids no título, que é o que se copia para o manifest.
+ */
+function tiraDaFamilia(f: Familia): string {
+  const pecas = f.ids.map((id) => `<img src="items/${id}_0_0.png" title="#${id}" loading="lazy">`).join('')
+  const faixa = f.primeiro === f.ultimo ? `#${f.primeiro}` : `#${f.primeiro}–${f.ultimo}`
+  return `<figure class="familia" data-id="${f.primeiro}" data-n="${f.ids.length}">
+<figcaption>${faixa} · ${f.ids.length} peça(s)</figcaption><div class="tira">${pecas}</div></figure>`
+}
+
+const ESTILO_FAMILIA = `
+.familia{display:block;margin:0 0 14px;padding:8px;background:#2b2b2b;border-radius:6px}
+.familia figcaption{font-size:12px;color:#9ab;margin-bottom:6px;font-variant-numeric:tabular-nums}
+.tira{display:flex;flex-wrap:wrap;gap:2px}
+.tira img{width:32px;height:32px;image-rendering:pixelated;background:#111}
+`
+
+export function renderFamilySheet(catalog: Catalog, minimo = 1): string {
+  const secao = (rotulo: string, genero: Genero): string => {
+    const fam = familiasDe(catalog.items, genero).filter((f) => f.ids.length >= minimo)
+    const total = fam.reduce((n, f) => n + f.ids.length, 0)
+    return `<h2>${rotulo} — ${fam.length} famílias, ${total} peças</h2>${fam.map(tiraDaFamilia).join('')}`
+  }
+  return `<!doctype html><meta charset="utf-8"><title>Famílias de tiles</title>
+<style>${STYLE}${ESTILO_FAMILIA}</style>
+<input placeholder="filtrar pelo id inicial" autofocus>
+<p style="color:#9ab">Cada tira é uma corrida de ids contíguos — no Tibia, as peças de um mesmo
+terreno foram autoradas juntas. Famílias com menos de ${minimo} peça(s) estão de fora.</p>
+${secao('Chão', 'chao')}
+${secao('Bloqueante', 'bloqueante')}
+<script>${SCRIPT.replace('figure', 'figure.familia')}</script>`
+}
+
+export async function writeFamilySheet(extractedDir: string, minimo: number): Promise<string> {
+  const catalog = await loadCatalog(extractedDir)
+  const path = join(extractedDir, 'familias.html')
+  await writeFile(path, renderFamilySheet(catalog, minimo))
   return path
 }

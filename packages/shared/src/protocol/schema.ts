@@ -32,6 +32,7 @@ export const EventSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('captureFailed'), tick, wildId: int, ball: str }).strict(),
   z.object({ type: z.literal('pokemonFainted'), tick, pokemonId: str }).strict(),
   z.object({ type: z.literal('switched'), tick, pokemonId: str }).strict(),
+  z.object({ type: z.literal('revived'), tick, pokemonId: str, itemId: str, hp: z.number().int().min(0) }).strict(),
   z.object({ type: z.literal('levelUp'), tick, pokemonId: str, level: int }).strict(),
   z.object({ type: z.literal('evolved'), tick, pokemonId: str, from: str, to: str }).strict(),
   z.object({ type: z.literal('itemUsed'), tick, itemId: str, pokemonId: str, hp: int }).strict(),

@@ -13,6 +13,18 @@ export function choosePotion(state: HuntState, registry: Registry, active: Pokem
   return sorted.find((p) => healAmount(p, active.hpMax) >= missing) ?? sorted[sorted.length - 1]!
 }
 
+type Reviver = Item & { kind: 'revive' }
+
+/**
+ * O Reviver mais FRACO que resolve — e aqui "resolver" é sempre, porque qualquer um tira o
+ * Pokémon de zero. A mesma regra da poção: gastar o caro quando o barato serve é o erro que o
+ * jogador não vê acontecer, porque ele está fora da tela quando acontece.
+ */
+export function chooseRevive(state: HuntState, registry: Registry): Reviver | null {
+  const owned = [...registry.items.values()].filter((i): i is Reviver => i.kind === 'revive' && (state.inventory[i.id] ?? 0) > 0)
+  return [...owned].sort((a, b) => a.healPercent - b.healPercent)[0] ?? null
+}
+
 const fail = (code: string, message: string): { error: EngineError } => ({ error: { code, message } })
 
 export function applyPotion(state: HuntState, registry: Registry, itemId: string): StepResult | { error: EngineError } {

@@ -31,7 +31,9 @@ describe('GET /shop', () => {
     await t.db.insert(inventory).values({ trainerId, itemId: 'potion', quantity: 2 })
     const body = (await api(t.app, cookie).get('/shop')).json() as { level: number; gold: number; items: Record<string, unknown>[] }
     expect(body).toMatchObject({ level: 10, gold: 500 })
-    expect(body.items.map((i) => i.itemId)).toEqual(['potion', 'poke-ball', 'super-potion', 'great-ball', 'hyper-potion', 'ultra-ball'])
+    // A ordem é por NÍVEL de destrave, e depois por preço. O Reviver (25) entra entre a Great
+    // Bola (20) e a Hiper Poção (30); o Máximo (45) fecha a lista depois da Ultra Bola.
+    expect(body.items.map((i) => i.itemId)).toEqual(['potion', 'poke-ball', 'super-potion', 'great-ball', 'revive', 'hyper-potion', 'ultra-ball', 'max-revive'])
     expect(body.items[0]).toEqual({ itemId: 'potion', name: 'Poção', kind: 'potion', buyPrice: 200, sellPrice: 100, unlockLevel: 0, unlocked: true, owned: 2 })
     expect(body.items[2]).toMatchObject({ itemId: 'super-potion', unlockLevel: 20, unlocked: false, owned: 0 })
   })

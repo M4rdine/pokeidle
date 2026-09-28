@@ -34,6 +34,9 @@ export function formatEvent(e: Event, ctx: LogContext): LogLine | null {
     case 'levelUp': return line(e.tick, 'marco', `${pokemonName(ctx, e.pokemonId)} subiu para o nível ${e.level}`)
     case 'evolved': return line(e.tick, 'marco', `${displayName(e.from)} evoluiu para ${displayName(e.to)}`)
     case 'itemUsed': return line(e.tick, 'info', `Usou ${itemName(ctx, e.itemId)}: HP ${e.hp}`)
+    // Marco, não recompensa: reviver é o que salvou a caçada de acabar, e é o que se procura ao
+    // rolar o registro para trás depois de horas fora.
+    case 'revived': return line(e.tick, 'marco', `${itemName(ctx, e.itemId)}: ${pokemonName(ctx, e.pokemonId)} voltou com ${e.hp} de HP`)
     case 'returning': return line(e.tick, 'info', 'HP baixo, voltando ao Centro')
     case 'healed': return line(e.tick, 'info', 'Time curado')
     case 'stopped': return line(e.tick, 'alert', `Hunt parada: ${STOP_TEXT[e.reason].toLowerCase()}`)

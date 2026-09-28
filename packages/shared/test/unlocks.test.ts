@@ -27,10 +27,14 @@ describe('unlocks', () => {
   it('nextUnlock caminha pela tabela', () => {
     expect(nextUnlock(u, 1, items)).toEqual({ level: 10, what: '4 vagas no time' })
     expect(nextUnlock(u, 10, items)).toEqual({ level: 20, what: 'Super Poção, Great Bola, 5 vagas no time' })
+    // O Reviver abre entre as vagas e a região nova: ele é a resposta ao time inteiro cair, e
+    // cair é o que começa a acontecer justamente nessa faixa.
+    expect(nextUnlock(u, 20, items)).toEqual({ level: 25, what: 'Reviver' })
     // Depois do nível 30 a meta é a região nova, não um item: ela abre antes da Ultra Bola.
     expect(nextUnlock(u, 30, items)).toEqual({ level: 34, what: 'região terras-altas' })
     expect(nextUnlock(u, 34, items)).toEqual({ level: 40, what: 'Ultra Bola' })
-    expect(nextUnlock(u, 40, items)).toBeNull()
+    expect(nextUnlock(u, 40, items)).toEqual({ level: 45, what: 'Reviver Máximo' })
+    expect(nextUnlock(u, 45, items)).toBeNull()
   })
   it('schema valida growthRate e teamSlots', () => {
     expect(() => UnlocksSchema.parse({ growthRate: 'medium-fast', teamSlots: [{ level: 1, slots: 3 }], items: {}, regions: {} })).not.toThrow()

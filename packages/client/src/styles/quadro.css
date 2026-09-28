@@ -228,6 +228,8 @@
 .icone-item[data-item="potion"] { background-image: url('./ui/item-potion.png'); }
 .icone-item[data-item="super-potion"] { background-image: url('./ui/item-super-potion.png'); }
 .icone-item[data-item="hyper-potion"] { background-image: url('./ui/item-hyper-potion.png'); }
+.icone-item[data-item="revive"] { background-image: url('./ui/item-revive.png'); }
+.icone-item[data-item="max-revive"] { background-image: url('./ui/item-max-revive.png'); }
 .icone-item[data-item="poke-ball"] { background-image: url('./ui/item-poke-ball.png'); }
 .icone-item[data-item="great-ball"] { background-image: url('./ui/item-great-ball.png'); }
 .icone-item[data-item="ultra-ball"] { background-image: url('./ui/item-ultra-ball.png'); }

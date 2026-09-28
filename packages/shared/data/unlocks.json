@@ -22,7 +22,9 @@
     "super-potion": 20,
     "great-ball": 20,
     "hyper-potion": 30,
-    "ultra-ball": 40
+    "ultra-ball": 40,
+    "revive": 25,
+    "max-revive": 45
   },
   "regions": {
     "kanto": 1,

@@ -45,6 +45,7 @@ export type Event =
   | { type: 'captureFailed'; tick: number; wildId: number; ball: string }
   | { type: 'pokemonFainted'; tick: number; pokemonId: string }
   | { type: 'switched'; tick: number; pokemonId: string }
+  | { type: 'revived'; tick: number; pokemonId: string; itemId: string; hp: number }
   | { type: 'levelUp'; tick: number; pokemonId: string; level: number }
   | { type: 'evolved'; tick: number; pokemonId: string; from: string; to: string }
   | { type: 'itemUsed'; tick: number; itemId: string; pokemonId: string; hp: number }

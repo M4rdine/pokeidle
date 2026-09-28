@@ -83,6 +83,17 @@ export function applyEvent(view: HuntView, e: Event, registry: ContentRegistry):
     case 'levelUp': return mapTeam(view, e.pokemonId, (p) => rescale({ ...p, level: e.level }, hpAt(baseHp(registry, p.speciesName), e.level)))
     case 'evolved': return mapTeam(view, e.pokemonId, (p) => rescale({ ...p, speciesName: e.to }, hpAt(baseHp(registry, e.to), p.level)))
     case 'itemUsed': return addItem(mapTeam(view, e.pokemonId, (p) => ({ ...p, hp: e.hp })), e.itemId, -1)
+    /*
+     * Reviver faz TRÊS coisas num evento só, e o espelho precisa das três: devolve o HP, gasta o
+     * item e põe o revivido em campo. Faltando a última, o espelho mostraria o time de pé com um
+     * ativo caído até o próximo snapshot corrigir — e o snapshot só vem a cada cinquenta tiques.
+     */
+    case 'revived': {
+      const curado = addItem(mapTeam(view, e.pokemonId, (p) => ({ ...p, hp: e.hp })), e.itemId, -1)
+      const index = curado.state?.player.team.findIndex((p) => p.id === e.pokemonId) ?? -1
+      if (index < 0) return curado
+      return withDerived(withPlayer(curado, { activeIndex: index, cooldowns: {} }), { cooldownUntil: {} })
+    }
     case 'returning': return clearTarget(withPlayer(view, { mode: 'returning' }))
     case 'healed': return withDerived(withPlayer(view, { mode: 'searching', team: s.player.team.map((p) => ({ ...p, hp: p.hpMax })), cooldowns: {} }), { cooldownUntil: {} })
     // healed: false é placeholder — o valor real chega depois no `hunt.stopped` (evento `stopped` não carrega essa info).

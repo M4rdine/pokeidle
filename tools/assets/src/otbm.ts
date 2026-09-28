@@ -75,6 +75,11 @@ export interface TileDoMapa {
   readonly chao: number | null
   /** Os ids de servidor empilhados, de baixo para cima. */
   readonly pilha: readonly number[]
+  /**
+   * Se o tile pertence a uma CASA. É o sinal que separa cidade de natureza sem olhar pixel: uma
+   * montanha não tem casa, e calçada de pedra engana qualquer classificador de cor.
+   */
+  readonly casa: boolean
 }
 
 export interface MapaOtbm {
@@ -159,6 +164,7 @@ export function lerMapa(dados: Uint8Array): MapaOtbm {
     const tipo = a.u8()
     let aqui = area
     let tile: { x: number; y: number; z: number } | null = null
+    let casa = false
     let idDoItem: number | null = null
 
     if (tipo === AREA_DE_TILES) {
@@ -166,7 +172,7 @@ export function lerMapa(dados: Uint8Array): MapaOtbm {
     } else if (tipo === TILE || tipo === TILE_DE_CASA) {
       if (!aqui) throw new Error('tile fora de uma área: a árvore não tem a forma esperada')
       tile = { x: aqui.x + a.u8(), y: aqui.y + a.u8(), z: aqui.z }
-      if (tipo === TILE_DE_CASA) a.u32()
+      if (tipo === TILE_DE_CASA) { casa = true; a.u32() }
     } else if (tipo === ITEM) {
       idDoItem = a.u16()
     } else if (tipo === CIDADE || tipo === PONTO_DE_ROTA) {
@@ -191,7 +197,7 @@ export function lerMapa(dados: Uint8Array): MapaOtbm {
     }
     a.cru() // NO_FIM
 
-    if (tile) tiles.push({ ...tile, chao, pilha })
+    if (tile) tiles.push({ ...tile, chao, pilha, casa })
     return idDoItem
   }
 

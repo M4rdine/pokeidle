@@ -16,6 +16,7 @@ import { animatedTileLayer, bakePlacements } from './map-layer.js'
 import { splitLayer } from './map-parts.js'
 import { type Entities } from './reconcile.js'
 import { loadSheets } from './sprites.js'
+import { ZOOM_MAXIMO, ZOOM_MINIMO, ZOOM_PADRAO } from './zoom-limites.js'
 
 export interface SceneDeps {
   readonly atlas: AtlasData
@@ -28,8 +29,8 @@ export interface SceneDeps {
 export interface Scene {
   applyView(view: HuntView): void
   onEvent(event: Event, view: HuntView): void
-  setZoom(z: 1 | 2): void
-  zoom(): 1 | 2
+  setZoom(z: number): void
+  zoom(): number
   resize(): void
   destroy(): void
 }
@@ -38,6 +39,14 @@ const px = (tile: number): number => tile * TILE_SIZE + TILE_SIZE / 2
 // Janela para o flash de evolução "esperar" o swap de sprite (Task 9 chama onEvent antes de
 // applyView, então o body novo ainda não existe quando o evento 'evolved' chega).
 const PENDING_EVOLVE_FLASH_MS = 1000
+
+/*
+ * A FAIXA DE ZOOM. Um é o mundo largo; três é a criatura ocupando quase cem pixels, que é onde o
+ * sprite de 32 começa a mostrar o próprio pixel grande demais. Dois é o padrão porque é a
+ * proporção que o gênero usa: painel com ~13 tiles e a criatura em 64.
+ *
+ * São inteiros de propósito: pixel art só amplia sem borrar em múltiplo inteiro.
+ */
 
 /**
  * Cor de fundo da página, lida do token, com o mesmo valor repetido aqui para o caso de o CSS não
@@ -134,7 +143,7 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
    * `pixelated` e `roundPixels` já estão ligados na cena, então dobrar é ampliação inteira de
    * pixel art: nenhum contorno borra. O 1x continua no teclado, para quem quiser ver mais mapa.
    */
-  let zoom: 1 | 2 = 2
+  let zoom = ZOOM_PADRAO
 
   app.ticker.add(() => {
     const now = deps.now()
@@ -243,7 +252,7 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
   return {
     applyView: (view) => { prev = entityLayer.applyView(view, prev) },
     onEvent,
-    setZoom: (z) => { zoom = z },
+    setZoom: (z) => { zoom = Math.min(ZOOM_MAXIMO, Math.max(ZOOM_MINIMO, Math.round(z))) },
     zoom: () => zoom,
     resize: () => app.resize(),
     destroy: () => {

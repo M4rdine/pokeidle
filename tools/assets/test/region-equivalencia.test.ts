@@ -15,6 +15,11 @@ import { importRegion } from '../src/region-import.js'
  *
  * Mas eles não ficam sem guarda: o segundo caso confere que toda área publicada tem o seu, e que
  * a região aponta para um mapa. Sem isso, a tela de escolher destino perde marcador sem aviso.
+ *
+ * O CONTRATO ENCOLHE, de propósito. Uma área marcada com `origem: "otbm"` foi recortada do mapa
+ * do mundo OpenTibia e não é mais reproduzível a partir do `.tmj` — exigir a identidade dela seria
+ * exigir que o importador do Tiled inventasse uma geografia que ele não desenhou. Ele continua
+ * governando as áreas que ainda são desenhadas, e some sozinho quando a última for convertida.
  */
 const semAutoria = (r: unknown): unknown => {
   const { townMap: _mapa, areas, ...resto } = r as { townMap?: string; areas: Record<string, unknown>[] }
@@ -33,7 +38,8 @@ describe('Kanto recortada bate com o conteúdo publicado', () => {
 
     expect(semAutoria(region)).toEqual(semAutoria(publicadas.find((r) => r.id === 'kanto')))
     for (const hunt of hunts) {
-      const atual = JSON.parse(await readFile(`../../packages/shared/data/hunts/${hunt.id}.json`, 'utf8'))
+      const atual = JSON.parse(await readFile(`../../packages/shared/data/hunts/${hunt.id}.json`, 'utf8')) as { origem?: string }
+      if (atual.origem === 'otbm') continue
       expect(hunt, `área ${hunt.id}`).toEqual(atual)
     }
     expect(hunts.map((h) => h.id)).toEqual(region.areas.map((a) => a.id))

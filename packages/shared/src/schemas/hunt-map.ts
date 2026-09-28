@@ -21,6 +21,13 @@ export const HuntMapSchema = z
   .object({
     id: kebab,
     name: z.string().min(1),
+    /*
+     * DE ONDE VEIO A GEOGRAFIA. Ausente, o mapa foi desenhado no Tiled e é reproduzível a partir
+     * de `kanto.tmj` — há um teste que exige essa identidade tile a tile. `otbm` diz que o mapa é
+     * um recorte do mundo OpenTibia, feito à mão por quem o autorou, e que o Tiled não o governa
+     * mais. Sem esta marca, o guarda do Tiled acusaria como divergência toda área convertida.
+     */
+    origem: z.literal('otbm').optional(),
     width: z.number().int().positive(),
     height: z.number().int().positive(),
     tileSize: z.literal(TILE_SIZE),

@@ -183,3 +183,54 @@ button.slot:active:not(:disabled) {
   100% { box-shadow: var(--relevo-1), 0 0 0 0 transparent; }
 }
 .subiu-de-nivel { animation: brilho-de-nivel 900ms ease-out both; }
+
+/*
+ * O CONTROLE DE ZOOM, sobre a cena.
+ *
+ * Canto inferior direito porque é onde a mão do gênero procura, e porque ali ele não cobre o
+ * Pokémon — que anda no meio — nem os avisos de captura, que sobem pelo alto.
+ */
+.zoom {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--raio);
+  background: color-mix(in srgb, var(--fundo) 82%, transparent);
+  box-shadow: inset 0 0 0 1px var(--borda), 0 2px 0 color-mix(in srgb, #000 35%, transparent);
+}
+
+/* `display: flex` de autoria vence o `[hidden]` do navegador: sem isto o controle aparece na tela
+ * de caçada sem cena, apertável e sem nada para aproximar. */
+.zoom[hidden] { display: none; }
+
+.zoom-botao {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--raio-p);
+  background: var(--painel);
+  box-shadow: inset 0 0 0 1px var(--borda);
+  color: var(--texto);
+  /* O sinal de menos e o de mais precisam do mesmo peso óptico; a fonte bitmap não os dá. */
+  font: 700 1rem/1 var(--fonte-texto);
+  cursor: pointer;
+  transition: background var(--rapido) var(--saida), transform var(--rapido) var(--saida);
+}
+
+.zoom-botao:hover:not(:disabled) { background: color-mix(in srgb, var(--painel) 70%, var(--texto)); }
+.zoom-botao:active:not(:disabled) { transform: translateY(1px); }
+.zoom-botao:disabled { opacity: 0.35; cursor: default; }
+
+.zoom-nivel {
+  min-width: 2.25rem;
+  color: var(--texto-fraco);
+  font: 400 0.8125rem/1 var(--fonte-texto);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}

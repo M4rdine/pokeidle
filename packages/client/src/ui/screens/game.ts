@@ -10,6 +10,7 @@ import { mountOverlays } from '../hud/overlays.js'
 import { mountTeamStrip } from '../hud/team-strip.js'
 import { mountMenu } from '../hud/menu.js'
 import { mountPerfil } from '../hud/perfil.js'
+import { mountZoom } from '../hud/zoom.js'
 import { el, mount } from '../dom.js'
 
 /**
@@ -34,14 +35,22 @@ export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
     mountMenu(menu, ctx), mountMoves(right, ctx), mountSituacao(right, ctx),
     mountLog(bottom, ctx), mountOverlays(center, ctx), mountCaptura(center, ctx)]
   let scene: Scene | null = null
+  const zoom = mountZoom(center, () => scene)
   let offScene: (() => void) | null = null
   let offEvents: (() => void) | null = null
   let disposed = false
 
+  /*
+   * O atalho ficou RELATIVO, e não mais em dois níveis fixos: com três níveis, "+" que pula direto
+   * para o meio deixa de ser aproximar e vira ir-para-um-lugar. O controle na tela é sincronizado
+   * daqui porque o teclado muda o zoom por fora dele.
+   */
   const onKey = (ev: KeyboardEvent): void => {
     if (!scene) return
-    if (ev.key === '+' || ev.key === '=') scene.setZoom(2)
-    if (ev.key === '-') scene.setZoom(1)
+    if (ev.key === '+' || ev.key === '=') scene.setZoom(scene.zoom() + 1)
+    else if (ev.key === '-') scene.setZoom(scene.zoom() - 1)
+    else return
+    zoom.sincronizar()
   }
   const onResize = (): void => scene?.resize()
   /**
@@ -75,6 +84,7 @@ export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
         window.addEventListener('keydown', onKey)
         window.addEventListener('resize', onResize)
         observador?.observe(center)
+        zoom.sincronizar()
       })
       .catch((error: unknown) => {
         if (disposed) return
@@ -87,6 +97,7 @@ export function mountGame(root: HTMLElement, ctx: AppContext): () => void {
     window.removeEventListener('keydown', onKey)
     window.removeEventListener('resize', onResize)
     observador?.disconnect()
+    zoom.desmontar()
     offScene?.()
     offEvents?.()
     scene?.destroy()

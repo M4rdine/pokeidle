@@ -11,6 +11,10 @@
 /* O modal do mapa é largo: ele carrega um mapa e uma tabela lado a lado, e em 560 px os dois
  * ficariam estreitos demais para servir a qualquer um dos dois. */
 .modal:has(.mapa-modal) { width: min(1180px, 96vw); }
+/* O de time também: cada peça é uma FILEIRA — retrato, nome, tipos, medidor e o trilho de ações.
+ * Em 560 px o medidor não cabia na linha e quebrava sozinho para a de baixo, encostado à direita,
+ * órfão do Pokémon que ele mede. A peça pede a largura; dá para ela. */
+.modal:has(.team-modal) { width: min(760px, 94vw); }
 .modal {
   border-radius: var(--raio-gg);
   width: min(560px, 92vw); max-height: 86vh;

@@ -100,9 +100,22 @@ describe('time', () => {
     const put = vi.fn(async () => ({ team, box }))
     openTeam(ctxWith({ http: { get, put } as never }))
     await flush()
-    expect(modal().textContent).toContain('vagas: 2/3')
-    expect(modal().querySelectorAll('.team-row')).toHaveLength(3)
-    modal().querySelector<HTMLButtonElement>('[data-pokemon=b] [aria-label=subir]')!.click()
+    // Time e mochila usam a MESMA peça do HUD. Eram linhas de texto ("charmander L10" + "5/10"
+    // em cinza) enquanto a coluna do jogo mostrava retrato, selos e medidor.
+    expect(modal().querySelectorAll('.slot-cartao')).toHaveLength(3)
+    expect(modal().querySelector('.slot-poco')).not.toBeNull()
+    expect(modal().querySelector('[data-pokemon=a] .hp-bar')?.getAttribute('data-hp-state')).toBe('ferido')
+    // A CAPACIDADE é metade da resposta desta tela: com três vagas e dois Pokémon sobra uma
+    // livre, e as outras três de seis dizem o nível que as abre. Sem elas, um time de dois
+    // parecia um time completo de dois.
+    expect(modal().querySelector('.cabeca-conta')?.textContent).toBe('2/3')
+    expect(modal().querySelectorAll('.slot-empty')).toHaveLength(1)
+    expect(modal().querySelectorAll('.slot-locked')).toHaveLength(3)
+    // `data-acao` e não `aria-label`: o rótulo agora nomeia o Pokémon ("subir zubat"), porque
+    // seis botões dizendo só "subir" não se distinguem num leitor de tela.
+    const subir = modal().querySelector<HTMLButtonElement>('[data-pokemon=b] [data-acao=subir]')!
+    expect(subir.getAttribute('aria-label')).toBe('subir zubat')
+    subir.click()
     await flush()
     expect(put).toHaveBeenCalledWith('/trainer/team', { slots: ['b', 'a'] }, expect.anything())
     modal().querySelector<HTMLButtonElement>('[data-pokemon=c] [data-acao=colocar]')!.click()
@@ -113,7 +126,10 @@ describe('time', () => {
     const get = vi.fn(async () => ({ team: [{ id: 'a', speciesName: 'charmander', level: 10, xp: 0, hp: 5, hpMax: 10, teamSlot: 0 }], box: [] }))
     openTeam(ctxWith({ http: { get } as never, hunt: createStore(inHuntView), session: inHuntSession() }))
     await flush()
-    expect(modal().textContent).toContain('pare a hunt para mexer no time')
+    // Em `form-error` isto vinha no vermelho de falha, dizendo que algo deu errado quando nada
+    // deu: o jogador só está caçando, que é o estado normal do jogo.
+    expect(modal().querySelector('.aviso-bloqueio')?.textContent).toContain('Pare a caçada')
+    expect(modal().querySelector('.form-error')?.textContent).toBe('')
     // Só o que muda o time trava. Abrir a ficha da espécie é leitura, e continuar podendo
     // consultá-la durante a caçada é justamente quando ela mais serve.
     expect([...modal().querySelectorAll('[data-acao]')].every((b) => b.hasAttribute('disabled'))).toBe(true)

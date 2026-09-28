@@ -1,8 +1,22 @@
+/**
+ * Organizar o time: a ordem de quem sai primeiro, e o vaivém entre time e mochila.
+ *
+ * O QUE CAIU. Este painel mostrava os mesmos Pokémon do HUD como LINHAS DE TEXTO: "bulbasaur L12"
+ * ao lado de "31/31" em cinza, e três botões avulsos. Enquanto isso, a dois cliques dali, a coluna
+ * do HUD mostrava cada um como peça — retrato num poço da cor do tipo, selos, medidor de HP com
+ * estado. O pior dos dois desenhos estava na tela onde o jogador de fato ORGANIZA o time.
+ *
+ * Agora as duas usam a mesma peça (`pokemon-slot.ts`). O que este painel acrescenta é o que só
+ * ele faz: o trilho de ações de cada peça, as vagas livres e travadas mostrando a capacidade, e a
+ * mochila embaixo.
+ */
 import type { AppContext } from '../../app-context.js'
+import { MAX_TEAM_SLOTS } from '../../config.js'
 import { TeamSchema, type PokemonDto } from '../../api/dto.js'
-import { displayName } from '../../state/log.js'
 import { hasActiveHunt } from '../../state/hunt-active.js'
+import { nivelDaVaga } from '../../state/progress.js'
 import { el } from '../dom.js'
+import { slotCartao, vagaLivre, vagaTravada } from '../pokemon-slot.js'
 import { botaoVoltar } from './pokedex.js'
 import { speciesSheet } from '../species/sheet.js'
 import { openModal, type Modal } from './modal.js'
@@ -22,7 +36,7 @@ export function openTeam(ctx: AppContext): Modal {
   const body = el('div', { class: 'team-modal' }, el('p', { class: 'muted' }, 'Carregando…'))
   const error = el('p', { class: 'form-error', role: 'alert' })
   const inHunt = hasActiveHunt(ctx)
-  const slots = ctx.session.get().me?.trainer.teamSlots ?? 6
+  const slots = ctx.session.get().me?.trainer.teamSlots ?? MAX_TEAM_SLOTS
 
   const save = (ids: readonly string[]): void => {
     error.textContent = ''
@@ -35,40 +49,48 @@ export function openTeam(ctx: AppContext): Modal {
     body.replaceChildren(botaoVoltar('Time', voltar), speciesSheet(ctx, speciesName))
   }
 
-  const line = (pokemon: PokemonDto, extra: HTMLElement[], abrirFicha: () => void): HTMLElement => {
-    // O nome vira botão: ele é a porta para a ficha da espécie, e era o lugar onde o jogador já
-    // tentava clicar sem que nada acontecesse.
-    const nome = el('button', { type: 'button', class: 'team-nome', 'data-ficha': pokemon.id },
-      `${displayName(pokemon.speciesName)} L${pokemon.level}`)
-    nome.addEventListener('click', abrirFicha)
-    return el('div', { class: 'team-row', 'data-pokemon': pokemon.id },
-      nome,
-      el('span', { class: 'muted' }, `${pokemon.hp}/${pokemon.hpMax}`),
-      ...extra)
-  }
+  /** Um cabeçalho de seção, na mesma faixa dos painéis do jogo, com a contagem à direita. */
+  const secao = (titulo: string, conta: string): HTMLElement =>
+    el('div', { class: 'cabeca cabeca-barra' }, el('span', {}, titulo), el('span', { class: 'cabeca-conta' }, conta))
 
   function render(team: readonly PokemonDto[], box: readonly PokemonDto[]): void {
     const ids = team.map((p) => p.id)
     const disabled = inHunt
-    const rows = team.map((pokemon, index) => {
-      const up = el('button', { type: 'button', 'data-acao': 'subir', 'aria-label': 'subir', ...((disabled || index === 0) && { disabled: true }) }, '↑')
-      const down = el('button', { type: 'button', 'data-acao': 'descer', 'aria-label': 'descer', ...((disabled || index === team.length - 1) && { disabled: true }) }, '↓')
-      const store = el('button', { type: 'button', 'data-acao': 'guardar', ...(disabled && { disabled: true }) }, 'Guardar')
-      up.addEventListener('click', () => save(swap(ids, index, index - 1)))
-      down.addEventListener('click', () => save(swap(ids, index, index + 1)))
-      store.addEventListener('click', () => save(ids.filter((id) => id !== pokemon.id)))
-      return line(pokemon, [up, down, store], () => mostrarFicha(pokemon.speciesName, () => render(team, box)))
+    const ficha = (pokemon: PokemonDto) => () => mostrarFicha(pokemon.speciesName, () => render(team, box))
+
+    /*
+     * As seis vagas, e não só os ocupados: a capacidade é metade da resposta que esta tela dá.
+     * Sem as vagas, um time de dois parecia um time completo de dois, e o jogador não via que
+     * tinha lugar sobrando nem qual nível abre o próximo.
+     */
+    const vagasDoTime = Array.from({ length: MAX_TEAM_SLOTS }, (_unused, index) => {
+      const pokemon = team[index]
+      if (!pokemon) return index < slots ? vagaLivre() : vagaTravada(nivelDaVaga(ctx.registry.unlocks, index))
+      const subir = el('button', { type: 'button', class: 'slot-acao', 'data-acao': 'subir', 'aria-label': `subir ${pokemon.speciesName}`, ...((disabled || index === 0) && { disabled: true }) }, '↑')
+      const descer = el('button', { type: 'button', class: 'slot-acao', 'data-acao': 'descer', 'aria-label': `descer ${pokemon.speciesName}`, ...((disabled || index === team.length - 1) && { disabled: true }) }, '↓')
+      const guardar = el('button', { type: 'button', class: 'slot-acao discreto', 'data-acao': 'guardar', ...(disabled && { disabled: true }) }, 'Guardar')
+      subir.addEventListener('click', () => save(swap(ids, index, index - 1)))
+      descer.addEventListener('click', () => save(swap(ids, index, index + 1)))
+      guardar.addEventListener('click', () => save(ids.filter((id) => id !== pokemon.id)))
+      return slotCartao({ ctx, id: pokemon.id, pokemon, aoAbrirFicha: ficha(pokemon), acoes: [subir, descer, guardar] })
     })
-    const boxRows = box.map((pokemon) => {
-      const add = el('button', { type: 'button', 'data-acao': 'colocar', ...((disabled || team.length >= slots) && { disabled: true }) }, 'Colocar no time')
-      add.addEventListener('click', () => save([...ids, pokemon.id]))
-      return line(pokemon, [add], () => mostrarFicha(pokemon.speciesName, () => render(team, box)))
+
+    const naMochila = box.map((pokemon) => {
+      const colocar = el('button', { type: 'button', class: 'slot-acao discreto', 'data-acao': 'colocar', ...((disabled || team.length >= slots) && { disabled: true }) }, 'Colocar no time')
+      colocar.addEventListener('click', () => save([...ids, pokemon.id]))
+      return slotCartao({ ctx, id: pokemon.id, pokemon, aoAbrirFicha: ficha(pokemon), acoes: [colocar] })
     })
+
     body.replaceChildren(
-      el('p', { class: 'muted' }, `vagas: ${team.length}/${slots}`),
-      ...(disabled ? [el('p', { class: 'form-error' }, 'pare a hunt para mexer no time')] : []),
-      el('h3', {}, 'Time'), ...rows,
-      el('h3', {}, 'Mochila de Pokémon'), ...(boxRows.length > 0 ? boxRows : [el('p', { class: 'muted' }, 'vazia')]),
+      // O aviso vem ANTES de tudo: é ele que explica por que os botões abaixo estão apagados, e
+      // depois dos botões chegaria tarde.
+      ...(disabled ? [el('p', { class: 'aviso-bloqueio', role: 'status' }, 'Pare a caçada para mexer no time.')] : []),
+      secao('time', `${team.length}/${slots}`),
+      el('div', { class: 'team-lista' }, ...vagasDoTime),
+      secao('mochila de pokémon', String(box.length)),
+      naMochila.length > 0
+        ? el('div', { class: 'team-lista' }, ...naMochila)
+        : el('p', { class: 'team-vazia muted' }, 'Nada guardado. O que você capturar e não couber no time aparece aqui.'),
       error)
   }
 

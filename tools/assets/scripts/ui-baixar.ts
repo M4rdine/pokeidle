@@ -34,9 +34,9 @@ const SPRITES: readonly string[] = [
   'poke-ball', 'great-ball', 'ultra-ball',
   'revive', 'max-revive',
   // Bolas situacionais: o bônus delas depende do estado da caçada, não de um número fixo
-  'quick-ball', 'dusk-ball', 'timer-ball', 'net-ball', 'nest-ball', 'repeat-ball', 'master-ball',
+  'quick-ball', 'net-ball', 'nest-ball', 'repeat-ball', 'master-ball',
   // Pedras: o segundo caminho de evolução, para as linhas que não evoluem por nível
-  'fire-stone', 'water-stone', 'thunder-stone', 'leaf-stone', 'moon-stone', 'sun-stone', 'everstone',
+  'fire-stone', 'thunder-stone', 'moon-stone',
   // Ícones de função da interface
   'town-map', 'berry-pouch', 'medal-box', 'coin-case', 'machine-part',
 ]

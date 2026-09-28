@@ -61,12 +61,20 @@ const DE_ASSUNTO: readonly { readonly nome: string; readonly item: string }[] = 
  * sprite na PokeAPI é o mesmo `itemId` que o nosso registro usa, porque os dois vieram do mesmo
  * acervo. Loja e mochila listavam "Poção" como texto puro num jogo em que tudo o mais tem figura.
  */
+/*
+ * Exatamente os itens que o REGISTRO tem — nem um a mais.
+ *
+ * A primeira versão desta lista trouxe também Bola Noturna, Bola Timer e três pedras que não
+ * evoluem nada aqui, porque eles estavam no acervo. Ficaram seis PNGs versionados que nenhuma
+ * regra de CSS citava: asset sem uso não dá erro, não aparece em teste nenhum e envelhece até
+ * alguém perguntar de onde veio.
+ */
 const DE_ITEM: readonly string[] = [
   'potion', 'super-potion', 'hyper-potion',
   'revive', 'max-revive',
   'poke-ball', 'great-ball', 'ultra-ball',
-  'quick-ball', 'dusk-ball', 'timer-ball', 'net-ball', 'nest-ball', 'repeat-ball', 'master-ball',
-  'fire-stone', 'water-stone', 'thunder-stone', 'leaf-stone', 'moon-stone', 'sun-stone', 'everstone',
+  'quick-ball', 'net-ball', 'nest-ball', 'repeat-ball', 'master-ball',
+  'fire-stone', 'thunder-stone', 'moon-stone',
 ]
 
 /**

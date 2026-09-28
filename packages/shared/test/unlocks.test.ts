@@ -25,23 +25,33 @@ describe('unlocks', () => {
     expect(regionUnlockLevel(u, 'johto')).toBe(0)
   })
   it('nextUnlock caminha pela tabela', () => {
-    expect(nextUnlock(u, 1, items)).toEqual({ level: 10, what: '4 vagas no time' })
     /*
-     * As TRÊS pedras abrem juntas, no 15. Só existem três porque só três têm alvo no registro:
-     * Pikachu, Growlithe e Jigglypuff. Vender Pedra da Água num jogo sem nenhuma espécie que a
-     * exija seria item morto na prateleira — e a prateleira é onde o jogador procura o que fazer
-     * com o ouro.
+     * A CURVA INTEIRA, e não degraus soltos.
+     *
+     * Enumerada assim, ela é a documentação do ritmo de progressão: algo novo a cada dois a seis
+     * níveis, do 10 ao 60. Escrita degrau a degrau, cada item novo no jogo quebrava o teste num
+     * ponto diferente e a forma da curva nunca aparecia em lugar nenhum.
      */
-    expect(nextUnlock(u, 10, items)).toEqual({ level: 15, what: 'Pedra do Fogo, Pedra do Trovão, Pedra da Lua' })
-    expect(nextUnlock(u, 15, items)).toEqual({ level: 20, what: 'Super Poção, Great Bola, 5 vagas no time' })
-    // O Reviver abre entre as vagas e a região nova: ele é a resposta ao time inteiro cair, e
-    // cair é o que começa a acontecer justamente nessa faixa.
-    expect(nextUnlock(u, 20, items)).toEqual({ level: 25, what: 'Reviver' })
-    // Depois do nível 30 a meta é a região nova, não um item: ela abre antes da Ultra Bola.
-    expect(nextUnlock(u, 30, items)).toEqual({ level: 34, what: 'região terras-altas' })
-    expect(nextUnlock(u, 34, items)).toEqual({ level: 40, what: 'Ultra Bola' })
-    expect(nextUnlock(u, 40, items)).toEqual({ level: 45, what: 'Reviver Máximo' })
-    expect(nextUnlock(u, 45, items)).toBeNull()
+    const curva: readonly (readonly [number, number, string])[] = [
+      [1, 10, '4 vagas no time'],
+      [10, 12, 'Bola Ninho'],
+      [12, 15, 'Pedra do Fogo, Pedra do Trovão, Pedra da Lua'],
+      [15, 18, 'Bola Rede'],
+      [18, 20, 'Super Poção, Great Bola, 5 vagas no time'],
+      [20, 22, 'Bola Rápida'],
+      [22, 25, 'Reviver'],
+      [25, 28, 'Bola Repetida'],
+      [28, 30, 'Hiper Poção, 6 vagas no time'],
+      // Depois do 30 a meta é a região nova, não um item: ela abre antes da Ultra Bola.
+      [30, 34, 'região terras-altas'],
+      [34, 40, 'Ultra Bola'],
+      [40, 45, 'Reviver Máximo'],
+      [45, 60, 'Master Bola'],
+    ]
+    for (const [de, nivel, what] of curva) {
+      expect(nextUnlock(u, de, items), `a partir do nível ${de}`).toEqual({ level: nivel, what })
+    }
+    expect(nextUnlock(u, 60, items)).toBeNull()
   })
   it('schema valida growthRate e teamSlots', () => {
     expect(() => UnlocksSchema.parse({ growthRate: 'medium-fast', teamSlots: [{ level: 1, slots: 3 }], items: {}, regions: {} })).not.toThrow()

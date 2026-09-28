@@ -4,7 +4,20 @@ import { kebab } from './species.js'
 const base = { id: kebab, name: z.string().min(1), buyPrice: z.number().int().min(0), sellPrice: z.number().int().min(0) }
 export const ItemSchema = z.discriminatedUnion('kind', [
   z.object({ ...base, kind: z.literal('potion'), healPercent: z.number().int().min(1).max(100) }),
-  z.object({ ...base, kind: z.literal('ball'), ballBonus: z.number().positive() }),
+  /*
+   * A bola tem um bônus DE CHÃO e, opcionalmente, uma SITUAÇÃO em que ele é outro.
+   *
+   * Com um eixo só, a melhor bola sempre ganha e as outras viram lixo: comprar Ultra torna Great
+   * e Poké itens que ninguém mais toca. O par `situacao`/`bonusNaSituacao` faz o valor depender
+   * do que está na frente, e é o que devolve escolha a uma decisão que hoje é automática.
+   */
+  z.object({
+    ...base,
+    kind: z.literal('ball'),
+    ballBonus: z.number().positive(),
+    situacao: z.enum(['intacto', 'agua-ou-inseto', 'nivel-baixo', 'ja-na-pokedex']).optional(),
+    bonusNaSituacao: z.number().positive().optional(),
+  }),
   /*
    * REVIVER é um tipo próprio, e não uma poção com uma marca.
    *

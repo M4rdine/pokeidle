@@ -83,5 +83,53 @@
     "kind": "stone",
     "buyPrice": 5000,
     "sellPrice": 2500
+  },
+  {
+    "id": "quick-ball",
+    "name": "Bola Rápida",
+    "kind": "ball",
+    "ballBonus": 1,
+    "situacao": "intacto",
+    "bonusNaSituacao": 4,
+    "buyPrice": 1600,
+    "sellPrice": 800
+  },
+  {
+    "id": "net-ball",
+    "name": "Bola Rede",
+    "kind": "ball",
+    "ballBonus": 1,
+    "situacao": "agua-ou-inseto",
+    "bonusNaSituacao": 3.5,
+    "buyPrice": 1600,
+    "sellPrice": 800
+  },
+  {
+    "id": "nest-ball",
+    "name": "Bola Ninho",
+    "kind": "ball",
+    "ballBonus": 1,
+    "situacao": "nivel-baixo",
+    "bonusNaSituacao": 4,
+    "buyPrice": 1200,
+    "sellPrice": 600
+  },
+  {
+    "id": "repeat-ball",
+    "name": "Bola Repetida",
+    "kind": "ball",
+    "ballBonus": 1,
+    "situacao": "ja-na-pokedex",
+    "bonusNaSituacao": 3.5,
+    "buyPrice": 1600,
+    "sellPrice": 800
+  },
+  {
+    "id": "master-ball",
+    "name": "Master Bola",
+    "kind": "ball",
+    "ballBonus": 255,
+    "buyPrice": 250000,
+    "sellPrice": 125000
   }
 ]

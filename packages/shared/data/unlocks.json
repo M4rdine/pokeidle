@@ -27,7 +27,12 @@
     "max-revive": 45,
     "fire-stone": 15,
     "thunder-stone": 15,
-    "moon-stone": 15
+    "moon-stone": 15,
+    "nest-ball": 12,
+    "net-ball": 18,
+    "quick-ball": 22,
+    "repeat-ball": 28,
+    "master-ball": 60
   },
   "regions": {
     "kanto": 1,

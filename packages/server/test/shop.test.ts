@@ -33,7 +33,16 @@ describe('GET /shop', () => {
     expect(body).toMatchObject({ level: 10, gold: 500 })
     // A ordem é por NÍVEL de destrave, e depois por preço. O Reviver (25) entra entre a Great
     // Bola (20) e a Hiper Poção (30); o Máximo (45) fecha a lista depois da Ultra Bola.
-    expect(body.items.map((i) => i.itemId)).toEqual(['potion', 'poke-ball', 'fire-stone', 'thunder-stone', 'moon-stone', 'super-potion', 'great-ball', 'revive', 'hyper-potion', 'ultra-ball', 'max-revive'])
+    /*
+     * O catálogo inteiro, na ordem em que a loja o mostra: por nível de destrave, e depois por
+     * preço. Enumerado assim ele documenta o que está à venda e quando — e é barato de corrigir
+     * quando um item novo entra, porque a lista é a própria resposta.
+     */
+    expect(body.items.map((i) => i.itemId)).toEqual([
+      'potion', 'poke-ball', 'nest-ball', 'fire-stone', 'thunder-stone', 'moon-stone', 'net-ball',
+      'super-potion', 'great-ball', 'quick-ball', 'revive', 'repeat-ball', 'hyper-potion',
+      'ultra-ball', 'max-revive', 'master-ball',
+    ])
     // Procura por ID, não por índice: a posição muda a cada item novo no catálogo, e um teste
     // preso a ela quebra por um motivo que não tem nada a ver com o que ele afirma.
     const item = (id: string) => body.items.find((i) => i.itemId === id)
@@ -57,7 +66,10 @@ describe('POST /shop/buy', () => {
   it('locked abaixo do nível; not-found para item inexistente; validation para quantidade 100', async () => {
     await setTrainer({ gold: 100000 })
     expect((await api(t.app, cookie).post('/shop/buy', { itemId: 'super-potion', quantity: 1 })).json()).toMatchObject({ error: { code: 'locked' } })
-    expect((await api(t.app, cookie).post('/shop/buy', { itemId: 'master-ball', quantity: 1 })).statusCode).toBe(404)
+    // Um id que o registro nunca vai ter. Este caso usava `master-ball` como "item inexistente",
+    // e passou a falhar no dia em que a Master Bola virou item de verdade — o teste dizia
+    // "inexistente" e apontava para algo que só ainda não existia.
+    expect((await api(t.app, cookie).post('/shop/buy', { itemId: 'item-que-nao-existe', quantity: 1 })).statusCode).toBe(404)
     expect((await api(t.app, cookie).post('/shop/buy', { itemId: 'potion', quantity: 100 })).statusCode).toBe(400)
     expect((await api(t.app, cookie).post('/shop/buy', { itemId: 'potion', quantity: 1, hack: true })).statusCode).toBe(400)
     await setTrainer({ xp: 8000 })

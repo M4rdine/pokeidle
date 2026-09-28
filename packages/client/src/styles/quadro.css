@@ -236,6 +236,11 @@
 .icone-item[data-item="poke-ball"] { background-image: url('./ui/item-poke-ball.png'); }
 .icone-item[data-item="great-ball"] { background-image: url('./ui/item-great-ball.png'); }
 .icone-item[data-item="ultra-ball"] { background-image: url('./ui/item-ultra-ball.png'); }
+.icone-item[data-item="quick-ball"] { background-image: url('./ui/item-quick-ball.png'); }
+.icone-item[data-item="net-ball"] { background-image: url('./ui/item-net-ball.png'); }
+.icone-item[data-item="nest-ball"] { background-image: url('./ui/item-nest-ball.png'); }
+.icone-item[data-item="repeat-ball"] { background-image: url('./ui/item-repeat-ball.png'); }
+.icone-item[data-item="master-ball"] { background-image: url('./ui/item-master-ball.png'); }
 
 .icone[data-icone="mapa"] { background-image: url('./ui/icone-mapa.png'); }
 .icone[data-icone="time"] { background-image: url('./ui/icone-time.png'); }

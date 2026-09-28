@@ -1,4 +1,4 @@
-import { access, copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
+import { access, copyFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { aoQuadradoNoGrupo } from './apertar-quadros.js'
 import { packGrid, toTiledTileset, type AtlasFrame, type TerrainInput } from './atlas.js'
@@ -29,7 +29,12 @@ export interface BuildOptions {
   readonly terrainsDir?: string
   /** Pasta dos props desenhados; padrão ao lado do manifesto. */
   readonly propsDir?: string
+  /** Pasta dos mapas de caçada; é ela que decide o que o atlas publicado carrega. */
+  readonly mapsDir?: string
 }
+
+/** Onde os mapas de caçada moram. */
+const MAPAS_PADRAO = 'packages/shared/data/hunts'
 
 async function readFrame(name: string, path: string): Promise<AtlasFrame> {
   return { name, image: decodePng(await readFile(path)) }
@@ -324,7 +329,7 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
   )
   log(`tiles.png: ${tileOrder.length} tiles em ${tiles.length} quadros; tiles.tsj pronto para o Tiled`)
 
-  const publicado = await publishAtlas(opts.outDir, opts.publishDir)
+  const publicado = await publishAtlas(opts, tiles, animations, log)
   if (publicado !== null) log(`publicado para o servidor em ${publicado}`)
 
   return { pokemonFrames: pokemon.length, tileFrames: tiles.length }
@@ -341,17 +346,79 @@ const MAX_SINTETIZADAS = 8
 /** Lado do tile em pixels; o tamanho de um prop é sempre um múltiplo dele. */
 const TILE = 32
 
-const PUBLICADOS = ['tiles.png', 'tiles.json', 'pokemon.png', 'pokemon.json'] as const
+const PUBLICADOS = ['pokemon.png', 'pokemon.json'] as const
 
 /**
- * Copia o atlas recém-gerado para a pasta que o servidor serve. Devolve o destino, ou null quando
- * não há destino configurado.
+ * Os nomes de tile que os mapas de caçada realmente usam, já com as fases das animações.
+ *
+ * Um tile animado aparece no mapa pelo nome-base e a tabela de animação lista as fases; trazer só
+ * a base deixaria a água parada no primeiro quadro.
  */
-async function publishAtlas(outDir: string, publishDir: string | undefined): Promise<string | null> {
+async function tilesUsadosPelosMapas(
+  mapsDir: string,
+  animations: Readonly<Record<string, readonly string[]>>,
+): Promise<ReadonlySet<string>> {
+  const usados = new Set<string>()
+  for (const arquivo of await readdir(mapsDir)) {
+    if (!arquivo.endsWith('.json')) continue
+    const mapa = JSON.parse(await readFile(join(mapsDir, arquivo), 'utf8')) as {
+      layers: Record<string, readonly (string | null)[] | undefined>
+    }
+    /*
+     * SÓ AS CAMADAS DE TILE. `blocking` é um vetor de BOOLEANOS — percorrê-lo junto fazia "true" e
+     * "false" entrarem como nomes de tile, e o guarda logo abaixo os acusou como faltando no
+     * atlas. Nomear as camadas aqui é o que impede uma camada nova de vazar para cá sem pensar.
+     */
+    for (const camada of [mapa.layers['ground'], mapa.layers['detail'], mapa.layers['canopy']]) {
+      for (const nome of camada ?? []) {
+        if (nome === null) continue
+        usados.add(nome)
+        for (const fase of animations[nome] ?? []) usados.add(fase)
+      }
+    }
+  }
+  return usados
+}
+
+/**
+ * Publica o atlas para o servidor — e o de TILES vai PODADO ao que os mapas usam.
+ *
+ * O manifest é a paleta do AUTOR: ele cresceu de 70 para 936 peças para que dê para desenhar mapa
+ * no Tiled com o tileset do Tibia inteiro. O navegador não precisa de nada disso: ele precisa dos
+ * tiles que os mapas de fato colocaram no chão.
+ *
+ * Sem a poda, importar a paleta levou `tiles.png` de 366 KB para 2,3 MB e `tiles.json` de 159 KB
+ * para 1 MB — seis vezes mais bytes no caminho crítico da cena, para desenhar os mesmos dezesseis
+ * mapas. O `.tsj` e o atlas cheio continuam em `outDir`, que é onde o Tiled lê.
+ */
+async function publishAtlas(
+  opts: BuildOptions,
+  tiles: readonly AtlasFrame[],
+  animations: Readonly<Record<string, readonly string[]>>,
+  log: Logger,
+): Promise<string | null> {
+  const publishDir = opts.publishDir
   if (publishDir === undefined) return null
   await mkdir(publishDir, { recursive: true })
   for (const nome of PUBLICADOS) {
-    await copyFile(join(outDir, nome), join(publishDir, nome))
+    await copyFile(join(opts.outDir, nome), join(publishDir, nome))
   }
+
+  const usados = await tilesUsadosPelosMapas(opts.mapsDir ?? MAPAS_PADRAO, animations)
+  const podados = tiles.filter((f) => usados.has(f.name))
+  /*
+   * Um mapa que cita tile que o atlas não tem é erro de dado, e some calado: o quadro fica
+   * transparente e ninguém procura o buraco. Aqui ele vira falha de build, que é onde dá para
+   * consertar.
+   */
+  const semQuadro = [...usados].filter((n) => !tiles.some((f) => f.name === n))
+  if (semQuadro.length > 0) {
+    throw new Error(`${semQuadro.length} tile(s) usados por mapas não existem no atlas: ${semQuadro.slice(0, 5).join(', ')}`)
+  }
+  const animacoesPodadas = Object.fromEntries(
+    Object.entries(animations).filter(([nome]) => usados.has(nome)),
+  )
+  await writeAtlas(publishDir, 'tiles', podados, animacoesPodadas)
+  log(`publicado podado: ${podados.length} de ${tiles.length} quadros (só o que os mapas usam)`)
   return publishDir
 }

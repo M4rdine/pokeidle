@@ -109,11 +109,14 @@ program
   .option('--publish <dir>', 'cópia servida ao navegador; "nenhum" para não publicar', 'packages/server/public/atlas')
   .option('--terrains <dir>', 'conjuntos de terreno desenhados', 'tools/assets/terrenos')
   .option('--props <dir>', 'props desenhados', 'tools/assets/props')
-  .action(async (opts: { extracted: string; manifest: string; out: string; publish: string; terrains: string; props: string }) => {
+  /* É esta pasta que decide o que o atlas PUBLICADO carrega: o de autoria leva a paleta inteira,
+   * o servido leva só o que os mapas puseram no chão. Ver `publishAtlas`. */
+  .option('--maps <dir>', 'mapas de caçada; decidem o que o atlas publicado carrega', 'packages/shared/data/hunts')
+  .action(async (opts: { extracted: string; manifest: string; out: string; publish: string; terrains: string; props: string; maps: string }) => {
     await buildAtlases({
       extractedDir: opts.extracted, manifestPath: opts.manifest, outDir: opts.out,
       publishDir: opts.publish === 'nenhum' ? undefined : opts.publish,
-      terrainsDir: opts.terrains, propsDir: opts.props,
+      terrainsDir: opts.terrains, propsDir: opts.props, mapsDir: opts.maps,
     }, out)
   })
 

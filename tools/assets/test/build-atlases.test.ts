@@ -120,6 +120,16 @@ async function writeIncompleteSet(path: string): Promise<void> {
   await writeFile(path, encodePng(gridPng([cellBytes(A, A, A, A), cellBytes(B, B, B, B)], 2)))
 }
 
+/** Um mapa de caçada mínimo, só com a camada de chão: é ela que decide o que o atlas publica. */
+async function mapaDeTeste(dir: string, chao: readonly string[]): Promise<string> {
+  const mapsDir = join(dir, 'mapas')
+  await mkdir(mapsDir, { recursive: true })
+  await writeFile(join(mapsDir, 'teste.json'), JSON.stringify({
+    layers: { ground: chao, detail: [], blocking: chao.map(() => false) },
+  }))
+  return mapsDir
+}
+
 describe('buildAtlases', () => {
   it('gera pokemon e tiles com nomes de frame e animações', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'pokeidle-atlas-'))
@@ -422,7 +432,7 @@ describe('buildAtlases', () => {
     await expect(readFile(join(publish, 'tiles.json'), 'utf8')).rejects.toThrow()
   })
 
-  it('com destino, publica exatamente os quatro arquivos servidos — e não o .tsj do Tiled', async () => {
+  it('publica os quatro arquivos servidos, e não o .tsj do Tiled', async () => {
     const { dir, extractedDir } = await setupFixtures()
     const manifestPath = join(dir, 'manifest.json')
     await writeFile(manifestPath, JSON.stringify({
@@ -431,16 +441,61 @@ describe('buildAtlases', () => {
       tiles: [{ name: 'grass', itemId: 100 }],
     }))
     const publish = join(dir, 'publicado')
+    const mapsDir = await mapaDeTeste(dir, ['grass'])
 
-    await buildAtlases({ extractedDir, manifestPath, outDir: dir, publishDir: publish }, () => {})
+    await buildAtlases({ extractedDir, manifestPath, outDir: dir, publishDir: publish, mapsDir }, () => {})
 
     for (const nome of ['tiles.png', 'tiles.json', 'pokemon.png', 'pokemon.json']) {
       await expect(readFile(join(publish, nome)), nome).resolves.toBeDefined()
     }
     // O tileset do Tiled é ferramenta de autoria; servir ao navegador seria peso morto.
     await expect(readFile(join(publish, 'tiles.tsj'), 'utf8')).rejects.toThrow()
-    // E o publicado é igual ao gerado, não uma versão de outro momento.
-    expect(await readFile(join(publish, 'tiles.json'), 'utf8')).toBe(await readFile(join(dir, 'tiles.json'), 'utf8'))
+  })
+
+  it('o atlas PUBLICADO leva só os tiles que os mapas usam; o de autoria leva tudo', async () => {
+    /*
+     * O manifest é a paleta do AUTOR — ele cresceu de 70 para 936 peças para dar para desenhar no
+     * Tiled com o tileset do Tibia inteiro. O navegador não precisa disso: precisa do que os mapas
+     * de fato puseram no chão.
+     *
+     * Sem a poda, importar a paleta levou o `tiles.png` servido de 366 KB para 2,3 MB — seis vezes
+     * mais bytes no caminho crítico da cena, para desenhar os mesmos dezesseis mapas.
+     */
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      // O 101 do fixture tem 64×64, então vira quatro peças com sufixo de corte. Serve bem: nenhuma
+      // delas é citada pelo mapa, e as quatro têm de ficar de fora do publicado.
+      tiles: [{ name: 'grass', itemId: 100 }, { name: 'nao-usado', itemId: 101, slice: { cols: 2, rows: 2 } }],
+    }))
+    const publish = join(dir, 'publicado')
+    const mapsDir = await mapaDeTeste(dir, ['grass'])
+
+    await buildAtlases({ extractedDir, manifestPath, outDir: dir, publishDir: publish, mapsDir }, () => {})
+
+    const quadros = async (base: string): Promise<string[]> =>
+      Object.keys((JSON.parse(await readFile(join(base, 'tiles.json'), 'utf8')) as { frames: Record<string, unknown> }).frames)
+    expect(await quadros(publish)).toEqual(['grass'])
+    expect(await quadros(dir)).toEqual(expect.arrayContaining(['grass', 'nao-usado-x0-y0', 'nao-usado-x1-y1']))
+  })
+
+  it('mapa que cita tile inexistente derruba o build, em vez de virar buraco transparente', async () => {
+    // Some calado: o quadro fica vazio e ninguém procura o que nunca viu desenhado.
+    const { dir, extractedDir } = await setupFixtures()
+    const manifestPath = join(dir, 'manifest.json')
+    await writeFile(manifestPath, JSON.stringify({
+      version: 1,
+      species: [{ id: 1, name: 'bulbasaur', outfitId: 10 }],
+      tiles: [{ name: 'grass', itemId: 100 }],
+    }))
+    const mapsDir = await mapaDeTeste(dir, ['grass', 'fantasma'])
+
+    await expect(buildAtlases(
+      { extractedDir, manifestPath, outDir: dir, publishDir: join(dir, 'publicado'), mapsDir },
+      () => {},
+    )).rejects.toThrow(/fantasma/)
   })
 
   it('recusa conjunto de terreno incompleto, em vez de gerar pincel com buraco', async () => {

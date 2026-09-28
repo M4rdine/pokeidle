@@ -485,6 +485,5231 @@
         "cols": 1,
         "rows": 2
       }
+    },
+    {
+      "name": "grama-clara-1",
+      "itemId": 4680
+    },
+    {
+      "name": "grama-clara-2",
+      "itemId": 4681
+    },
+    {
+      "name": "grama-clara-3",
+      "itemId": 4682
+    },
+    {
+      "name": "grama-clara-4",
+      "itemId": 4683
+    },
+    {
+      "name": "grama-clara-5",
+      "itemId": 4684
+    },
+    {
+      "name": "grama-clara-6",
+      "itemId": 4685
+    },
+    {
+      "name": "grama-clara-7",
+      "itemId": 4686
+    },
+    {
+      "name": "grama-clara-8",
+      "itemId": 4687
+    },
+    {
+      "name": "grama-clara-9",
+      "itemId": 4688
+    },
+    {
+      "name": "grama-clara-10",
+      "itemId": 4689
+    },
+    {
+      "name": "grama-clara-11",
+      "itemId": 4690
+    },
+    {
+      "name": "grama-clara-12",
+      "itemId": 4691
+    },
+    {
+      "name": "grama-clara-13",
+      "itemId": 4692
+    },
+    {
+      "name": "grama-clara-14",
+      "itemId": 4693
+    },
+    {
+      "name": "grama-clara-15",
+      "itemId": 4694
+    },
+    {
+      "name": "grama-clara-16",
+      "itemId": 4695
+    },
+    {
+      "name": "grama-clara-17",
+      "itemId": 4696
+    },
+    {
+      "name": "grama-clara-18",
+      "itemId": 4697
+    },
+    {
+      "name": "grama-clara-19",
+      "itemId": 4698
+    },
+    {
+      "name": "grama-clara-20",
+      "itemId": 4699
+    },
+    {
+      "name": "grama-clara-21",
+      "itemId": 4700
+    },
+    {
+      "name": "grama-clara-22",
+      "itemId": 4701
+    },
+    {
+      "name": "grama-escura-1",
+      "itemId": 4515
+    },
+    {
+      "name": "grama-escura-2",
+      "itemId": 4515,
+      "patternX": 1
+    },
+    {
+      "name": "grama-escura-3",
+      "itemId": 4515,
+      "patternY": 1
+    },
+    {
+      "name": "grama-escura-4",
+      "itemId": 4515,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "grama-escura-5",
+      "itemId": 4516
+    },
+    {
+      "name": "grama-escura-6",
+      "itemId": 4517
+    },
+    {
+      "name": "grama-escura-7",
+      "itemId": 4518
+    },
+    {
+      "name": "grama-escura-8",
+      "itemId": 4519
+    },
+    {
+      "name": "grama-escura-9",
+      "itemId": 4520
+    },
+    {
+      "name": "grama-escura-10",
+      "itemId": 4521
+    },
+    {
+      "name": "grama-escura-11",
+      "itemId": 4522
+    },
+    {
+      "name": "grama-escura-12",
+      "itemId": 4523
+    },
+    {
+      "name": "grama-escura-13",
+      "itemId": 4524
+    },
+    {
+      "name": "grama-escura-14",
+      "itemId": 4525
+    },
+    {
+      "name": "grama-escura-15",
+      "itemId": 4526
+    },
+    {
+      "name": "grama-escura-16",
+      "itemId": 4527
+    },
+    {
+      "name": "grama-escura-17",
+      "itemId": 4528
+    },
+    {
+      "name": "grama-escura-18",
+      "itemId": 4529
+    },
+    {
+      "name": "grama-escura-19",
+      "itemId": 4530
+    },
+    {
+      "name": "grama-florida-1",
+      "itemId": 15917
+    },
+    {
+      "name": "grama-florida-2",
+      "itemId": 15918
+    },
+    {
+      "name": "grama-florida-3",
+      "itemId": 15919
+    },
+    {
+      "name": "grama-florida-4",
+      "itemId": 15920
+    },
+    {
+      "name": "grama-florida-5",
+      "itemId": 15921
+    },
+    {
+      "name": "grama-florida-6",
+      "itemId": 15922
+    },
+    {
+      "name": "grama-florida-7",
+      "itemId": 15923
+    },
+    {
+      "name": "grama-florida-8",
+      "itemId": 15924
+    },
+    {
+      "name": "grama-florida-9",
+      "itemId": 15925
+    },
+    {
+      "name": "grama-florida-10",
+      "itemId": 15926
+    },
+    {
+      "name": "grama-florida-11",
+      "itemId": 15927
+    },
+    {
+      "name": "grama-florida-12",
+      "itemId": 15928
+    },
+    {
+      "name": "pedra-trilha-1",
+      "itemId": 19231
+    },
+    {
+      "name": "pedra-trilha-2",
+      "itemId": 19232
+    },
+    {
+      "name": "pedra-trilha-3",
+      "itemId": 19233
+    },
+    {
+      "name": "pedra-trilha-4",
+      "itemId": 19234
+    },
+    {
+      "name": "pedra-trilha-5",
+      "itemId": 19235
+    },
+    {
+      "name": "pedra-trilha-6",
+      "itemId": 19236
+    },
+    {
+      "name": "pedra-trilha-7",
+      "itemId": 19237
+    },
+    {
+      "name": "pedra-trilha-8",
+      "itemId": 19238
+    },
+    {
+      "name": "pedra-trilha-9",
+      "itemId": 19239
+    },
+    {
+      "name": "pedra-trilha-10",
+      "itemId": 19240
+    },
+    {
+      "name": "pedra-trilha-11",
+      "itemId": 19241
+    },
+    {
+      "name": "pedra-trilha-12",
+      "itemId": 19242
+    },
+    {
+      "name": "pedra-trilha-13",
+      "itemId": 19243
+    },
+    {
+      "name": "pedra-trilha-14",
+      "itemId": 19244
+    },
+    {
+      "name": "pedra-trilha-15",
+      "itemId": 19245
+    },
+    {
+      "name": "pedra-trilha-16",
+      "itemId": 19246
+    },
+    {
+      "name": "pedra-trilha-17",
+      "itemId": 19247
+    },
+    {
+      "name": "pedra-trilha-18",
+      "itemId": 19248
+    },
+    {
+      "name": "pedra-trilha-19",
+      "itemId": 19249
+    },
+    {
+      "name": "pedra-trilha-20",
+      "itemId": 19250
+    },
+    {
+      "name": "pedra-trilha-21",
+      "itemId": 19251
+    },
+    {
+      "name": "pedra-trilha-22",
+      "itemId": 19252
+    },
+    {
+      "name": "pedra-trilha-23",
+      "itemId": 19253
+    },
+    {
+      "name": "pedra-trilha-24",
+      "itemId": 19254
+    },
+    {
+      "name": "pedra-trilha-25",
+      "itemId": 19255
+    },
+    {
+      "name": "pedra-trilha-26",
+      "itemId": 19256
+    },
+    {
+      "name": "pedra-trilha-27",
+      "itemId": 19257
+    },
+    {
+      "name": "pedra-trilha-28",
+      "itemId": 19258
+    },
+    {
+      "name": "pedra-trilha-29",
+      "itemId": 19259
+    },
+    {
+      "name": "pedra-trilha-30",
+      "itemId": 19260
+    },
+    {
+      "name": "pedra-trilha-31",
+      "itemId": 19261
+    },
+    {
+      "name": "pedra-trilha-32",
+      "itemId": 19262
+    },
+    {
+      "name": "pedra-trilha-33",
+      "itemId": 19263
+    },
+    {
+      "name": "pedra-trilha-34",
+      "itemId": 19264
+    },
+    {
+      "name": "pedra-trilha-35",
+      "itemId": 19265
+    },
+    {
+      "name": "pedra-trilha-36",
+      "itemId": 19266
+    },
+    {
+      "name": "pedra-trilha-37",
+      "itemId": 19267
+    },
+    {
+      "name": "pedra-trilha-38",
+      "itemId": 19268
+    },
+    {
+      "name": "pedra-trilha-39",
+      "itemId": 19269
+    },
+    {
+      "name": "pedra-trilha-40",
+      "itemId": 19270
+    },
+    {
+      "name": "pedra-trilha-41",
+      "itemId": 19271
+    },
+    {
+      "name": "pedra-trilha-42",
+      "itemId": 19272
+    },
+    {
+      "name": "pedra-trilha-43",
+      "itemId": 19273
+    },
+    {
+      "name": "pedra-trilha-44",
+      "itemId": 19274
+    },
+    {
+      "name": "pedra-trilha-45",
+      "itemId": 19275
+    },
+    {
+      "name": "pedra-trilha-46",
+      "itemId": 19276
+    },
+    {
+      "name": "pedra-trilha-47",
+      "itemId": 19277
+    },
+    {
+      "name": "pedra-trilha-48",
+      "itemId": 19278
+    },
+    {
+      "name": "pedra-trilha-49",
+      "itemId": 19279
+    },
+    {
+      "name": "pedra-trilha-50",
+      "itemId": 19280
+    },
+    {
+      "name": "pedra-trilha-51",
+      "itemId": 19281
+    },
+    {
+      "name": "pedra-trilha-52",
+      "itemId": 19282
+    },
+    {
+      "name": "pedra-trilha-53",
+      "itemId": 19283
+    },
+    {
+      "name": "rocha-chao-1",
+      "itemId": 4394
+    },
+    {
+      "name": "rocha-chao-2",
+      "itemId": 4395
+    },
+    {
+      "name": "rocha-chao-3",
+      "itemId": 4396
+    },
+    {
+      "name": "rocha-chao-4",
+      "itemId": 4397
+    },
+    {
+      "name": "rocha-chao-5",
+      "itemId": 4398
+    },
+    {
+      "name": "rocha-chao-6",
+      "itemId": 4399
+    },
+    {
+      "name": "rocha-chao-7",
+      "itemId": 4400
+    },
+    {
+      "name": "rocha-chao-8",
+      "itemId": 4401
+    },
+    {
+      "name": "rocha-chao-9",
+      "itemId": 4402
+    },
+    {
+      "name": "rocha-chao-10",
+      "itemId": 4403
+    },
+    {
+      "name": "rocha-chao-11",
+      "itemId": 4404
+    },
+    {
+      "name": "rocha-chao-12",
+      "itemId": 4405
+    },
+    {
+      "name": "rocha-chao-13",
+      "itemId": 4406
+    },
+    {
+      "name": "rocha-chao-14",
+      "itemId": 4407
+    },
+    {
+      "name": "rocha-chao-15",
+      "itemId": 4408
+    },
+    {
+      "name": "rocha-chao-16",
+      "itemId": 4409
+    },
+    {
+      "name": "rocha-chao-17",
+      "itemId": 4410
+    },
+    {
+      "name": "caverna-chao-1",
+      "itemId": 16060
+    },
+    {
+      "name": "caverna-chao-2",
+      "itemId": 16061
+    },
+    {
+      "name": "caverna-chao-3",
+      "itemId": 16062
+    },
+    {
+      "name": "caverna-chao-4",
+      "itemId": 16063
+    },
+    {
+      "name": "caverna-chao-5",
+      "itemId": 16064
+    },
+    {
+      "name": "caverna-chao-6",
+      "itemId": 16065
+    },
+    {
+      "name": "caverna-chao-7",
+      "itemId": 16066
+    },
+    {
+      "name": "caverna-chao-8",
+      "itemId": 16067
+    },
+    {
+      "name": "caverna-chao-9",
+      "itemId": 16068
+    },
+    {
+      "name": "caverna-chao-10",
+      "itemId": 16069
+    },
+    {
+      "name": "caverna-chao-11",
+      "itemId": 16070
+    },
+    {
+      "name": "caverna-chao-12",
+      "itemId": 16071
+    },
+    {
+      "name": "caverna-chao-13",
+      "itemId": 16072
+    },
+    {
+      "name": "caverna-chao-14",
+      "itemId": 16073
+    },
+    {
+      "name": "caverna-chao-15",
+      "itemId": 16074
+    },
+    {
+      "name": "caverna-chao-16",
+      "itemId": 16075
+    },
+    {
+      "name": "caverna-chao-17",
+      "itemId": 16076
+    },
+    {
+      "name": "caverna-chao-18",
+      "itemId": 16077
+    },
+    {
+      "name": "caverna-chao-19",
+      "itemId": 16078
+    },
+    {
+      "name": "caverna-chao-20",
+      "itemId": 16079
+    },
+    {
+      "name": "caverna-chao-21",
+      "itemId": 16080
+    },
+    {
+      "name": "caverna-chao-22",
+      "itemId": 16080,
+      "patternX": 1
+    },
+    {
+      "name": "caverna-chao-23",
+      "itemId": 16080,
+      "patternX": 2
+    },
+    {
+      "name": "caverna-chao-24",
+      "itemId": 16080,
+      "patternX": 3
+    },
+    {
+      "name": "caverna-chao-25",
+      "itemId": 16080,
+      "patternY": 1
+    },
+    {
+      "name": "caverna-chao-26",
+      "itemId": 16080,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "caverna-chao-27",
+      "itemId": 16080,
+      "patternX": 2,
+      "patternY": 1
+    },
+    {
+      "name": "caverna-chao-28",
+      "itemId": 16080,
+      "patternX": 3,
+      "patternY": 1
+    },
+    {
+      "name": "caverna-chao-29",
+      "itemId": 16080,
+      "patternY": 2
+    },
+    {
+      "name": "caverna-chao-30",
+      "itemId": 16080,
+      "patternX": 1,
+      "patternY": 2
+    },
+    {
+      "name": "caverna-chao-31",
+      "itemId": 16080,
+      "patternX": 2,
+      "patternY": 2
+    },
+    {
+      "name": "caverna-chao-32",
+      "itemId": 16080,
+      "patternX": 3,
+      "patternY": 2
+    },
+    {
+      "name": "caverna-chao-33",
+      "itemId": 16080,
+      "patternY": 3
+    },
+    {
+      "name": "caverna-chao-34",
+      "itemId": 16080,
+      "patternX": 1,
+      "patternY": 3
+    },
+    {
+      "name": "caverna-chao-35",
+      "itemId": 16080,
+      "patternX": 2,
+      "patternY": 3
+    },
+    {
+      "name": "caverna-chao-36",
+      "itemId": 16080,
+      "patternX": 3,
+      "patternY": 3
+    },
+    {
+      "name": "caverna-chao-37",
+      "itemId": 16081
+    },
+    {
+      "name": "caverna-chao-38",
+      "itemId": 16081,
+      "patternX": 1
+    },
+    {
+      "name": "caverna-chao-39",
+      "itemId": 16081,
+      "patternX": 2
+    },
+    {
+      "name": "caverna-chao-40",
+      "itemId": 16081,
+      "patternX": 3
+    },
+    {
+      "name": "caverna-chao-41",
+      "itemId": 16081,
+      "patternY": 1
+    },
+    {
+      "name": "caverna-chao-42",
+      "itemId": 16081,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "caverna-chao-43",
+      "itemId": 16081,
+      "patternX": 2,
+      "patternY": 1
+    },
+    {
+      "name": "caverna-chao-44",
+      "itemId": 16081,
+      "patternX": 3,
+      "patternY": 1
+    },
+    {
+      "name": "caverna-chao-45",
+      "itemId": 16081,
+      "patternY": 2
+    },
+    {
+      "name": "caverna-chao-46",
+      "itemId": 16081,
+      "patternX": 1,
+      "patternY": 2
+    },
+    {
+      "name": "caverna-chao-47",
+      "itemId": 16081,
+      "patternX": 2,
+      "patternY": 2
+    },
+    {
+      "name": "caverna-chao-48",
+      "itemId": 16081,
+      "patternX": 3,
+      "patternY": 2
+    },
+    {
+      "name": "caverna-chao-49",
+      "itemId": 16081,
+      "patternY": 3
+    },
+    {
+      "name": "caverna-chao-50",
+      "itemId": 16081,
+      "patternX": 1,
+      "patternY": 3
+    },
+    {
+      "name": "caverna-chao-51",
+      "itemId": 16081,
+      "patternX": 2,
+      "patternY": 3
+    },
+    {
+      "name": "caverna-chao-52",
+      "itemId": 16081,
+      "patternX": 3,
+      "patternY": 3
+    },
+    {
+      "name": "caverna-chao-53",
+      "itemId": 16082
+    },
+    {
+      "name": "caverna-chao-54",
+      "itemId": 16083
+    },
+    {
+      "name": "pedra-lavrada-1",
+      "itemId": 537
+    },
+    {
+      "name": "pedra-lavrada-2",
+      "itemId": 537,
+      "patternX": 1
+    },
+    {
+      "name": "pedra-lavrada-3",
+      "itemId": 537,
+      "patternX": 2
+    },
+    {
+      "name": "pedra-lavrada-4",
+      "itemId": 537,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-5",
+      "itemId": 537,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-6",
+      "itemId": 537,
+      "patternX": 2,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-7",
+      "itemId": 537,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-8",
+      "itemId": 537,
+      "patternX": 1,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-9",
+      "itemId": 537,
+      "patternX": 2,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-10",
+      "itemId": 538
+    },
+    {
+      "name": "pedra-lavrada-11",
+      "itemId": 538,
+      "patternX": 1
+    },
+    {
+      "name": "pedra-lavrada-12",
+      "itemId": 538,
+      "patternX": 2
+    },
+    {
+      "name": "pedra-lavrada-13",
+      "itemId": 538,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-14",
+      "itemId": 538,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-15",
+      "itemId": 538,
+      "patternX": 2,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-16",
+      "itemId": 538,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-17",
+      "itemId": 538,
+      "patternX": 1,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-18",
+      "itemId": 538,
+      "patternX": 2,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-19",
+      "itemId": 539
+    },
+    {
+      "name": "pedra-lavrada-20",
+      "itemId": 539,
+      "patternX": 1
+    },
+    {
+      "name": "pedra-lavrada-21",
+      "itemId": 539,
+      "patternX": 2
+    },
+    {
+      "name": "pedra-lavrada-22",
+      "itemId": 539,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-23",
+      "itemId": 539,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-24",
+      "itemId": 539,
+      "patternX": 2,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-25",
+      "itemId": 539,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-26",
+      "itemId": 539,
+      "patternX": 1,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-27",
+      "itemId": 539,
+      "patternX": 2,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-28",
+      "itemId": 540
+    },
+    {
+      "name": "pedra-lavrada-29",
+      "itemId": 540,
+      "patternX": 1
+    },
+    {
+      "name": "pedra-lavrada-30",
+      "itemId": 540,
+      "patternX": 2
+    },
+    {
+      "name": "pedra-lavrada-31",
+      "itemId": 540,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-32",
+      "itemId": 540,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-33",
+      "itemId": 540,
+      "patternX": 2,
+      "patternY": 1
+    },
+    {
+      "name": "pedra-lavrada-34",
+      "itemId": 540,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-35",
+      "itemId": 540,
+      "patternX": 1,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-36",
+      "itemId": 540,
+      "patternX": 2,
+      "patternY": 2
+    },
+    {
+      "name": "pedra-lavrada-37",
+      "itemId": 541
+    },
+    {
+      "name": "pedra-lavrada-38",
+      "itemId": 542
+    },
+    {
+      "name": "pedra-lavrada-39",
+      "itemId": 543
+    },
+    {
+      "name": "pedra-lavrada-40",
+      "itemId": 544
+    },
+    {
+      "name": "pedra-lavrada-41",
+      "itemId": 545
+    },
+    {
+      "name": "pedra-lavrada-42",
+      "itemId": 546
+    },
+    {
+      "name": "pedra-lavrada-43",
+      "itemId": 547
+    },
+    {
+      "name": "pedra-lavrada-44",
+      "itemId": 548
+    },
+    {
+      "name": "pedra-lavrada-45",
+      "itemId": 549
+    },
+    {
+      "name": "pedra-lavrada-46",
+      "itemId": 550
+    },
+    {
+      "name": "pedra-lavrada-47",
+      "itemId": 551
+    },
+    {
+      "name": "pedra-lavrada-48",
+      "itemId": 552
+    },
+    {
+      "name": "pedra-lavrada-49",
+      "itemId": 553
+    },
+    {
+      "name": "pedra-lavrada-50",
+      "itemId": 554
+    },
+    {
+      "name": "pedra-lavrada-51",
+      "itemId": 555
+    },
+    {
+      "name": "pedra-lavrada-52",
+      "itemId": 556
+    },
+    {
+      "name": "pedra-lavrada-53",
+      "itemId": 557
+    },
+    {
+      "name": "pedra-lavrada-54",
+      "itemId": 558
+    },
+    {
+      "name": "pedra-lavrada-55",
+      "itemId": 559
+    },
+    {
+      "name": "pedra-lavrada-56",
+      "itemId": 560
+    },
+    {
+      "name": "pedra-lavrada-57",
+      "itemId": 561
+    },
+    {
+      "name": "pedra-lavrada-58",
+      "itemId": 562
+    },
+    {
+      "name": "pedra-lavrada-59",
+      "itemId": 563
+    },
+    {
+      "name": "pedra-lavrada-60",
+      "itemId": 564
+    },
+    {
+      "name": "areia-pedra-1",
+      "itemId": 13946
+    },
+    {
+      "name": "areia-pedra-2",
+      "itemId": 13947
+    },
+    {
+      "name": "areia-pedra-3",
+      "itemId": 13948
+    },
+    {
+      "name": "areia-pedra-4",
+      "itemId": 13949
+    },
+    {
+      "name": "areia-pedra-5",
+      "itemId": 13950
+    },
+    {
+      "name": "areia-pedra-6",
+      "itemId": 13951
+    },
+    {
+      "name": "areia-pedra-7",
+      "itemId": 13952
+    },
+    {
+      "name": "areia-pedra-8",
+      "itemId": 13953
+    },
+    {
+      "name": "areia-pedra-9",
+      "itemId": 13954
+    },
+    {
+      "name": "areia-pedra-10",
+      "itemId": 13955
+    },
+    {
+      "name": "areia-pedra-11",
+      "itemId": 13956
+    },
+    {
+      "name": "areia-pedra-12",
+      "itemId": 13957
+    },
+    {
+      "name": "areia-pedra-13",
+      "itemId": 13958
+    },
+    {
+      "name": "areia-pedra-14",
+      "itemId": 13959
+    },
+    {
+      "name": "areia-pedra-15",
+      "itemId": 13960
+    },
+    {
+      "name": "areia-pedra-16",
+      "itemId": 13961
+    },
+    {
+      "name": "areia-pedra-17",
+      "itemId": 13962
+    },
+    {
+      "name": "areia-pedra-18",
+      "itemId": 13963
+    },
+    {
+      "name": "areia-pedra-19",
+      "itemId": 13964
+    },
+    {
+      "name": "areia-pedra-20",
+      "itemId": 13965
+    },
+    {
+      "name": "areia-pedra-21",
+      "itemId": 13966
+    },
+    {
+      "name": "areia-pedra-22",
+      "itemId": 13966,
+      "patternX": 1
+    },
+    {
+      "name": "areia-pedra-23",
+      "itemId": 13967
+    },
+    {
+      "name": "areia-pedra-24",
+      "itemId": 13967,
+      "patternX": 1
+    },
+    {
+      "name": "areia-pedra-25",
+      "itemId": 13968
+    },
+    {
+      "name": "areia-pedra-26",
+      "itemId": 13968,
+      "patternY": 1
+    },
+    {
+      "name": "areia-pedra-27",
+      "itemId": 13969
+    },
+    {
+      "name": "areia-pedra-28",
+      "itemId": 13969,
+      "patternY": 1
+    },
+    {
+      "name": "areia-pedra-29",
+      "itemId": 13970
+    },
+    {
+      "name": "areia-pedra-30",
+      "itemId": 13971
+    },
+    {
+      "name": "areia-pedra-31",
+      "itemId": 13972
+    },
+    {
+      "name": "areia-pedra-32",
+      "itemId": 13973
+    },
+    {
+      "name": "areia-pedra-33",
+      "itemId": 13974
+    },
+    {
+      "name": "areia-pedra-34",
+      "itemId": 13975
+    },
+    {
+      "name": "areia-pedra-35",
+      "itemId": 13976
+    },
+    {
+      "name": "areia-pedra-36",
+      "itemId": 13977
+    },
+    {
+      "name": "areia-pedra-37",
+      "itemId": 13978
+    },
+    {
+      "name": "areia-pedra-38",
+      "itemId": 13979
+    },
+    {
+      "name": "areia-pedra-39",
+      "itemId": 13980
+    },
+    {
+      "name": "areia-pedra-40",
+      "itemId": 13981
+    },
+    {
+      "name": "areia-pedra-41",
+      "itemId": 13982
+    },
+    {
+      "name": "areia-pedra-42",
+      "itemId": 13983
+    },
+    {
+      "name": "areia-pedra-43",
+      "itemId": 13984
+    },
+    {
+      "name": "areia-pedra-44",
+      "itemId": 13985
+    },
+    {
+      "name": "areia-pedra-45",
+      "itemId": 13986
+    },
+    {
+      "name": "areia-pedra-46",
+      "itemId": 13987
+    },
+    {
+      "name": "areia-pedra-47",
+      "itemId": 13988
+    },
+    {
+      "name": "areia-pedra-48",
+      "itemId": 13989
+    },
+    {
+      "name": "areia-pedra-49",
+      "itemId": 13990
+    },
+    {
+      "name": "areia-pedra-50",
+      "itemId": 13991
+    },
+    {
+      "name": "areia-pedra-51",
+      "itemId": 13992
+    },
+    {
+      "name": "areia-pedra-52",
+      "itemId": 13993
+    },
+    {
+      "name": "areia-pedra-53",
+      "itemId": 13994
+    },
+    {
+      "name": "areia-pedra-54",
+      "itemId": 13995
+    },
+    {
+      "name": "areia-pedra-55",
+      "itemId": 13996
+    },
+    {
+      "name": "areia-pedra-56",
+      "itemId": 13997
+    },
+    {
+      "name": "praia-1",
+      "itemId": 14434
+    },
+    {
+      "name": "praia-2",
+      "itemId": 14435
+    },
+    {
+      "name": "praia-3",
+      "itemId": 14436
+    },
+    {
+      "name": "praia-4",
+      "itemId": 14437
+    },
+    {
+      "name": "praia-5",
+      "itemId": 14438
+    },
+    {
+      "name": "praia-6",
+      "itemId": 14439
+    },
+    {
+      "name": "praia-7",
+      "itemId": 14440
+    },
+    {
+      "name": "praia-8",
+      "itemId": 14441
+    },
+    {
+      "name": "praia-9",
+      "itemId": 14442
+    },
+    {
+      "name": "praia-10",
+      "itemId": 14443
+    },
+    {
+      "name": "praia-11",
+      "itemId": 14444
+    },
+    {
+      "name": "praia-12",
+      "itemId": 14445
+    },
+    {
+      "name": "praia-13",
+      "itemId": 14446
+    },
+    {
+      "name": "praia-14",
+      "itemId": 14447
+    },
+    {
+      "name": "costa-1",
+      "itemId": 880
+    },
+    {
+      "name": "costa-2",
+      "itemId": 881
+    },
+    {
+      "name": "costa-3",
+      "itemId": 882
+    },
+    {
+      "name": "costa-4",
+      "itemId": 883
+    },
+    {
+      "name": "costa-5",
+      "itemId": 884
+    },
+    {
+      "name": "costa-6",
+      "itemId": 885
+    },
+    {
+      "name": "costa-7",
+      "itemId": 886
+    },
+    {
+      "name": "costa-8",
+      "itemId": 887
+    },
+    {
+      "name": "costa-9",
+      "itemId": 888
+    },
+    {
+      "name": "costa-10",
+      "itemId": 889
+    },
+    {
+      "name": "costa-11",
+      "itemId": 890
+    },
+    {
+      "name": "costa-12",
+      "itemId": 891
+    },
+    {
+      "name": "agua-1",
+      "itemId": 16515
+    },
+    {
+      "name": "agua-2",
+      "itemId": 16516
+    },
+    {
+      "name": "agua-3",
+      "itemId": 16517
+    },
+    {
+      "name": "agua-4",
+      "itemId": 16518
+    },
+    {
+      "name": "agua-5",
+      "itemId": 16519
+    },
+    {
+      "name": "agua-6",
+      "itemId": 16520
+    },
+    {
+      "name": "agua-7",
+      "itemId": 16521
+    },
+    {
+      "name": "agua-8",
+      "itemId": 16522
+    },
+    {
+      "name": "agua-9",
+      "itemId": 16523
+    },
+    {
+      "name": "agua-10",
+      "itemId": 16524
+    },
+    {
+      "name": "agua-11",
+      "itemId": 16525
+    },
+    {
+      "name": "agua-12",
+      "itemId": 16526
+    },
+    {
+      "name": "agua-13",
+      "itemId": 16527
+    },
+    {
+      "name": "agua-14",
+      "itemId": 16528
+    },
+    {
+      "name": "neve-1",
+      "itemId": 6580
+    },
+    {
+      "name": "neve-2",
+      "itemId": 6581
+    },
+    {
+      "name": "neve-3",
+      "itemId": 6582
+    },
+    {
+      "name": "neve-4",
+      "itemId": 6583
+    },
+    {
+      "name": "neve-5",
+      "itemId": 6584
+    },
+    {
+      "name": "neve-6",
+      "itemId": 6585
+    },
+    {
+      "name": "neve-7",
+      "itemId": 6586
+    },
+    {
+      "name": "neve-8",
+      "itemId": 6587
+    },
+    {
+      "name": "neve-9",
+      "itemId": 6588
+    },
+    {
+      "name": "neve-10",
+      "itemId": 6589
+    },
+    {
+      "name": "neve-11",
+      "itemId": 6590
+    },
+    {
+      "name": "neve-12",
+      "itemId": 6591
+    },
+    {
+      "name": "neve-13",
+      "itemId": 6592
+    },
+    {
+      "name": "neve-14",
+      "itemId": 6593
+    },
+    {
+      "name": "neve-15",
+      "itemId": 6594
+    },
+    {
+      "name": "neve-16",
+      "itemId": 6595
+    },
+    {
+      "name": "neve-17",
+      "itemId": 6596
+    },
+    {
+      "name": "neve-18",
+      "itemId": 6597
+    },
+    {
+      "name": "neve-19",
+      "itemId": 6598
+    },
+    {
+      "name": "neve-20",
+      "itemId": 6599
+    },
+    {
+      "name": "neve-21",
+      "itemId": 6600
+    },
+    {
+      "name": "neve-22",
+      "itemId": 6601
+    },
+    {
+      "name": "neve-23",
+      "itemId": 6602
+    },
+    {
+      "name": "neve-24",
+      "itemId": 6603
+    },
+    {
+      "name": "neve-25",
+      "itemId": 6604
+    },
+    {
+      "name": "neve-26",
+      "itemId": 6605
+    },
+    {
+      "name": "neve-27",
+      "itemId": 6606
+    },
+    {
+      "name": "neve-28",
+      "itemId": 6607
+    },
+    {
+      "name": "neve-29",
+      "itemId": 6608
+    },
+    {
+      "name": "neve-fenda-1",
+      "itemId": 6612
+    },
+    {
+      "name": "neve-fenda-2",
+      "itemId": 6612,
+      "patternY": 1
+    },
+    {
+      "name": "neve-fenda-3",
+      "itemId": 6613
+    },
+    {
+      "name": "neve-fenda-4",
+      "itemId": 6613,
+      "patternX": 1
+    },
+    {
+      "name": "neve-fenda-5",
+      "itemId": 6614
+    },
+    {
+      "name": "neve-fenda-6",
+      "itemId": 6615
+    },
+    {
+      "name": "neve-fenda-7",
+      "itemId": 6616
+    },
+    {
+      "name": "neve-fenda-8",
+      "itemId": 6617
+    },
+    {
+      "name": "neve-fenda-9",
+      "itemId": 6618
+    },
+    {
+      "name": "neve-fenda-10",
+      "itemId": 6619
+    },
+    {
+      "name": "neve-fenda-11",
+      "itemId": 6620
+    },
+    {
+      "name": "neve-fenda-12",
+      "itemId": 6621
+    },
+    {
+      "name": "neve-fenda-13",
+      "itemId": 6622
+    },
+    {
+      "name": "neve-fenda-14",
+      "itemId": 6623
+    },
+    {
+      "name": "neve-fenda-15",
+      "itemId": 6624
+    },
+    {
+      "name": "neve-fenda-16",
+      "itemId": 6625
+    },
+    {
+      "name": "neve-fenda-17",
+      "itemId": 6626
+    },
+    {
+      "name": "costa-gelada-1",
+      "itemId": 4621
+    },
+    {
+      "name": "costa-gelada-2",
+      "itemId": 4622
+    },
+    {
+      "name": "costa-gelada-3",
+      "itemId": 4623
+    },
+    {
+      "name": "costa-gelada-4",
+      "itemId": 4624
+    },
+    {
+      "name": "costa-gelada-5",
+      "itemId": 4625
+    },
+    {
+      "name": "costa-gelada-6",
+      "itemId": 4626
+    },
+    {
+      "name": "costa-gelada-7",
+      "itemId": 4627
+    },
+    {
+      "name": "costa-gelada-8",
+      "itemId": 4628
+    },
+    {
+      "name": "costa-gelada-9",
+      "itemId": 4629
+    },
+    {
+      "name": "costa-gelada-10",
+      "itemId": 4630
+    },
+    {
+      "name": "costa-gelada-11",
+      "itemId": 4631
+    },
+    {
+      "name": "costa-gelada-12",
+      "itemId": 4632
+    },
+    {
+      "name": "chapa-metal-1",
+      "itemId": 8952
+    },
+    {
+      "name": "chapa-metal-2",
+      "itemId": 8953
+    },
+    {
+      "name": "chapa-metal-3",
+      "itemId": 8954
+    },
+    {
+      "name": "chapa-metal-4",
+      "itemId": 8955
+    },
+    {
+      "name": "chapa-metal-5",
+      "itemId": 8956
+    },
+    {
+      "name": "chapa-metal-6",
+      "itemId": 8957
+    },
+    {
+      "name": "chapa-metal-7",
+      "itemId": 8958
+    },
+    {
+      "name": "chapa-metal-8",
+      "itemId": 8959
+    },
+    {
+      "name": "chapa-metal-9",
+      "itemId": 8960
+    },
+    {
+      "name": "chapa-metal-10",
+      "itemId": 8961
+    },
+    {
+      "name": "chapa-metal-11",
+      "itemId": 8962
+    },
+    {
+      "name": "chapa-metal-12",
+      "itemId": 8963
+    },
+    {
+      "name": "chapa-metal-13",
+      "itemId": 8964
+    },
+    {
+      "name": "chapa-metal-14",
+      "itemId": 8965
+    },
+    {
+      "name": "chapa-metal-15",
+      "itemId": 8966
+    },
+    {
+      "name": "cascalho-1",
+      "itemId": 13503
+    },
+    {
+      "name": "cascalho-2",
+      "itemId": 13504
+    },
+    {
+      "name": "cascalho-3",
+      "itemId": 13505
+    },
+    {
+      "name": "cascalho-4",
+      "itemId": 13506
+    },
+    {
+      "name": "cascalho-5",
+      "itemId": 13507
+    },
+    {
+      "name": "cascalho-6",
+      "itemId": 13508
+    },
+    {
+      "name": "cascalho-7",
+      "itemId": 13509
+    },
+    {
+      "name": "cascalho-8",
+      "itemId": 13510
+    },
+    {
+      "name": "cascalho-9",
+      "itemId": 13511
+    },
+    {
+      "name": "cascalho-10",
+      "itemId": 13512
+    },
+    {
+      "name": "cascalho-11",
+      "itemId": 13513
+    },
+    {
+      "name": "cascalho-12",
+      "itemId": 13514
+    },
+    {
+      "name": "cascalho-13",
+      "itemId": 13515
+    },
+    {
+      "name": "cascalho-14",
+      "itemId": 13516
+    },
+    {
+      "name": "cascalho-15",
+      "itemId": 13517
+    },
+    {
+      "name": "cascalho-16",
+      "itemId": 13518
+    },
+    {
+      "name": "penhasco-1",
+      "itemId": 4457,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-2",
+      "itemId": 4457,
+      "patternY": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-3",
+      "itemId": 4457,
+      "patternY": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-4",
+      "itemId": 4457,
+      "patternY": 3,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-5",
+      "itemId": 4458,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-6",
+      "itemId": 4458,
+      "patternX": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-7",
+      "itemId": 4458,
+      "patternX": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-8",
+      "itemId": 4458,
+      "patternX": 3,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-9",
+      "itemId": 4459,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-10",
+      "itemId": 4460,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-11",
+      "itemId": 4460,
+      "patternX": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-12",
+      "itemId": 4460,
+      "patternX": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-13",
+      "itemId": 4460,
+      "patternX": 3,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-14",
+      "itemId": 4461,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-15",
+      "itemId": 4461,
+      "patternY": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-16",
+      "itemId": 4461,
+      "patternY": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-17",
+      "itemId": 4461,
+      "patternY": 3,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-18",
+      "itemId": 4462,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-19",
+      "itemId": 4462,
+      "patternX": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-20",
+      "itemId": 4463,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-21",
+      "itemId": 4463,
+      "patternX": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-22",
+      "itemId": 4464,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-23",
+      "itemId": 4464,
+      "patternX": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-24",
+      "itemId": 4465,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-25",
+      "itemId": 4465,
+      "patternX": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-26",
+      "itemId": 4466,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-27",
+      "itemId": 4467,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-28",
+      "itemId": 4468,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-29",
+      "itemId": 4469,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-30",
+      "itemId": 4470,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-31",
+      "itemId": 4471,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-32",
+      "itemId": 4472,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-33",
+      "itemId": 4473,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-34",
+      "itemId": 4474,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-35",
+      "itemId": 4475,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-36",
+      "itemId": 4476,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-37",
+      "itemId": 4477,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-38",
+      "itemId": 4478,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-39",
+      "itemId": 4479,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-40",
+      "itemId": 4480,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-41",
+      "itemId": 4481,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-42",
+      "itemId": 4482,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-43",
+      "itemId": 4483,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-44",
+      "itemId": 4484,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-45",
+      "itemId": 4485,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-46",
+      "itemId": 4486,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-47",
+      "itemId": 4487,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-48",
+      "itemId": 4488,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-49",
+      "itemId": 4489,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-50",
+      "itemId": 4490,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-51",
+      "itemId": 4491,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-52",
+      "itemId": 4492,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-53",
+      "itemId": 4493,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-54",
+      "itemId": 4494,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-55",
+      "itemId": 4495,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-56",
+      "itemId": 4496,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-57",
+      "itemId": 4497,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-58",
+      "itemId": 4498,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-59",
+      "itemId": 4499,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-60",
+      "itemId": 4500,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-61",
+      "itemId": 4501,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "penhasco-62",
+      "itemId": 4502,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-1",
+      "itemId": 8588,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-2",
+      "itemId": 8589,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-3",
+      "itemId": 8590,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-4",
+      "itemId": 8591,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-5",
+      "itemId": 8592,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-6",
+      "itemId": 8593,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-7",
+      "itemId": 8594,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-8",
+      "itemId": 8595,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-9",
+      "itemId": 8596,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-10",
+      "itemId": 8597,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-11",
+      "itemId": 8598,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-12",
+      "itemId": 8599,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-13",
+      "itemId": 8600,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-14",
+      "itemId": 8601,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-15",
+      "itemId": 8602,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-16",
+      "itemId": 8603,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-17",
+      "itemId": 8604,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-18",
+      "itemId": 8605,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-19",
+      "itemId": 8606,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-20",
+      "itemId": 8607,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-21",
+      "itemId": 8608,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-22",
+      "itemId": 8609,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-23",
+      "itemId": 8610,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-24",
+      "itemId": 8611,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-25",
+      "itemId": 8612,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-26",
+      "itemId": 8613,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-27",
+      "itemId": 8614,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-28",
+      "itemId": 8615,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-29",
+      "itemId": 8616,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-30",
+      "itemId": 8617,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-31",
+      "itemId": 8618,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-32",
+      "itemId": 8619,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-33",
+      "itemId": 8620,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-34",
+      "itemId": 8621,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-35",
+      "itemId": 8622,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-36",
+      "itemId": 8623,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "entulho-caverna-37",
+      "itemId": 8624,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-1",
+      "itemId": 3613,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-2",
+      "itemId": 3614,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-3",
+      "itemId": 3615,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-4",
+      "itemId": 3616,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-5",
+      "itemId": 3617,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-6",
+      "itemId": 3618,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-7",
+      "itemId": 3619,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-8",
+      "itemId": 3620,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-9",
+      "itemId": 3621,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-10",
+      "itemId": 3622,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-11",
+      "itemId": 3623,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-12",
+      "itemId": 3624,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-13",
+      "itemId": 3625,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-14",
+      "itemId": 3626,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-15",
+      "itemId": 3627
+    },
+    {
+      "name": "arvore-16",
+      "itemId": 3628
+    },
+    {
+      "name": "arvore-17",
+      "itemId": 3629
+    },
+    {
+      "name": "arvore-18",
+      "itemId": 3630
+    },
+    {
+      "name": "arvore-19",
+      "itemId": 3631,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-20",
+      "itemId": 3632,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-21",
+      "itemId": 3633,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-22",
+      "itemId": 3634,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-23",
+      "itemId": 3635,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-24",
+      "itemId": 3636,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-25",
+      "itemId": 3637,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-26",
+      "itemId": 3638,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-27",
+      "itemId": 3639,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-28",
+      "itemId": 3640,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-29",
+      "itemId": 3641,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-30",
+      "itemId": 3642
+    },
+    {
+      "name": "arvore-31",
+      "itemId": 3643
+    },
+    {
+      "name": "arvore-32",
+      "itemId": 3644
+    },
+    {
+      "name": "arvore-33",
+      "itemId": 3645
+    },
+    {
+      "name": "arvore-34",
+      "itemId": 3646
+    },
+    {
+      "name": "arvore-35",
+      "itemId": 3647,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-36",
+      "itemId": 3648,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-37",
+      "itemId": 3649,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arvore-38",
+      "itemId": 3650
+    },
+    {
+      "name": "conifera-1",
+      "itemId": 17561,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-2",
+      "itemId": 17562,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-3",
+      "itemId": 17563,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-4",
+      "itemId": 17564,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-5",
+      "itemId": 17565,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-6",
+      "itemId": 17566,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-7",
+      "itemId": 17567,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-8",
+      "itemId": 17568,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-9",
+      "itemId": 17569,
+      "slice": {
+        "cols": 2,
+        "rows": 1
+      }
+    },
+    {
+      "name": "conifera-10",
+      "itemId": 17570,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-11",
+      "itemId": 17571,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-12",
+      "itemId": 17572,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-13",
+      "itemId": 17573,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-14",
+      "itemId": 17574,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-15",
+      "itemId": 17575,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-16",
+      "itemId": 17576,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-17",
+      "itemId": 17577,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-18",
+      "itemId": 17578,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-19",
+      "itemId": 17579,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-20",
+      "itemId": 17580,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-21",
+      "itemId": 17581,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-22",
+      "itemId": 17582,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-23",
+      "itemId": 17583,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-24",
+      "itemId": 17584,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-25",
+      "itemId": 17585,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-26",
+      "itemId": 17586,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-27",
+      "itemId": 17587,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-28",
+      "itemId": 17588,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-29",
+      "itemId": 17589,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-30",
+      "itemId": 17590,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-31",
+      "itemId": 17591,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-32",
+      "itemId": 17592,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-33",
+      "itemId": 17593,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-34",
+      "itemId": 17594,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-35",
+      "itemId": 17595,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-36",
+      "itemId": 17596,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-37",
+      "itemId": 17597,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-38",
+      "itemId": 17598,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-39",
+      "itemId": 17599,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-40",
+      "itemId": 17600,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-41",
+      "itemId": 17601,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-42",
+      "itemId": 17602,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-43",
+      "itemId": 17603,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-44",
+      "itemId": 17604,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-45",
+      "itemId": 17605,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-46",
+      "itemId": 17606,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-47",
+      "itemId": 17607,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-48",
+      "itemId": 17608,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-49",
+      "itemId": 17609,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "conifera-50",
+      "itemId": 17610,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-1",
+      "itemId": 3750,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-2",
+      "itemId": 3751,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-3",
+      "itemId": 3752,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-4",
+      "itemId": 3753,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-5",
+      "itemId": 3754,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-6",
+      "itemId": 3755,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-7",
+      "itemId": 3756,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-8",
+      "itemId": 3757,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-9",
+      "itemId": 3758,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-10",
+      "itemId": 3759,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-11",
+      "itemId": 3760,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-12",
+      "itemId": 3761,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-13",
+      "itemId": 3762,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-14",
+      "itemId": 3763,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-15",
+      "itemId": 3764
+    },
+    {
+      "name": "folhagem-16",
+      "itemId": 3765
+    },
+    {
+      "name": "folhagem-17",
+      "itemId": 3766,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-18",
+      "itemId": 3767,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-19",
+      "itemId": 3768,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-20",
+      "itemId": 3769,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-21",
+      "itemId": 3770,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-22",
+      "itemId": 3771,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-23",
+      "itemId": 3772,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-24",
+      "itemId": 3773,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-25",
+      "itemId": 3774
+    },
+    {
+      "name": "folhagem-26",
+      "itemId": 3775
+    },
+    {
+      "name": "folhagem-27",
+      "itemId": 3776
+    },
+    {
+      "name": "folhagem-28",
+      "itemId": 3777
+    },
+    {
+      "name": "folhagem-29",
+      "itemId": 3778
+    },
+    {
+      "name": "folhagem-30",
+      "itemId": 3779
+    },
+    {
+      "name": "folhagem-31",
+      "itemId": 3780
+    },
+    {
+      "name": "folhagem-32",
+      "itemId": 3781
+    },
+    {
+      "name": "folhagem-33",
+      "itemId": 3782
+    },
+    {
+      "name": "folhagem-34",
+      "itemId": 3783
+    },
+    {
+      "name": "folhagem-35",
+      "itemId": 3784
+    },
+    {
+      "name": "folhagem-36",
+      "itemId": 3785
+    },
+    {
+      "name": "folhagem-37",
+      "itemId": 3786
+    },
+    {
+      "name": "folhagem-38",
+      "itemId": 3787
+    },
+    {
+      "name": "folhagem-39",
+      "itemId": 3788
+    },
+    {
+      "name": "folhagem-40",
+      "itemId": 3789
+    },
+    {
+      "name": "folhagem-41",
+      "itemId": 3790
+    },
+    {
+      "name": "folhagem-42",
+      "itemId": 3791
+    },
+    {
+      "name": "folhagem-43",
+      "itemId": 3792
+    },
+    {
+      "name": "folhagem-44",
+      "itemId": 3793
+    },
+    {
+      "name": "folhagem-45",
+      "itemId": 3794
+    },
+    {
+      "name": "folhagem-46",
+      "itemId": 3795
+    },
+    {
+      "name": "folhagem-47",
+      "itemId": 3796
+    },
+    {
+      "name": "folhagem-48",
+      "itemId": 3797
+    },
+    {
+      "name": "folhagem-49",
+      "itemId": 3798
+    },
+    {
+      "name": "folhagem-50",
+      "itemId": 3799
+    },
+    {
+      "name": "folhagem-51",
+      "itemId": 3800
+    },
+    {
+      "name": "folhagem-52",
+      "itemId": 3801
+    },
+    {
+      "name": "folhagem-53",
+      "itemId": 3802
+    },
+    {
+      "name": "folhagem-54",
+      "itemId": 3803
+    },
+    {
+      "name": "folhagem-55",
+      "itemId": 3804,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-56",
+      "itemId": 3805
+    },
+    {
+      "name": "folhagem-57",
+      "itemId": 3806
+    },
+    {
+      "name": "folhagem-58",
+      "itemId": 3807
+    },
+    {
+      "name": "folhagem-59",
+      "itemId": 3808,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-60",
+      "itemId": 3809
+    },
+    {
+      "name": "folhagem-61",
+      "itemId": 3810
+    },
+    {
+      "name": "folhagem-62",
+      "itemId": 3811
+    },
+    {
+      "name": "folhagem-63",
+      "itemId": 3812
+    },
+    {
+      "name": "folhagem-64",
+      "itemId": 3813
+    },
+    {
+      "name": "folhagem-65",
+      "itemId": 3814
+    },
+    {
+      "name": "folhagem-66",
+      "itemId": 3815
+    },
+    {
+      "name": "folhagem-67",
+      "itemId": 3816
+    },
+    {
+      "name": "folhagem-68",
+      "itemId": 3817
+    },
+    {
+      "name": "folhagem-69",
+      "itemId": 3818
+    },
+    {
+      "name": "folhagem-70",
+      "itemId": 3819
+    },
+    {
+      "name": "folhagem-71",
+      "itemId": 3820
+    },
+    {
+      "name": "folhagem-72",
+      "itemId": 3821
+    },
+    {
+      "name": "folhagem-73",
+      "itemId": 3822
+    },
+    {
+      "name": "folhagem-74",
+      "itemId": 3823
+    },
+    {
+      "name": "folhagem-75",
+      "itemId": 3824
+    },
+    {
+      "name": "folhagem-76",
+      "itemId": 3825
+    },
+    {
+      "name": "folhagem-77",
+      "itemId": 3826
+    },
+    {
+      "name": "folhagem-78",
+      "itemId": 3827,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-79",
+      "itemId": 3828,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-80",
+      "itemId": 3829
+    },
+    {
+      "name": "folhagem-81",
+      "itemId": 3830
+    },
+    {
+      "name": "folhagem-82",
+      "itemId": 3831
+    },
+    {
+      "name": "folhagem-83",
+      "itemId": 3832
+    },
+    {
+      "name": "folhagem-84",
+      "itemId": 3833
+    },
+    {
+      "name": "folhagem-85",
+      "itemId": 3834
+    },
+    {
+      "name": "folhagem-86",
+      "itemId": 3835
+    },
+    {
+      "name": "folhagem-87",
+      "itemId": 3836
+    },
+    {
+      "name": "folhagem-88",
+      "itemId": 3837
+    },
+    {
+      "name": "folhagem-89",
+      "itemId": 3838
+    },
+    {
+      "name": "folhagem-90",
+      "itemId": 3839
+    },
+    {
+      "name": "folhagem-91",
+      "itemId": 3840
+    },
+    {
+      "name": "folhagem-92",
+      "itemId": 3841
+    },
+    {
+      "name": "folhagem-93",
+      "itemId": 3842
+    },
+    {
+      "name": "folhagem-94",
+      "itemId": 3843
+    },
+    {
+      "name": "folhagem-95",
+      "itemId": 3844
+    },
+    {
+      "name": "folhagem-96",
+      "itemId": 3845
+    },
+    {
+      "name": "folhagem-97",
+      "itemId": 3846
+    },
+    {
+      "name": "folhagem-98",
+      "itemId": 3847
+    },
+    {
+      "name": "folhagem-99",
+      "itemId": 3848
+    },
+    {
+      "name": "folhagem-100",
+      "itemId": 3849
+    },
+    {
+      "name": "folhagem-101",
+      "itemId": 3850
+    },
+    {
+      "name": "folhagem-102",
+      "itemId": 3851
+    },
+    {
+      "name": "folhagem-103",
+      "itemId": 3852
+    },
+    {
+      "name": "folhagem-104",
+      "itemId": 3853
+    },
+    {
+      "name": "folhagem-105",
+      "itemId": 3854
+    },
+    {
+      "name": "folhagem-106",
+      "itemId": 3855
+    },
+    {
+      "name": "folhagem-107",
+      "itemId": 3856
+    },
+    {
+      "name": "folhagem-108",
+      "itemId": 3857
+    },
+    {
+      "name": "folhagem-109",
+      "itemId": 3858
+    },
+    {
+      "name": "folhagem-110",
+      "itemId": 3859
+    },
+    {
+      "name": "folhagem-111",
+      "itemId": 3860
+    },
+    {
+      "name": "folhagem-112",
+      "itemId": 3861
+    },
+    {
+      "name": "folhagem-113",
+      "itemId": 3862
+    },
+    {
+      "name": "folhagem-114",
+      "itemId": 3863
+    },
+    {
+      "name": "folhagem-115",
+      "itemId": 3864
+    },
+    {
+      "name": "folhagem-116",
+      "itemId": 3865
+    },
+    {
+      "name": "folhagem-117",
+      "itemId": 3866
+    },
+    {
+      "name": "folhagem-118",
+      "itemId": 3867
+    },
+    {
+      "name": "folhagem-119",
+      "itemId": 3868
+    },
+    {
+      "name": "folhagem-120",
+      "itemId": 3869
+    },
+    {
+      "name": "folhagem-121",
+      "itemId": 3870,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-122",
+      "itemId": 3871,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-123",
+      "itemId": 3872,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "folhagem-124",
+      "itemId": 3873,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-1",
+      "itemId": 14038,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-2",
+      "itemId": 14039,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-3",
+      "itemId": 14040,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-4",
+      "itemId": 14041,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-5",
+      "itemId": 14042,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-6",
+      "itemId": 14043,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-7",
+      "itemId": 14044,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-8",
+      "itemId": 14045,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-9",
+      "itemId": 14046,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-10",
+      "itemId": 14047,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-11",
+      "itemId": 14048,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-12",
+      "itemId": 14049,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-13",
+      "itemId": 14050,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-14",
+      "itemId": 14051,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-15",
+      "itemId": 14052,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-16",
+      "itemId": 14053,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-17",
+      "itemId": 14054,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-18",
+      "itemId": 14055,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-19",
+      "itemId": 14056,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-20",
+      "itemId": 14057,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-21",
+      "itemId": 14058,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-22",
+      "itemId": 14059,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-23",
+      "itemId": 14060,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "arbusto-24",
+      "itemId": 14061,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-1",
+      "itemId": 6719,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-2",
+      "itemId": 6719,
+      "patternY": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-3",
+      "itemId": 6719,
+      "patternY": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-4",
+      "itemId": 6720,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-5",
+      "itemId": 6720,
+      "patternX": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-6",
+      "itemId": 6720,
+      "patternX": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-7",
+      "itemId": 6721,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-8",
+      "itemId": 6721,
+      "patternX": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-9",
+      "itemId": 6722,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-10",
+      "itemId": 6722,
+      "patternX": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-11",
+      "itemId": 6723,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-12",
+      "itemId": 6723,
+      "patternX": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-13",
+      "itemId": 6724,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-14",
+      "itemId": 6725,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-15",
+      "itemId": 6726,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-16",
+      "itemId": 6727,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-17",
+      "itemId": 6728,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-18",
+      "itemId": 6728,
+      "patternY": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-19",
+      "itemId": 6728,
+      "patternY": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-20",
+      "itemId": 6729,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-21",
+      "itemId": 6729,
+      "patternX": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-22",
+      "itemId": 6729,
+      "patternX": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-23",
+      "itemId": 6730,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-24",
+      "itemId": 6731,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-25",
+      "itemId": 6732,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-26",
+      "itemId": 6733,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-27",
+      "itemId": 6734,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-28",
+      "itemId": 6735,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-29",
+      "itemId": 6736,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-30",
+      "itemId": 6737,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-31",
+      "itemId": 6738,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-32",
+      "itemId": 6739,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-33",
+      "itemId": 6740,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-34",
+      "itemId": 6741,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-35",
+      "itemId": 6742,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-36",
+      "itemId": 6743,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-37",
+      "itemId": 6744,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-38",
+      "itemId": 6745,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-39",
+      "itemId": 6746,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-40",
+      "itemId": 6747,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-41",
+      "itemId": 6748,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-42",
+      "itemId": 6749,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "parede-gelo-43",
+      "itemId": 6750
+    },
+    {
+      "name": "parede-gelo-44",
+      "itemId": 6751
+    },
+    {
+      "name": "parede-gelo-45",
+      "itemId": 6752
+    },
+    {
+      "name": "parede-gelo-46",
+      "itemId": 6753
+    },
+    {
+      "name": "gelo-espinho-1",
+      "itemId": 6810
+    },
+    {
+      "name": "gelo-espinho-2",
+      "itemId": 6811
+    },
+    {
+      "name": "gelo-espinho-3",
+      "itemId": 6812
+    },
+    {
+      "name": "gelo-espinho-4",
+      "itemId": 6813
+    },
+    {
+      "name": "gelo-espinho-5",
+      "itemId": 6814
+    },
+    {
+      "name": "gelo-espinho-6",
+      "itemId": 6815
+    },
+    {
+      "name": "gelo-espinho-7",
+      "itemId": 6816
+    },
+    {
+      "name": "gelo-espinho-8",
+      "itemId": 6817
+    },
+    {
+      "name": "gelo-espinho-9",
+      "itemId": 6818
+    },
+    {
+      "name": "gelo-espinho-10",
+      "itemId": 6819
+    },
+    {
+      "name": "gelo-espinho-11",
+      "itemId": 6820
+    },
+    {
+      "name": "gelo-espinho-12",
+      "itemId": 6821
+    },
+    {
+      "name": "gelo-espinho-13",
+      "itemId": 6822
+    },
+    {
+      "name": "gelo-espinho-14",
+      "itemId": 6822,
+      "patternY": 1
+    },
+    {
+      "name": "gelo-espinho-15",
+      "itemId": 6822,
+      "patternY": 2
+    },
+    {
+      "name": "gelo-espinho-16",
+      "itemId": 6823
+    },
+    {
+      "name": "gelo-espinho-17",
+      "itemId": 6823,
+      "patternX": 1
+    },
+    {
+      "name": "gelo-espinho-18",
+      "itemId": 6823,
+      "patternX": 2
+    },
+    {
+      "name": "gelo-espinho-19",
+      "itemId": 6824
+    },
+    {
+      "name": "gelo-espinho-20",
+      "itemId": 6825
+    },
+    {
+      "name": "gelo-espinho-21",
+      "itemId": 6826
+    },
+    {
+      "name": "gelo-espinho-22",
+      "itemId": 6827
+    },
+    {
+      "name": "gelo-espinho-23",
+      "itemId": 6828
+    },
+    {
+      "name": "gelo-espinho-24",
+      "itemId": 6829
+    },
+    {
+      "name": "gelo-espinho-25",
+      "itemId": 6830
+    },
+    {
+      "name": "gelo-espinho-26",
+      "itemId": 6831
+    },
+    {
+      "name": "gelo-espinho-27",
+      "itemId": 6832
+    },
+    {
+      "name": "gelo-espinho-28",
+      "itemId": 6833
+    },
+    {
+      "name": "gelo-espinho-29",
+      "itemId": 6834
+    },
+    {
+      "name": "gelo-espinho-30",
+      "itemId": 6835
+    },
+    {
+      "name": "gelo-espinho-31",
+      "itemId": 6836
+    },
+    {
+      "name": "gelo-espinho-32",
+      "itemId": 6837
+    },
+    {
+      "name": "pedregulho-1",
+      "itemId": 9502,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-2",
+      "itemId": 9503,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-3",
+      "itemId": 9504,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-4",
+      "itemId": 9505,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-5",
+      "itemId": 9506,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-6",
+      "itemId": 9507,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-7",
+      "itemId": 9508,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-8",
+      "itemId": 9509,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-9",
+      "itemId": 9510,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-10",
+      "itemId": 9511,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-11",
+      "itemId": 9512,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-12",
+      "itemId": 9513,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-13",
+      "itemId": 9514,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-14",
+      "itemId": 9515,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-15",
+      "itemId": 9516,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-16",
+      "itemId": 9517,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-17",
+      "itemId": 9518,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-18",
+      "itemId": 9519,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-19",
+      "itemId": 9520,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-20",
+      "itemId": 9521,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-21",
+      "itemId": 9522,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-22",
+      "itemId": 9523,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-23",
+      "itemId": 9524,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-24",
+      "itemId": 9525,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-25",
+      "itemId": 9526,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-26",
+      "itemId": 9527,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-27",
+      "itemId": 9528,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-28",
+      "itemId": 9529,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-29",
+      "itemId": 9530,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-30",
+      "itemId": 9531,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-31",
+      "itemId": 9532,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-32",
+      "itemId": 9533,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-33",
+      "itemId": 9534,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-34",
+      "itemId": 9535,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-35",
+      "itemId": 9536,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-36",
+      "itemId": 9537,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-37",
+      "itemId": 9538,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-38",
+      "itemId": 9539,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-39",
+      "itemId": 9540,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-40",
+      "itemId": 9541,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-41",
+      "itemId": 9542,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-42",
+      "itemId": 9543,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-43",
+      "itemId": 9544,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-44",
+      "itemId": 9545,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-45",
+      "itemId": 9546,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-46",
+      "itemId": 9547,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-47",
+      "itemId": 9548,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-48",
+      "itemId": 9549,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-49",
+      "itemId": 9550,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-50",
+      "itemId": 9551,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-51",
+      "itemId": 9552,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-52",
+      "itemId": 9553,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-53",
+      "itemId": 9554,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-54",
+      "itemId": 9555,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-55",
+      "itemId": 9556,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "pedregulho-56",
+      "itemId": 9557,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "bloco-rocha-1",
+      "itemId": 1914
+    },
+    {
+      "name": "bloco-rocha-2",
+      "itemId": 1915
+    },
+    {
+      "name": "bloco-rocha-3",
+      "itemId": 1916
+    },
+    {
+      "name": "bloco-rocha-4",
+      "itemId": 1917
+    },
+    {
+      "name": "bloco-rocha-5",
+      "itemId": 1918
+    },
+    {
+      "name": "bloco-rocha-6",
+      "itemId": 1919
+    },
+    {
+      "name": "bloco-rocha-7",
+      "itemId": 1920
+    },
+    {
+      "name": "bloco-rocha-8",
+      "itemId": 1921
+    },
+    {
+      "name": "bloco-rocha-9",
+      "itemId": 1922
+    },
+    {
+      "name": "bloco-rocha-10",
+      "itemId": 1923
+    },
+    {
+      "name": "bloco-rocha-11",
+      "itemId": 1924
+    },
+    {
+      "name": "bloco-rocha-12",
+      "itemId": 1925
+    },
+    {
+      "name": "bloco-rocha-13",
+      "itemId": 1926
+    },
+    {
+      "name": "bloco-rocha-14",
+      "itemId": 1927
+    },
+    {
+      "name": "bloco-rocha-15",
+      "itemId": 1928
+    },
+    {
+      "name": "bloco-rocha-16",
+      "itemId": 1929
+    },
+    {
+      "name": "bloco-rocha-17",
+      "itemId": 1930,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "bloco-rocha-18",
+      "itemId": 1931,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "bloco-rocha-19",
+      "itemId": 1932
+    },
+    {
+      "name": "bloco-rocha-20",
+      "itemId": 1933
+    },
+    {
+      "name": "bloco-rocha-21",
+      "itemId": 1934
+    },
+    {
+      "name": "bloco-rocha-22",
+      "itemId": 1935
+    },
+    {
+      "name": "bloco-rocha-23",
+      "itemId": 1936
+    },
+    {
+      "name": "bloco-rocha-24",
+      "itemId": 1937
+    },
+    {
+      "name": "bloco-rocha-25",
+      "itemId": 1938
+    },
+    {
+      "name": "bloco-rocha-26",
+      "itemId": 1939
+    },
+    {
+      "name": "bloco-rocha-27",
+      "itemId": 1940
+    },
+    {
+      "name": "bloco-rocha-28",
+      "itemId": 1941,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "bloco-rocha-29",
+      "itemId": 1942,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "bloco-rocha-30",
+      "itemId": 1943,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "bloco-rocha-31",
+      "itemId": 1944,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "bloco-rocha-32",
+      "itemId": 1945,
+      "slice": {
+        "cols": 2,
+        "rows": 1
+      }
+    },
+    {
+      "name": "bloco-rocha-33",
+      "itemId": 1946
+    },
+    {
+      "name": "grama-alta-1",
+      "itemId": 6159
+    },
+    {
+      "name": "grama-alta-2",
+      "itemId": 6160
+    },
+    {
+      "name": "grama-alta-3",
+      "itemId": 6161
+    },
+    {
+      "name": "grama-alta-4",
+      "itemId": 6162
+    },
+    {
+      "name": "grama-alta-5",
+      "itemId": 6163
+    },
+    {
+      "name": "grama-alta-6",
+      "itemId": 6164
+    },
+    {
+      "name": "grama-alta-7",
+      "itemId": 6165
+    },
+    {
+      "name": "grama-alta-8",
+      "itemId": 6166
+    },
+    {
+      "name": "grama-alta-9",
+      "itemId": 6167
+    },
+    {
+      "name": "grama-alta-10",
+      "itemId": 6168
+    },
+    {
+      "name": "grama-alta-11",
+      "itemId": 6169
+    },
+    {
+      "name": "grama-alta-12",
+      "itemId": 6170
     }
   ],
   "transitions": [

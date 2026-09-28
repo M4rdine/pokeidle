@@ -5,6 +5,7 @@ import { loadRegistry, parseHuntMap } from '@pokeidle/shared'
 import { buildAtlases } from './build-atlases.js'
 import { parseDat, type DatVersion } from './dat.js'
 import { extractAll } from './extract.js'
+import { lerMinimapa, pintarAndar } from './otmm.js'
 import { readJson } from './json-file.js'
 import { loadManifest } from './manifest.js'
 import { loadTilesAtlas, renderMapPreview } from './map-preview.js'
@@ -120,6 +121,32 @@ program
  * A folha que torna a curadoria possível: as peças agrupadas por corrida de ids contíguos, que no
  * Tibia é como as famílias de terreno foram autoradas. Ver `familias.ts`.
  */
+/*
+ * Transforma o minimapa do OTClient num PNG por andar. O `.otmm` é o mundo inteiro de um servidor,
+ * um byte de cor por tile — ver `otmm.ts`. O arquivo não vive no repositório: é material de origem,
+ * como o dump de sprites, e quem o tem aponta o caminho.
+ */
+program
+  .command('minimapa')
+  .argument('<arquivo>', 'caminho do .otmm')
+  .option('--out <dir>', 'pasta de saída', 'assets/minimapa')
+  .option('--andar <z>', 'só este andar; sem isto, todos os que o arquivo trouxer')
+  .action(async (arquivo: string, opts: { out: string; andar?: string }) => {
+    const mapa = lerMinimapa(await readFile(arquivo))
+    const andares = opts.andar !== undefined
+      ? [Number(opts.andar)]
+      : [...new Set(mapa.blocos.map((b) => b.z))].sort((a, b) => a - b)
+    out(`${mapa.descricao || 'minimapa'}: ${mapa.blocos.length} blocos, andares ${andares.join(', ')}`)
+    await mkdir(opts.out, { recursive: true })
+    for (const z of andares) {
+      const r = pintarAndar(mapa, z)
+      if (!r) continue
+      const caminho = join(opts.out, `andar-${z}.png`)
+      await writeFile(caminho, encodePng(r.imagem))
+      out(`  andar ${z}: ${r.imagem.width}x${r.imagem.height} em (${r.x},${r.y}) -> ${caminho}`)
+    }
+  })
+
 program
   .command('familias')
   .option('--extracted <dir>', 'pasta com PNGs extraídos e catalog.json', 'assets/extracted-otp2019')

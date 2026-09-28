@@ -62,3 +62,31 @@ imagens.
 nas pontas. Sem ele o texto branco do cartão cai em cima de céu azul claro. O cartão em si fica a
 92% de opacidade, **sem desfoque**: desfoque é o reflexo moderno para descolar um cartão do fundo,
 e aqui apagaria a única coisa que a arte tem.
+
+
+## `mapas/kanto.webp` — o mapa-múndi da escolha de destino
+
+**796×892 px, 138 KB, WebP SEM PERDA.** O mapa do mundo do servidor otPokemon, publicado por eles
+em `otponline.com/images/map/Kanto.png` — a mesma imagem que a página de mapa deles usa.
+
+### Por que sem perda, e não PNG indexado
+
+O arquivo tem 330 cores distintas: a paleta é chapada (catorze tons) mas as costas são
+antialiasadas, e é o alfa parcial delas que desenha o contorno do continente. Indexar em 64 cores
+caía para 71 KB e deixava de ser idêntico — serrilhava justamente a borda que dá a forma do mundo.
+O WebP sem perda é byte a byte igual ao original.
+
+### Por que ele substituiu o Town Map de 192×144
+
+O anterior era um esquema de marcos, não um mapa: cabia em qualquer lugar porque não tinha o que
+mostrar. Este tem litoral, montanha, cidade e floresta em cor chapada, que é o que deixa a escolha
+de destino ser sobre o MUNDO.
+
+### As posições dos marcadores
+
+As dezesseis áreas foram recolocadas por BUSCA DE TERRENO, não a olho: cada uma declara o tipo de
+chão que quer — grama, mata, rocha, areia, gelo, cidade — e o ponto é o pixel dessa cor mais
+próximo do alvo, respeitando distância mínima entre marcadores. O desvio máximo foi de 3,4 pontos
+percentuais. É por isso que o `local` de cada área agora DESCREVE onde ela está ("mata do planalto
+central") em vez de nomear um marco de Kanto: este é o mundo do servidor, e "Pallet" ou "Cerulean"
+seriam nomes de lugares que não existem nele.

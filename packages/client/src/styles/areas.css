@@ -127,26 +127,41 @@
 .mapa-aba.tab-active .mapa-aba-nivel { color: var(--selecao-texto); opacity: 0.8; }
 
 /* ── O mapa ──────────────────────────────────────────────────────────────────
- * O fundo é o Town Map oficial, 192×144 px de pixel art. Ele cabe inteiro em qualquer largura de
- * modal, e por isso não há zoom nem arraste: os dois existiam para um render de tileset cheio de
- * detalhe que não cabia, e sobre este mapa seriam dois controles sem para onde ir.
+ * O fundo é o mapa-múndi renderizado do servidor: 796×892 px, RETRATO. Ele substituiu o Town Map
+ * de 192×144 — que era um esquema de marcos, não um mapa: cabia em qualquer lugar porque não
+ * tinha o que mostrar.
  */
 .mapa { position: relative; line-height: 0; }
 /*
- * O mapa cabe INTEIRO na janela, sempre. Ele guarda a proporção 4:3 da arte e tem teto de altura;
+ * O mapa cabe INTEIRO na janela, sempre. Ele guarda a proporção da arte e tem teto de altura;
  * quando a janela é baixa, é a largura que cede e o mapa centraliza na coluna.
  *
  * Sem o teto, numa janela de 950 px o mapa ficava com 731 px de altura, o modal estourava o
- * `max-height` e o corpo rolava: metade de Kanto ficava abaixo da dobra, numa tela cujo trabalho
- * inteiro é mostrar Kanto de relance. Rolagem para ver um mapa é o mesmo que não mostrá-lo.
+ * `max-height` e o corpo rolava: metade do mundo ficava abaixo da dobra, numa tela cujo trabalho
+ * inteiro é mostrá-lo de relance. Rolagem para ver um mapa é o mesmo que não mostrá-lo.
+ *
+ * A PROPORÇÃO VIROU RETRATO e o teto subiu junto. Com 4:3 travado no CSS, o mapa novo apareceria
+ * esticado na horizontal — a arte tem 796×892, e a `aspect-ratio` é o único lugar que sabe disso.
  */
 .mapa-mundo {
   position: relative;
-  aspect-ratio: 192 / 144;
-  max-height: 58vh;
+  aspect-ratio: 796 / 892;
+  max-height: 72vh;
   width: auto; max-width: 100%;
   margin-inline: auto;
   border-radius: var(--raio-g);
+  /*
+   * O OCEANO É DESTA CAIXA, não da arte.
+   *
+   * O mapa vem com o mar TRANSPARENTE — é o alfa que desenha o contorno do continente, e é por
+   * isso que a extração o preserva. Sobre a tela de áreas, que tem a arte do mundo ao fundo, esse
+   * vazio virou um halo esbranquiçado em volta de cada ilha: dava para ver a placa e as árvores da
+   * arte-chave através do mar.
+   *
+   * A cor é a água funda da própria paleta do mapa (#1a344f), então o mar continua sendo do mesmo
+   * desenho — só deixa de ser um buraco.
+   */
+  background: #1a344f;
   /* A moldura vem do mesmo relevo do resto do sistema: o mapa é uma peça apoiada, não uma
    * imagem solta na página. */
   box-shadow: var(--relevo-1);
@@ -172,7 +187,7 @@
 .mapa-imagem {
   display: block; width: 100%; height: 100%;
   border-radius: var(--raio-g);
-  /* Pixel art sobe em degrau, nunca interpolada — 192 px de largura viram ~700 na tela. */
+  /* Pixel art sobe em degrau, nunca interpolada: o mapa é de tiles de 1 px por tile do mundo. */
   image-rendering: pixelated;
 }
 .mapa-marcadores { position: absolute; inset: 0; }

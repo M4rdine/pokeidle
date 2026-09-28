@@ -30,6 +30,15 @@ const BoundsSchema = z.object({
  * importador. Aqui ficam só os metadados que o navegador de áreas precisa para desenhar o
  * marcador e filtrar por tipo, nível e espécie.
  */
+/**
+ * Distância mínima entre dois marcadores, em pontos percentuais do mapa.
+ *
+ * O disco do marcador tem ~34 px sobre um mapa que ocupa ~600 px de largura na tela, ou seja ~5,7%
+ * de lado. Quatro pontos é o ponto em que dois discos ainda se distinguem — abaixo disso viram uma
+ * mancha só e a área de baixo deixa de ser clicável.
+ */
+const DISTANCIA_MINIMA_NO_MAPA = 4
+
 export const AreaSchema = z.object({
   id: kebab,
   name: z.string().min(1),
@@ -80,14 +89,27 @@ export const RegionSchema = z.object({
     if (a.bounds.x + a.bounds.width > r.width || a.bounds.y + a.bounds.height > r.height) {
       ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['areas', i], message: `área ${a.id} sai dos limites da região` })
     }
-    // Dois marcadores no mesmo ponto viram um só na tela, e a área de baixo fica inalcançável
-    // sem nada denunciando — o marcador some e ninguém procura o que nunca viu.
-    const chave = `${a.noMapa.x},${a.noMapa.y}`
-    const antes = pontos.get(chave)
-    if (antes !== undefined) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['areas', i], message: `${a.id} e ${antes} caem no mesmo ponto do mapa` })
+    /*
+     * Dois marcadores PERTO DEMAIS se sobrepõem na tela, e a área de baixo fica inalcançável sem
+     * nada denunciando — o marcador some e ninguém procura o que nunca viu.
+     *
+     * A conferência era de ponto IDÊNTICO, e isso só pegava o caso que ninguém comete: dois
+     * decimais iguais. O que acontece de verdade é `62.1, 46.1` e `62.4, 46.3`, que na tela são um
+     * disco em cima do outro. A distância mínima é em pontos percentuais, que é a unidade em que
+     * as posições são escritas.
+     */
+    for (const [chave, outra] of pontos) {
+      const [bx, by] = chave.split(',').map(Number) as [number, number]
+      const dist = Math.hypot(a.noMapa.x - bx, a.noMapa.y - by)
+      if (dist < DISTANCIA_MINIMA_NO_MAPA) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['areas', i],
+          message: `${a.id} e ${outra} ficam a ${dist.toFixed(1)} do mapa, abaixo do mínimo de ${DISTANCIA_MINIMA_NO_MAPA}`,
+        })
+      }
     }
-    pontos.set(chave, a.id)
+    pontos.set(`${a.noMapa.x},${a.noMapa.y}`, a.id)
   }
 })
 

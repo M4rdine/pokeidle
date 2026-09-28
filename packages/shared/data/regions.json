@@ -22,9 +22,9 @@
           "y": 18
         },
         "noMapa": {
-          "x": 22.7,
-          "y": 62,
-          "local": "Rota 1"
+          "x": 62.1,
+          "y": 46.1,
+          "local": "campo a leste do lago central"
         },
         "species": [
           "zubat",
@@ -54,9 +54,9 @@
           "y": 18
         },
         "noMapa": {
-          "x": 22.7,
-          "y": 46.9,
-          "local": "Mata de Viridian"
+          "x": 65.7,
+          "y": 28.1,
+          "local": "mata do planalto central"
         },
         "species": [
           "bellsprout",
@@ -85,9 +85,9 @@
           "y": 18
         },
         "noMapa": {
-          "x": 43.5,
-          "y": 30.2,
-          "local": "Rota 3, sopé do Monte Lua"
+          "x": 49.2,
+          "y": 25.3,
+          "local": "trilha da encosta norte"
         },
         "species": [
           "diglett",
@@ -115,9 +115,9 @@
           "y": 18
         },
         "noMapa": {
-          "x": 64.3,
-          "y": 30.2,
-          "local": "Cerulean"
+          "x": 54.3,
+          "y": 45.3,
+          "local": "margem do lago central"
         },
         "species": [
           "horsea",
@@ -145,9 +145,9 @@
           "y": 54
         },
         "noMapa": {
-          "x": 22.7,
-          "y": 74.7,
-          "local": "Pallet"
+          "x": 30.2,
+          "y": 34.0,
+          "local": "praia do arquipélago oeste"
         },
         "species": [
           "squirtle",
@@ -175,9 +175,9 @@
           "y": 54
         },
         "noMapa": {
-          "x": 68.5,
-          "y": 63.5,
-          "local": "Caverna do Diglett"
+          "x": 72.0,
+          "y": 29.9,
+          "local": "boca da serra leste"
         },
         "species": [
           "zubat",
@@ -205,9 +205,9 @@
           "y": 54
         },
         "noMapa": {
-          "x": 82,
-          "y": 48.3,
-          "local": "Lavender"
+          "x": 79.8,
+          "y": 25.7,
+          "local": "interior da serra leste"
         },
         "species": [
           "golbat",
@@ -234,9 +234,9 @@
           "y": 54
         },
         "noMapa": {
-          "x": 22.7,
-          "y": 35.8,
-          "local": "Pewter"
+          "x": 20.0,
+          "y": 12.8,
+          "local": "maciço do norte"
         },
         "species": [
           "rhydon",
@@ -274,9 +274,9 @@
           "y": 18
         },
         "noMapa": {
-          "x": 23.7,
-          "y": 92.7,
-          "local": "Mansão de Cinnabar"
+          "x": 13.9,
+          "y": 72.0,
+          "local": "grutas do sudoeste"
         },
         "species": [
           "arbok",
@@ -303,9 +303,9 @@
           "y": 18
         },
         "noMapa": {
-          "x": 81,
-          "y": 30.2,
-          "local": "Túnel Rocha"
+          "x": 85.1,
+          "y": 40.0,
+          "local": "túnel da serra leste"
         },
         "species": [
           "kabutops",
@@ -332,9 +332,9 @@
           "y": 18
         },
         "noMapa": {
-          "x": 57,
-          "y": 81.6,
-          "local": "Zona Safári"
+          "x": 44.0,
+          "y": 74.7,
+          "local": "planície do sul"
         },
         "species": [
           "exeggutor",
@@ -361,9 +361,9 @@
           "y": 18
         },
         "noMapa": {
-          "x": 82,
-          "y": 48.3,
-          "local": "Usina, na Rota 10"
+          "x": 60.1,
+          "y": 57.8,
+          "local": "cidade do sul"
         },
         "species": [
           "muk",
@@ -390,9 +390,9 @@
           "y": 54
         },
         "noMapa": {
-          "x": 39.3,
-          "y": 91.3,
-          "local": "Ilhas Espuma"
+          "x": 57.0,
+          "y": 7.0,
+          "local": "ilhas geladas do norte"
         },
         "species": [
           "kabutops",
@@ -419,9 +419,9 @@
           "y": 54
         },
         "noMapa": {
-          "x": 51.8,
-          "y": 46.9,
-          "local": "Celadon"
+          "x": 76.4,
+          "y": 91.8,
+          "local": "mata densa do sudeste"
         },
         "species": [
           "exeggutor",
@@ -448,9 +448,9 @@
           "y": 54
         },
         "noMapa": {
-          "x": 14.3,
-          "y": 35.8,
-          "local": "Estrada da Vitória"
+          "x": 75.8,
+          "y": 76.0,
+          "local": "montanha do sudeste"
         },
         "species": [
           "pidgeot",
@@ -477,9 +477,9 @@
           "y": 54
         },
         "noMapa": {
-          "x": 14.3,
-          "y": 30.2,
-          "local": "Planalto Índigo"
+          "x": 86.1,
+          "y": 3.8,
+          "local": "ilha deserta do nordeste"
         },
         "species": [
           "nidoking",

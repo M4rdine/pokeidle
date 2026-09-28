@@ -85,3 +85,58 @@ describe('onde uma espécie aparece', () => {
     expect(areasOfSpecies(registry.regions, 'nao-existe')).toEqual([])
   })
 })
+
+/**
+ * Os marcadores no mapa-múndi.
+ *
+ * O mapa deixou de ser o Town Map de 192×144 — um esquema de marcos, que cabia em qualquer lugar
+ * porque não tinha o que mostrar — e passou a ser o mundo renderizado do servidor, em 796×892. As
+ * dezesseis áreas foram recolocadas por busca de terreno, e estes casos seguram o que essa
+ * recolocação pode quebrar sem ninguém ver.
+ */
+describe('os marcadores no mapa', () => {
+  const regioes = [...loadRegistry().regions.values()]
+  const todos = regioes.flatMap((r) => r.areas.map((a) => ({ id: a.id, ...a.noMapa })))
+
+  it('toda área tem um ponto DENTRO do mapa', () => {
+    // A posição é percentual: fora de 0–100 o marcador é desenhado fora da moldura, e some.
+    expect(todos.length).toBeGreaterThan(0)
+    for (const m of todos) {
+      expect(m.x, m.id).toBeGreaterThanOrEqual(0)
+      expect(m.x, m.id).toBeLessThanOrEqual(100)
+      expect(m.y, m.id).toBeGreaterThanOrEqual(0)
+      expect(m.y, m.id).toBeLessThanOrEqual(100)
+    }
+  })
+
+  it('nenhum par de marcadores se sobrepõe, NA REGIÃO E ENTRE REGIÕES', () => {
+    /*
+     * O esquema confere dentro de cada região, e só. Kanto e Terras Altas dividem o MESMO mapa —
+     * as Terras Altas são a Kanto tardia —, então dois marcadores de regiões diferentes podem cair
+     * um sobre o outro sem o esquema reclamar. Na tela eles nunca aparecem juntos, mas duas áreas
+     * no mesmo ponto é sinal de que a recolocação errou.
+     */
+    const perto: string[] = []
+    for (let i = 0; i < todos.length; i++) {
+      for (let j = i + 1; j < todos.length; j++) {
+        const a = todos[i]!
+        const b = todos[j]!
+        const d = Math.hypot(a.x - b.x, a.y - b.y)
+        if (d < 4) perto.push(`${a.id} e ${b.id} a ${d.toFixed(1)}`)
+      }
+    }
+    expect(perto).toEqual([])
+  })
+
+  it('o rótulo DESCREVE o lugar, em vez de nomear marco de Kanto que não existe no mapa', () => {
+    /*
+     * O mapa é o mundo do servidor, não a Kanto dos jogos: não há Pallet nem Cerulean nele. O
+     * rótulo aparece no marcador ("Campo Inicial (campo a leste do lago central)"), e nomear ali um
+     * lugar que não está no desenho é mentir para quem está olhando o desenho.
+     */
+    const marcosDeKanto = /pallet|cerulean|pewter|celadon|lavender|viridian|cinnabar|rota \d/i
+    const mentindo = todos.filter((m) => marcosDeKanto.test(m.local)).map((m) => `${m.id}: ${m.local}`)
+    expect(mentindo).toEqual([])
+    for (const m of todos) expect(m.local.length, m.id).toBeGreaterThan(3)
+  })
+})

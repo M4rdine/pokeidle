@@ -18,7 +18,7 @@ import { fileURLToPath } from 'node:url'
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const DESTINO = join(RAIZ, 'tools', 'assets', 'ui', 'pokeapi')
-const BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items'
+const BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites'
 
 /**
  * Tudo que o acervo precisa ter, nos NOMES DA POKEAPI.
@@ -29,20 +29,33 @@ const BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/i
  * `ui-icones.ts`.
  */
 const SPRITES: readonly string[] = [
+  // Consumíveis e bolas do registro
   'potion', 'super-potion', 'hyper-potion',
   'poke-ball', 'great-ball', 'ultra-ball',
+  'revive', 'max-revive',
+  // Bolas situacionais: o bônus delas depende do estado da caçada, não de um número fixo
+  'quick-ball', 'dusk-ball', 'timer-ball', 'net-ball', 'nest-ball', 'repeat-ball', 'master-ball',
+  // Pedras: o segundo caminho de evolução, para as linhas que não evoluem por nível
+  'fire-stone', 'water-stone', 'thunder-stone', 'leaf-stone', 'moon-stone', 'sun-stone', 'everstone',
+  // Ícones de função da interface
   'town-map', 'berry-pouch', 'medal-box', 'coin-case', 'machine-part',
 ]
 
-async function baixar(nome: string): Promise<number> {
-  const res = await fetch(`${BASE}/${nome}.png`)
+/**
+ * As insígnias, por número. São dezesseis porque o jogo tem dezesseis áreas — oito por região —,
+ * e a numeração do acervo segue a ordem dos ginásios: 1 a 8 é Kanto, 9 a 16 é Johto.
+ */
+const INSIGNIAS: readonly number[] = Array.from({ length: 16 }, (_unused, i) => i + 1)
+
+async function baixar(nome: string, pasta = 'items'): Promise<number> {
+  const res = await fetch(`${BASE}/${pasta}/${nome}.png`)
   if (!res.ok) throw new Error(`${nome}: HTTP ${res.status}`)
   const bytes = new Uint8Array(await res.arrayBuffer())
   // Um PNG começa com a assinatura de oito bytes. Sem esta checagem, uma página de erro do
   // GitHub entraria no acervo como se fosse imagem e só quebraria na hora de decodificar.
   const assinatura = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
   if (!assinatura.every((b, i) => bytes[i] === b)) throw new Error(`${nome}: a resposta não é um PNG`)
-  await writeFile(join(DESTINO, `${nome}.png`), bytes)
+  await writeFile(join(DESTINO, `${pasta === 'items' ? '' : `${pasta}-`}${nome}.png`), bytes)
   return bytes.length
 }
 
@@ -52,7 +65,12 @@ async function main(): Promise<void> {
     const bytes = await baixar(nome)
     process.stdout.write(`${nome.padEnd(16)} ${String(bytes).padStart(6)} bytes\n`)
   }
-  process.stdout.write(`\n${SPRITES.length} sprites em ${DESTINO}\nAgora rode "pnpm icones".\n`)
+  for (const n of INSIGNIAS) {
+    const bytes = await baixar(String(n), 'badges')
+    process.stdout.write(`${`insígnia ${n}`.padEnd(16)} ${String(bytes).padStart(6)} bytes\n`)
+  }
+  const total = SPRITES.length + INSIGNIAS.length
+  process.stdout.write(`\n${total} sprites em ${DESTINO}\nAgora rode "pnpm icones".\n`)
 }
 
 main().catch((err: unknown) => {

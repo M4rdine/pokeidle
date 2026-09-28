@@ -230,6 +230,52 @@
 /* A luz de status fica no canto oposto à marca, fechando a barra. `margin-left: auto` e não uma
  * terceira coluna de grade: a grade do menu já se centraliza com vãos automáticos dos dois lados,
  * e uma coluna a mais desalinharia justamente o que ela centraliza. */
+/*
+ * ── Insígnias ──
+ *
+ * Dezesseis peças de 22 px em duas fileiras de oito — uma por área, na ordem em que o jogo as
+ * abre. A conquistada vem em cor cheia e levantada; a que falta fica APAGADA E DESSATURADA, não
+ * escondida: uma fileira que mostra só o que já se tem não diz quanto falta, e é o quanto falta
+ * que faz a próxima valer.
+ */
+.insignias-cabeca { margin-top: var(--space-1); }
+.insignias {
+  display: grid; grid-template-columns: repeat(8, 1fr); gap: var(--space-1);
+  padding: var(--space-2); border-radius: var(--raio-p);
+  background: var(--face-cava); box-shadow: var(--relevo-cava);
+}
+.insignia {
+  aspect-ratio: 1; min-width: 0;
+  background-repeat: no-repeat; background-position: center; background-size: contain;
+  image-rendering: pixelated;
+  /* A que falta é SILHUETA, não ausência: a forma continua lá para o olho reconhecer depois. */
+  filter: grayscale(1) brightness(0.45);
+  opacity: 0.6;
+  transition: filter var(--normal) ease-out, opacity var(--normal) ease-out;
+}
+/* O halo é de LATÃO, não do traço vivo: insígnia é estrutura de progresso, não estado vivo — e
+ * as duas cores desta casa têm trabalhos separados. */
+.insignia-ganha {
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--latao) 55%, transparent));
+  opacity: 1;
+}
+.insignia[data-n="1"] { background-image: url('./ui/insignia-1.png'); }
+.insignia[data-n="2"] { background-image: url('./ui/insignia-2.png'); }
+.insignia[data-n="3"] { background-image: url('./ui/insignia-3.png'); }
+.insignia[data-n="4"] { background-image: url('./ui/insignia-4.png'); }
+.insignia[data-n="5"] { background-image: url('./ui/insignia-5.png'); }
+.insignia[data-n="6"] { background-image: url('./ui/insignia-6.png'); }
+.insignia[data-n="7"] { background-image: url('./ui/insignia-7.png'); }
+.insignia[data-n="8"] { background-image: url('./ui/insignia-8.png'); }
+.insignia[data-n="9"] { background-image: url('./ui/insignia-9.png'); }
+.insignia[data-n="10"] { background-image: url('./ui/insignia-10.png'); }
+.insignia[data-n="11"] { background-image: url('./ui/insignia-11.png'); }
+.insignia[data-n="12"] { background-image: url('./ui/insignia-12.png'); }
+.insignia[data-n="13"] { background-image: url('./ui/insignia-13.png'); }
+.insignia[data-n="14"] { background-image: url('./ui/insignia-14.png'); }
+.insignia[data-n="15"] { background-image: url('./ui/insignia-15.png'); }
+.insignia[data-n="16"] { background-image: url('./ui/insignia-16.png'); }
+
 .estado-topo {
   display: flex; align-items: center; gap: var(--space-2);
   font-size: var(--t-xs); flex-shrink: 0; margin-left: auto;

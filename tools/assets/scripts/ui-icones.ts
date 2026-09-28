@@ -63,8 +63,19 @@ const DE_ASSUNTO: readonly { readonly nome: string; readonly item: string }[] = 
  */
 const DE_ITEM: readonly string[] = [
   'potion', 'super-potion', 'hyper-potion',
+  'revive', 'max-revive',
   'poke-ball', 'great-ball', 'ultra-ball',
+  'quick-ball', 'dusk-ball', 'timer-ball', 'net-ball', 'nest-ball', 'repeat-ball', 'master-ball',
+  'fire-stone', 'water-stone', 'thunder-stone', 'leaf-stone', 'moon-stone', 'sun-stone', 'everstone',
 ]
+
+/**
+ * As insígnias. Dezesseis, uma por área do jogo, na ordem dos ginásios do acervo.
+ *
+ * Elas são maiores que os ícones de item (até 5,7 KB contra 300 bytes) porque são arte de
+ * medalha, não sprite de inventário — e é justamente isso que as faz servir de troféu.
+ */
+const DE_INSIGNIA: readonly number[] = Array.from({ length: 16 }, (_unused, i) => i + 1)
 
 const DE_CONTROLE: readonly { readonly nome: string; readonly tile: number }[] = [
   { nome: 'mais', tile: 33 },
@@ -142,6 +153,18 @@ async function main(): Promise<void> {
     await writeFile(join(SAIDA, `item-${item}.png`), encodePng(decodePng(bruto)))
     process.stdout.write(`${item.padEnd(16)} item     oficial\n`)
   }
+
+  for (const n of DE_INSIGNIA) {
+    const origem = join(OFICIAIS, `badges-${n}.png`)
+    let bruto
+    try {
+      bruto = await readFile(origem)
+    } catch {
+      throw new Error(`falta a insígnia em ${origem}. Rode "pnpm icones-baixar" para trazer o acervo.`)
+    }
+    await writeFile(join(SAIDA, `insignia-${n}.png`), encodePng(decodePng(bruto)))
+  }
+  process.stdout.write(`${'insígnias'.padEnd(16)} oficial  ${DE_INSIGNIA.length}\n`)
 
   const folha = decodePng(await readFile(FOLHA_CONTROLE))
   for (const { nome, tile } of DE_CONTROLE) {

@@ -2,6 +2,7 @@ import { findArea } from '@pokeidle/shared'
 import type { AppContext } from '../../app-context.js'
 import { PokedexSchema } from '../../api/dto.js'
 import { trainerProgress } from '../../state/progress.js'
+import { insignias } from '../../state/insignias.js'
 import { huntPokedexCount } from '../../state/tips.js'
 import { el, escreverComPulso, pct } from '../dom.js'
 
@@ -31,6 +32,8 @@ export function mountPerfil(root: HTMLElement, ctx: AppContext): () => void {
   // O progresso do nível vem com os números ao lado da barra, e não só com a barra: "faltam
   // 1.894.076 xp" é uma informação; uma barra a 87 % é uma impressão.
   const xpTexto = el('span', { class: 'muted', 'data-xp-texto': '' }, '—')
+  const faixaInsignias = el('div', { class: 'insignias' })
+  const contagemInsignias = el('span', { class: 'cabeca-conta', 'data-insignias': '' }, '0/0')
 
   root.append(el('header', { class: 'perfil panel' },
     // A coluna da esquerda não tinha faixa de título em painel nenhum, enquanto a da direita
@@ -53,6 +56,15 @@ export function mountPerfil(root: HTMLElement, ctx: AppContext): () => void {
       el('div', { class: 'cartao-leitura cartao-ouro' }, el('span', {}, 'ouro'), gold),
       el('div', { class: 'cartao-leitura' }, areaNome, dex)),
     leitura(el('span', {}, 'próximo'), nextUnlock),
+    /*
+     * A FILEIRA DE INSÍGNIAS. É o único objeto de progresso da tela — o resto é número e barra,
+     * e número não dá a sensação de ter chegado a lugar nenhum.
+     *
+     * Ela fica sempre visível, com as não conquistadas apagadas: uma fileira que mostra só o que
+     * já se tem não diz quanto falta, e é o quanto falta que faz a próxima valer.
+     */
+    el('div', { class: 'cabeca insignias-cabeca' }, el('span', {}, 'insígnias'), contagemInsignias),
+    faixaInsignias,
     ))
 
   // O XP do treinador sobe durante a hunt: o espelho manda, o /me só serve enquanto não há hunt.
@@ -89,11 +101,28 @@ export function mountPerfil(root: HTMLElement, ctx: AppContext): () => void {
     areaNome.textContent = area.name
     dex.textContent = `${n}/${m}`
   }
+  const renderInsignias = (): void => {
+    const lista = insignias(ctx.registry.regions, entries, ctx.hunt.get().state?.settings.seen ?? [])
+    contagemInsignias.textContent = `${lista.filter((i) => i.conquistada).length}/${lista.length}`
+    faixaInsignias.replaceChildren(...lista.map((i) => el('span', {
+      class: i.conquistada ? 'insignia insignia-ganha' : 'insignia',
+      'data-n': String(i.numero),
+      // O título carrega o que falta: sem ele, a insígnia apagada é um enfeite cinza que não
+      // diz o que fazer para acendê-la.
+      title: i.conquistada
+        ? `${i.areaNome} (${i.regiaoNome}) — completa`
+        : `${i.areaNome} (${i.regiaoNome}) — ${i.capturados} de ${i.total} capturados`,
+    })))
+  }
+  // Desenha já, antes de a Pokédex chegar: a fileira nasce com as dezesseis apagadas, e não
+  // vazia. Vazia, ela apareceria de repente e o painel saltaria de altura ao carregar.
+  renderInsignias()
+
   // Engolir aqui deixava o mostrador em "—" para sempre, indistinguível de "ainda carregando".
   void loadEntries()
-    .then((loaded) => { entries = loaded; renderDex() })
+    .then((loaded) => { entries = loaded; renderDex(); renderInsignias() })
     .catch(() => { areaNome.textContent = 'área'; dex.textContent = '?'; dex.title = 'não foi possível ler a Pokédex' })
-  const offDex = ctx.hunt.subscribe((v) => v.state?.settings.seen, renderDex)
+  const offDex = ctx.hunt.subscribe((v) => v.state?.settings.seen, () => { renderDex(); renderInsignias() })
   // O estado do SISTEMA (socket e tique) saiu daqui para a barra superior, em `hud/estado.ts`:
   // ele não fala do treinador, fala do produto, e o lugar dele é o canto oposto à marca.
   return () => { offMe(); offXp(); offGold(); offDex() }

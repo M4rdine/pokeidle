@@ -18,11 +18,11 @@
  * A sanfona era a pior parte: abrir uma área empurrava as de baixo, então comparar duas exigia
  * fechar uma. O analisador agora é um painel fixo ao lado, que não empurra nada.
  */
-import type { AppContext, ModalName } from '../../../app-context.js'
+import type { AppContext } from '../../../app-context.js'
 import { PokedexSchema, StartHuntSchema, TeamSchema } from '../../../api/dto.js'
-import { MODAL_ICONS, MODAL_LABELS } from '../../../config.js'
 import { trainerProgress } from '../../../state/progress.js'
 import { el, mount } from '../../dom.js'
+import { mountMenu } from '../../hud/menu.js'
 import { escolherDestino, type DadosDoTreinador } from './escolher-destino.js'
 import type { AreaNoMapa } from './MapaRegiao.js'
 
@@ -54,34 +54,57 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
 
   const progresso = me ? trainerProgress(ctx.registry, me.trainer.xp) : null
 
-  /**
-   * As mesmas funções do menu do jogo. Sem caçada ativa não existe HUD, então SEM ISTO esta tela
-   * é um beco: o jogador que parou para comprar poção não tem por onde abrir a Loja. Foi o que
-   * aconteceu quando a tela foi reescrita — e quem pegou foi o smoke do Playwright, procurando o
-   * botão "Loja" depois de parar a caçada.
+  /*
+   * A classe no HOSPEDEIRO, porque é ele que pinta a arte do mundo ao fundo — a mesma da tela de
+   * jogo. Escolher onde caçar acontece DENTRO do mundo, não numa página sobre ele, e antes disso a
+   * tela era um retângulo cinza flutuando no vazio enquanto a do jogo tinha atmosfera: a troca
+   * entre as duas lia como troca de produto. Sai no desmonte, junto com o resto.
    */
-  const funcoes = el('nav', { class: 'menu panel', 'aria-label': 'Funções do jogo' },
-    el('div', { class: 'menu-grade' },
-      ...(Object.keys(MODAL_LABELS) as ModalName[]).map((modal) =>
-        el('button', { type: 'button', class: 'menu-item', 'data-open': modal, onclick: () => ctx.openModal?.(modal) },
-          el('span', { class: 'icone', 'data-icone': MODAL_ICONS[modal] }),
-          el('span', {}, MODAL_LABELS[modal])))))
+  root.classList.add('tela-areas')
+  /*
+   * A BARRA SUPERIOR É A MESMA DO JOGO, pelo mesmo componente — não uma cópia da marcação.
+   *
+   * Sem caçada ativa não existe HUD, e sem esta barra a tela é um beco: quem parou para comprar
+   * poção não tem por onde abrir a Loja. Foi o que aconteceu quando a tela foi reescrita, e quem
+   * pegou foi o smoke do Playwright procurando o botão "Loja".
+   *
+   * Ela era remontada À MÃO aqui, com a marcação antiga, e por isso saiu quebrada no dia em que a
+   * barra do jogo ganhou marca, status e moldura: a cópia não acompanhou o original. Chamar o
+   * componente é o que impede a próxima divergência.
+   *
+   * A barra fica FORA do que se redesenha. `render()` troca os filhos, e a barra tem assinatura
+   * viva (a luz de status) — redesenhá-la a cada clique vazaria uma assinatura por vez.
+   */
+  const barra = el('div', { class: 'areas-topo' })
+  const conteudo = el('div', { class: 'areas-conteudo' })
+  /*
+   * `replaceChildren` e não `append`: o hospedeiro é COMPARTILHADO entre as telas, e quem estava
+   * aqui antes é o "Carregando…" do arranque. Com `append` ele ficava pendurado acima da barra —
+   * o preço de trocar um `mount()`, que limpa, por uma montagem em duas partes.
+   */
+  root.replaceChildren(barra, conteudo)
+  const pararMenu = mountMenu(barra, ctx)
 
   function render(): void {
     if (primeira === undefined) {
-      mount(root, el('main', { class: 'screen screen-areas' }, el('p', { class: 'muted' }, 'Nenhuma região carregada.')))
+      mount(conteudo, el('main', { class: 'screen screen-areas' }, el('p', { class: 'muted' }, 'Nenhuma região carregada.')))
       return
     }
-    mount(root, el('main', { class: 'screen screen-areas' },
+    mount(conteudo, el('main', { class: 'screen screen-areas' },
       el('header', { class: 'area-head' },
-        el('h1', {}, 'Onde caçar'),
+        el('div', { class: 'area-titulo' },
+          el('h1', {}, 'Onde caçar'),
+          // Instrução, não enfeite: é a única linha da tela que explica como ela funciona, e o
+          // mapa não tem como dizer sozinho que os marcadores são clicáveis.
+          el('p', { class: 'area-dica' }, 'Aponte um marcador no mapa e confira o rendimento antes de sair.')),
+        // As mesmas leituras do painel do treinador, no mesmo componente: quem sai da caçada não
+        // pode achar que entrou noutro produto.
         progresso
-          ? el('p', { class: 'muted' },
-              `Nível ${progresso.level} · `,
-              el('span', { class: 'area-ouro' }, (me?.trainer.gold ?? 0).toLocaleString('pt-BR')),
-              ` de ouro · ${progresso.next?.what ?? 'tudo destravado'}`)
+          ? el('div', { class: 'area-leituras' },
+              el('div', { class: 'cartao-leitura' }, el('span', {}, 'nível'), el('span', {}, String(progresso.level))),
+              el('div', { class: 'cartao-leitura cartao-ouro' }, el('span', {}, 'ouro'), el('span', {}, (me?.trainer.gold ?? 0).toLocaleString('pt-BR'))),
+              el('div', { class: 'cartao-leitura' }, el('span', {}, 'próximo'), el('span', {}, progresso.next?.what ?? 'tudo destravado')))
           : null),
-      funcoes,
       escolherDestino({
         ctx, regiaoId, areaId, dados, erro, acao,
         aoTrocarRegiao: (id) => { regiaoId = id; areaId = null; erro = ''; render() },
@@ -106,5 +129,5 @@ export function mountAreas(root: HTMLElement, ctx: AppContext): () => void {
     render()
   })
 
-  return () => { root.replaceChildren() }
+  return () => { pararMenu(); root.classList.remove('tela-areas'); root.replaceChildren() }
 }

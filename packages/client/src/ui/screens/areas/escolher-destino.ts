@@ -80,11 +80,26 @@ export function escolherDestino(props: Props): HTMLElement {
   const temNaPokedex = (species: string): boolean => dados?.caught.includes(species) ?? false
   const nomeDoItem = (id: string): string => ctx.registry.items.get(id)?.name ?? id
 
+  /*
+   * O VAZIO É DESENHADO. Este painel acompanha a altura do mapa, então sem área escolhida ele era
+   * meio quilo de nada: 550 px de caixa com uma frase cinza no meio — e era o maior bloco da tela.
+   *
+   * O que ele mostra agora é o que ele VAI mostrar, em nome: XP, ouro e captura. Anunciar o
+   * conteúdo é o que transforma um painel ocioso em promessa, e é de graça — as três palavras são
+   * os cabeçalhos da tabela que aparece no lugar.
+   */
   const analise = escolhida === undefined
-    ? el('aside', { class: 'mapa-analise panel' },
+    ? el('aside', { class: 'mapa-analise panel cantoneiras' },
         el('p', { class: 'cabeca cabeca-barra' }, 'Analisador'),
-        el('p', { class: 'mapa-analise-vazio muted' }, 'Escolha uma área no mapa para ver o que ela rende.'))
-    : el('aside', { class: 'mapa-analise panel' },
+        el('div', { class: 'mapa-analise-vazio' },
+          el('span', { class: 'mapa-analise-marca', 'aria-hidden': 'true' }),
+          el('p', { class: 'mapa-analise-chamada' }, 'Escolha uma área no mapa'),
+          el('p', { class: 'muted' }, 'O analisador mede a área com o seu time de agora:'),
+          el('ul', { class: 'mapa-analise-promessa' },
+            el('li', {}, 'XP por derrota'),
+            el('li', {}, 'ouro por derrota'),
+            el('li', {}, 'chance de captura'))))
+    : el('aside', { class: 'mapa-analise panel cantoneiras' },
         el('div', { class: 'cabeca-barra mapa-analise-topo' },
           el('h3', {}, escolhida.name),
           el('span', { class: 'chip chip-nivel' }, `nv ${escolhida.minLevel}–${escolhida.maxLevel}`)),

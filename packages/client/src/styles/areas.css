@@ -14,10 +14,80 @@
  * de mundo visual depois de a madeira ter caído.
  */
 
+/* ── O mundo por trás ────────────────────────────────────────────────────────
+ * A MESMA ATMOSFERA DA TELA DE JOGO, arte e véu idênticos. Escolher onde caçar não é uma pausa
+ * fora do jogo: é a decisão mais importante que o jogo pede, e antes disso ela acontecia num
+ * retângulo cinza sobre o vazio enquanto a tela ao lado tinha mundo. Ir de uma para a outra lia
+ * como sair do produto e entrar num formulário.
+ *
+ * `fixed` pelo mesmo motivo de lá: o mundo está atrás de tudo e não desliza com a interface.
+ */
+.tela-areas {
+  display: flex; flex-direction: column; gap: var(--space-2);
+  min-height: 100vh; padding: var(--space-2);
+  background:
+    linear-gradient(180deg, rgb(11 15 26 / 78%), rgb(11 15 26 / 86%) 55%, rgb(11 15 26 / 92%)),
+    url('./arte/entrada.webp') center / cover no-repeat fixed,
+    var(--fundo);
+  image-rendering: pixelated;
+}
+/* A arte é ampliada por `pixelated`, e o conteúdo em cima dela NÃO é: sem isto, todo texto e todo
+ * relevo da tela herdavam a ampliação de vizinho mais próximo. */
+.tela-areas > * { image-rendering: auto; }
+.areas-conteudo { display: flex; flex-direction: column; min-width: 0; }
+
+/*
+ * Sem painel em volta: o mapa e o analisador JÁ SÃO peças com moldura, e uma caixa em volta das
+ * duas era caixa dentro de caixa — a mesma correção que a fileira do menu levou. O que a tela
+ * ganha é o mundo aparecendo entre as peças, como na do jogo.
+ */
 .screen-areas { max-width: 1180px; width: 100%; margin: 0 auto; }
-.area-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
+
+/* ── Cabeçalho ───────────────────────────────────────────────────────────────
+ * O título na voz de HUD e as leituras do treinador do outro lado, nos mesmos cartões do painel
+ * do perfil. Era um `h1` de tamanho de corpo com uma linha cinza colada embaixo dele: a tela mais
+ * decisiva do jogo abria sem ninguém anunciando.
+ *
+ * `baseline` não serve aqui: os dois lados têm mais de uma linha, e alinhar pela primeira
+ * encostava os cartões no topo do título. `end` apoia os dois na mesma base visual.
+ */
+.area-head { display: flex; align-items: end; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
+.area-titulo {
+  display: flex; flex-direction: column; gap: var(--space-1);
+  /* Base generosa: com `min-width: 0` a instrução era espremida pelos cartões e quebrava com uma
+   * palavra sozinha na última linha. */
+  flex: 1 1 420px; min-width: 0; position: relative;
+  padding-left: var(--space-3);
+}
+.area-head h1 {
+  margin: 0; font-family: var(--fonte-hud); font-size: var(--t-xl);
+  letter-spacing: 0.02em; line-height: 1.1;
+}
+/* A lâmina viva do cabeçalho de painel, no tamanho do título: é a marca que diz "aqui começa
+ * algo" em toda esta casa, e o título da tela é o lugar mais óbvio para ela.
+ *
+ * ELA É UM TALHO, NÃO UMA BARRA. Na altura da maiúscula inteira, afastada ou não, ela lia como
+ * uma barra inclinada e o título virava "/ Onde caçar" — um glifo, não um sinal. O que a faz ser
+ * marca é ser CURTA: metade da altura da letra, larga o bastante para ter peso, e centrada na
+ * altura do "O". É a mesma proporção da lâmina de 12 px sobre o cabeçalho de 11 px dos painéis. */
+.area-titulo::before {
+  content: ""; position: absolute; left: 0; top: 0.34em;
+  width: 5px; height: 0.5em;
+  transform: skewX(-14deg);
+  background: var(--vivo);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--vivo) 55%, transparent);
+}
+/* `66ch` porque a frase tem 64 caracteres: em 46 ela quebrava e deixava "sair." sozinho na
+ * segunda linha. `pretty` é o seguro para quando o texto mudar. */
+.area-dica {
+  margin: 0; color: var(--texto-fraco); font-size: var(--t-s);
+  max-width: 66ch; text-wrap: pretty;
+}
+.area-leituras { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+/* Os três cartões têm a MESMA largura mínima: é o que faz os números lerem como um painel de
+ * instrumentos em vez de três etiquetas de tamanhos diferentes. */
+.area-leituras .cartao-leitura { min-width: 104px; }
 .area-head .muted { margin: 0; }
-.area-ouro { color: var(--ouro); font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* ── A composição ────────────────────────────────────────────────────────────
  * O mapa manda na largura e o analisador fica com o que sobra, com piso: abaixo de 300 px a
@@ -167,16 +237,83 @@
  * Painel fixo ao lado do mapa. Não empurra nada e não muda de lugar conforme a área — era a
  * sanfona que fazia as duas coisas.
  */
+/*
+ * Cantoneiras em LATÃO, como as da barra de funções — não no vivo, que é o padrão do componente.
+ *
+ * A regra de cor desta casa: o latão é a MOLDURA do produto e o vivo marca o que está acontecendo
+ * agora. Um painel é moldura. No vivo, as quatro marcas ficavam em ciano forte ao lado de um mapa
+ * que já tem as suas, e as duas peças disputavam a mesma atenção sem nenhuma das duas estar
+ * acontecendo. Em latão elas concordam com a barra do topo, e o ciano fica só onde há vida: a
+ * lâmina do título, o fio do cabeçalho e os marcadores da promessa.
+ */
 .mapa-analise { padding: 0 0 var(--space-3); display: flex; flex-direction: column; min-width: 0; }
+.mapa-analise.cantoneiras::after { --cantoneira-cor: var(--latao); }
 .mapa-analise-topo { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
 .mapa-analise h3 { margin: 0; font-family: var(--fonte-hud); font-size: var(--t-l); }
+/*
+ * A AÇÃO É UM RODAPÉ, não um item da pilha.
+ *
+ * O painel acompanha a altura do mapa, então "Caçar aqui" ficava logo abaixo da nota e sobravam
+ * 200 px de painel vazio embaixo dele — o botão mais importante da tela, boiando no meio. Ancorado
+ * na base ele vira o trilho de confirmação que todo painel de jogo tem: a ação mora sempre no
+ * mesmo lugar, independente de a área ter quatro espécies ou dez.
+ *
+ * `margin-top: auto` só empurra quando SOBRA altura, então no modal — onde o painel tem a altura
+ * do conteúdo — nada muda.
+ */
 .mapa-analise-corpo {
+  flex: 1; min-height: 0;
   padding: var(--space-3) var(--space-3) 0;
   display: flex; flex-direction: column; gap: var(--space-3); align-items: flex-start;
 }
+.mapa-analise-corpo > .primary { margin-top: auto; align-self: stretch; }
 /* Sem área escolhida, o convite fica no meio da coluna: é o único conteúdo dela, e encostado no
  * topo parecia um painel esperando carregar. */
-.mapa-analise-vazio { margin: auto; padding: var(--space-3); text-align: center; max-width: 24ch; }
+/*
+ * ── O VAZIO DESENHADO ──
+ *
+ * Este painel acompanha a altura do mapa, então sem área escolhida ele eram 550 px de caixa com
+ * uma frase cinza no meio: o maior bloco da tela, e o único sem conteúdo. Agora ele ANUNCIA o que
+ * vai aparecer ali — que é a diferença entre um painel ocioso e uma promessa.
+ */
+.mapa-analise-vazio {
+  margin: auto; padding: var(--space-4) var(--space-3);
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-2);
+  text-align: center; max-width: 30ch;
+}
+/* O mesmo sprite do ícone do Mapa no menu, grande e recuado: a marca do que está faltando é o
+ * próprio objeto que resolve a falta — e é o ícone que o jogador acabou de ver no menu, o que faz
+ * a ligação sem precisar de legenda.
+ *
+ * SEM `grayscale`. Dessaturado e a 32% ele não virava um mapa apagado, virava uma PEDRA: o sprite
+ * é reconhecido pela cor da capa, e sem ela sobra a silhueta, que é um retângulo. Recuar é baixar
+ * a opacidade; apagar a cor é destruir o assunto. */
+.mapa-analise-marca {
+  width: 56px; height: 56px;
+  background: url('./ui/icone-mapa.png') center / contain no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.55;
+}
+.mapa-analise-chamada {
+  margin: 0; font-family: var(--fonte-hud); font-size: var(--t-l);
+  color: var(--texto);
+}
+.mapa-analise-vazio .muted { margin: 0; font-size: var(--t-s); }
+/*
+ * As três promessas são os CABEÇALHOS DA TABELA que aparece no lugar, em coluna e com o marcador
+ * vivo. Prometer o que não vem depois seria pior que não prometer nada, então a lista é literal.
+ */
+.mapa-analise-promessa {
+  list-style: none; margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: var(--space-1);
+  font-size: var(--t-s); color: var(--texto);
+}
+.mapa-analise-promessa li { display: flex; align-items: center; gap: var(--space-2); }
+.mapa-analise-promessa li::before {
+  content: ""; width: 4px; height: 4px; flex-shrink: 0;
+  transform: rotate(45deg);
+  background: color-mix(in srgb, var(--vivo) 75%, transparent);
+}
 .hunt-gate { margin: 0; color: var(--ouro); font-size: var(--t-s); font-weight: 700; }
 .area-missing { color: var(--ouro); font-size: var(--t-s); }
 

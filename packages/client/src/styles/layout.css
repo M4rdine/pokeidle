@@ -26,7 +26,13 @@ button, [role="button"], label:has(> input[type="checkbox"]) { min-height: var(-
  * página aparecendo só na margem. A tela do jogo é o caso oposto: lá cada painel é uma
  * superfície, e o fundo entre eles é o que os separa.
  */
-.screen:not(.game-grid):not(.screen-auth):not(.screen-starter) {
+/*
+ * A lista de exceções é a lista das telas que PINTAM O PRÓPRIO MUNDO: a do jogo, a entrada, a
+ * escolha do inicial e a de áreas. Numa quinta exceção esta regra deve virar o contrário — uma
+ * classe `.screen-folha` em quem quer a folha —, porque `:not()` empilhado deixa de dizer qual é
+ * o caso comum.
+ */
+.screen:not(.game-grid):not(.screen-auth):not(.screen-starter):not(.screen-areas) {
   background: var(--face-painel);
   border: var(--border-w) solid var(--borda);
   border-radius: var(--raio-g);

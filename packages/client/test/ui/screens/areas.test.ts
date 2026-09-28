@@ -138,6 +138,51 @@ describe('escolher onde caçar', () => {
     expect(funcoes).toContain('team')
   })
 
+  it('a barra do topo é a MESMA do jogo — marca e status inclusive, não uma cópia da fileira', () => {
+    /*
+     * O caso acima (`.menu-item`) não pega o que quebrou de verdade: a tela remontava a barra à
+     * mão, então no dia em que a do jogo ganhou marca à esquerda e status à direita, esta ficou
+     * com os seis botões flutuando no meio de uma moldura larga e dois vazios enormes. Os botões
+     * estavam todos lá — o teste passava, e a tela estava torta.
+     *
+     * Marca e status são justamente as partes que a cópia não tinha. Exigi-las aqui é exigir que
+     * a barra venha do COMPONENTE, porque reproduzi-las à mão de novo seria refazer o bug.
+     */
+    const root = montar()
+    expect(root.querySelector('.marca-topo')).not.toBeNull()
+    expect(root.querySelector('.estado-topo')).not.toBeNull()
+  })
+
+  it('a montagem limpa o hospedeiro: nada da tela anterior sobra por cima', () => {
+    // O hospedeiro é compartilhado entre as telas. Montando com `append` em vez de trocar os
+    // filhos, o "Carregando…" do arranque ficava pendurado acima da barra.
+    const root = document.createElement('div')
+    root.append(document.createElement('p'))
+    root.firstElementChild!.textContent = 'Carregando…'
+    mountAreas(root, ctxWith())
+    expect(root.textContent).not.toContain('Carregando…')
+  })
+
+  it('o desmonte devolve o hospedeiro como o encontrou, sem a classe do mundo', () => {
+    // A atmosfera é pintada por uma classe NO HOSPEDEIRO. Esquecer de tirá-la deixaria a arte de
+    // fundo por baixo da tela de jogo, que pinta a sua própria.
+    const root = document.createElement('div')
+    const parar = mountAreas(root, ctxWith())
+    expect(root.classList.contains('tela-areas')).toBe(true)
+    parar()
+    expect(root.classList.contains('tela-areas')).toBe(false)
+    expect(root.childElementCount).toBe(0)
+  })
+
+  it('o analisador vazio anuncia o que vai medir, em vez de ser um vão', () => {
+    // O painel acompanha a altura do mapa: sem área escolhida ele é o maior bloco da tela. As três
+    // promessas são os cabeçalhos da tabela que aparece no lugar — prometer outra coisa seria pior
+    // que não prometer nada.
+    const vazio = montar().querySelector('.mapa-analise-vazio')!
+    const promessas = [...vazio.querySelectorAll('.mapa-analise-promessa li')].map((li) => li.textContent)
+    expect(promessas).toEqual(['XP por derrota', 'ouro por derrota', 'chance de captura'])
+  })
+
   it('região sem área liberada pelo servidor não desenha mapa vazio: diz o que houve', () => {
     const root = montar({}, [])
     expect(root.querySelector('.mapa-imagem')).toBeNull()

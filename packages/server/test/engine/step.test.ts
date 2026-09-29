@@ -120,7 +120,18 @@ describe('returning e healing', () => {
 })
 
 describe('returning sem rota até o Centro', () => {
-  it('Centro cercado de selvagens para a hunt com stopped/no-route', () => {
+  it('Centro cercado de selvagens NÃO para a hunt: o bicho sai do caminho', () => {
+    /*
+     * Esta regra foi invertida de propósito, e a inversão veio de medir.
+     *
+     * Antes, selvagem contava como parede na volta ao Centro, e o motor encerrava com `no-route`.
+     * Nos mapas recortados do mundo OpenTibia isso virou desastre: num corredor de caverna não há
+     * desvio, um bicho na passagem zerava a rota e a caçada ACABAVA com o time inteiro de pé —
+     * três cavernas paravam assim, com uma derrota em dez minutos.
+     *
+     * Agora o caminho é traçado ignorando os selvagens, e quem resolve o encontro é o passo a
+     * passo: o jogador espera o bicho sair do tile, que é o que um jogador faria.
+     */
     const deps = miniDeps()
     const s = baseState({}, deps)
     const blockers = [
@@ -129,10 +140,20 @@ describe('returning sem rota até o Centro', () => {
     ]
     const st = { ...s, wilds: blockers, player: { ...s.player, mode: 'returning' as const } }
     const r = step(st, deps)
+    expect(r.events.some((e) => e.type === 'stopped')).toBe(false)
+    expect(r.state.player.mode).toBe('returning')
+  })
+
+  it('mas o isolamento GEOMÉTRICO ainda para: sem rota é sem rota', () => {
+    // O `no-route` continua existindo para o que ele sempre quis cobrir — parede, não bicho.
+    const deps = miniDeps()
+    const hunt = { ...deps.hunt, layers: { ...deps.hunt.layers, blocking: deps.hunt.layers.blocking.map((_, i) => i === 3 * 5 + 4 || i === 4 * 5 + 3) } }
+    const comParede = { ...deps, hunt }
+    const s = baseState({}, comParede)
+    const st = { ...s, wilds: [], player: { ...s.player, mode: 'returning' as const } }
+    const r = step(st, comParede)
     expect(r.events).toEqual([{ type: 'stopped', tick: 0, reason: 'no-route' }])
     expect(r.state.player.mode).toBe('stopped')
-    expect(r.state.player.targetWildId).toBeNull()
-    expect(r.state.player.path).toEqual([])
   })
 })
 

@@ -147,22 +147,32 @@ sem vínculo com elas. Se algum detentor de direito pedir a remoção de um asse
 
 O cenário tem DUAS origens, e vale dizer qual é qual.
 
-As áreas desenhadas pelo pipeline deste repositório — terreno, props, prédios e marcos — não usam
-nada de pack. O teste `cenario-publicado` trava isso sobre os mapas que o SERVIDOR ENTREGA, e não
-sobre a fonte do Tiled: recusa qualquer tile que não venha de conjunto, transição ou prop próprio.
-A prévia abaixo sai de `pnpm assets map-preview` e é composta só desse material:
+**Três áreas são desenhadas pelo pipeline deste repositório** — terreno, props, prédios e marcos —
+e não usam nada de pack. O teste `cenario-publicado` trava isso sobre os mapas que o SERVIDOR
+ENTREGA, e não sobre a fonte do Tiled: recusa qualquer tile que não venha de conjunto, transição
+ou prop próprio. A prévia abaixo sai de `pnpm assets map-preview` e é composta só desse material:
 
 ![Recorte do Campo Inicial: trilha, grama alta e o Centro Pokémon, tudo em arte gerada pelo projeto](docs/imagens/campo-inicial.webp)
 
-Já o **Pico Rochoso** — a caverna da primeira captura de tela — é um RECORTE do mapa de um servidor
-OpenTibia, desenhado com sprites do Tibia. Esses sprites são da CipSoft: não são arte própria, e o
-pedido de remoção vale para eles do mesmo jeito.
+**As outras treze são RECORTES do mapa de um servidor OpenTibia**, desenhadas com sprites do
+Tibia — sete cavernas dos andares 8 e 9, e seis de superfície do andar 7. Esses sprites são da
+CipSoft: não são arte própria, e o pedido de remoção vale para eles do mesmo jeito.
 
 Essa exceção é NOMEADA, não tolerada. O mesmo teste exige que a área de mapa externo use só tile do
 recorte — sem misturar arte própria — e que a lista dele bata exatamente com as áreas que declaram
 `origem: "otbm"` no arquivo. Converter mais uma área reprova o teste até alguém decidir declará-la,
 aqui e lá. Foi assim que este parágrafo deixou de poder envelhecer sozinho: o guarda anterior
-conferia o `.tmj` do Tiled, e ficou verde justamente quando esta área saiu de lá.
+conferia o `.tmj` do Tiled, e ficou verde justamente quando a primeira área saiu de lá.
+
+As três que ficaram desenhadas ficaram por motivo MEDIDO, não por esquecimento:
+
+- **`campo-inicial`** é a vitrine da arte própria — é ela na prévia acima;
+- **`praia-longa`** porque aquele mundo não tem praia: areia é **4% da superfície inteira** dele, e
+  o melhor recorte possível saiu uma costa de mato. Seria mentir no nome da área;
+- **`usina-velha`** porque o recorte a PIOROU. Ela já era o elo fraco do jogo por matchup, e com
+  caverna passou de 0,3 para 1,7 quedas por dez minutos. Trocar por uma caverna mais aberta levou a
+  4,7 — porque salão deixa quatro selvagens cercarem o jogador, e corredor só deixa um passar.
+  Converter era piorar, então ela ficou como estava.
 
 Quem clonar este repositório recebe o código inteiro e monta o próprio atlas com
 `pnpm assets build`, apontando para os assets que tiver. O código é do autor.

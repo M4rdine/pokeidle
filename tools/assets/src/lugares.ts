@@ -78,6 +78,13 @@ export const LIMITES_PADRAO: Limites = {
   /*
    * Abaixo de 25% o recorte é maciço de pedra e não se anda; acima de 70% é campo. A caverna
    * jogável do Tibia vive no meio, e é essa faixa que descreve "corredor com salas".
+   *
+   * O PISO É POR CAVERNA. Para recorte de SUPERFÍCIE ele precisa subir para perto de 0,55, e isso
+   * custou duas repescagens: a Trilha Pedregosa saiu com 367 células andáveis contra as 848 do
+   * mapa desenhado, e a mesma quantidade de selvagens em menos da metade do espaço dobrou a
+   * densidade — um Charmander nível 20 desmaiou quatro vezes numa área de nível 8–14. Em caverna
+   * isso não acontece porque CORREDOR É ESTREITO: só um ou dois bichos alcançam o jogador por vez.
+   * Em campo aberto, todos alcançam.
    */
   andavelMinimo: 0.25,
   andavelMaximo: 0.7,

@@ -89,7 +89,7 @@ async function main(): Promise<void> {
     layers: { ground: (string | null)[]; detail: (string | null)[]; blocking: boolean[]; canopy?: (string | null)[] }
     spawnPoint: { x: number; y: number }
     pokecenter: { x: number; y: number }
-    spawns: { x: number; y: number }[]
+    spawns: { x: number; y: number; radius: number }[]
   }
   const { width: largura, height: altura } = nosso
 
@@ -195,20 +195,88 @@ async function main(): Promise<void> {
    * existia olha o mapa desenhado no Tiled, e esta área já não vem de lá. Por isso agora há um
    * guarda sobre as áreas PUBLICADAS, em packages/shared.
    */
-  const andavel = (p: { x: number; y: number }): boolean => !blocking[p.y * largura + p.x]
+  /**
+   * A MAIOR ILHA ANDÁVEL, e tudo vai para dentro dela.
+   *
+   * Achar "o tile andável mais perto" não basta, e isso custou caro: no Bosque Denso a entrada
+   * caiu numa faixa de grama separada do resto por água, e o Centro Pokémon mais três dos quatro
+   * nascimentos foram parar do outro lado. O motor mandava o jogador atravessar o lago a pé, não
+   * conseguia, e a área rendeu 42 mil XP/h contra os 198 mil de antes — um quinto. Não dava erro
+   * em lugar nenhum: só um número feio na sonda de balanceamento e o guarda de caminhabilidade
+   * acusando três pontos inalcançáveis.
+   *
+   * Recortar um pedaço de mundo quase sempre parte a área em ilhas — margem de lago, os dois lados
+   * de um paredão. Escolher a maior e prender tudo nela é o que faz o recorte virar UM lugar.
+   */
+  const ilhas: number[][] = []
+  const deQualIlha = new Int32Array(largura * altura).fill(-1)
+  for (let i = 0; i < largura * altura; i++) {
+    if (blocking[i] || deQualIlha[i] !== -1) continue
+    const ilha: number[] = [i]
+    deQualIlha[i] = ilhas.length
+    for (let k = 0; k < ilha.length; k++) {
+      const atual = ilha[k]!
+      const ax = atual % largura
+      const ay = (atual / largura) | 0
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
+        const nx = ax + dx
+        const ny = ay + dy
+        if (nx < 0 || ny < 0 || nx >= largura || ny >= altura) continue
+        const j = ny * largura + nx
+        if (blocking[j] || deQualIlha[j] !== -1) continue
+        deQualIlha[j] = ilhas.length
+        ilha.push(j)
+      }
+    }
+    ilhas.push(ilha)
+  }
+  if (ilhas.length === 0) throw new Error('o recorte não tem um tile andável: escolha outro pedaço do mundo')
+  const maior = ilhas.reduce((a, b) => (b.length > a.length ? b : a))
+  const ilhaPrincipal = ilhas.indexOf(maior)
+
+  /** O ponto mais próximo DENTRO da ilha principal. */
   const primeiroAndavel = (de: { x: number; y: number }): { x: number; y: number } => {
-    if (andavel(de)) return de
+    const dentro = (p: { x: number; y: number }): boolean =>
+      p.x >= 0 && p.y >= 0 && p.x < largura && p.y < altura && deQualIlha[p.y * largura + p.x] === ilhaPrincipal
+    if (dentro(de)) return de
     for (let r = 1; r < Math.max(largura, altura); r++) {
       for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) {
         const p = { x: de.x + dx, y: de.y + dy }
-        if (p.x >= 0 && p.y >= 0 && p.x < largura && p.y < altura && andavel(p)) return p
+        if (dentro(p)) return p
       }
     }
     throw new Error('o recorte não tem um tile andável: escolha outro pedaço do mundo')
   }
 
-  const entrada = primeiroAndavel(nosso.spawnPoint)
-  const centro = primeiroAndavel(nosso.pokecenter)
+  /**
+   * A ENTRADA NÃO PODE NASCER DENTRO DO NINHO.
+   *
+   * O ponto antigo vem de um mapa que não é este, então "o andável mais próximo dele" não quer
+   * dizer nada — e na Caverna Funda deu no pior lugar possível: a entrada a um tile do ninho de
+   * quatro selvagens. O jogador nascia cercado, levava treze golpes em vinte e oito tiques e a
+   * caçada acabava em seis segundos. Medido contra o mapa desenhado, com o MESMO Pokémon e a MESMA
+   * IA: 172 derrotas e nenhuma queda lá, contra 1 derrota e time caído aqui. Não era a IA nem o
+   * nível — era onde ele nascia.
+   *
+   * Entrada e Centro passam a ser escolhidos, não herdados: o ponto da ilha principal mais longe
+   * de qualquer ninho, e o Centro o mais longe da entrada entre os igualmente seguros — para a ida
+   * ao Centro continuar sendo uma viagem, que é o custo que o desenho cobra por machucar.
+   */
+  const ninhos = nosso.spawns.map((sp) => ({ x: sp.x, y: sp.y, raio: sp.radius }))
+  const longeDeNinho = (i: number): number => {
+    const x = i % largura
+    const y = (i / largura) | 0
+    return ninhos.length === 0 ? 0 : Math.min(...ninhos.map((n) => Math.abs(n.x - x) + Math.abs(n.y - y) - n.raio))
+  }
+  const maisSeguro = maior.reduce((a, b) => (longeDeNinho(b) > longeDeNinho(a) ? b : a))
+  const entrada = { x: maisSeguro % largura, y: (maisSeguro / largura) | 0 }
+  /* O Centro vai para o ponto seguro mais distante da entrada: perto dela, voltar não custaria. */
+  const seguros = maior.filter((i) => longeDeNinho(i) >= 2)
+  const doCentro = seguros.reduce((a, b) => {
+    const d = (i: number) => Math.abs((i % largura) - entrada.x) + Math.abs(((i / largura) | 0) - entrada.y)
+    return d(b) > d(a) ? b : a
+  })
+  const centro = { x: doCentro % largura, y: (doCentro / largura) | 0 }
   // Realocados ANTES de mobiliar, senão reservá-los não protege nada: a pedra cairia em cima.
   const nascimentos = nosso.spawns.map(primeiroAndavel)
 

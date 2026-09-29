@@ -5968,6 +5968,1818 @@
         "cols": 2,
         "rows": 2
       }
+    },
+    {
+      "name": "otbm-2164",
+      "itemId": 2164,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-353-p20",
+      "itemId": 353,
+      "patternX": 2,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-353-p12",
+      "itemId": 353,
+      "patternX": 1,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-352-p03",
+      "itemId": 352,
+      "patternX": 0,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-352-p23",
+      "itemId": 352,
+      "patternX": 2,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-352-p33",
+      "itemId": 352,
+      "patternX": 3,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-352-p01",
+      "itemId": 352,
+      "patternX": 0,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-352-p11",
+      "itemId": 352,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-352",
+      "itemId": 352,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-352-p30",
+      "itemId": 352,
+      "patternX": 3,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-353-p31",
+      "itemId": 353,
+      "patternX": 3,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-353",
+      "itemId": 353,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-353-p11",
+      "itemId": 353,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-352-p32",
+      "itemId": 352,
+      "patternX": 3,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-353-p30",
+      "itemId": 353,
+      "patternX": 3,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-352-p10",
+      "itemId": 352,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-352-p21",
+      "itemId": 352,
+      "patternX": 2,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-353-p33",
+      "itemId": 353,
+      "patternX": 3,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-353-p01",
+      "itemId": 353,
+      "patternX": 0,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-353-p03",
+      "itemId": 353,
+      "patternX": 0,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-352-p31",
+      "itemId": 352,
+      "patternX": 3,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-353-p32",
+      "itemId": 353,
+      "patternX": 3,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-4708",
+      "itemId": 4708,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4712",
+      "itemId": 4712,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3683",
+      "itemId": 3683,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-353-p10",
+      "itemId": 353,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4687",
+      "itemId": 4687,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3693",
+      "itemId": 3693,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3687",
+      "itemId": 3687,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4693",
+      "itemId": 4693,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3696",
+      "itemId": 3696,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4742",
+      "itemId": 4742,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3685",
+      "itemId": 3685,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-353-p22",
+      "itemId": 353,
+      "patternX": 2,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-4701",
+      "itemId": 4701,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3689",
+      "itemId": 3689,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4686",
+      "itemId": 4686,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4692",
+      "itemId": 4692,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3691",
+      "itemId": 3691,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-353-p23",
+      "itemId": 353,
+      "patternX": 2,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-4689",
+      "itemId": 4689,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4739",
+      "itemId": 4739,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4698",
+      "itemId": 4698,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4680",
+      "itemId": 4680,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4740",
+      "itemId": 4740,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4743",
+      "itemId": 4743,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4691",
+      "itemId": 4691,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3688",
+      "itemId": 3688,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4697",
+      "itemId": 4697,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4705",
+      "itemId": 4705,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3694",
+      "itemId": 3694,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4684",
+      "itemId": 4684,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4688",
+      "itemId": 4688,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4744",
+      "itemId": 4744,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3690",
+      "itemId": 3690,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4738",
+      "itemId": 4738,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-353-p02",
+      "itemId": 353,
+      "patternX": 0,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-352-p13",
+      "itemId": 352,
+      "patternX": 1,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-352-p20",
+      "itemId": 352,
+      "patternX": 2,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-352-p22",
+      "itemId": 352,
+      "patternX": 2,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-353-p13",
+      "itemId": 353,
+      "patternX": 1,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-353-p21",
+      "itemId": 353,
+      "patternX": 2,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-352-p12",
+      "itemId": 352,
+      "patternX": 1,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-354-p22",
+      "itemId": 354,
+      "patternX": 2,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-354-p03",
+      "itemId": 354,
+      "patternX": 0,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-355-p23",
+      "itemId": 355,
+      "patternX": 2,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-355-p03",
+      "itemId": 355,
+      "patternX": 0,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-354",
+      "itemId": 354,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-355-p10",
+      "itemId": 355,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-354-p20",
+      "itemId": 354,
+      "patternX": 2,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-354-p31",
+      "itemId": 354,
+      "patternX": 3,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-355-p31",
+      "itemId": 355,
+      "patternX": 3,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-355-p21",
+      "itemId": 355,
+      "patternX": 2,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-354-p21",
+      "itemId": 354,
+      "patternX": 2,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-355-p32",
+      "itemId": 355,
+      "patternX": 3,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-354-p23",
+      "itemId": 354,
+      "patternX": 2,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-354-p13",
+      "itemId": 354,
+      "patternX": 1,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-352-p02",
+      "itemId": 352,
+      "patternX": 0,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-355-p22",
+      "itemId": 355,
+      "patternX": 2,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-354-p30",
+      "itemId": 354,
+      "patternX": 3,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-355-p20",
+      "itemId": 355,
+      "patternX": 2,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-355-p11",
+      "itemId": 355,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-354-p33",
+      "itemId": 354,
+      "patternX": 3,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-354-p10",
+      "itemId": 354,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-355-p01",
+      "itemId": 355,
+      "patternX": 0,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-355-p13",
+      "itemId": 355,
+      "patternX": 1,
+      "patternY": 3
+    },
+    {
+      "name": "otbm-354-p11",
+      "itemId": 354,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-354-p32",
+      "itemId": 354,
+      "patternX": 3,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-354-p02",
+      "itemId": 354,
+      "patternX": 0,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-355",
+      "itemId": 355,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4515",
+      "itemId": 4515,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4644",
+      "itemId": 4644,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4515-p10",
+      "itemId": 4515,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4635-p20",
+      "itemId": 4635,
+      "patternX": 2,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4635",
+      "itemId": 4635,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4635-p10",
+      "itemId": 4635,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4643",
+      "itemId": 4643,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3615",
+      "itemId": 3615,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4640",
+      "itemId": 4640,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4614",
+      "itemId": 4614,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4636-p02",
+      "itemId": 4636,
+      "patternX": 0,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-4515-p01",
+      "itemId": 4515,
+      "patternX": 0,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-4636",
+      "itemId": 4636,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4515-p11",
+      "itemId": 4515,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-4637",
+      "itemId": 4637,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4641",
+      "itemId": 4641,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3682",
+      "itemId": 3682,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4639",
+      "itemId": 4639,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4636-p01",
+      "itemId": 4636,
+      "patternX": 0,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-4821",
+      "itemId": 4821,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3653",
+      "itemId": 3653,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4822",
+      "itemId": 4822,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4633",
+      "itemId": 4633,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3619",
+      "itemId": 3619,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4633-p10",
+      "itemId": 4633,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4638",
+      "itemId": 4638,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4642",
+      "itemId": 4642,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4633-p20",
+      "itemId": 4633,
+      "patternX": 2,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3699",
+      "itemId": 3699,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3698",
+      "itemId": 3698,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3700",
+      "itemId": 3700,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3614",
+      "itemId": 3614,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3616",
+      "itemId": 3616,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3621",
+      "itemId": 3621,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3617",
+      "itemId": 3617,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3618",
+      "itemId": 3618,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3697",
+      "itemId": 3697,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3620",
+      "itemId": 3620,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3681",
+      "itemId": 3681,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4634-p02",
+      "itemId": 4634,
+      "patternX": 0,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-3622",
+      "itemId": 3622,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4634",
+      "itemId": 4634,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4634-p01",
+      "itemId": 4634,
+      "patternX": 0,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-3625",
+      "itemId": 3625,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3626",
+      "itemId": 3626,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4709",
+      "itemId": 4709,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4721",
+      "itemId": 4721,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3686",
+      "itemId": 3686,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4716",
+      "itemId": 4716,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4713",
+      "itemId": 4713,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3692",
+      "itemId": 3692,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3684",
+      "itemId": 3684,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4720",
+      "itemId": 4720,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4683",
+      "itemId": 4683,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4724",
+      "itemId": 4724,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4682",
+      "itemId": 4682,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4690",
+      "itemId": 4690,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4722",
+      "itemId": 4722,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4714",
+      "itemId": 4714,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4723",
+      "itemId": 4723,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3624",
+      "itemId": 3624,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3623",
+      "itemId": 3623,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4597",
+      "itemId": 4597,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4707",
+      "itemId": 4707,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4711",
+      "itemId": 4711,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-103-p10",
+      "itemId": 103,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4539",
+      "itemId": 4539,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-103-p20",
+      "itemId": 103,
+      "patternX": 2,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4531",
+      "itemId": 4531,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-103-p30",
+      "itemId": 103,
+      "patternX": 3,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4531-p10",
+      "itemId": 4531,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-103",
+      "itemId": 103,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4540",
+      "itemId": 4540,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4715",
+      "itemId": 4715,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-103-p11",
+      "itemId": 103,
+      "patternX": 1,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-4534",
+      "itemId": 4534,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-103-p21",
+      "itemId": 103,
+      "patternX": 2,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-103-p31",
+      "itemId": 103,
+      "patternX": 3,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-103-p01",
+      "itemId": 103,
+      "patternX": 0,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-4532",
+      "itemId": 4532,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-103-p12",
+      "itemId": 103,
+      "patternX": 1,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-4534-p01",
+      "itemId": 4534,
+      "patternX": 0,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-103-p22",
+      "itemId": 103,
+      "patternX": 2,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-103-p32",
+      "itemId": 103,
+      "patternX": 3,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-103-p02",
+      "itemId": 103,
+      "patternX": 0,
+      "patternY": 2
+    },
+    {
+      "name": "otbm-4532-p01",
+      "itemId": 4532,
+      "patternX": 0,
+      "patternY": 1
+    },
+    {
+      "name": "otbm-4535-p10",
+      "itemId": 4535,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4535",
+      "itemId": 4535,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4538-p10",
+      "itemId": 4538,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4542",
+      "itemId": 4542,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4719",
+      "itemId": 4719,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4541",
+      "itemId": 4541,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4533",
+      "itemId": 4533,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4537-p10",
+      "itemId": 4537,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4533-p10",
+      "itemId": 4533,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-1847",
+      "itemId": 1847,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-1848",
+      "itemId": 1848,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-1849",
+      "itemId": 1849,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-1850",
+      "itemId": 1850,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3629",
+      "itemId": 3629,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3630",
+      "itemId": 3630,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3748",
+      "itemId": 3748,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4536",
+      "itemId": 4536,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4537",
+      "itemId": 4537,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-1296",
+      "itemId": 1296,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-1283",
+      "itemId": 1283,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-1290",
+      "itemId": 1290,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-1734",
+      "itemId": 1734,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-1631",
+      "itemId": 1631,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4536-p10",
+      "itemId": 4536,
+      "patternX": 1,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-1301",
+      "itemId": 1301,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-1288",
+      "itemId": 1288,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-408",
+      "itemId": 408,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2541",
+      "itemId": 2541,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 1
+      }
+    },
+    {
+      "name": "otbm-2321",
+      "itemId": 2321,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2361",
+      "itemId": 2361,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-1739-p01",
+      "itemId": 1739,
+      "patternX": 0,
+      "patternY": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-1735",
+      "itemId": 1735,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2320",
+      "itemId": 2320,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-1628",
+      "itemId": 1628,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-1876",
+      "itemId": 1876,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2360",
+      "itemId": 2360,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2359",
+      "itemId": 2359,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-1301-p01",
+      "itemId": 1301,
+      "patternX": 0,
+      "patternY": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-1291",
+      "itemId": 1291,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-1877",
+      "itemId": 1877,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4538",
+      "itemId": 4538,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4703",
+      "itemId": 4703,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4681",
+      "itemId": 4681,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2171",
+      "itemId": 2171,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4710",
+      "itemId": 4710,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2172",
+      "itemId": 2172,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4718",
+      "itemId": 4718,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2177",
+      "itemId": 2177,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 1,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4518",
+      "itemId": 4518,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4528",
+      "itemId": 4528,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2120-p22",
+      "itemId": 2120,
+      "patternX": 2,
+      "patternY": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2120-p23",
+      "itemId": 2120,
+      "patternX": 2,
+      "patternY": 3,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4517",
+      "itemId": 4517,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2120-p10",
+      "itemId": 2120,
+      "patternX": 1,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3631",
+      "itemId": 3631,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2120-p01",
+      "itemId": 2120,
+      "patternX": 0,
+      "patternY": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2120-p11",
+      "itemId": 2120,
+      "patternX": 1,
+      "patternY": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3632",
+      "itemId": 3632,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3633",
+      "itemId": 3633,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3634",
+      "itemId": 3634,
+      "patternX": 0,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2120-p02",
+      "itemId": 2120,
+      "patternX": 0,
+      "patternY": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2120-p12",
+      "itemId": 2120,
+      "patternX": 1,
+      "patternY": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4523",
+      "itemId": 4523,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-4516",
+      "itemId": 4516,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2120-p32",
+      "itemId": 2120,
+      "patternX": 3,
+      "patternY": 2,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2120-p03",
+      "itemId": 2120,
+      "patternX": 0,
+      "patternY": 3,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2120-p13",
+      "itemId": 2120,
+      "patternX": 1,
+      "patternY": 3,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2120-p33",
+      "itemId": 2120,
+      "patternX": 3,
+      "patternY": 3,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4522",
+      "itemId": 4522,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2120-p30",
+      "itemId": 2120,
+      "patternX": 3,
+      "patternY": 0,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-4527",
+      "itemId": 4527,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2120-p21",
+      "itemId": 2120,
+      "patternX": 2,
+      "patternY": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-2120-p31",
+      "itemId": 2120,
+      "patternX": 3,
+      "patternY": 1,
+      "slice": {
+        "cols": 2,
+        "rows": 2
+      }
+    },
+    {
+      "name": "otbm-3627",
+      "itemId": 3627,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3628",
+      "itemId": 3628,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3108",
+      "itemId": 3108,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3109",
+      "itemId": 3109,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2002",
+      "itemId": 2002,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3113",
+      "itemId": 3113,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3116",
+      "itemId": 3116,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3107",
+      "itemId": 3107,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2892",
+      "itemId": 2892,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3112",
+      "itemId": 3112,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-2003",
+      "itemId": 2003,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3117",
+      "itemId": 3117,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3114-p20",
+      "itemId": 3114,
+      "patternX": 2,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3111",
+      "itemId": 3111,
+      "patternX": 0,
+      "patternY": 0
+    },
+    {
+      "name": "otbm-3104",
+      "itemId": 3104,
+      "patternX": 0,
+      "patternY": 0
     }
   ],
   "transitions": [

@@ -148,7 +148,22 @@ function returning(state: HuntState, deps: EngineDeps): StepResult {
     if (next && isWalkable(state, deps.hunt, next)) return advance(state, next, rest)
     return idle(withPlayer(state, { path: [] }))
   }
+  /*
+   * SELVAGEM NÃO É PAREDE, e tratá-lo como parede encerrava a caçada.
+   *
+   * O caminho de volta é traçado desviando dos selvagens, o que é certo enquanto houver desvio.
+   * Num corredor de caverna não há: um bicho na passagem zerava a rota, o motor dava
+   * `no-route` e a hunt ACABAVA com o time inteiro de pé. Medido nos mapas novos: três cavernas
+   * paravam assim, com uma derrota em dez minutos.
+   *
+   * A segunda tentativa ignora os selvagens. O caminho passa a existir, e quem resolve o encontro
+   * é o passo a passo: `isWalkable` vê o bicho no próximo tile e o jogador espera ele sair — que é
+   * o que um jogador faria. Parar de verdade fica para o isolamento GEOMÉTRICO, que é o caso que
+   * `stopNoRoute` existe para cobrir.
+   */
+  const semSelvagens = (p: Point): boolean => blockedAt(deps.hunt, p)
   const path = pathTo(state, deps, center, atCenter, null)
+    ?? findPath({ from: state.player.position, target: center, isBlocked: semSelvagens, isGoal: atCenter, width: deps.hunt.width, height: deps.hunt.height })
   if (path === null) return stopNoRoute(state)
   const [next, ...rest] = path
   if (!next || !isWalkable(state, deps.hunt, next)) return idle(withPlayer(state, { path: [] }))

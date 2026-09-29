@@ -28,8 +28,26 @@ const HUNTS = join('..', '..', 'packages', 'shared', 'data', 'hunts')
  * quais áreas usam sprite de terceiro, e essa lista tem que continuar batendo com esta. É por isso
  * que o teste exige igualdade exata, e não "contém" — uma área nova de mapa externo reprova até
  * alguém decidir declará-la nos dois lugares.
+ *
+ * TRÊS ÁREAS FICARAM DE FORA, cada uma por um motivo medido:
+ *
+ *  - `campo-inicial` é a vitrine da arte própria — é ela que o README mostra para provar que o
+ *    pipeline desenha cenário;
+ *  - `praia-longa` porque o mundo OpenTibia não TEM praia: areia é 4% da superfície inteira dele,
+ *    e o melhor recorte possível saiu uma costa de mato. Seria mentir no nome da área;
+ *  - `usina-velha` porque o recorte a PIOROU. Ela já era o elo fraco do jogo por matchup, e com
+ *    caverna passou de 0,3 para 1,7 quedas por dez minutos. Trocar por uma caverna mais aberta
+ *    levou a 4,7 — porque salão deixa quatro selvagens cercarem, e corredor só deixa um passar.
+ *    Converter era piorar, então ela ficou como estava.
  */
-const DE_MAPA_EXTERNO: ReadonlySet<string> = new Set(['pico-rochoso'])
+const DE_MAPA_EXTERNO: ReadonlySet<string> = new Set([
+  // Sete cavernas, dos andares 8 e 9 do mundo OpenTibia.
+  'pico-rochoso', 'entrada-da-caverna', 'caverna-funda', 'gruta-umida',
+  'tunel-rocha', 'trilha-da-vitoria', 'cume-indigo',
+  // Seis de superfície, do andar 7.
+  'bosque-denso', 'mata-fechada', 'campo-safari', 'trilha-pedregosa',
+  'margem-do-lago', 'ilhas-espuma',
+])
 
 interface Hunt {
   readonly id: string

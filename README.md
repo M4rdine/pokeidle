@@ -137,7 +137,7 @@ Se quiser uma ideia do que fazer, as specs em `docs/superpowers/specs/` terminam
 
 ## Licença dos assets
 
-Os sprites de Pokémon vêm de um pack de fã. O **atlas servido ao navegador** (4 arquivos, 2,4 MB,
+Os sprites de Pokémon vêm de um pack de fã. O **atlas servido ao navegador** (6 arquivos, 1,8 MB,
 em `packages/server/public/atlas`) está versionado: sem ele quem clona não consegue rodar o jogo,
 e um projeto aberto a PR precisa ser "clonou, rodou". O **dump bruto de 647 MB** continua fora, em
 `assets/` — é material de origem, e nada no build precisa dele depois que o atlas existe.

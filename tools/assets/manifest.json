@@ -7782,6 +7782,98 @@
       "patternY": 0
     }
   ],
+  "golpes": [
+    {
+      "type": "normal",
+      "projetil": 68,
+      "efeito": 19
+    },
+    {
+      "type": "fire",
+      "projetil": 4,
+      "efeito": 6
+    },
+    {
+      "type": "water",
+      "projetil": 3,
+      "efeito": 50
+    },
+    {
+      "type": "grass",
+      "projetil": 48,
+      "efeito": 46
+    },
+    {
+      "type": "electric",
+      "projetil": 40,
+      "efeito": 49
+    },
+    {
+      "type": "ice",
+      "projetil": 65,
+      "efeito": 44
+    },
+    {
+      "type": "rock",
+      "projetil": 12,
+      "efeito": 27
+    },
+    {
+      "type": "ground",
+      "projetil": 61,
+      "efeito": 45
+    },
+    {
+      "type": "flying",
+      "projetil": 52,
+      "efeito": 43
+    },
+    {
+      "type": "bug",
+      "projetil": 69,
+      "efeito": 21
+    },
+    {
+      "type": "poison",
+      "projetil": 67,
+      "efeito": 54
+    },
+    {
+      "type": "psychic",
+      "projetil": 76,
+      "efeito": 48
+    },
+    {
+      "type": "ghost",
+      "projetil": 19,
+      "efeito": 18
+    },
+    {
+      "type": "dark",
+      "projetil": 27,
+      "efeito": 10
+    },
+    {
+      "type": "fighting",
+      "projetil": 11,
+      "efeito": 5
+    },
+    {
+      "type": "dragon",
+      "projetil": 71,
+      "efeito": 36
+    },
+    {
+      "type": "steel",
+      "projetil": 78,
+      "efeito": 2
+    },
+    {
+      "type": "fairy",
+      "projetil": 62,
+      "efeito": 14
+    }
+  ],
   "transitions": [
     {
       "name": "grama-terra",

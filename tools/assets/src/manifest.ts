@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { parseOrThrow } from '@pokeidle/shared'
+import { parseOrThrow, TYPE_NAMES } from '@pokeidle/shared'
 import type { Catalog } from './catalog.js'
 import { readJson } from './json-file.js'
 import { sliceName } from './tile-slice.js'
@@ -90,10 +90,29 @@ const PropSchema = z.object({
   tolerance: z.number().int().min(0).max(80).optional(),
 }).strict()
 
+/**
+ * A animação de um TIPO de golpe: o que viaja e o que estoura.
+ *
+ * O `.dat` traz 658 efeitos e 89 projéteis sem nome nenhum — só número. Mapear golpe a golpe
+ * seriam 91 escolhas feitas a olho; mapear por TIPO são dezesseis, e tipo já é o que governa cor,
+ * dano e vantagem no jogo inteiro. Os golpes icônicos podem ganhar entrada própria depois; a
+ * tabela por tipo cobre todos de uma vez, e é o que faz a Brasa parecer brasa hoje.
+ *
+ * `projetil` é o que atravessa a tela, e só aparece em golpe de alcance; `efeito` estoura no alvo
+ * e vale para os dois. Qualquer um dos dois pode faltar — golpe de contato não precisa de projétil.
+ */
+const AnimacaoDeTipoSchema = z.object({
+  type: z.enum(TYPE_NAMES),
+  projetil: z.number().int().positive().optional(),
+  efeito: z.number().int().positive().optional(),
+}).strict()
+
 export const ManifestSchema = z.object({
   version: z.literal(1),
   species: z.array(SpeciesSchema),
   tiles: z.array(TileSchema),
+  /** Ver `AnimacaoDeTipoSchema`. Ausente, o cliente cai no desenho genérico. */
+  golpes: z.array(AnimacaoDeTipoSchema).optional(),
   terrains: z.array(TerrainSchema).optional(),
   transitions: z.array(TransitionSchema).optional(),
   terrainSets: z.array(TerrainSetSchema).optional(),

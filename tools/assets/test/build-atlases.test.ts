@@ -22,6 +22,8 @@ const catalog: Catalog = {
     { id: 102, width: 1, height: 1, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false, isSplash: false, isCorpse: false, isContainer: false, isNotPathable: false, hasLight: false },
     { id: 103, width: 1, height: 1, patternX: 1, patternY: 1, phases: 3, isGround: true, isBlocking: false, isSplash: false, isCorpse: false, isContainer: false, isNotPathable: false, hasLight: false },
   ],
+  effects: [],
+  missiles: [],
 }
 
 async function writePng(path: string, w: number, h: number, v: number): Promise<void> {

@@ -1,10 +1,11 @@
 import { access, copyFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { efeitoAnimName, projetilFrameName } from '@pokeidle/shared'
 import { aoQuadradoNoGrupo } from './apertar-quadros.js'
 import { packGrid, toTiledTileset, type AtlasFrame, type TerrainInput } from './atlas.js'
 import type { Catalog, CatalogOutfit } from './catalog.js'
 import { DIRECTION_NAMES, type RgbaImage } from './compose.js'
-import { itemFramePath, loadCatalog, outfitFramePath, type Logger } from './extract.js'
+import { efeitoFramePath, itemFramePath, loadCatalog, outfitFramePath, projetilFramePath, type Logger } from './extract.js'
 import { expandedTileNames, loadManifest, validateManifest, type Manifest, type PropEntry, type SpeciesEntry, type TerrainSetEntry, type TileEntry, type TransitionEntry } from './manifest.js'
 import { decodePng, encodePng } from './png.js'
 import { isPhaseFrame, phaseFrameName, phaseFrameNames } from './tile-animation.js'
@@ -20,7 +21,7 @@ export interface BuildOptions {
   readonly outDir: string
   /**
    * Para onde publicar a cópia que o servidor entrega ao navegador. O build escreve o atlas de
-   * trabalho em `outDir` (com o `.tsj` que o Tiled usa) e publica aqui os quatro arquivos da
+   * trabalho em `outDir` (com o `.tsj` que o Tiled usa) e publica aqui os arquivos da
    * allowlist. Sem isso a cópia servida congela na última vez que alguém lembrou de copiar à
    * mão, e o jogo desenha um mapa com metade dos tiles faltando.
    */
@@ -277,11 +278,61 @@ async function writeAtlas(
   baseName: string,
   frames: readonly AtlasFrame[],
   animations?: Readonly<Record<string, readonly string[]>>,
+  /** Vai junto no `meta` da folha. É por onde a tabela de golpe por tipo chega ao cliente. */
+  extraMeta?: Readonly<Record<string, unknown>>,
 ): Promise<ReturnType<typeof packGrid>> {
   const packed = packGrid(frames, `${baseName}.png`, 0, animations)
+  const sheet = extraMeta === undefined ? packed.sheet : { ...packed.sheet, meta: { ...packed.sheet.meta, ...extraMeta } }
   await writeFile(join(outDir, `${baseName}.png`), encodePng(packed.image))
-  await writeFile(join(outDir, `${baseName}.json`), JSON.stringify(packed.sheet, null, 2))
+  await writeFile(join(outDir, `${baseName}.json`), JSON.stringify(sheet, null, 2))
   return packed
+}
+
+/**
+ * Os quadros das ANIMAÇÕES DE GOLPE: o que viaja e o que estoura.
+ *
+ * O projétil tem OITO DIREÇÕES — o `.dat` guarda um padrão 3×3 e o cliente escolhe a célula pelo
+ * sinal do deslocamento —, e o efeito tem fases. Por isso o projétil vira um quadro por direção e
+ * o efeito vira uma animação, do mesmo jeito que um tile animado.
+ *
+ * Um id repetido entre tipos entra UMA VEZ: vários tipos podem compartilhar o mesmo estouro, e
+ * empacotar o mesmo desenho duas vezes só engorda o que o navegador baixa.
+ */
+async function golpeFrames(
+  extractedDir: string,
+  golpes: NonNullable<Manifest['golpes']>,
+  catalog: Catalog,
+): Promise<{ frames: AtlasFrame[]; animations: Record<string, string[]> }> {
+  const frames: AtlasFrame[] = []
+  const animations: Record<string, string[]> = {}
+  const feitos = new Set<string>()
+
+  for (const g of golpes) {
+    if (g.projetil !== undefined && !feitos.has(`p${g.projetil}`)) {
+      feitos.add(`p${g.projetil}`)
+      const info = catalog.missiles.find((m) => m.id === g.projetil)
+      if (!info) throw new Error(`golpe ${g.type}: projétil ${g.projetil} não existe no catálogo`)
+      for (let px = 0; px < info.directions; px++) {
+        for (let py = 0; py < info.directions; py++) {
+          const caminho = projetilFramePath(extractedDir, g.projetil, px, py)
+          frames.push({ name: projetilFrameName(g.projetil, px, py), image: decodePng(await readFile(caminho)) })
+        }
+      }
+    }
+    if (g.efeito !== undefined && !feitos.has(`e${g.efeito}`)) {
+      feitos.add(`e${g.efeito}`)
+      const info = catalog.effects.find((e) => e.id === g.efeito)
+      if (!info) throw new Error(`golpe ${g.type}: efeito ${g.efeito} não existe no catálogo`)
+      const nomes: string[] = []
+      for (let fase = 0; fase < info.phases; fase++) {
+        const nome = `efeito-${g.efeito}-f${fase}`
+        frames.push({ name: nome, image: decodePng(await readFile(efeitoFramePath(extractedDir, g.efeito, fase))) })
+        nomes.push(nome)
+      }
+      animations[efeitoAnimName(g.efeito)] = nomes
+    }
+  }
+  return { frames, animations }
 }
 
 export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): Promise<{ pokemonFrames: number; tileFrames: number }> {
@@ -329,13 +380,20 @@ export async function buildAtlases(opts: BuildOptions, log: Logger = () => {}): 
   )
   log(`tiles.png: ${tileOrder.length} tiles em ${tiles.length} quadros; tiles.tsj pronto para o Tiled`)
 
-  const publicado = await publishAtlas(opts, tiles, animations, log)
+  const golpes = manifest.golpes ?? []
+  if (golpes.length > 0) {
+    const g = await golpeFrames(opts.extractedDir, golpes, catalog)
+    await writeAtlas(opts.outDir, 'golpes', g.frames, g.animations, { golpes })
+    log(`golpes.png: ${g.frames.length} quadros de ${golpes.length} tipo(s)`)
+  }
+
+  const publicado = await publishAtlas(opts, tiles, animations, log, golpes.length > 0)
   if (publicado !== null) log(`publicado para o servidor em ${publicado}`)
 
   return { pokemonFrames: pokemon.length, tileFrames: tiles.length }
 }
 
-/** Os quatro arquivos que o servidor entrega; o `.tsj` é ferramenta e fica de fora. */
+/** Os arquivos que o servidor entrega; o `.tsj` é ferramenta e fica de fora. */
 /**
  * Quantas das dezesseis peças o build aceita compor sozinho. O gerador costuma pular os códigos
  * em xadrez, e cinco é normal; mais da metade composta significa que a folha não é um conjunto de
@@ -346,7 +404,15 @@ const MAX_SINTETIZADAS = 8
 /** Lado do tile em pixels; o tamanho de um prop é sempre um múltiplo dele. */
 const TILE = 32
 
+/**
+ * O que é copiado para a pasta servida, além do `tiles` que é podado à parte.
+ *
+ * `golpes` é CONDICIONAL: um manifest sem a tabela de animação não gera esses dois arquivos, e
+ * copiá-los assim mesmo derrubava o build inteiro num `ENOENT`. O cliente já trata a ausência —
+ * ele volta ao desenho genérico —, então faltar é um estado legítimo, não um erro.
+ */
 const PUBLICADOS = ['pokemon.png', 'pokemon.json'] as const
+const PUBLICADOS_DE_GOLPE = ['golpes.png', 'golpes.json'] as const
 
 /**
  * Os nomes de tile que os mapas de caçada realmente usam, já com as fases das animações.
@@ -396,11 +462,12 @@ async function publishAtlas(
   tiles: readonly AtlasFrame[],
   animations: Readonly<Record<string, readonly string[]>>,
   log: Logger,
+  temGolpes: boolean,
 ): Promise<string | null> {
   const publishDir = opts.publishDir
   if (publishDir === undefined) return null
   await mkdir(publishDir, { recursive: true })
-  for (const nome of PUBLICADOS) {
+  for (const nome of [...PUBLICADOS, ...(temGolpes ? PUBLICADOS_DE_GOLPE : [])]) {
     await copyFile(join(opts.outDir, nome), join(publishDir, nome))
   }
 

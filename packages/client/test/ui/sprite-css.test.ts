@@ -7,7 +7,7 @@ const sheet: SpritesheetJson = {
   animations: { 'charmander/walk_south': ['charmander/walk_south_0'] },
   meta: { image: 'pokemon.png', size: { w: 128, h: 32 }, scale: '1' },
 }
-const atlas: AtlasData = { pokemon: sheet, tiles: sheet }
+const atlas: AtlasData = { pokemon: sheet, tiles: sheet, golpes: null }
 
 describe('sprite em CSS', () => {
   it('devolve as propriedades do frame walk_south_0', () => {

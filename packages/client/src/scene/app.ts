@@ -1,4 +1,4 @@
-import { alcanceDe, typeMultiplier, TYPE_NAMES, type HuntMap, type ContentRegistry, type TypeName } from '@pokeidle/shared'
+import { alcanceDe, direcaoDoProjetil, efeitoAnimName, projetilFrameName, typeMultiplier, TYPE_NAMES, type HuntMap, type ContentRegistry, type TypeName } from '@pokeidle/shared'
 import type { Event } from '@pokeidle/shared/protocol'
 // A CSP do servidor (default-src 'self') proíbe unsafe-eval; este módulo troca os geradores de
 // código do Pixi por implementações equivalentes sem `new Function`.
@@ -6,9 +6,9 @@ import 'pixi.js/unsafe-eval'
 import { Application, Container } from 'pixi.js'
 import { TILE_ANIMATION_MS, TILE_SIZE } from '../config.js'
 import { activePokemon, type HuntView } from '../state/hunt-view.js'
-import type { AtlasData } from './atlas.js'
+import { golpeDoTipo, type AtlasData } from './atlas.js'
 import { cameraStep, type Camera } from './camera.js'
-import { bolaDeCaptura, createEffectRunner, fadeOut, floatingText, lunge, projetil, ring, shake } from './effects.js'
+import { bolaDeCaptura, createEffectRunner, estouro, fadeOut, floatingText, lunge, projetil, projetilSprite, ring, shake } from './effects.js'
 import { carregarBolas } from './bolas.js'
 import { createEntityLayer } from './entities.js'
 import { isDone, positionAt } from './interpolate.js'
@@ -201,13 +201,29 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
     const move = deps.registry.moves.get(e.move)
     /*
      * GOLPE QUE VIAJA NÃO SE LANÇA. Investida é contato; a três tiles ela vira gesto no vazio e o
-     * dano aparece sem causa visível. Quem tem alcance dispara um projétil entre os dois.
+     * dano aparece sem causa visível. Quem tem alcance dispara um projétil entre os dois — e o
+     * projétil é o SPRITE do tipo do golpe quando o atlas de golpes existe, com o ponto colorido
+     * como reserva para instalação com atlas antigo.
      */
+    const anim = move ? golpeDoTipo(deps.atlas, move.type) : null
+    const dx = targetRoot.x - attackerRoot.x
+    const dy = targetRoot.y - attackerRoot.y
     if (move && alcanceDe(move) > 1) {
-      effects.add(projetil(overlay, attackerRoot, targetRoot, coresTipo[move.type] ?? COR_NEUTRA))
+      const { px, py } = direcaoDoProjetil(dx, dy)
+      const tex = anim?.projetil === undefined ? undefined : sheets.golpes?.textures[projetilFrameName(anim.projetil, px, py)]
+      effects.add(tex
+        ? projetilSprite(overlay, tex, attackerRoot, targetRoot)
+        : projetil(overlay, attackerRoot, targetRoot, coresTipo[move.type] ?? COR_NEUTRA))
     } else {
-      effects.add(lunge(attackerLive.sprite.body, Math.sign(targetRoot.x - attackerRoot.x), Math.sign(targetRoot.y - attackerRoot.y)))
+      effects.add(lunge(attackerLive.sprite.body, Math.sign(dx), Math.sign(dy)))
     }
+    /*
+     * O ESTOURO é o que dá identidade ao golpe: fogo estoura em chama, planta em vinha, elétrico em
+     * faísca. Sem o atlas de golpes sobra o clarão de sempre, que continua acontecendo dos dois
+     * jeitos porque é ele que diz QUEM levou.
+     */
+    const quadros = anim?.efeito === undefined ? undefined : sheets.golpes?.animations[efeitoAnimName(anim.efeito)]
+    if (quadros && quadros.length > 0) effects.add(estouro(overlay, quadros, targetRoot.x, targetRoot.y))
     effects.flash(targetLive.sprite.body)
     if (e.attacker === 'wild') effects.add(shake(targetLive.sprite.body))
     const defender = e.attacker === 'player' ? view.state?.wilds.find((w) => String(w.id) === e.targetId) : activePokemon(view)

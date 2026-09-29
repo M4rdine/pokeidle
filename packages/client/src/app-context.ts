@@ -28,7 +28,7 @@ export interface AppContext {
 }
 
 const emptySheet = { frames: {}, animations: {}, meta: { image: 'pokemon.png', size: { w: 0, h: 0 }, scale: '1' } }
-const emptyAtlas: AtlasData = { pokemon: emptySheet, tiles: emptySheet }
+const emptyAtlas: AtlasData = { pokemon: emptySheet, tiles: emptySheet, golpes: null }
 const noHttp = async (): Promise<never> => { throw new Error('http não configurado') }
 const memoryStorage = (): Pick<Storage, 'getItem' | 'setItem'> => {
   const map = new Map<string, string>()

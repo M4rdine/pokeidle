@@ -1,5 +1,5 @@
 export { TICK_MS, TILE_SIZE } from '@pokeidle/shared'
-export const ATLAS_URL = { pokemon: '/assets/atlas/pokemon.json', tiles: '/assets/atlas/tiles.json' } as const
+export const ATLAS_URL = { pokemon: '/assets/atlas/pokemon.json', tiles: '/assets/atlas/tiles.json', golpes: '/assets/atlas/golpes.json' } as const
 export const WS_PATH = '/ws'
 export const LOG_MAX_LINES = 200
 /** Tempo de cada fase de um tile animado. Todos compartilham o mesmo relógio, para a água pulsar junta. */

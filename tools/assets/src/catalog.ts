@@ -33,6 +33,25 @@ export interface CatalogItem {
   readonly hasLight: boolean
 }
 
+/**
+ * Um efeito mágico ou um projétil do `.dat`.
+ *
+ * O formato tem QUATRO categorias — itens, outfits, efeitos e projéteis — e este extrator lia as
+ * duas primeiras e jogava as outras fora. São 658 efeitos animados e 89 projéteis, e neste dump
+ * eles são de POKÉMON: lança-chamas em cone, raio de gelo em segmentos, folha navalha, osso,
+ * trovão, sono, e as próprias Pokébolas arremessadas com rastro. Estavam no disco desde sempre.
+ *
+ * O projétil tem OITO DIREÇÕES (padrão 3×3 sem o centro) e o efeito tem fases; por isso os dois
+ * cabem na mesma forma, com `directions` valendo 1 para o efeito.
+ */
+export interface CatalogAnimation {
+  readonly id: number
+  readonly width: number
+  readonly height: number
+  readonly directions: number
+  readonly phases: number
+}
+
 export interface Catalog {
   readonly version: DatVersion
   readonly extended: boolean
@@ -40,7 +59,13 @@ export interface Catalog {
   readonly datSignature: number
   readonly outfits: readonly CatalogOutfit[]
   readonly items: readonly CatalogItem[]
+  readonly effects: readonly CatalogAnimation[]
+  readonly missiles: readonly CatalogAnimation[]
 }
+
+const toAnimation = (t: ThingType): CatalogAnimation => ({
+  id: t.id, width: t.width, height: t.height, directions: t.patternX, phases: t.phases,
+})
 
 export function hasSprites(t: ThingType): boolean {
   return t.spriteIds.some((id) => id !== 0)
@@ -84,10 +109,20 @@ export function buildCatalog(spr: SprFile, dat: DatFile): Catalog {
     datSignature: dat.signature,
     outfits: dat.outfits.filter(hasSprites).map(toOutfit),
     items: dat.items.filter(hasSprites).map(toItem),
+    effects: dat.effects.filter(hasSprites).map(toAnimation),
+    missiles: dat.missiles.filter(hasSprites).map(toAnimation),
   }
 }
 
 const DisplacementSchema = z.object({ x: z.number().int(), y: z.number().int() })
+
+const CatalogAnimationSchema = z.object({
+  id: z.number().int().positive(),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  directions: z.number().int().positive(),
+  phases: z.number().int().positive(),
+})
 
 const CatalogOutfitSchema = z.object({
   id: z.number().int().positive(),
@@ -122,6 +157,8 @@ export const CatalogSchema = z.object({
   datSignature: z.number().int(),
   outfits: z.array(CatalogOutfitSchema),
   items: z.array(CatalogItemSchema),
+  effects: z.array(CatalogAnimationSchema),
+  missiles: z.array(CatalogAnimationSchema),
 })
 
 export function parseCatalog(json: unknown): Catalog {

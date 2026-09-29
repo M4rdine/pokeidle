@@ -1,4 +1,4 @@
-import { ColorMatrixFilter, Container, Graphics, Sprite, Text, type Texture, type Ticker } from 'pixi.js'
+import { AnimatedSprite, ColorMatrixFilter, Container, Graphics, Sprite, Text, type Texture, type Ticker } from 'pixi.js'
 
 export type Updater = (dtMs: number) => boolean // devolve false quando termina
 
@@ -138,6 +138,8 @@ export function ring(layer: Container, x: number, y: number, color: number, ms =
 /** Quanto o projétil arqueia no meio do caminho, em pixels — o bastante para não virar régua. */
 const ARCO_DO_PROJETIL = 10
 const MS_PROJETIL = 160
+/** Quanto tempo o estouro fica na tela. Curto: é pontuação do golpe, não cena à parte. */
+const MS_ESTOURO = 420
 
 /**
  * O golpe que VIAJA, de quem atacou até quem levou.
@@ -150,6 +152,41 @@ const MS_PROJETIL = 160
  * Um ponto na cor do tipo, com um arco curto. Não é o sprite de projétil do Tibia — esses existem,
  * são 89, e entram depois; isto é o mínimo para o golpe à distância ser LEGÍVEL hoje.
  */
+/**
+ * O projétil de VERDADE: o sprite do golpe atravessando a tela.
+ *
+ * O `.dat` guarda cada projétil em oito direções, e quem escolhe a célula é o sinal do
+ * deslocamento — é assim que a folha aponta para onde voa. Sem textura, quem chama cai no
+ * `projetil` desenhado, logo abaixo.
+ */
+export function projetilSprite(layer: Container, textura: Texture, de: { x: number; y: number }, para: { x: number; y: number }): Updater {
+  const s = new Sprite(textura)
+  s.anchor.set(0.5)
+  layer.addChild(s)
+  return over(MS_PROJETIL, (k) => {
+    s.x = de.x + (para.x - de.x) * k
+    s.y = de.y + (para.y - de.y) * k - Math.sin(k * Math.PI) * ARCO_DO_PROJETIL - 12
+  }, () => { s.destroy() })
+}
+
+/**
+ * O ESTOURO no alvo: a animação do efeito, uma vez, e some.
+ *
+ * Fica no ALVO e não no atacante porque é o impacto que conta a história — quem levou, e de quê.
+ * A âncora é embaixo, como a dos personagens, senão um efeito de dois tiles flutua acima da cabeça.
+ */
+export function estouro(layer: Container, quadros: readonly Texture[], x: number, y: number): Updater {
+  if (quadros.length === 0) return () => false
+  const s = new AnimatedSprite(quadros.map((t) => ({ texture: t, time: MS_ESTOURO / quadros.length })))
+  s.anchor.set(0.5, 0.8)
+  s.x = x
+  s.y = y
+  s.loop = false
+  s.play()
+  layer.addChild(s)
+  return over(MS_ESTOURO, () => {}, () => { s.destroy() })
+}
+
 export function projetil(layer: Container, de: { x: number; y: number }, para: { x: number; y: number }, color: number): Updater {
   const g = new Graphics()
   layer.addChild(g)

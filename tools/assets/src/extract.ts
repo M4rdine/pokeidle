@@ -41,6 +41,29 @@ async function writeOutfit(spr: SprFile, outfit: ThingType, outDir: string): Pro
   }
 }
 
+/** Um efeito por fase; um projétil por direção. Ver `CatalogAnimation`. */
+export function efeitoFramePath(outDir: string, id: number, phase: number): string {
+  return join(outDir, 'efeitos', `${id}_${phase}.png`)
+}
+
+export function projetilFramePath(outDir: string, id: number, px: number, py: number): string {
+  return join(outDir, 'projeteis', `${id}_${px}_${py}.png`)
+}
+
+async function writeEfeito(spr: SprFile, t: ThingType, outDir: string): Promise<void> {
+  for (let phase = 0; phase < t.phases; phase++) {
+    await writeFile(efeitoFramePath(outDir, t.id, phase), encodePng(composeFrame(spr, t, { patternX: 0, phase })))
+  }
+}
+
+async function writeProjetil(spr: SprFile, t: ThingType, outDir: string): Promise<void> {
+  for (let px = 0; px < t.patternX; px++) {
+    for (let py = 0; py < t.patternY; py++) {
+      await writeFile(projetilFramePath(outDir, t.id, px, py), encodePng(composeFrame(spr, t, { patternX: px, patternY: py, phase: 0 })))
+    }
+  }
+}
+
 async function writeItem(spr: SprFile, item: ThingType, outDir: string): Promise<void> {
   for (let px = 0; px < item.patternX; px++) {
     for (let py = 0; py < item.patternY; py++) {
@@ -50,6 +73,29 @@ async function writeItem(spr: SprFile, item: ThingType, outDir: string): Promise
       }
     }
   }
+}
+
+/**
+ * Escreve só os EFEITOS e PROJÉTEIS, mais o `catalog.json`.
+ *
+ * Mesmo motivo de `extractCatalog`: os PNGs de item são dezenas de milhares e não mudam quando o
+ * que se quer é outra categoria do mesmo `.dat`. Reescrevê-los para ganhar os efeitos é meia hora
+ * de disco por nada.
+ */
+export async function extractAnimations(opts: ExtractOptions, log: Logger = () => {}): Promise<Catalog> {
+  const format = { extended: opts.extended ?? false }
+  const spr = parseSpr(new Uint8Array(await readFile(opts.sprPath)), format)
+  const dat = parseDat(new Uint8Array(await readFile(opts.datPath)), opts.version, format)
+  await mkdir(join(opts.outDir, 'efeitos'), { recursive: true })
+  await mkdir(join(opts.outDir, 'projeteis'), { recursive: true })
+  const efeitos = dat.effects.filter(hasSprites)
+  for (const t of efeitos) await writeEfeito(spr, t, opts.outDir)
+  const projeteis = dat.missiles.filter(hasSprites)
+  for (const t of projeteis) await writeProjetil(spr, t, opts.outDir)
+  const catalog = buildCatalog(spr, dat)
+  await writeFile(join(opts.outDir, 'catalog.json'), JSON.stringify(catalog, null, 2))
+  log(`efeitos: ${efeitos.length} · projéteis: ${projeteis.length}`)
+  return catalog
 }
 
 /**
@@ -87,6 +133,14 @@ export async function extractAll(opts: ExtractOptions, log: Logger = () => {}): 
     await writeItem(spr, item, opts.outDir)
     if (i % 1000 === 0) log(`itens: ${i}/${items.length}`)
   }
+
+  await mkdir(join(opts.outDir, 'efeitos'), { recursive: true })
+  await mkdir(join(opts.outDir, 'projeteis'), { recursive: true })
+  const efeitos = dat.effects.filter(hasSprites)
+  for (const t of efeitos) await writeEfeito(spr, t, opts.outDir)
+  const projeteis = dat.missiles.filter(hasSprites)
+  for (const t of projeteis) await writeProjetil(spr, t, opts.outDir)
+  log(`efeitos: ${efeitos.length} · projéteis: ${projeteis.length}`)
 
   const catalog = buildCatalog(spr, dat)
   await writeFile(join(opts.outDir, 'catalog.json'), JSON.stringify(catalog, null, 2))

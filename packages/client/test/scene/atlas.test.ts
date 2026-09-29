@@ -9,8 +9,8 @@ const sheet: SpritesheetJson = {
 
 describe('atlas', () => {
   it('frameOf devolve o retângulo do frame pedido ou null', () => {
-    expect(frameOf({ pokemon: sheet, tiles: sheet }, 'charmander', 'south', 1)).toEqual({ x: 96, y: 0, w: 32, h: 32 })
-    expect(frameOf({ pokemon: sheet, tiles: sheet }, 'mewtwo', 'south', 0)).toBeNull()
+    expect(frameOf({ pokemon: sheet, tiles: sheet, golpes: null }, 'charmander', 'south', 1)).toEqual({ x: 96, y: 0, w: 32, h: 32 })
+    expect(frameOf({ pokemon: sheet, tiles: sheet, golpes: null }, 'mewtwo', 'south', 0)).toBeNull()
   })
 
   it('loadAtlas busca os dois JSONs e falha com mensagem clara quando o atlas não existe', async () => {

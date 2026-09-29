@@ -18,6 +18,8 @@ const catalog: Catalog = {
     { id: 100, width: 1, height: 1, patternX: 2, patternY: 1, phases: 1, isGround: true, isBlocking: false, isSplash: false, isCorpse: false, isContainer: false, isNotPathable: false, hasLight: false },
     { id: 101, width: 2, height: 2, patternX: 1, patternY: 1, phases: 1, isGround: true, isBlocking: false, isSplash: false, isCorpse: false, isContainer: false, isNotPathable: false, hasLight: false },
   ],
+  effects: [],
+  missiles: [],
 }
 
 const valid = {

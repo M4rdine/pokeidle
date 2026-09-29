@@ -5,7 +5,7 @@ import type { AtlasData } from './atlas.js'
 import { animationKey } from './atlas.js'
 import type { Direction } from './interpolate.js'
 
-export interface Sheets { readonly pokemon: Spritesheet; readonly tiles: Spritesheet }
+export interface Sheets { readonly pokemon: Spritesheet; readonly tiles: Spritesheet; readonly golpes: Spritesheet | null }
 
 // Mesmo diretório do JSON do atlas (ATLAS_URL), nunca uma constante duplicada.
 const dirOf = (url: string): string => url.slice(0, url.lastIndexOf('/') + 1)
@@ -29,7 +29,22 @@ export async function loadSheets(atlas: AtlasData): Promise<Sheets> {
   const pokemon = new Spritesheet(pokemonTex, atlas.pokemon as SpritesheetData)
   const tiles = new Spritesheet(tilesTex, atlas.tiles as SpritesheetData)
   await Promise.all([pokemon.parse(), tiles.parse()])
-  return { pokemon, tiles }
+
+  /*
+   * O atlas de golpes é OPCIONAL e carregado à parte: ele é o mais novo dos três, e uma instalação
+   * com atlas antigo não pode ficar sem jogo por causa de animação. Falhou, o combate volta ao
+   * desenho genérico — que é o que existia antes dele.
+   */
+  let golpes: Spritesheet | null = null
+  if (atlas.golpes) {
+    try {
+      const tex = await Assets.load<Texture>(dirOf(ATLAS_URL.golpes) + atlas.golpes.meta.image)
+      const folha = new Spritesheet(tex, atlas.golpes as SpritesheetData)
+      await folha.parse()
+      golpes = folha
+    } catch { golpes = null }
+  }
+  return { pokemon, tiles, golpes }
 }
 
 export interface EntitySprite {

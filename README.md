@@ -8,15 +8,21 @@ progresso continua com a aba fechada. A simulação inteira acontece no servidor
 **▶ Jogue: <https://pokeidle.187-77-37-92.sslip.io>** — crie uma conta, escolha o inicial e mande
 caçar. O progresso continua com a aba fechada.
 
-![A tela de jogo: o mundo ao centro, ficha e time à esquerda, golpes e situação à direita, registro embaixo](docs/imagens/jogo.webp)
+![A tela de jogo: numa caverna, o Blastoise do jogador acerta 49 de dano num Arcanine selvagem a três tiles de distância; ficha e time à esquerda, golpes e situação à direita, registro embaixo](docs/imagens/jogo.webp)
 
-O servidor simula; o cliente desenha o que recebe e manda intenção. O cenário é gerado pelo
-pipeline deste repositório — terreno, props e prédios saem de conjuntos próprios, e o mapa é
-composto por código a partir de uma lista de biomas.
+O servidor simula; o cliente desenha o que recebe e manda intenção. Na captura, o golpe sai de
+longe: o alcance vem do tipo do golpe — o que encosta e o que viaja —, e vale igual para o seu
+Pokémon e para o selvagem. Os selvagens não esperam parados: eles vagam, notam quem entra no campo
+de visão deles e vão atrás, e a rocha esconde.
+
+![O mapa-múndi com os marcadores das áreas; à direita, o analisador do Pico Rochoso listando espécies, XP, ouro e chance de captura com o time atual](docs/imagens/mapa.webp)
+
+Escolher para onde ir é a decisão do jogo, então ela tem um analisador: XP e ouro por derrota e
+chance de captura, medidos com o time que você tem agora — não com um número de tabela.
 
 | Ficha de espécie | Painel de operação |
 |---|---|
-| ![Ficha do Vulpix: onde aparece, atributos-base, evolução e golpes por nível](docs/imagens/ficha.webp) | ![Painel lendo /metrics: caçadas ativas, duração do tick, persistência e HTTP](docs/imagens/metricas.webp) |
+| ![Ficha do Arcanine: captura, experiência-base, onde aparece com o nível do portão, e atributos-base](docs/imagens/ficha.webp) | ![Painel lendo /metrics: caçadas ativas, duração do tick, persistência e HTTP](docs/imagens/metricas.webp) |
 
 A ficha responde a pergunta que decide a próxima caçada — onde essa espécie aparece, em que faixa
 de nível e se o portão já abriu. O painel lê o mesmo `/metrics` que um Prometheus raparia.
@@ -139,9 +145,19 @@ e um projeto aberto a PR precisa ser "clonou, rodou". O **dump bruto de 647 MB**
 Pokémon é marca da Nintendo, Creatures e Game Freak. Este é um projeto de fã, sem fim comercial e
 sem vínculo com elas. Se algum detentor de direito pedir a remoção de um asset, ele sai.
 
-O cenário — terreno, props, prédios e marcos — é gerado pelo pipeline deste repositório e não vem
-do pack; o teste `kanto-cenario` trava isso, recusando qualquer tile que não seja de conjunto
-próprio. A prévia abaixo sai de `pnpm assets map-preview` e é composta só desse material:
+O cenário tem DUAS origens, e vale dizer qual é qual.
 
-![Recorte do Campo Inicial: trilha, grama alta e o Centro Pokémon, tudo em arte gerada pelo projeto](docs/imagens/campo-inicial.webp) Quem clonar este repositório recebe o código inteiro e monta o
-próprio atlas com `pnpm assets build`, apontando para os assets que tiver. O código é do autor.
+As áreas desenhadas pelo pipeline deste repositório — terreno, props, prédios e marcos — não usam
+nada de pack, e o teste `kanto-cenario` trava isso sobre o mapa do Tiled, recusando qualquer tile
+que não seja de conjunto próprio. A prévia abaixo sai de `pnpm assets map-preview` e é composta só
+desse material:
+
+![Recorte do Campo Inicial: trilha, grama alta e o Centro Pokémon, tudo em arte gerada pelo projeto](docs/imagens/campo-inicial.webp)
+
+Já o **Pico Rochoso** — a caverna da primeira captura de tela — é um RECORTE do mapa de um servidor
+OpenTibia, desenhado com sprites do Tibia. Esses sprites são da CipSoft: não são arte própria, e o
+`kanto-cenario` não os cobre, porque ele confere o `.tmj` do Tiled e essa área já não sai de lá. O
+pedido de remoção vale para eles do mesmo jeito.
+
+Quem clonar este repositório recebe o código inteiro e monta o próprio atlas com
+`pnpm assets build`, apontando para os assets que tiver. O código é do autor.

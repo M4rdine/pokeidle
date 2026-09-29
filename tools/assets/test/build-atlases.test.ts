@@ -163,8 +163,9 @@ describe('buildAtlases', () => {
      */
     const bytes = await readFile(join(outDir, 'pokemon.png'))
     const hash = createHash('sha1').update(bytes).digest('hex')
-    expect(pokemon.meta.image).toMatch(/^pokemon\.png\?v=[0-9a-f]{8,}$/)
-    expect(hash.startsWith(String(pokemon.meta.image).split('=')[1])).toBe(true)
+    const versao = /^pokemon\.png\?v=([0-9a-f]{8,})$/.exec(String(pokemon.meta.image))
+    expect(versao, `meta.image é "${String(pokemon.meta.image)}"`).not.toBeNull()
+    expect(hash.startsWith(versao![1]!), `${versao![1]!} não é prefixo de ${hash}`).toBe(true)
     const img = decodePng(bytes)
     expect(img.width).toBe(3 * 64)
 

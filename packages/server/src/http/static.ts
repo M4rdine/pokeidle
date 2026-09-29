@@ -12,6 +12,40 @@ import { parseBody } from './validate.js'
 
 const AtlasParams = z.object({ file: z.string().min(1).max(64) }).strict()
 const IMMUTABLE = 'public, max-age=31536000, immutable'
+/** Revalidar sempre; com ETag a pergunta custa um 304 sem corpo. */
+const REVALIDAR = 'no-cache'
+
+/**
+ * Quantos dígitos do hash a URL precisa trazer para valer um ano de cache.
+ *
+ * O servidor não sabe quantos o build gastou — e não precisa: qualquer PREFIXO do hash do conteúdo
+ * serve, desde que seja longo o bastante para não acertar por sorte. Assim o build escolhe o
+ * tamanho sozinho e não existe constante para as duas pontas discordarem.
+ */
+const VERSAO_MINIMA = 8
+
+const versaoPedida = (query: unknown): string | null => {
+  const v = (query as { readonly v?: unknown } | null | undefined)?.v
+  return typeof v === 'string' ? v : null
+}
+
+/**
+ * O PAR `tiles.png` + `tiles.json` NÃO PODE DESCASAR, e era isso que uma hora de cache nos dois
+ * permitia: o navegador buscava o JSON novo, reaproveitava o PNG velho do cache, e desenhava o
+ * cenário com as coordenadas de um atlas contra os pixels de outro — tile trocado, sem erro nenhum
+ * no console.
+ *
+ * A saída é a mesma que o build do cliente já usa em `/app`: quem é endereçado pelo conteúdo pode
+ * ser guardado para sempre. O JSON é o ÍNDICE e revalida a cada carga; ele é que diz qual imagem
+ * pedir, em `meta.image`, com o hash do PNG na query. Pedido com o hash certo, um ano de cache;
+ * pedido sem ele (ou com o de outro conteúdo), revalida — então a única forma de conseguir cache
+ * longo é pedir exatamente os bytes que se conhece.
+ */
+const politicaDoAtlas = (file: string, query: unknown) => (hashDoConteudo: string): string => {
+  if (file.endsWith('.json')) return REVALIDAR
+  const pedida = versaoPedida(query)
+  return pedida !== null && pedida.length >= VERSAO_MINIMA && hashDoConteudo.startsWith(pedida) ? IMMUTABLE : REVALIDAR
+}
 
 /** Tipos que o build do cliente emite dentro de `/app`. O que não estiver aqui não é servido. */
 const TIPOS_DE_APP: Readonly<Record<string, string>> = {
@@ -34,7 +68,7 @@ interface Guardado { readonly mtimeMs: number; readonly size: number; readonly e
 /**
  * Memória do que já foi lido, por caminho, invalidada por `mtime` e tamanho.
  *
- * Só as duas pastas de asset entram aqui — atlas (4 arquivos) e mapas das regiões (um por
+ * Só as duas pastas de asset entram aqui — atlas (três pares de PNG e JSON) e mapas das regiões (um por
  * região) —, e o caminho já veio validado pela allowlist ou pelo `path.relative`. Não é cache de
  * uso geral: é uma tabela pequena e de tamanho conhecido, e por isso não tem despejo.
  */
@@ -48,10 +82,13 @@ const guardados = new Map<string, Guardado>()
  * sem ETag ele não tinha como perguntar. Com ETag a pergunta custa um 304 sem corpo.
  *
  * O ETag é hash do CONTEÚDO, e não `mtime`-mais-tamanho como faz o nginx: `pnpm assets build`
- * reescreve os quatro arquivos a cada rodada, quase sempre com bytes idênticos, e com ETag de
+ * reescreve os seis arquivos a cada rodada, quase sempre com bytes idênticos, e com ETag de
  * `mtime` cada build invalidaria o cache de todo mundo à toa.
+ *
+ * O `cacheControl` pode ser uma FUNÇÃO do hash do conteúdo: é assim que `politicaDoAtlas` decide
+ * entre um ano e revalidar sem que este trecho precise ler o arquivo duas vezes.
  */
-async function servirAsset(request: FastifyRequest, reply: FastifyReply, filePath: string, type: string, cacheControl: string): Promise<FastifyReply | null> {
+async function servirAsset(request: FastifyRequest, reply: FastifyReply, filePath: string, type: string, cacheControl: string | ((hashDoConteudo: string) => string)): Promise<FastifyReply | null> {
   let info
   try { info = await stat(filePath) } catch { return null }
   if (!info.isFile()) return null
@@ -68,7 +105,9 @@ async function servirAsset(request: FastifyRequest, reply: FastifyReply, filePat
     })()
   if (!atual) return null
 
-  reply.header('cache-control', cacheControl).header('etag', atual.etag)
+  // O hash sem as aspas do ETag: é dele que a política do atlas decide se pode cravar um ano.
+  const politica = typeof cacheControl === 'string' ? cacheControl : cacheControl(atual.etag.slice(1, -1))
+  reply.header('cache-control', politica).header('etag', atual.etag)
   // A resposta 304 não leva corpo nem content-type: o navegador reaproveita o que já tem.
   if (request.headers['if-none-match'] === atual.etag) return reply.status(304).send()
   return reply.type(type).send(atual.body)
@@ -80,7 +119,7 @@ export async function registerStatic(app: FastifyInstance, config: Config): Prom
     const { file } = parseBody(AtlasParams, request.params)
     const type = ATLAS_FILES[file]
     if (!type) return reply.status(404).send(errorBody('not-found', 'arquivo não permitido'))
-    const servido = await servirAsset(request, reply, path.join(config.ASSETS_DIR, file), type, 'public, max-age=3600')
+    const servido = await servirAsset(request, reply, path.join(config.ASSETS_DIR, file), type, politicaDoAtlas(file, request.query))
     return servido ?? reply.status(404).send(errorBody('not-found', 'atlas não encontrado; gere com pnpm assets build'))
   })
   /**

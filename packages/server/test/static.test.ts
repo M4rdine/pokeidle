@@ -76,6 +76,58 @@ describe('revalidação dos assets', () => {
     await app.close()
   })
 
+  /*
+   * O PAR DESCASADO era o defeito: `tiles.png` e `tiles.json` em URL fixa com uma hora de cache
+   * cada, e nada obrigando os dois a serem da mesma geração. O navegador buscava o JSON novo,
+   * reaproveitava o PNG velho, e desenhava coordenadas de um atlas contra os pixels de outro —
+   * cenário com tile trocado e nenhum erro no console.
+   *
+   * Os três casos abaixo prendem a regra pelos dois lados: só quem pede pelo conteúdo ganha cache
+   * longo, e o índice nunca ganha.
+   */
+  it('PNG pedido com o hash do próprio conteúdo pode ser guardado por um ano', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-atlas-'))
+    await writeFile(join(dir, 'tiles.png'), Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x01]))
+    const app = await freshApp(t, undefined, { ASSETS_DIR: dir })
+
+    const sem = await api(app).get('/assets/atlas/tiles.png')
+    expect(sem.headers['cache-control']).toBe('no-cache')
+    const hash = (sem.headers['etag'] as string).slice(1, -1)
+
+    const com = await api(app).get(`/assets/atlas/tiles.png?v=${hash.slice(0, 12)}`)
+    expect(com.statusCode).toBe(200)
+    expect(com.headers['cache-control']).toBe('public, max-age=31536000, immutable')
+    await app.close()
+  })
+
+  it('hash de outro conteúdo, ou curto demais, não compra cache: revalida', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-atlas-'))
+    await writeFile(join(dir, 'tiles.png'), Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x02]))
+    const app = await freshApp(t, undefined, { ASSETS_DIR: dir })
+    const hash = ((await api(app).get('/assets/atlas/tiles.png')).headers['etag'] as string).slice(1, -1)
+
+    // O `v` de um PNG que este servidor não tem — é o caso do par descasado, e ele não vale cache.
+    const outro = await api(app).get('/assets/atlas/tiles.png?v=0123456789ab')
+    expect(outro.headers['cache-control']).toBe('no-cache')
+    // Prefixo certo mas curto: aceitar 1 dígito daria 1 em 16 de acertar por sorte.
+    const curto = await api(app).get(`/assets/atlas/tiles.png?v=${hash.slice(0, 4)}`)
+    expect(curto.headers['cache-control']).toBe('no-cache')
+    await app.close()
+  })
+
+  it('o JSON do atlas revalida sempre: é ele que diz qual imagem pedir', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'pokeidle-atlas-'))
+    await writeFile(join(dir, 'tiles.json'), '{"frames":{},"meta":{"image":"tiles.png?v=abc"}}')
+    const app = await freshApp(t, undefined, { ASSETS_DIR: dir })
+    const r = await api(app).get('/assets/atlas/tiles.json')
+    expect(r.headers['cache-control']).toBe('no-cache')
+    const hash = (r.headers['etag'] as string).slice(1, -1)
+    // Nem trazendo o hash do próprio JSON: um índice guardado por um ano congela a geração inteira.
+    const teimoso = await api(app).get(`/assets/atlas/tiles.json?v=${hash.slice(0, 12)}`)
+    expect(teimoso.headers['cache-control']).toBe('no-cache')
+    await app.close()
+  })
+
   it('ETag de outro arquivo não vale: cada um responde pelo seu conteúdo', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'pokeidle-atlas-'))
     await writeFile(join(dir, 'tiles.json'), '{"a":1}')

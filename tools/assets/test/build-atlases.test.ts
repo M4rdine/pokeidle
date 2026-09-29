@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
@@ -155,14 +156,25 @@ describe('buildAtlases', () => {
     const pokemon = JSON.parse(await readFile(join(outDir, 'pokemon.json'), 'utf8'))
     expect(pokemon.frames['bulbasaur/walk_south_1']).toBeDefined()
     expect(pokemon.animations['bulbasaur/walk_south']).toEqual(['bulbasaur/walk_south_0', 'bulbasaur/walk_south_1'])
-    expect(pokemon.meta.image).toBe('pokemon.png')
-    const img = decodePng(await readFile(join(outDir, 'pokemon.png')))
+    /*
+     * O `meta.image` leva o HASH DO PNG na query: é dele que o cliente monta a URL da imagem, e é
+     * por isso que o servidor pode guardá-la por um ano sem casar pixels velhos com coordenadas
+     * novas. Ver `politicaDoAtlas` no servidor, a outra ponta do combinado.
+     */
+    const bytes = await readFile(join(outDir, 'pokemon.png'))
+    const hash = createHash('sha1').update(bytes).digest('hex')
+    expect(pokemon.meta.image).toMatch(/^pokemon\.png\?v=[0-9a-f]{8,}$/)
+    expect(hash.startsWith(String(pokemon.meta.image).split('=')[1])).toBe(true)
+    const img = decodePng(bytes)
     expect(img.width).toBe(3 * 64)
 
     const tiles = JSON.parse(await readFile(join(outDir, 'tiles.json'), 'utf8'))
     expect(tiles.frames['grass'].frame).toEqual({ x: 0, y: 0, w: 32, h: 32 })
     const tsj = JSON.parse(await readFile(join(outDir, 'tiles.tsj'), 'utf8'))
     expect(tsj.tiles[0].properties[0].value).toBe('grass')
+    // O tileset do Tiled fica com o nome CRU: ali `image` é caminho de arquivo, não URL, e um
+    // `?v=` no meio viraria parte do nome procurado — tileset abre sem imagem.
+    expect(tsj.image).toBe('tiles.png')
   })
 
   it('gera frames e animação de ataque quando a espécie tem attackOutfitId', async () => {

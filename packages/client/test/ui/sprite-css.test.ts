@@ -19,6 +19,19 @@ describe('sprite em CSS', () => {
     })
     expect(spriteStyle(atlas, 'mewtwo')).toBeNull()
   })
+  /*
+   * O `meta.image` do atlas publicado vem com o hash na query (`pokemon.png?v=abc…`), porque é
+   * assim que o servidor pode guardar a imagem por um ano sem casar pixels velhos com coordenadas
+   * novas. Aqui isso entra num `url()` SEM ASPAS, e um `?` recusado pelo parser de CSS apagaria o
+   * sprite de toda a interface — em silêncio, que é como o CSSOM descarta valor inválido.
+   */
+  it('aceita o hash na query do meta.image: url() sem aspas com "?" sobrevive ao CSSOM', () => {
+    const versionado: SpritesheetJson = { ...sheet, meta: { ...sheet.meta, image: 'pokemon.png?v=0123456789ab' } }
+    const comHash: AtlasData = { pokemon: versionado, tiles: versionado, golpes: null }
+    expect(spriteStyle(comHash, 'charmander')?.['background-image']).toBe('url(/assets/atlas/pokemon.png?v=0123456789ab)')
+    const dentro = spriteThumb(comHash, 'charmander', 32).firstElementChild as HTMLElement
+    expect(dentro.style.getPropertyValue('background-image')).toContain('?v=0123456789ab')
+  })
   it('aplica via CSSOM (a CSP bloqueia atributo style, não a API de estilo)', () => {
     const caixa = spriteThumb(atlas, 'charmander', 32)
     const dentro = caixa.firstElementChild as HTMLElement

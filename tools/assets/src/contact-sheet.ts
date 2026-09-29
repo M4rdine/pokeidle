@@ -45,9 +45,15 @@ export function renderContactSheet(catalog: Catalog, opts: ContactSheetOptions):
 
 /** Folha de aprovação do tileset: cada peça recortada do atlas, com o nome embaixo. */
 export function renderTilesetSheet(sheet: PixiSpritesheet): string {
+  /*
+   * Sem o `?v=` do hash: esta folha é aberta com `file://`, onde a query não é query nenhuma —
+   * vira parte do nome do arquivo procurado, e a imagem não carrega. O hash existe para o cache do
+   * navegador contra o servidor, e aqui não há servidor.
+   */
+  const imagem = sheet.meta.image.split('?')[0]
   const cells = Object.entries(sheet.frames).map(([name, f]) => {
     const y = f.frame.y === 0 ? '0px' : `-${f.frame.y}px`
-    return `<figure data-id="${name}"><span style="width:${f.frame.w}px;height:${f.frame.h}px;display:block;image-rendering:pixelated;background-image:url(${sheet.meta.image});background-position:-${f.frame.x}px ${y}"></span><figcaption>${name}</figcaption></figure>`
+    return `<figure data-id="${name}"><span style="width:${f.frame.w}px;height:${f.frame.h}px;display:block;image-rendering:pixelated;background-image:url(${imagem});background-position:-${f.frame.x}px ${y}"></span><figcaption>${name}</figcaption></figure>`
   })
   return `<!doctype html><meta charset="utf-8"><title>Tileset do Pokeidle</title><style>${STYLE}</style>
 <input placeholder="filtrar por nome" autofocus>

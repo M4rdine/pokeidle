@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { access, copyFile, mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { efeitoAnimName, projetilFrameName } from '@pokeidle/shared'
@@ -273,6 +274,13 @@ async function propFrames(dir: string, props: readonly PropEntry[]): Promise<Atl
   return frames
 }
 
+/**
+ * Dígitos do hash gastos na URL da imagem. Doze são de sobra contra colisão aqui (são três
+ * imagens) e o servidor aceita qualquer prefixo com pelo menos oito, então este número pode mudar
+ * sem combinar nada com ele.
+ */
+const VERSAO_NO_NOME = 12
+
 async function writeAtlas(
   outDir: string,
   baseName: string,
@@ -282,8 +290,21 @@ async function writeAtlas(
   extraMeta?: Readonly<Record<string, unknown>>,
 ): Promise<ReturnType<typeof packGrid>> {
   const packed = packGrid(frames, `${baseName}.png`, 0, animations)
-  const sheet = extraMeta === undefined ? packed.sheet : { ...packed.sheet, meta: { ...packed.sheet.meta, ...extraMeta } }
-  await writeFile(join(outDir, `${baseName}.png`), encodePng(packed.image))
+  const png = encodePng(packed.image)
+  /*
+   * O `meta.image` LEVA O HASH DO PNG, e é o que impede o par torto.
+   *
+   * O cliente monta a URL da imagem a partir daqui (`dirOf(json) + meta.image`), então pôr o hash
+   * na query faz a imagem mudar de endereço junto com o conteúdo — e o servidor pode então guardá-la
+   * por um ano sem risco de casar pixels velhos com coordenadas novas. Ver `politicaDoAtlas` no
+   * servidor, que é a outra ponta.
+   *
+   * Vai só no JSON que o NAVEGADOR lê. O `packed.sheet` devolvido continua com o nome cru, porque
+   * dele sai o tileset do Tiled, e ali `image` é caminho de arquivo, não URL.
+   */
+  const versao = createHash('sha1').update(png).digest('hex').slice(0, VERSAO_NO_NOME)
+  const sheet = { ...packed.sheet, meta: { ...packed.sheet.meta, ...extraMeta, image: `${baseName}.png?v=${versao}` } }
+  await writeFile(join(outDir, `${baseName}.png`), png)
   await writeFile(join(outDir, `${baseName}.json`), JSON.stringify(sheet, null, 2))
   return packed
 }

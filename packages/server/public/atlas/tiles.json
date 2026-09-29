@@ -20186,7 +20186,7 @@
     ]
   },
   "meta": {
-    "image": "tiles.png",
+    "image": "tiles.png?v=0413c7086818",
     "format": "RGBA8888",
     "size": {
       "w": 1024,

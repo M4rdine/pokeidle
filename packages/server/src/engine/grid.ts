@@ -7,6 +7,33 @@ export const samePoint = (a: Point, b: Point): boolean => a.x === b.x && a.y ===
 export const neighbors = (p: Point): Point[] => [{ x: p.x, y: p.y - 1 }, { x: p.x + 1, y: p.y }, { x: p.x, y: p.y + 1 }, { x: p.x - 1, y: p.y }]
 const key = (p: Point): number => p.y * 100_000 + p.x
 
+/**
+ * Há linha reta livre entre `a` e `b`?
+ *
+ * Sem isto, um selvagem com golpe à distância atira ATRAVÉS DA ROCHA — e, pior, enxerga o jogador
+ * do outro lado da parede e sai caçando pelo mapa inteiro alguém que ele não deveria ter notado.
+ * Numa caverna, que é corredor e parede, é a diferença entre uma emboscada e um tiroteio absurdo.
+ *
+ * Bresenham, conferindo só os tiles DO MEIO: a origem é o atirador e o destino é o alvo, e nenhum
+ * dos dois bloqueia o próprio tiro.
+ */
+export function temLinhaDeVisao(a: Point, b: Point, isBlocked: (p: Point) => boolean): boolean {
+  let { x, y } = a
+  const dx = Math.abs(b.x - x)
+  const dy = -Math.abs(b.y - y)
+  const passoX = x < b.x ? 1 : -1
+  const passoY = y < b.y ? 1 : -1
+  let erro = dx + dy
+  for (;;) {
+    if (x === b.x && y === b.y) return true
+    const dobro = 2 * erro
+    if (dobro >= dy) { erro += dy; x += passoX }
+    else { erro += dx; y += passoY }
+    if (x === b.x && y === b.y) return true
+    if (isBlocked({ x, y })) return false
+  }
+}
+
 export interface PathInput {
   readonly from: Point; readonly target: Point
   readonly isBlocked: (p: Point) => boolean; readonly isGoal: (p: Point) => boolean

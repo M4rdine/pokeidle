@@ -1,26 +1,13 @@
-import { wildAttack } from './combat.js'
-import { isAdjacent } from './grid.js'
+
 import { applyPotion, choosePotion, chooseRevive } from './items.js'
 import { stepPlayer } from './player.js'
 import { applyDefeat } from './progression.js'
 import { processRespawns } from './spawn.js'
 import { resolveTroca } from './troca.js'
+import { stepWilds } from './wild-ai.js'
 import type { EngineDeps, Event, HuntState, StepResult } from './types.js'
 
 const chain = (a: StepResult, f: (s: HuntState) => StepResult): StepResult => { const b = f(a.state); return { state: b.state, events: [...a.events, ...b.events] } }
-
-/**
- * Só o selvagem já engajado no tick anterior revida: quem chega ataca primeiro (GDD §3.1).
- * Exportada só para teste direto (`step.test.ts`, troca de alvo no meio da luta): construir esse
- * cenário via `step`/geometria da fixture exigiria um selvagem defendido de forma artificial, já
- * que o motor não troca de alvo com o antigo ainda vivo em nenhum caminho de produção.
- */
-export function engagedWildAttack(state: HuntState, deps: EngineDeps, engagedBefore: number | null): StepResult {
-  if (state.player.mode !== 'fighting' || engagedBefore === null || state.player.targetWildId !== engagedBefore) return { state, events: [] }
-  const wild = state.wilds.find((w) => w.id === state.player.targetWildId)
-  if (!wild || wild.hp <= 0 || !isAdjacent(state.player.position, wild.position)) return { state, events: [] }
-  return wildAttack(state, deps, wild)
-}
 
 function resolveDefeats(state: HuntState, deps: EngineDeps): StepResult {
   return state.wilds.filter((w) => w.hp <= 0).reduce<StepResult>((acc, w) => chain(acc, (s) => applyDefeat(s, deps, w)), { state, events: [] })
@@ -111,7 +98,11 @@ export function step(state: HuntState, deps: EngineDeps): StepResult {
   if (state.player.mode === 'stopped') {
     return { state: { ...respawned.state, tick: respawned.state.tick + 1 }, events: respawned.events }
   }
-  const engagedBefore = state.player.mode === 'fighting' ? state.player.targetWildId : null
-  const r = chain(chain(chain(respawned, (s) => stepPlayer(s, deps)), (s) => engagedWildAttack(s, deps, engagedBefore)), (s) => resolveConsequences(s, deps))
+  /*
+   * ONDE O JOGADOR ESTAVA NO INÍCIO DO TIQUE. É o que os selvagens usam para decidir se atacam:
+   * aproximar-se nunca leva porrada no mesmo tique da chegada. Ver `wild-ai.ts`.
+   */
+  const alvoAntes = state.player.position
+  const r = chain(chain(chain(respawned, (s) => stepPlayer(s, deps)), (s) => stepWilds(s, deps, alvoAntes)), (s) => resolveConsequences(s, deps))
   return { state: { ...r.state, tick: r.state.tick + 1 }, events: r.events }
 }

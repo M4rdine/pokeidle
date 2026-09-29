@@ -135,6 +135,32 @@ export function ring(layer: Container, x: number, y: number, color: number, ms =
   }, () => { g.destroy() })
 }
 
+/** Quanto o projétil arqueia no meio do caminho, em pixels — o bastante para não virar régua. */
+const ARCO_DO_PROJETIL = 10
+const MS_PROJETIL = 160
+
+/**
+ * O golpe que VIAJA, de quem atacou até quem levou.
+ *
+ * Existe porque o ataque à distância nasceu invisível. A cena desenhava toda agressão como
+ * `lunge` — o atacante se lança contra o alvo —, e a três tiles isso vira investida no ar: o
+ * número de dano aparecia do nada, sem nada ligando os dois. Quem olhava não tinha como saber que
+ * a Brasa saiu de lá e acertou aqui.
+ *
+ * Um ponto na cor do tipo, com um arco curto. Não é o sprite de projétil do Tibia — esses existem,
+ * são 89, e entram depois; isto é o mínimo para o golpe à distância ser LEGÍVEL hoje.
+ */
+export function projetil(layer: Container, de: { x: number; y: number }, para: { x: number; y: number }, color: number): Updater {
+  const g = new Graphics()
+  layer.addChild(g)
+  return over(MS_PROJETIL, (k) => {
+    const x = de.x + (para.x - de.x) * k
+    // O arco é uma parábola simples: sobe até a metade do caminho e desce.
+    const y = de.y + (para.y - de.y) * k - Math.sin(k * Math.PI) * ARCO_DO_PROJETIL - 12
+    g.clear().circle(x, y, 4).fill({ color, alpha: 0.95 }).circle(x, y, 7).fill({ color, alpha: 0.25 })
+  }, () => { g.destroy() })
+}
+
 /*
  * ── A BOLA DE CAPTURA, no mundo ──
  *

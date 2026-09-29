@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { xpForLevel } from '@pokeidle/shared'
 import { applyPotion, choosePotion } from '../../src/engine/items.js'
 import { pickTarget, stepPlayer } from '../../src/engine/player.js'
-import { engagedWildAttack, resolveConsequences, step } from '../../src/engine/step.js'
+import { resolveConsequences, step } from '../../src/engine/step.js'
 import type { HuntState } from '../../src/engine/types.js'
 import { baseState, charmander5, miniDeps } from './fixtures/mini.js'
 
@@ -20,13 +20,19 @@ describe('pickTarget e caminhada', () => {
     const t = pickTarget(baseState({}, deps), deps)
     expect(t).toEqual({ wildId: 1, path: [{ x: 1, y: 0 }, { x: 2, y: 0 }, { x: 3, y: 0 }] })
   })
-  it('searching → walking → fighting em 4 ticks, com eventos moved', () => {
+  it('searching → walking → fighting: fecha a distância e engaja, andando pelo caminho', () => {
+    /*
+     * A coreografia exata foi trocada por um limite, e de propósito. O teste antigo cravava
+     * "quatro tiques, três passos, parando em (3,0)": isso só valia num mundo de estátuas, onde
+     * a presa esperava. Com selvagens que andam — e com o jogador atirando de longe quando tem
+     * golpe especial — o número de passos depende do encontro. O que continua verdade, e é o que
+     * importa, é que ele ACHA, FECHA e ENGAJA sem se perder no caminho.
+     */
     const deps = miniDeps()
-    const r = run(baseState({}, deps), deps, 4)
+    const r = run(baseState({}, deps), deps, 6)
     expect(r.state.player.mode).toBe('fighting')
-    expect(r.state.player.position).toEqual({ x: 3, y: 0 })
-    expect(r.events.filter((e) => (e as { type: string }).type === 'moved')).toHaveLength(3)
-    expect(r.state.tick).toBe(4)
+    expect(r.events.filter((e) => (e as { type: string }).type === 'moved').length).toBeGreaterThan(0)
+    expect(r.state.tick).toBe(6)
   })
   it('sem selvagens fica searching parado', () => {
     const deps = miniDeps()
@@ -206,29 +212,30 @@ describe('poções e limiares', () => {
 })
 
 describe('quem chega ataca primeiro', () => {
-  it('o selvagem só revida no tick seguinte ao engajamento', () => {
+  it('o selvagem não revida no tick em que o jogador entra no alcance dele', () => {
+    /*
+     * A regra continua; o que mudou é o que a dispara. Antes era o ENGAJAMENTO — o jogador
+     * escolher o alvo e encostar. Agora é o ALCANCE, medido contra onde o jogador estava no
+     * início do tique, e vale igual para o golpe que encosta e para o que viaja.
+     *
+     * O caso direto, com as duas posições controladas, mora em `wild-ai.test.ts`; aqui fica a
+     * versão de ponta a ponta, passando pelo `step`: em nenhum tique um selvagem ataca de um
+     * lugar de onde ele não alcançaria o jogador ANTES de o jogador se mexer.
+     */
     const deps = miniDeps()
     let s = baseState({}, deps)
-    let arrival: ReturnType<typeof step> | null = null
-    for (let i = 0; i < 10 && !arrival; i++) { const r = step(s, deps); s = r.state; if (r.state.player.mode === 'fighting') arrival = r }
-    expect(arrival).not.toBeNull()
-    const wildAttacks = (r: ReturnType<typeof step>) => r.events.filter((e) => e.type === 'attack' && e.attacker === 'wild')
-    expect(wildAttacks(arrival!)).toHaveLength(0)
-    expect(wildAttacks(step(arrival!.state, deps))).toHaveLength(1)
-  })
-  it('troca de alvo no meio da luta: o novo alvo não revida no tick da troca', () => {
-    // Nenhum caminho de produção troca de alvo com o antigo ainda vivo (o motor só re-escolhe
-    // alvo a partir de `searching`), então o cenário é exercitado chamando `engagedWildAttack`
-    // diretamente (exportada só para este teste — ver comentário em `step.ts`).
-    const deps = miniDeps()
-    const s = baseState({}, deps)
-    const wildA = { ...s.wilds[0]!, id: 1 }
-    const wildB = { ...s.wilds[0]!, id: 2, position: { x: 3, y: 0 } } // adjacente ao jogador, como A
-    const st = { ...s, wilds: [wildA, wildB], player: { ...s.player, mode: 'fighting' as const, targetWildId: 2 } }
-    // engagedBefore (1) é o alvo do tick anterior; o alvo já mudou para B (2) neste tick.
-    const r = engagedWildAttack(st, deps, 1)
-    expect(r.events).toEqual([])
-    expect(r.state).toBe(st)
+    for (let i = 0; i < 12; i++) {
+      const antes = s.player.position
+      const r = step(s, deps)
+      for (const e of r.events) {
+        if (e.type !== 'attack' || e.attacker !== 'wild') continue
+        const w = s.wilds.find((x) => String(x.id) === e.attackerId)!
+        const distanciaAntes = Math.abs(w.position.x - antes.x) + Math.abs(w.position.y - antes.y)
+        // `leech-life` é físico: alcance 1. Nenhum ataque pode sair de mais longe do que isso.
+        expect(distanciaAntes, `tique ${i}`).toBeLessThanOrEqual(1)
+      }
+      s = r.state
+    }
   })
   it('kill no tick de chegada: selvagem com 1 de HP morre no primeiro ataque e nunca revida', () => {
     const deps = miniDeps()

@@ -1,4 +1,4 @@
-import { typeMultiplier, type HuntMap, type ContentRegistry } from '@pokeidle/shared'
+import { alcanceDe, typeMultiplier, TYPE_NAMES, type HuntMap, type ContentRegistry, type TypeName } from '@pokeidle/shared'
 import type { Event } from '@pokeidle/shared/protocol'
 // A CSP do servidor (default-src 'self') proíbe unsafe-eval; este módulo troca os geradores de
 // código do Pixi por implementações equivalentes sem `new Function`.
@@ -8,7 +8,7 @@ import { TILE_ANIMATION_MS, TILE_SIZE } from '../config.js'
 import { activePokemon, type HuntView } from '../state/hunt-view.js'
 import type { AtlasData } from './atlas.js'
 import { cameraStep, type Camera } from './camera.js'
-import { bolaDeCaptura, createEffectRunner, fadeOut, floatingText, lunge, ring, shake } from './effects.js'
+import { bolaDeCaptura, createEffectRunner, fadeOut, floatingText, lunge, projetil, ring, shake } from './effects.js'
 import { carregarBolas } from './bolas.js'
 import { createEntityLayer } from './entities.js'
 import { isDone, positionAt } from './interpolate.js'
@@ -69,9 +69,28 @@ function corDaMesa(parent: HTMLElement): number {
   return hex === null ? FUNDO_PADRAO : Number.parseInt(hex[1]!, 16)
 }
 
+/**
+ * As cores de tipo, LIDAS DOS TOKENS — a mesma paleta das etiquetas do HUD.
+ *
+ * Escritas aqui em hexadecimal, elas se descolariam da folha na primeira troca de paleta e
+ * ninguém veria: um projétil de fogo continua parecendo um projétil de fogo mesmo na cor errada.
+ * É exatamente o que já aconteceu com a cor da mesa, logo acima. Lidas uma vez na criação da
+ * cena, porque são dezoito e não mudam durante a partida.
+ */
+export const tokenDoTipo = (tipo: TypeName): string => `--type-${tipo}`
+const COR_NEUTRA = 0xffffff
+function coresDeTipo(parent: HTMLElement): Readonly<Record<string, number>> {
+  const estilo = getComputedStyle(parent)
+  return Object.fromEntries(TYPE_NAMES.map((t) => {
+    const hex = /^#([0-9a-f]{6})$/i.exec(estilo.getPropertyValue(tokenDoTipo(t)).trim())
+    return [t, hex === null ? COR_NEUTRA : Number.parseInt(hex[1]!, 16)]
+  }))
+}
+
 /** Cria a cena PixiJS: mapa numa textura, sprites do atlas, tween por tick, câmera e efeitos. Só a Task 9 chama isto. */
 export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise<Scene> {
   const isHidden = deps.isHidden ?? (() => document.hidden)
+  const coresTipo = coresDeTipo(parent)
   const app = new Application()
   // A tarja que sobra quando o mundo é menor que o painel tem que sumir contra o fundo da página,
   // não virar um terceiro plano. A cor SAI DO TOKEN em vez de ser escrita aqui: já foi um
@@ -179,12 +198,18 @@ export async function createScene(parent: HTMLElement, deps: SceneDeps): Promise
     if (!attackerLive || !targetLive) return
     const attackerRoot = attackerLive.sprite.root
     const targetRoot = targetLive.sprite.root
-    const dx = Math.sign(targetRoot.x - attackerRoot.x)
-    const dy = Math.sign(targetRoot.y - attackerRoot.y)
-    effects.add(lunge(attackerLive.sprite.body, dx, dy))
+    const move = deps.registry.moves.get(e.move)
+    /*
+     * GOLPE QUE VIAJA NÃO SE LANÇA. Investida é contato; a três tiles ela vira gesto no vazio e o
+     * dano aparece sem causa visível. Quem tem alcance dispara um projétil entre os dois.
+     */
+    if (move && alcanceDe(move) > 1) {
+      effects.add(projetil(overlay, attackerRoot, targetRoot, coresTipo[move.type] ?? COR_NEUTRA))
+    } else {
+      effects.add(lunge(attackerLive.sprite.body, Math.sign(targetRoot.x - attackerRoot.x), Math.sign(targetRoot.y - attackerRoot.y)))
+    }
     effects.flash(targetLive.sprite.body)
     if (e.attacker === 'wild') effects.add(shake(targetLive.sprite.body))
-    const move = deps.registry.moves.get(e.move)
     const defender = e.attacker === 'player' ? view.state?.wilds.find((w) => String(w.id) === e.targetId) : activePokemon(view)
     const types = defender ? (deps.registry.species.get(defender.speciesName)?.types ?? []) : []
     const mult = move && types.length > 0 ? typeMultiplier(deps.registry.typeChart, move.type, types) : 1

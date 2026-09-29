@@ -1,6 +1,7 @@
 import { HEAL_TICKS } from './constants.js'
+import { alcanceDe, availableMoves, type Move } from '@pokeidle/shared'
 import { attemptCapture, captureApplies, playerAttack } from './combat.js'
-import { findPath, floodFrom, inBounds, isAdjacent, neighbors, pathFromFlood, samePoint } from './grid.js'
+import { findPath, floodFrom, inBounds, isAdjacent, manhattan, neighbors, pathFromFlood, samePoint, temLinhaDeVisao } from './grid.js'
 import { blockedAt, isWalkable } from './spawn.js'
 import type { EngineDeps, Event, HuntState, PlayerState, Point, StepResult, WildState } from './types.js'
 
@@ -44,6 +45,35 @@ export function pickTarget(state: HuntState, deps: EngineDeps): { wildId: number
 
 const targetOf = (state: HuntState): WildState | undefined => state.wilds.find((w) => w.id === state.player.targetWildId && w.hp > 0)
 
+/**
+ * Dá para acertar o selvagem DAQUI?
+ *
+ * O ALCANCE VALE PARA OS DOIS LADOS, e isso não é generosidade: quando só o selvagem atirava, o
+ * jogador levava dano de graça durante toda a aproximação — a Brasa do Charmander dele ficava
+ * inútil enquanto a do selvagem acertava. A medição mostrou o tamanho disso: com o alcance só de
+ * um lado, três áreas do fim do jogo perdiam entre 20% e 43% do rendimento.
+ *
+ * A RECARGA NÃO ENTRA AQUI, e essa distinção custou um bug: esta pergunta é sobre POSIÇÃO, e a
+ * posição não muda porque um golpe está esfriando. Quando a recarga entrava, o jogador com todos
+ * os golpes quentes achava que não alcançava, saía de combate, dava um passo, voltava — e ficava
+ * oscilando sem bater em ninguém. O que a recarga decide é QUAL golpe sai, e isso é `strike`.
+ *
+ * Linha de visão pelo mesmo motivo do selvagem: não se atira através da rocha.
+ */
+function acertaDaqui(state: HuntState, deps: EngineDeps, wild: WildState): boolean {
+  const active = state.player.team[state.player.activeIndex]
+  if (!active) return false
+  if (!temLinhaDeVisao(state.player.position, wild.position, (p) => blockedAt(deps.hunt, p))) return false
+  const especie = deps.registry.species.get(active.speciesName)
+  if (!especie) return false
+  const distancia = manhattan(state.player.position, wild.position)
+  return availableMoves(especie, active.level, deps.registry.moves).some((m) => alcanceDe(m) >= distancia)
+}
+
+/** A peneira de alcance passada ao golpe: o que sai daqui, entre os que já esfriaram. */
+const daqui = (state: HuntState, wild: WildState) => (m: Move): boolean =>
+  alcanceDe(m) >= manhattan(state.player.position, wild.position)
+
 function searching(state: HuntState, deps: EngineDeps): StepResult {
   const target = pickTarget(state, deps)
   if (!target) return idle(state)
@@ -59,12 +89,34 @@ function advance(state: HuntState, next: Point, rest: readonly Point[]): StepRes
 function walking(state: HuntState, deps: EngineDeps): StepResult {
   const wild = targetOf(state)
   if (!wild) return idle(toSearching(state))
-  const [next, ...rest] = state.player.path
-  if (!next) return isAdjacent(state.player.position, wild.position) ? idle(withPlayer(state, { mode: 'fighting' })) : idle(toSearching(state))
+  /*
+   * A PRESA ANDA AGORA, e o caminho envelhece.
+   *
+   * Ele foi traçado até um vizinho de onde o selvagem ESTAVA. Quando o bicho se move, seguir o
+   * caminho velho leva o jogador ao lugar errado, e só ao chegar ele descobre que não está
+   * adjacente — volta a `searching`, re-escolhe alvo e perde os tiques da ida inteira. Medindo,
+   * era isso que fazia a caçada render menos com selvagens móveis: não o dano a mais, o tempo
+   * jogado fora indo aonde ninguém está.
+   */
+  const fim = state.player.path[state.player.path.length - 1]
+  const velho = fim !== undefined && !isAdjacent(fim, wild.position)
+  let caminho = state.player.path
+  if (velho) {
+    // Refazer E ANDAR no mesmo tique. Refazer e esperar custaria um tique por movimento da presa,
+    // e é uma parada a cada quatro tiques — o suficiente para a caçada render medidamente menos.
+    const refeito = pathTo(state, deps, wild.position, (p) => isAdjacent(p, wild.position), wild.id)
+    if (refeito === null) return idle(toSearching(state))
+    caminho = refeito
+  }
+  const [next, ...rest] = caminho
+  if (!next) return isAdjacent(state.player.position, wild.position) ? idle(withPlayer(state, { mode: 'fighting', path: [] })) : idle(toSearching(state))
   if (!isWalkable(state, deps.hunt, next)) {
     const path = pathTo(state, deps, wild.position, (p) => isAdjacent(p, wild.position), wild.id)
     return path === null ? idle(toSearching(state)) : idle(withPlayer(state, { path }))
   }
+  // Já dá para acertar daqui? Então ataca ANDANDO — parar para depois atacar no tique seguinte
+  // devolveria ao selvagem o tique que a simetria de alcance veio corrigir.
+  if (acertaDaqui(state, deps, wild)) return fighting(withPlayer(state, { mode: 'fighting', path: [] }), deps)
   const moved = advance(state, next, rest)
   const arrived = isAdjacent(next, wild.position)
   return { state: arrived ? withPlayer(moved.state, { mode: 'fighting', path: [] }) : moved.state, events: moved.events }
@@ -73,10 +125,10 @@ function walking(state: HuntState, deps: EngineDeps): StepResult {
 function fighting(state: HuntState, deps: EngineDeps): StepResult {
   const wild = targetOf(state)
   if (!wild) return idle(toSearching(state))
-  if (!isAdjacent(state.player.position, wild.position)) return idle(withPlayer(state, { mode: 'walking', path: [] }))
+  if (!acertaDaqui(state, deps, wild)) return idle(withPlayer(state, { mode: 'walking', path: [] }))
   const ball = captureApplies(state, deps.registry, wild)
   if (ball) return attemptCapture(state, deps, wild, ball)
-  const attack = playerAttack(state, deps, wild)
+  const attack = playerAttack(state, deps, wild, daqui(state, wild))
   if (attack.outcome !== 'immune') return attack
   const skipped: Event = { type: 'skipped', tick: state.tick, wildId: wild.id }
   return { state: toSearching(withPlayer(state, { skippedWildIds: [...state.player.skippedWildIds, wild.id] })), events: [skipped] }

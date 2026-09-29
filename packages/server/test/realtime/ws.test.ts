@@ -185,11 +185,23 @@ describe('hunt pelo socket', () => {
     expect(JSON.stringify(snap)).not.toMatch(/seed|rngState/)
     expect(snap['session']).toMatchObject({ huntId: 'campo-inicial', startedAt: T0.toISOString() })
     expect(snap['serverTime']).toBe(T0.getTime())
-    t.scheduler.tick(); t.scheduler.tick() // tick 0 só escolhe alvo (sem eventos); o 1 já anda ou luta
+    /*
+     * O QUE ESTE TRECHO GUARDA É O CANO, não a coreografia do motor.
+     *
+     * Ele cravava "o primeiro tique com evento é o 1", porque o tique 0 só escolhia alvo. Deixou
+     * de valer quando os selvagens passaram a andar sozinhos: agora o mundo se mexe já no tique 0,
+     * e qual tique carrega o primeiro evento depende de quantos bichos a área tem. O que continua
+     * verdade, e é o que importa aqui, é que os tiques CHEGAM pelo socket, na ordem, com a lista
+     * de eventos e a hora do servidor.
+     */
+    t.scheduler.tick(); t.scheduler.tick()
     const tick = await c.nextOf('hunt.tick')
-    expect(tick['tick']).toBe(1)
+    expect(typeof tick['tick']).toBe('number')
     expect(Array.isArray(tick['events'])).toBe(true)
     expect(tick['serverTime']).toBe(t.clock.now.getTime())
+    t.scheduler.tick()
+    const seguinte = await c.nextOf('hunt.tick')
+    expect(seguinte['tick'] as number).toBeGreaterThan(tick['tick'] as number)
     c.send({ t: 'ping' }); expect(await c.nextOf('pong')).toEqual({ t: 'pong' })
     c.send({ t: 'item.use', itemId: 'potion' })
     expect(await c.nextOf('error')).toMatchObject({ t: 'error', code: 'full-hp' })

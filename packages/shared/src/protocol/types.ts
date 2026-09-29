@@ -39,6 +39,7 @@ export interface HuntState {
 export type Event =
   | { type: 'spawned'; tick: number; wildId: number; speciesName: string; level: number; position: Point }
   | { type: 'moved'; tick: number; from: Point; to: Point }
+  | { type: 'wildMoved'; tick: number; wildId: number; from: Point; to: Point }
   | { type: 'attack'; tick: number; attacker: 'player' | 'wild'; attackerId: string; targetId: string; move: string; damage: number; targetHp: number }
   | { type: 'wildDefeated'; tick: number; wildId: number; speciesName: string; level: number; xpTrainer: number; xpPokemon: number; gold: number; drops: readonly { item: string; quantity: number }[] }
   | { type: 'captured'; tick: number; wildId: number; speciesName: string; level: number; ball: string; toBox: boolean }

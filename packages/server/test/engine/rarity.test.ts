@@ -22,8 +22,25 @@ function correr(registry: Registry, seed: number) {
     hunt,
     sessionId: 'raridade',
     team: [{ id: 'p1', speciesName: 'charmander', level: 12, xp: xpForLevel('medium-slow', 12), hp, hpMax: hp }],
-    inventory: { potion: 3, 'poke-ball': 5 },
-    settings: defaultSettings(),
+    /*
+     * BOLSA FARTA, e isso é o que isola o multiplicador.
+     *
+     * Com bolsa curta, o degrau alto derruba mais poções, a bolsa fica diferente, o motor cura em
+     * momentos diferentes e a caçada inteira diverge — o ouro passa a diferir por um caminho que
+     * nada tem a ver com o multiplicador. Isso já era verdade e ficou visível quando os selvagens
+     * passaram a caçar: com dano de verdade, a divergência deixa de ser inofensiva. Estoque que
+     * nunca acaba faz as duas corridas tomarem as mesmas decisões, que é o que o teste quer medir.
+     */
+    inventory: { potion: 999, 'poke-ball': 999 },
+    /*
+     * BOLA FIXA, e é isto que isola o multiplicador de verdade.
+     *
+     * Com `ballTier: 'best'`, o degrau alto derruba uma Great Bola, passa a capturar com ela, e a
+     * caçada inteira diverge a partir da primeira captura que mudou de resultado — medido: tique
+     * 204, `captureFailed` de um lado e `captured` do outro. O ouro passa a diferir por um caminho
+     * que não é o multiplicador. Prendendo a bola, as duas corridas tomam as mesmas decisões.
+     */
+    settings: { ...defaultSettings(), capture: { ...defaultSettings().capture, ballTier: 'poke' } },
   }, deps)
   const { events } = simulate(s0, TICKS, deps)
   const derrotas = events.filter((e) => e.type === 'wildDefeated')

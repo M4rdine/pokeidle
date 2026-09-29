@@ -31,6 +31,15 @@ describe('applyEvent (tabela da spec §4)', () => {
     const v = ev({ type: 'moved', tick: 1, from: { x: 0, y: 0 }, to: { x: 1, y: 0 } })
     expect(v.state!.player).toMatchObject({ position: { x: 1, y: 0 }, mode: 'walking' })
   })
+  it('wildMoved anda o selvagem, e só ele', () => {
+    /*
+     * A cena interpola qualquer entidade que mude de posição, então basta a visão saber: sem este
+     * caso, o selvagem andaria no servidor e ficaria plantado na tela até o próximo snapshot.
+     */
+    const v = ev({ type: 'wildMoved', tick: 1, wildId, from: { x: 2, y: 2 }, to: { x: 2, y: 3 } })
+    expect(v.state!.wilds.find((w) => w.id === wildId)!.position).toEqual({ x: 2, y: 3 })
+    expect(v.state!.player.position).toEqual(base().state!.player.position)
+  })
   it('attack do jogador: hp do selvagem, alvo, cooldown do golpe, modo fighting', () => {
     const v = ev({ type: 'attack', tick: 7, attacker: 'player', attackerId: 'p1', targetId: String(wildId), move: 'ember', damage: 9, targetHp: 7 })
     expect(v.state!.wilds.find((w) => w.id === wildId)!.hp).toBe(7)

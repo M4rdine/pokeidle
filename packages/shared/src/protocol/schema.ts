@@ -26,6 +26,7 @@ const int = z.number().int(); const str = z.string(); const tick = int.min(0)
 export const EventSchema = z.discriminatedUnion('type', [
   z.object({ type: z.literal('spawned'), tick, wildId: int, speciesName: str, level: int, position: Point }).strict(),
   z.object({ type: z.literal('moved'), tick, from: Point, to: Point }).strict(),
+  z.object({ type: z.literal('wildMoved'), tick, wildId: z.number().int(), from: Point, to: Point }).strict(),
   z.object({ type: z.literal('attack'), tick, attacker: z.enum(['player', 'wild']), attackerId: str, targetId: str, move: str, damage: int, targetHp: int }).strict(),
   z.object({ type: z.literal('wildDefeated'), tick, wildId: int, speciesName: str, level: int, xpTrainer: int, xpPokemon: int, gold: int, drops: z.array(z.object({ item: str, quantity: int }).strict()) }).strict(),
   z.object({ type: z.literal('captured'), tick, wildId: int, speciesName: str, level: int, ball: str, toBox: z.boolean() }).strict(),

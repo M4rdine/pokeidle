@@ -2,6 +2,7 @@ import { readFile, readdir } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
+import { TYPE_NAMES } from '@pokeidle/shared'
 
 const ESTILOS = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'src', 'styles')
 
@@ -148,6 +149,17 @@ describe('todo token lido em tempo de execução existe no CSS', () => {
     const nome = /export const TOKEN_DO_FUNDO = '(--[a-z-]+)'/.exec(cena)?.[1]
     expect(nome, 'TOKEN_DO_FUNDO sumiu de scene/app.ts').toBeDefined()
     expect([...(await cores())]).toContain(nome!.slice(2))
+  })
+
+  it('todo token de tipo que a cena lê para o projétil está declarado', async () => {
+    /*
+     * A cena passou a ler `--type-<tipo>` para pintar o golpe que viaja. É o mesmo risco do
+     * `--fora`: um tipo sem token cai no branco neutro, e um projétil branco continua parecendo
+     * um projétil. Dezoito tokens, conferidos de uma vez.
+     */
+    const declarados = await cores()
+    const faltando = TYPE_NAMES.filter((t) => !declarados.has(`type-${t}`))
+    expect(faltando, 'tipo sem cor em tokens.css').toEqual([])
   })
 
   it('o valor de reserva da cena é o mesmo do token', async () => {

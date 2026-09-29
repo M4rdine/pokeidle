@@ -19,7 +19,7 @@ const pokemonName = (ctx: LogContext, id: string): string => { const p = ctx.sta
 const wildName = (ctx: LogContext, id: string): string => { const w = ctx.state?.wilds.find((x) => String(x.id) === id); return w ? displayName(w.speciesName) : 'Selvagem' }
 const line = (tick: number, kind: LogKind, text: string): LogLine => ({ tick, kind, text })
 
-/** Uma linha por evento relevante; `moved` e `spawned` não geram linha (ruído). */
+/** Uma linha por evento relevante; `moved`, `wildMoved` e `spawned` não geram linha (ruído). */
 export function formatEvent(e: Event, ctx: LogContext): LogLine | null {
   switch (e.type) {
     case 'attack': return e.attacker === 'player'
@@ -43,7 +43,8 @@ export function formatEvent(e: Event, ctx: LogContext): LogLine | null {
     case 'pokemonFainted': return line(e.tick, 'alert', `${pokemonName(ctx, e.pokemonId)} desmaiou`)
     case 'switched': return line(e.tick, 'info', `${pokemonName(ctx, e.pokemonId)} entrou em campo`)
     case 'skipped': return line(e.tick, 'info', `Pulou ${wildName(ctx, String(e.wildId))}: nenhum golpe faz efeito`)
-    case 'moved': case 'spawned': return null
+    // `wildMoved` é o mais ruidoso de todos: cada bicho da tela anda sozinho o tempo todo.
+    case 'moved': case 'wildMoved': case 'spawned': return null
   }
 }
 export const appendLog = (lines: readonly LogLine[], next: LogLine, max = LOG_MAX_LINES): readonly LogLine[] => [...lines, next].slice(-max)

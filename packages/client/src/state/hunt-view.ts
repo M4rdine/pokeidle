@@ -56,6 +56,9 @@ export function applyEvent(view: HuntView, e: Event, registry: ContentRegistry):
       return withState(view, { ...s, wilds: [...s.wilds, { id: e.wildId, spawnIndex: -1, speciesName: e.speciesName, level: e.level, hp: hpMax, hpMax, position: e.position, cooldowns: {}, captureTried: false }] })
     }
     case 'moved': return withPlayer(view, { position: e.to, mode: 'walking' })
+    // O selvagem anda sozinho. A cena interpola qualquer entidade que mude de posição, então basta
+    // a visão saber — não há nada a fazer no desenho.
+    case 'wildMoved': return mapWild(view, e.wildId, (w) => ({ ...w, position: e.to }))
     case 'attack': {
       if (e.attacker === 'wild') return mapTeam(view, e.targetId, (p) => ({ ...p, hp: e.targetHp }))
       const wildId = Number(e.targetId)

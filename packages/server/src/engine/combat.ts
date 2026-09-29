@@ -23,8 +23,15 @@ export function readyMoves(registry: Registry, speciesName: string, level: numbe
 
 interface Strike { readonly move: Move; readonly damage: number }
 
-function strike(deps: EngineDeps, tick: number, attacker: { speciesName: string; level: number; cooldowns: Readonly<Record<string, number>> }, defender: { speciesName: string; level: number }): { outcome: AttackOutcome; strike?: Strike } {
-  const ready = readyMoves(deps.registry, attacker.speciesName, attacker.level, attacker.cooldowns, tick)
+/**
+ * `podeUsar` peneira os golpes antes da escolha, e é por onde entra o ALCANCE: sem ele, o motor
+ * escolheria o melhor golpe e só depois descobriria que não dá para usá-lo dali — e o selvagem
+ * ficaria parado com uma Investida na mão a três tiles do alvo, em vez de disparar a Brasa que
+ * tem. Peneirar antes é o que faz a distância mudar a decisão, e não só o resultado.
+ */
+function strike(deps: EngineDeps, tick: number, attacker: { speciesName: string; level: number; cooldowns: Readonly<Record<string, number>> }, defender: { speciesName: string; level: number }, podeUsar?: (m: Move) => boolean): { outcome: AttackOutcome; strike?: Strike } {
+  const todos = readyMoves(deps.registry, attacker.speciesName, attacker.level, attacker.cooldowns, tick)
+  const ready = podeUsar ? todos.filter(podeUsar) : todos
   if (ready.length === 0) return { outcome: 'none' }
   const atk = combatantOf(deps.registry, attacker.speciesName, attacker.level)
   const def = combatantOf(deps.registry, defender.speciesName, defender.level)
@@ -39,9 +46,9 @@ const activeOf = (state: HuntState): PokemonState => {
   return p
 }
 
-export function playerAttack(state: HuntState, deps: EngineDeps, wild: WildState): AttackResult {
+export function playerAttack(state: HuntState, deps: EngineDeps, wild: WildState, podeUsar?: (m: Move) => boolean): AttackResult {
   const active = activeOf(state)
-  const result = strike(deps, state.tick, { ...active, cooldowns: state.player.cooldowns }, wild)
+  const result = strike(deps, state.tick, { ...active, cooldowns: state.player.cooldowns }, wild, podeUsar)
   if (result.outcome !== 'hit' || !result.strike) return { state, events: [], outcome: result.outcome }
   const { move, damage } = result.strike
   const hp = Math.max(0, wild.hp - damage)
@@ -56,9 +63,9 @@ export function playerAttack(state: HuntState, deps: EngineDeps, wild: WildState
   }
 }
 
-export function wildAttack(state: HuntState, deps: EngineDeps, wild: WildState): AttackResult {
+export function wildAttack(state: HuntState, deps: EngineDeps, wild: WildState, podeUsar?: (m: Move) => boolean): AttackResult {
   const active = activeOf(state)
-  const result = strike(deps, state.tick, wild, active)
+  const result = strike(deps, state.tick, wild, active, podeUsar)
   if (result.outcome !== 'hit' || !result.strike) return { state, events: [], outcome: result.outcome }
   const { move, damage } = result.strike
   const hp = Math.max(0, active.hp - damage)

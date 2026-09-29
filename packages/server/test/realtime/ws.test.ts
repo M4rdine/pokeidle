@@ -180,32 +180,45 @@ describe('hunt pelo socket', () => {
   it('start por REST manda snapshot; ticks chegam; intents funcionam; stop manda hunt.stopped', async () => {
     const c = await open()
     await c.next() // idle
-    await api(t.app, cookie).post('/hunts/campo-inicial/start')
+    // O status do start é asserção, não enfeite: um 500 aqui não manda snapshot, e sem conferir
+    // isto a falha aparece 15 s depois como "timeout esperando mensagem", longe da causa.
+    expect((await api(t.app, cookie).post('/hunts/campo-inicial/start')).statusCode).toBe(201)
     const snap = await c.nextOf('hunt.snapshot')
     expect(JSON.stringify(snap)).not.toMatch(/seed|rngState/)
     expect(snap['session']).toMatchObject({ huntId: 'campo-inicial', startedAt: T0.toISOString() })
     expect(snap['serverTime']).toBe(T0.getTime())
+    /*
+     * ESTE INTENT VEM ANTES DO PRIMEIRO TIQUE, e é só por isso que ele é determinístico.
+     *
+     * `full-hp` é a resposta certa enquanto o ativo está com o HP cheio — e isso deixou de ser
+     * verdade dois tiques adiante quando os selvagens passaram a se mexer e atacar sozinhos:
+     * dependendo da semente da área, um deles já encostou, o Charmander levou dano, e a poção
+     * CURA em vez de recusar. Nenhum `error` chega, a espera estoura em 15 s, e o CI reprova
+     * apontando para o helper do socket. Antes do primeiro tique o mundo ainda não se moveu, então
+     * o HP cheio é construção do `beforeEach`, não sorte.
+     */
+    c.send({ t: 'item.use', itemId: 'potion' })
+    expect(await c.nextOf('error')).toMatchObject({ t: 'error', code: 'full-hp' })
+    t.clock.now = new Date(t.clock.now.getTime() + 250)
     /*
      * O QUE ESTE TRECHO GUARDA É O CANO, não a coreografia do motor.
      *
      * Ele cravava "o primeiro tique com evento é o 1", porque o tique 0 só escolhia alvo. Deixou
      * de valer quando os selvagens passaram a andar sozinhos: agora o mundo se mexe já no tique 0,
      * e qual tique carrega o primeiro evento depende de quantos bichos a área tem. O que continua
-     * verdade, e é o que importa aqui, é que os tiques CHEGAM pelo socket, na ordem, com a lista
-     * de eventos e a hora do servidor.
+     * verdade, e é o que importa aqui, é que o tique CHEGA pelo socket com a lista de eventos e a
+     * hora do servidor.
+     *
+     * Um tique sem evento nenhum não transmite nada, então "espere a PRÓXIMA mensagem de tique"
+     * não é garantia do cano — é aposta na coreografia. Que o número do tique avança é do motor, e
+     * os testes dele é que cobram isso.
      */
     t.scheduler.tick(); t.scheduler.tick()
     const tick = await c.nextOf('hunt.tick')
     expect(typeof tick['tick']).toBe('number')
     expect(Array.isArray(tick['events'])).toBe(true)
     expect(tick['serverTime']).toBe(t.clock.now.getTime())
-    t.scheduler.tick()
-    const seguinte = await c.nextOf('hunt.tick')
-    expect(seguinte['tick'] as number).toBeGreaterThan(tick['tick'] as number)
     c.send({ t: 'ping' }); expect(await c.nextOf('pong')).toEqual({ t: 'pong' })
-    c.send({ t: 'item.use', itemId: 'potion' })
-    expect(await c.nextOf('error')).toMatchObject({ t: 'error', code: 'full-hp' })
-    t.clock.now = new Date(t.clock.now.getTime() + 250)
     c.send({ t: 'team.setActive', pokemonId: 'alheio' })
     expect(await c.nextOf('error')).toMatchObject({ code: 'unknown-pokemon' })
     t.clock.now = new Date(t.clock.now.getTime() + 250)
